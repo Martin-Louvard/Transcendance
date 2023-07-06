@@ -1,7 +1,6 @@
 import { extend, useFrame } from "@react-three/fiber"
 import { useRef, useEffect } from "react"
 import { TrackballControls} from "@react-three/drei"
-
 export default function Experience()
 {
 
@@ -10,7 +9,7 @@ export default function Experience()
     const groupRef = useRef()
 
 
-    useFrame((state, delta) =>{
+    useFrame((_state, delta) =>{
         groupRef.current.rotation.y += delta 
     })
 

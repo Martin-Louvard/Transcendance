@@ -1,5 +1,5 @@
 import React from 'react';
-
+import Stack from './Stack';
 
 interface FooterProps {
   // Define any props you need for the Footer
@@ -8,7 +8,7 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = () => {
   return (
     <div id='footer'>
-      <p>I'm the footer</p>
+      <Stack/>
     </div>
   );
 }
