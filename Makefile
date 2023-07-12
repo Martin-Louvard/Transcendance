@@ -6,7 +6,7 @@ frontend install:
 	@cd frontend && npm install
 
 # Run dev server (using Vite)
-run dev:
+front:
 	@cd frontend && npm run dev
 
 

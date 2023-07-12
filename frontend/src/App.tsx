@@ -4,7 +4,7 @@ import {
   Routes,
   Route,
 } from 'react-router-dom';
-import Navbar from './components/NavBar.tsx'
+import Navbar from './components/Navbar/NavBar.tsx'
 import Home from './pages/Home/index.tsx';
 import About from './pages/About/index.tsx';
 
@@ -14,12 +14,10 @@ function App() {
     <>
     <Router>
       <Navbar/>
-      <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
         </Routes>
-      </main>
     </Router>
     </>
   )

@@ -14,21 +14,23 @@ const Authentication: React.FC = () => {
   };
 
   return (
-    <div className="card-block">
-      <div className="card">
-        <button onClick={handleLoginClick}>
-          Login
-        </button>
-      </div>
-      <div className="card">
-        <button onClick={handleSignupClick}>
-          Signup
-        </button>
+    <div className="auth-wrapper">
+      <div className="card-block">
+        <div className="card">
+          <button onClick={handleLoginClick}>
+            Login
+          </button>
+        </div>
+        <div className="card">
+          <button onClick={handleSignupClick}>
+            Signup
+          </button>
+        </div>
       </div>
       <div className="form-container">
       {showLogin ? <LoginForm /> : <SignupForm />}
       </div>
-    </div>
+      </div>
   );
 };
 

@@ -1,4 +1,4 @@
-import Stack from "../../components/Stack";
+import Footer from "../../components/Footer/Footer";
 import "./index.css"
 const About = () => {
 
@@ -11,7 +11,7 @@ const About = () => {
         <li>Clement Vidon</li>
         <li>Darian Sereno</li>
     </ul>
-    <Stack/>
+    <Footer/>
     </>
 }
 export default About;

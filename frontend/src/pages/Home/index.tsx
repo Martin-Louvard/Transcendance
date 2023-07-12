@@ -1,14 +1,14 @@
-import Authentication from "../Authentication";
-import { useSelector } from 'react-redux';
+import Authentication from "../../components/Authentication";
+import Dashboard from "../../components/Dashboard";
+import { useAppSelector } from "../../hooks";
 
 const Home = () => {
-    const user = useSelector((state) => state.user);
+    const user = useAppSelector((state) => state.user);
 
     return <>
     {
-        user.email ? <h6>Connected with email: {user.email}</h6> : <Authentication/>
+        user.isLoggedIn ? <Dashboard/> : <Authentication/>
     }
-        
     </>
 }
 export default Home;
