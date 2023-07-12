@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import LeftMenu from './LeftMenu';
 import './Dashboard.css'
 import Experience from '../../Experience';
@@ -6,22 +6,25 @@ import { Canvas } from '@react-three/fiber';
 
 const Dashboard: React.FC = () => {
   const [isPlaying , setIsPlaying ] = useState(false)
+  const [fullscreen, setFullScreen] = useState(false)
 
-
-  const launchGame = () =>{
-    setIsPlaying(true);
-  }
+  useEffect(()=>{}, [fullscreen])
 
   return (<>
     <div className="dashboard-wrapper">
-      <LeftMenu/>
-      <div className='canvas-wrapper'>
+      <LeftMenu hideMenu={fullscreen}/>
+      <div className="canvas-wrapper">
+
         {isPlaying ?
-          <Canvas>
-          <Experience/>
-         </Canvas> : 
+        <>
+        <img id={"back"} onClick={() =>{ setFullScreen(!fullscreen);}} className='fullscreen-button' src={'fullscreen.svg/'} />
+        <img id={"back"} onClick={() =>{ setIsPlaying(false); setFullScreen(false)}} className='exit-button align-right' src={'cross.svg/'} />
+          <Canvas >
+            <Experience/>
+          </Canvas>
+        </> : 
           <div>
-            <button className="play-button" onClick={launchGame}>Play</button>
+            <button className="play-button" onClick={()=>{setIsPlaying(true);}}>Play</button>
           </div>}
       </div>
     </div>

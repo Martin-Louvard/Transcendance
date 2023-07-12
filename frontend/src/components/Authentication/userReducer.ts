@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 // Define a type for the slice state
 interface userState {
   email: string,
+  username: string,
   password: string,
   isLoggedIn: boolean
 }
@@ -10,6 +11,7 @@ interface userState {
 // Define the initial state using that type
 const initialState: userState = {
   email: "",
+  username: "",
   password: "",
   isLoggedIn: false
 }
