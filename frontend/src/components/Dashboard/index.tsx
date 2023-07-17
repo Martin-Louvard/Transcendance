@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import LeftMenu from './LeftMenu';
 import './Dashboard.css'
-import Experience from '../../Experience';
-import { Canvas } from '@react-three/fiber';
+import PongGame from '../Pong/pong';
 
 const Dashboard: React.FC = () => {
   const [isPlaying , setIsPlaying ] = useState(false)
@@ -19,9 +18,7 @@ const Dashboard: React.FC = () => {
         <>
         <img id={"back"} onClick={() =>{ setFullScreen(!fullscreen);}} className='fullscreen-button' src={'fullscreen.svg/'} />
         <img id={"back"} onClick={() =>{ setIsPlaying(false); setFullScreen(false)}} className='exit-button align-right' src={'cross.svg/'} />
-          <Canvas >
-            <Experience/>
-          </Canvas>
+          <PongGame/>
         </> : 
           <div>
             <button className="play-button" onClick={()=>{setIsPlaying(true);}}>Play</button>
