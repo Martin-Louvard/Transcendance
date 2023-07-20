@@ -10,14 +10,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id               Int      @id @default(autoincrement())
   username         String   @unique
+  email            String   @unique
   password         String
   avatar           String?
   twoFAEnabled     Boolean  @default(false)
-  status           String  @default("inactive")
+  status           String   @default("inactive")
   victoriesCount   Int      @default(0)
   defeatCount      Int      @default(0)
   rank             String   @default("Noobie")
@@ -25,7 +25,7 @@ model User {
   achievements     Json?
   friends          User[]   @relation("Friends")
   symetric_friend  User[]   @relation("Friends")
-  games            Game[]   
+  games            Game[]
   JoinedChatChannels     ChatChannel[] @relation("JoinedChannels")
   OwnedChatChannels      ChatChannel[] @relation("OwnedChannels")
   BannedFromChatChannels ChatChannel[] @relation("BannedFromChannels")
@@ -57,7 +57,7 @@ model ChatMessage {
 
 model Game {
   id         Int      @id @default(autoincrement())
-  players    User[]   
+  players    User[]
   gameData   Json?
   status     String @default("Created")
   createdAt  DateTime @default(now())

@@ -5,7 +5,13 @@ interface userState {
   email: string,
   username: string,
   password: string,
-  isLoggedIn: boolean
+  isLoggedIn: boolean,
+  twoFAEnabled: boolean,
+  victoriesCount: number,
+  defeatCount: number,
+  rank: string,
+  level: number,
+  friends: object
 }
 
 // Define the initial state using that type
@@ -13,7 +19,13 @@ const initialState: userState = {
   email: "",
   username: "",
   password: "",
-  isLoggedIn: false
+  isLoggedIn: false,
+  twoFAEnabled: false,
+  victoriesCount: 0,
+  defeatCount: 0,
+  rank: "Noobie",
+  level: 0,
+  friends: {}
 }
 
 

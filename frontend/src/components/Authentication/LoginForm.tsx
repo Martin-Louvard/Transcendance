@@ -10,7 +10,7 @@ const LoginForm: React.FC = () => {
 
   const login = () =>{
     //ADD CALL TO BACKEND HERE (or maybe in reducer action aka setUser?)
-    
+
     const email = ""; //Change by email recupere de l'api call
     const isLoggedIn = true
     dispatch(setUser({email, username, password, isLoggedIn}))

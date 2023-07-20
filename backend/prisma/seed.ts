@@ -12,6 +12,7 @@ async function main() {
     update: {},
     create: {
         username: 'User1',
+        email: 'fakeEmail@gmail.com',
         password: '123',
     },
   });
@@ -21,8 +22,8 @@ async function main() {
     update: {},
     create: {
         username: 'User2',
+        email: 'fakeEmail2@gmail.com',
         password: '123',
-        rank: "Noobie"    
       },
   });
 
