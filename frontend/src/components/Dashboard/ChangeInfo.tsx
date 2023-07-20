@@ -17,7 +17,6 @@ const ChangeInfo: React.FC = () => {
     const changeInfo = async () =>{
 
         //ADD CALL TO BACKEND HERE (or maybe in reducer action aka setUser?)
-            //ADD CALL TO BACKEND HERE (or maybe in reducer action aka setUser?)
     const requestOptions = {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -27,7 +26,6 @@ const ChangeInfo: React.FC = () => {
           password: password
          })
       };
-
       try{
         await fetch(`http://localhost:3001/users/${username}`, requestOptions)
         .then(response => response.json())

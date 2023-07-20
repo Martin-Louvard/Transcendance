@@ -8,12 +8,30 @@ const LoginForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch()
 
-  const login = () =>{
-    //ADD CALL TO BACKEND HERE (or maybe in reducer action aka setUser?)
+  const login = async () =>{
 
-    const email = ""; //Change by email recupere de l'api call
-    const isLoggedIn = true
-    dispatch(setUser({email, username, password, isLoggedIn}))
+    const requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    };
+
+    try{
+      await fetch(`http://localhost:3001/users/${username}`, requestOptions)
+      .then(response => response.json())
+      .then(data =>{
+        console.log(data)
+        if (data.password == password){
+          const email = data.email
+          const isLoggedIn = true
+          dispatch(setUser({email, username, password, isLoggedIn}))
+        }
+        else
+          alert("Wrong password");
+      });
+    }catch(err) {
+      alert(err);
+    }
+
   }
   
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

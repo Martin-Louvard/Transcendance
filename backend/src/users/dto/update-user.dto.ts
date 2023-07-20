@@ -9,7 +9,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
     @ApiProperty()
     victoriesCount: number;
-    
+
     @ApiProperty()
     defeatCount: number;
 
