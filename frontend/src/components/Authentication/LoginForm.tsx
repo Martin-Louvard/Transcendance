@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Form from './Form';
-import { setUser } from './userReducer'
+import  login  from './login.ts'
+import { setUser } from './userReducer';
 import { useAppDispatch } from '../../hooks';
 
 const LoginForm: React.FC = () => {
@@ -8,13 +9,6 @@ const LoginForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const dispatch = useAppDispatch()
 
-  const login = () =>{
-    //ADD CALL TO BACKEND HERE (or maybe in reducer action aka setUser?)
-
-    const email = ""; //Change by email recupere de l'api call
-    const isLoggedIn = true
-    dispatch(setUser({email, username, password, isLoggedIn}))
-  }
   
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
    event.target.id === "username" ? setUsername(event.target.value): 
@@ -22,9 +16,16 @@ const LoginForm: React.FC = () => {
     ()=>{}
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    username.length && password.length && login()
+    username.length && password.length 
+    const user = await login(username,password)
+    if(user)
+    {    
+      const isLoggedIn = true
+      dispatch(setUser({user, isLoggedIn}))
+    }
+
   };
 
   return (

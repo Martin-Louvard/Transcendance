@@ -9,16 +9,11 @@ async function bootstrap() {
   app.enableCors({origin: "http://localhost:3000"});
 
   const config = new DocumentBuilder()
-
     .setTitle('Transcendence')
-
     .setDescription('The Transcendence API description')
-
     .setVersion('0.1')
-
+    .addBearerAuth()
     .build();
-
-
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api', app, document);

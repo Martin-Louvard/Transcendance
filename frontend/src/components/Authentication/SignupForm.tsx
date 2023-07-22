@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Form from './Form';
+import login from './login';
 import { setUser } from './userReducer';
 import { useAppDispatch } from '../../hooks';
 
@@ -11,7 +12,6 @@ const SignupForm: React.FC = () => {
   const dispatch = useAppDispatch()
 
   const signup = async () =>{
-
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -21,13 +21,13 @@ const SignupForm: React.FC = () => {
         password: password
        })
     };
+
     try{
       await fetch('http://localhost:3001/users', requestOptions)
-      .then(response => response.json())
-      .then(data => console.log(data));
-
+      .then(response => {if (response.status !== 201) return(alert ("Signup failed"))})
+      const user = await login(username,password)
       const isLoggedIn = true
-      dispatch(setUser({email, username, password, isLoggedIn}))
+      dispatch(setUser({user, isLoggedIn}))
     }catch(err) {
       alert(err);
     }
