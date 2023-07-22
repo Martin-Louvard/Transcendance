@@ -20,8 +20,12 @@ const LoginForm: React.FC = () => {
     event.preventDefault();
     username.length && password.length 
     const user = await login(username,password)
-    const isLoggedIn = true
-    dispatch(setUser({user, isLoggedIn}))
+    if(user)
+    {    
+      const isLoggedIn = true
+      dispatch(setUser({user, isLoggedIn}))
+    }
+
   };
 
   return (
