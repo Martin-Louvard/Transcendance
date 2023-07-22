@@ -1,13 +1,12 @@
 FROM node:18
 
+RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+EXPOSE 3000
+EXPOSE 5555
 
-RUN npm install
+COPY tools/nestscript.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/nestscript.sh
 
-COPY . .
-
-RUN npm run build
-
-CMD ["node", "dist/main.js"]
+ENTRYPOINT ["bash", "nestscript.sh"]

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Form from './Form';
-import { setUser } from './userReducer'
+import login from './login';
+import { setUser } from './userReducer';
 import { useAppDispatch } from '../../hooks';
 
 const SignupForm: React.FC = () => {
@@ -10,12 +11,26 @@ const SignupForm: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const dispatch = useAppDispatch()
 
-  const signup = () =>{
+  const signup = async () =>{
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password
+       })
+    };
 
-    //ADD CALL TO BACKEND HERE (or maybe in reducer action aka setUser?)
-
-    const isLoggedIn = true
-    dispatch(setUser({email, username, password, isLoggedIn}))
+    try{
+      await fetch('http://localhost:3001/users', requestOptions)
+      .then(response => {if (response.status !== 201) return(alert ("Signup failed"))})
+      const user = await login(username,password)
+      const isLoggedIn = true
+      dispatch(setUser({user, isLoggedIn}))
+    }catch(err) {
+      alert(err);
+    }
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

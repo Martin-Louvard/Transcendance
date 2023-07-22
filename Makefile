@@ -1,13 +1,28 @@
+all        :    build up
 
-##### Frontend Make Commands ####
+build    :
+	docker compose -f docker-compose.yml build
 
-# Install frontend Dependencies (Like React and Vite)
-frontend install:
-	@cd frontend && npm install
+up        :
+	docker compose -f docker-compose.yml up --detach
 
-# Run dev server (using Vite)
-front:
-	@cd frontend && npm run dev
+stop    :
+	docker compose -f docker-compose.yml stop
+
+purge    :
+	docker system prune -af
+
+re         :
+	make stop
+	make purge
+	make rmvol
+	make build
+	make up
+
+VOL:=$(shell docker volume ls -q)
+
+rmvol    :
+	docker volume rm $(VOL)
 
 
-.PHONY: frontend
+.PHONY: all, build, up, stop, purge, re, rmvol, backend
