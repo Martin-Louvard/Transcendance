@@ -26,8 +26,6 @@ services:
             - '5432:5432'
         networks:
             - transcendence
-        depends_on:
-            - nestjs
     nestjs:
         networks:
             - transcendence
@@ -41,6 +39,8 @@ services:
             - '5555:5555'
         volumes:
             - nestjs:/usr/src/app
+        depends_on:
+            - postgres 
 
 volumes:
     react:
