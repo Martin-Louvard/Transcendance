@@ -4,7 +4,7 @@ import { useAppSelector } from "../../hooks";
 
 const Home = () => {
     const user = useAppSelector((state) => state.user);
-
+    
     return <>
     {
         user.isLoggedIn ?  <Dashboard/> : <Authentication/>
