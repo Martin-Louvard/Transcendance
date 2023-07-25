@@ -17,7 +17,7 @@ export class AuthController {
   }
 
   @Get('42login')
-  auth42(@Query() param: string) {
+  auth42(@Query() param: {code:string}) {
     return this.authService.auth42(param);
   }
 }

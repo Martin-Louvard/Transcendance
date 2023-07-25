@@ -47,7 +47,30 @@ async function main() {
       },
   });
 
-  console.log({ user1, user2, admin });
+  const user42 = await prisma.user.upsert({
+    where: { username: 'User42' },
+    update: { password: commonpassword },
+    create: {
+        username: 'User42',
+        email: 'fakeEmail42@gmail.com',
+        email42: '42email@stud42.fr',
+        password: commonpassword ,
+    },
+  });
+
+  const martin42 = await prisma.user.upsert({
+    where: { username: 'martin42' },
+    update: { password: commonpassword },
+    create: {
+        username: 'mlouvar',
+        email: 'fakeEmailMartin42@gmail.com',
+        email42: 'malouvar@student.42.fr',
+        password: commonpassword ,
+    },
+  });
+
+
+  console.log({ user1, user2, user42, admin, martin42 });
 }
 
 // execute the main function

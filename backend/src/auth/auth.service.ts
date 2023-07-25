@@ -8,7 +8,7 @@ import { env } from 'process';
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService, private jwtService: JwtService) {}
+    constructor(private prisma: PrismaService, private jwtService: JwtService, private readonly usersService: UsersService) {}
     
     //Need to find the right type for the Promise return
     async login(username: string, pass: string): Promise<any> {
@@ -26,8 +26,14 @@ export class AuthService {
         return {...result, access_token: await this.jwtService.signAsync(payload)};
     }
 
-    async auth42(params){
-        
+    async login42(user)
+    {
+        let { password, ...result} = user;
+        const payload = { sub: user.id, username: user.username };
+        return {...result, access_token: await this.jwtService.signAsync(payload)};
+    }
+
+    async auth42(params: {code:string}): Promise<any>{
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -44,15 +50,22 @@ export class AuthService {
             const response = await fetch('https://api.intra.42.fr/oauth/token', requestOptions);
             const data = await response.json();
             const token_42 = data.access_token ;
-            const user =  await this.login42(token_42)
-            return(user);
+            const userInfo =  await this.get42UserInfo(token_42)
+            const dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}});
+            if (dbUser)
+            {
+                let { password, ...result} = dbUser;
+                const payload = { sub: dbUser.id, username: dbUser.username };
+                return {...result, access_token: await this.jwtService.signAsync(payload)};
+            }
+            return (userInfo)
 
           }catch(err) {
             return(err);
           }
     }
 
-    async login42(token: string){
+    async get42UserInfo(token: string): Promise<any>{
         const requestOptions = {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
