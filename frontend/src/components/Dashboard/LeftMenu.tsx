@@ -26,7 +26,7 @@ const LeftMenu = ({hideMenu}) =>{
     const menu = () =>{
         return  (<>
             {
-                hideMenu ? "" :        <div className="menu-wrapper">
+                hideMenu ? "" :  <div className="menu-wrapper">
                 <button id={"friends"} onClick={handleClick}>Friends</button>
                 <button id={"history"} onClick={handleClick}>LeaderBoard</button>
                 <button id={"profile"} onClick={handleClick}>My Profile</button>

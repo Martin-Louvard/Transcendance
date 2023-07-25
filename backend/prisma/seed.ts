@@ -1,33 +1,53 @@
 // prisma/seed.ts
 
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 // initialize Prisma Client
 const prisma = new PrismaClient();
 
+const roundsOfHashing = 10;
+
+
 async function main() {
-  // create two dummy articles
+
+  const commonpassword = await bcrypt.hash('123', roundsOfHashing);
+  const adminpassword = await bcrypt.hash('admin', roundsOfHashing);
+  
+  // create one admin user
+  const admin = await prisma.user.upsert({
+    where: { username: 'admin' },
+    update: { password: adminpassword },
+    create: {
+        username: 'admin',
+        email: 'admin@gmail.com',
+        password: adminpassword,
+      },
+  });
+
+
+  // create two common users
   const user1 = await prisma.user.upsert({
     where: { username: 'User1' },
-    update: {},
+    update: { password: commonpassword },
     create: {
         username: 'User1',
         email: 'fakeEmail@gmail.com',
-        password: '123',
+        password: commonpassword ,
     },
   });
 
   const user2 = await prisma.user.upsert({
     where: { username: 'User2' },
-    update: {},
+    update: { password: commonpassword },
     create: {
         username: 'User2',
         email: 'fakeEmail2@gmail.com',
-        password: '123',
+        password: commonpassword,
       },
   });
 
-  console.log({ user1, user2 });
+  console.log({ user1, user2, admin });
 }
 
 // execute the main function

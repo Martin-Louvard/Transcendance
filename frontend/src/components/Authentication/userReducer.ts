@@ -2,30 +2,38 @@ import { createSlice } from '@reduxjs/toolkit'
 
 // Define a type for the slice state
 interface userState {
-  email: string,
+  id: number,
   username: string,
-  password: string,
-  isLoggedIn: boolean,
+  email: string,
+  avatar: string,
   twoFAEnabled: boolean,
+  status: string,
   victoriesCount: number,
   defeatCount: number,
   rank: string,
   level: number,
-  friends: object
+  achievements: JSON | null,
+  createdAt: string,
+  access_token: string,
+  isLoggedIn: boolean
 }
 
 // Define the initial state using that type
 const initialState: userState = {
-  email: "",
+  id: 0,
   username: "",
-  password: "",
-  isLoggedIn: false,
+  email: "",
+  avatar: "",
   twoFAEnabled: false,
+  status: "inactive",
   victoriesCount: 0,
   defeatCount: 0,
   rank: "Noobie",
   level: 0,
-  friends: {}
+  achievements: null,
+  createdAt: "",
+  access_token: "",
+  isLoggedIn: false
 }
 
 
