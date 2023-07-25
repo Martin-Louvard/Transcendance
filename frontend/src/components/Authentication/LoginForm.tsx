@@ -25,7 +25,6 @@ const LoginForm: React.FC = () => {
       const isLoggedIn = true
       dispatch(setUser({user, isLoggedIn}))
     }
-
   };
 
   return (

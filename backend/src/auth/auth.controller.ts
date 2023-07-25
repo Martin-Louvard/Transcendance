@@ -1,4 +1,4 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, Get, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './entities/auth.entity';
@@ -14,5 +14,10 @@ export class AuthController {
   @ApiOkResponse({ type: AuthEntity })
   login(@Body() {username, password }: LoginDto) {
     return this.authService.login(username, password);
+  }
+
+  @Get('42login')
+  auth42(@Query() param: string) {
+    return this.authService.auth42(param);
   }
 }
