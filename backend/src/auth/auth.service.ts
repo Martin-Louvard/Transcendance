@@ -33,7 +33,7 @@ export class AuthService {
         return {...result, access_token: await this.jwtService.signAsync(payload)};
     }
 
-    async auth42(params: {code:string}): Promise<any>{
+    async auth42(code): Promise<any>{
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -41,8 +41,8 @@ export class AuthService {
                 grant_type: "authorization_code",
                 client_id: env.VITE_42API_UID,
                 client_secret: env.VITE_42API_SECRET,
-                code: params.code,
-                redirect_uri: 'http://localhost:3001/auth/42login'
+                code: code,
+                redirect_uri: 'http://localhost:3000/'
             })
           };
 
@@ -51,14 +51,15 @@ export class AuthService {
             const data = await response.json();
             const token_42 = data.access_token ;
             const userInfo =  await this.get42UserInfo(token_42)
-            const dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}});
-            if (dbUser)
+            let dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}});
+            if (!dbUser)
             {
-                let { password, ...result} = dbUser;
-                const payload = { sub: dbUser.id, username: dbUser.username };
-                return {...result, access_token: await this.jwtService.signAsync(payload)};
+                await this.prisma.user.create({data: {username: userInfo.login, email42: userInfo.email, email: userInfo.email}});
+                dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}});
             }
-            return (userInfo)
+            let { password, ...result} = dbUser;
+            const payload = { sub: dbUser.id, username: dbUser.username };
+            return {...result, access_token: await this.jwtService.signAsync(payload)};
 
           }catch(err) {
             return(err);

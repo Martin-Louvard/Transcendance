@@ -15,7 +15,7 @@ model User {
   username         String   @unique
   email            String   @unique
   email42          String?  @unique
-  password         String
+  password         String?
   avatar           String?
   twoFAEnabled     Boolean  @default(false)
   status           String   @default("inactive")

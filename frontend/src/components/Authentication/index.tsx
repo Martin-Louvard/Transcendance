@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import LoginForm from './LoginForm.tsx';
 import SignupForm from './SignupForm.tsx';
+import { useAppDispatch } from '../../hooks';
+import { setUser } from './userReducer';
 
 const Authentication: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
   const queryParameters = new URLSearchParams(window.location.search)
   const Api42uid = import.meta.env.VITE_42API_UID;
+  const dispatch = useAppDispatch()
 
   useEffect(()=>{
     if(queryParameters.has("code") )
@@ -25,7 +28,7 @@ const Authentication: React.FC = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        code42: code42
+        code: code42
        })
     };
 
@@ -34,7 +37,8 @@ const Authentication: React.FC = () => {
       if (response.ok)
       {
         const data = await response.json();
-        console.log(data);
+        const isLoggedIn = true
+        dispatch(setUser({data, isLoggedIn}))
       }
     }catch(err) {
       alert(err);
@@ -55,7 +59,7 @@ const Authentication: React.FC = () => {
           </button>
         </div>
         <div className="card">
-          <a href={`https://api.intra.42.fr/oauth/authorize?client_id=${Api42uid}&redirect_uri=http%3A%2F%2Flocalhost%3A3001%2Fauth%2F42login&response_type=code`}>
+          <a href={`https://api.intra.42.fr/oauth/authorize?client_id=${Api42uid}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&response_type=code`}>
               Login with 42
           </a>
         </div>

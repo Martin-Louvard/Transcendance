@@ -15,6 +15,7 @@ const Navbar: React.FC<NavbarProps> = () => {
 
   const logout = () =>{
     const isLoggedIn = false
+    window.location.assign("http://localhost:3000/")
     dispatch(setUser({isLoggedIn}))
   }
 
