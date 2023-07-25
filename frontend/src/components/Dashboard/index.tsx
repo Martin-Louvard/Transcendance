@@ -3,27 +3,14 @@ import LeftMenu from './LeftMenu';
 import './Dashboard.css'
 import Experience from '../../Experience';
 import { Canvas } from '@react-three/fiber';
-import ChatBoxList from '../Chat/testChat';
-import MessageList from '../Chat/MessageList';
-import MessageForm from '../Chat/MessageForm';
-
-interface Chatbox {
-  id: number;
-  name: string;
-}
-
-interface Message {
-  id: number;
-  sender: string;
-  text: string;
-}
 
 const Dashboard: React.FC = () => {
   const [isPlaying , setIsPlaying ] = useState(false);
   const [fullscreen, setFullScreen] = useState(false);
-  const [chatboxes, setChatboxes] = useState<Chatbox[]>([]);
+  /*  const [chatboxes, setChatboxes] = useState<Chatbox[]>([]);
   const [currentChatbox, setCurrentChatbox] = useState<Chatbox | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isChatWindowOpen, setIsChatWindowOpen] = useState(false);
 
   useEffect(()=> {
     fetch('http://localhost:3001/chat-channels')
@@ -31,13 +18,20 @@ const Dashboard: React.FC = () => {
       .then((data: Chatbox[]) => setChatboxes(data))
       .catch((error) => console.error(error))
   }, []);
+
   const handleSelectChatbox = (chatbox: Chatbox) => {
     setCurrentChatbox(chatbox);
+    setIsChatWindowOpen(true);
     fetch(`http://localhost:3001/chat-channels/${chatbox.id}/messages`)
       .then((response) => response.json())
       .then((data: Message[]) => setMessages(data))
       .catch((error) => console.error(error))
   }
+
+  const handleChatWindowClose = () => {
+    setIsChatWindowOpen(false);
+  };
+
   const handleSendMessage = (message: string) => {
     fetch(`http://localhost:3001/chat-channels/${currentChatbox.id}/messages`, {
       method: 'POST',
@@ -51,7 +45,7 @@ const Dashboard: React.FC = () => {
         setMessages((prevMessages) => [...prevMessages, data]);
       })
       .catch((error) => console.error(error))
-  }
+  } */
 
   useEffect(()=>{}, [fullscreen]);
 
@@ -71,15 +65,6 @@ const Dashboard: React.FC = () => {
         <div>
           <button className="play-button" onClick={()=>{setIsPlaying(true);}}>Play</button>
       </div>}
-    </div>
-    <div>
-      <ChatBoxList chatboxes={chatboxes} onSelectChatbox={handleSelectChatbox} />
-      {currentChatbox && (
-        <div>
-          <MessageList messages={messages} />
-          <MessageForm onSendMessage={handleSendMessage} />
-        </div>
-      )}
     </div>
     </div>
   </>
