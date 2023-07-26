@@ -27,7 +27,7 @@ const SignupForm: React.FC = () => {
       .then(response => {if (response.status !== 201) return(alert ("Signup failed"))})
       const user = await login(username,password)
       const isLoggedIn = true
-      dispatch(setUser({user, isLoggedIn}))
+      dispatch(setUser({...user, isLoggedIn}))
     }catch(err) {
       alert(err);
     }

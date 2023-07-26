@@ -16,7 +16,6 @@ const ChangeInfo: React.FC = () => {
 
     const changeInfo = async () =>{
 
-        //ADD CALL TO BACKEND HERE (or maybe in reducer action aka setUser?)
     const requestOptions = {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },

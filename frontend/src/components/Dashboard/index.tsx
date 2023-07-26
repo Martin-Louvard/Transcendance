@@ -8,6 +8,7 @@ const Dashboard: React.FC = () => {
   const [isPlaying , setIsPlaying ] = useState(false)
   const [fullscreen, setFullScreen] = useState(false)
 
+  
   useEffect(()=>{}, [fullscreen])
 
   return (<>

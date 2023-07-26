@@ -36,9 +36,10 @@ const Authentication: React.FC = () => {
       const response = await fetch('http://localhost:3001/auth/42login', requestOptions);
       if (response.ok)
       {
-        const data = await response.json();
+        const user = await response.json();
+        console.log(user)
         const isLoggedIn = true
-        dispatch(setUser({data, isLoggedIn}))
+        dispatch(setUser({...user, isLoggedIn}))
       }
     }catch(err) {
       alert(err);

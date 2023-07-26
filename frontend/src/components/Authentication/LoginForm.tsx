@@ -23,7 +23,7 @@ const LoginForm: React.FC = () => {
     if(user)
     {    
       const isLoggedIn = true
-      dispatch(setUser({user, isLoggedIn}))
+      dispatch(setUser({...user, isLoggedIn}))
     }
   };
 

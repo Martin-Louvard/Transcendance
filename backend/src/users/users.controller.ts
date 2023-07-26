@@ -18,8 +18,6 @@ export class UsersController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOkResponse({ type: User, isArray: true })
   findAll() {
     return this.usersService.findAll();
