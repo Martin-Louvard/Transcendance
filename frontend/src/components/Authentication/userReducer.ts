@@ -15,6 +15,7 @@ interface userState {
   achievements: JSON | null,
   createdAt: string,
   access_token: string,
+  friends: Array<Object>,
   isLoggedIn: boolean
 }
 
@@ -33,6 +34,7 @@ const initialState: userState = {
   achievements: null,
   createdAt: "",
   access_token: "",
+  friends: [{}],
   isLoggedIn: false
 }
 

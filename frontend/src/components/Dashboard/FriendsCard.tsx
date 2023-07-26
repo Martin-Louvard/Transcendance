@@ -1,27 +1,33 @@
 import ProfileCard from "./ProfileCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAppSelector } from "../../hooks";
 
 const FriendsCard = () =>{
-    const friends = [
-        { username: 'John Doe', email: 'johndoe@example.com', password: 'password123' },
-        { username: 'Jane Smith', email: 'janesmith@example.com', password: 'p@ssw0rd' },
-        { username: 'Michael Johnson', email: 'michaeljohnson@example.com', password: 'securepass' },
-        { username: 'Emily Davis', email: 'emilydavis@example.com', password: 'pass1234' },
-        { username: 'David Wilson', email: 'davidwilson@example.com', password: 'strongpassword' },
-        { username: 'John Doe', email: 'johndoe@example.com', password: 'password123' },
-        { username: 'Jane Smith', email: 'janesmith@example.com', password: 'p@ssw0rd' },
-        { username: 'Michael Johnson', email: 'michaeljohnson@example.com', password: 'securepass' },
-        { username: 'Emily Davis', email: 'emilydavis@example.com', password: 'pass1234' },
-        { username: 'David Wilson', email: 'davidwilson@example.com', password: 'strongpassword' }
-      ];
-    
-
+    const storedFriends = useAppSelector((state) => state.user.friends);
     const [showFriend, setShowFriend] = useState(false)
-    const [selectedFriend, setSelectedFriend] = useState()
+    const [selectedFriend, setSelectedFriend] = useState(Object)
+    const [friends, setFriends] = useState(storedFriends)
 
-    const displayFriendProfile = (user) =>{
+    useEffect(() => {
+      const fetchFriendsWithInfos = async () => {
+        const friendsWithInfos = await Promise.all(
+          storedFriends.map(async (item) => {
+            const response = await fetch(`http://localhost:3001/users/id/${item.friend_id}?id=${item.friend_id}`);
+            const data = await response.json();
+            return data;
+          })
+        );
+        console.log(friendsWithInfos);
+        setFriends(friendsWithInfos);
+      };
+    
+      fetchFriendsWithInfos();
+    }, [storedFriends]);
+
+
+    const displayFriendProfile = (userFriend: object) =>{
       setShowFriend(true)
-      setSelectedFriend(user)
+      setSelectedFriend(userFriend)
     }
 
     const friendList = () =>{
