@@ -30,6 +30,11 @@ export class UsersController {
     return this.usersService.findOne(username);
   }
 
+  @Get('id/:id')
+  findById(@Query('id') id: string) {
+    return this.usersService.findById(+id);
+  }
+
   @Get('42user/:email42')
   findBy42Email(@Query('email42') email42: string) {
     return this.usersService.findBy42Email(email42);

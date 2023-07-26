@@ -1,8 +1,6 @@
 // prisma/seed.ts
-
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-
 // initialize Prisma Client
 const prisma = new PrismaClient();
 
@@ -22,6 +20,7 @@ async function main() {
         username: 'admin',
         email: 'admin@gmail.com',
         password: adminpassword,
+
       },
   });
 
@@ -34,6 +33,9 @@ async function main() {
         username: 'User1',
         email: 'fakeEmail@gmail.com',
         password: commonpassword ,
+        friends: {
+          create:[{friend_id: admin.id}]
+        }
     },
   });
 
@@ -44,6 +46,9 @@ async function main() {
         username: 'User2',
         email: 'fakeEmail2@gmail.com',
         password: commonpassword,
+        friends: {
+          create:[{friend_id: admin.id}]
+        }
       },
   });
 
@@ -55,9 +60,26 @@ async function main() {
         email: 'fakeEmail42@gmail.com',
         email42: '42email@stud42.fr',
         password: commonpassword ,
+        friends: {
+          create:[{friend_id: admin.id}]
+        }
     },
   });
 
+
+  await prisma.user.upsert({
+    where: { username: 'admin' },
+    update: { password: adminpassword,        
+      friends: {
+      create:[{friend_id: user1.id}, {friend_id: user2.id}, {friend_id: user42.id}]
+    } },
+    create: {
+        username: 'admin',
+        email: 'admin@gmail.com',
+        password: adminpassword,
+
+      },
+  });
   /*const martin42 = await prisma.user.upsert({
     where: { username: 'martin42' },
     update: { password: commonpassword },

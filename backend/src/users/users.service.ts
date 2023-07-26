@@ -19,15 +19,19 @@ export class UsersService {
   }
 
   findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({include: {friends: true, games: true, JoinedChatChannels: true}});
   }
 
   findOne(username: string) {
-    return this.prisma.user.findUnique({where: {username}});
+    return this.prisma.user.findUnique({where: {username}, include: {friends: true, games: true, JoinedChatChannels: true}});
+  }
+
+  findById(id: number) {
+    return this.prisma.user.findUnique({where: {id}, include: {friends: true, games: true, JoinedChatChannels: true}});
   }
 
   findBy42Email(email42: string) {
-    return this.prisma.user.findUnique({where: {email42}});
+    return this.prisma.user.findUnique({where: {email42}, include: {friends: true, games: true, JoinedChatChannels: true}});
   }
 
   async update(username: string, updateUserDto: UpdateUserDto) {

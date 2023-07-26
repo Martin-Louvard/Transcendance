@@ -11,27 +11,39 @@ datasource db {
 }
 
 model User {
-  id               Int      @id @default(autoincrement())
-  username         String   @unique
-  email            String   @unique
-  email42          String?  @unique
-  password         String?
-  avatar           String?
-  twoFAEnabled     Boolean  @default(false)
-  status           String   @default("inactive")
-  victoriesCount   Int      @default(0)
-  defeatCount      Int      @default(0)
-  rank             String   @default("Noobie")
-  level            Int      @default(0)
-  achievements     Json?
-  friends          User[]   @relation("Friends")
-  symetric_friend  User[]   @relation("Friends")
-  games            Game[]
-  JoinedChatChannels     ChatChannel[] @relation("JoinedChannels")
-  OwnedChatChannels      ChatChannel[] @relation("OwnedChannels")
-  BannedFromChatChannels ChatChannel[] @relation("BannedFromChannels")
-  chatMessages     ChatMessage[]
-  createdAt        DateTime @default(now())
+  id                      Int      @id @default(autoincrement())
+  username                String   @unique
+  email                   String   @unique
+  email42                 String?  @unique
+  password                String?
+  avatar                  String?
+  twoFAEnabled            Boolean  @default(false)
+  status                  String   @default("inactive")
+  victoriesCount          Int      @default(0)
+  defeatCount             Int      @default(0)
+  rank                    String   @default("Noobie")
+  level                   Int      @default(0)
+  achievements            Json?
+  friends                 Friends[] @relation(name: "user")
+  friendUserFriends       Friends[] @relation(name: "friend_user")
+  games                   Game[]
+  JoinedChatChannels      ChatChannel[] @relation("JoinedChannels")
+  OwnedChatChannels       ChatChannel[] @relation("OwnedChannels")
+  BannedFromChatChannels  ChatChannel[] @relation("BannedFromChannels")
+  chatMessages            ChatMessage[]
+  createdAt               DateTime @default(now())
+}
+
+model Friends {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  friend_id Int
+  user      User    @relation(name: "user", fields: [user_id], references: [id])
+  friend    User    @relation(name: "friend_user", fields: [friend_id], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([user_id, friend_id])
 }
 
 model ChatChannel {
