@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateUserFriendsDto } from './dto/update-user-friends.dto';
+
 import * as bcrypt from 'bcrypt';
 
 export const roundsOfHashing = 10;
@@ -40,6 +42,21 @@ export class UsersService {
     }
 
     return this.prisma.user.update({where: {username}, data: updateUserDto});
+  }
+
+  async updateFriendList(username: string, updateUserFriendsDto: UpdateUserFriendsDto) {
+    const userFriend = await this.prisma.user.findUnique({where: {username: updateUserFriendsDto.friend_username}});
+    if (!userFriend)
+      throw new NotFoundException(`No user found for username: ${username}`);
+
+    await this.prisma.user.update({
+      where: {username: username}, 
+      data: {
+        friends: {
+          create: [{friend_id: userFriend.id}]
+        }}
+        });
+    return this.prisma.user.findUnique({where: {username: username}, include: {friends: true}});
   }
 
   remove(id: number) {

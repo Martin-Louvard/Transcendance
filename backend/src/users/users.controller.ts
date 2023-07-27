@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } f
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserFriendsDto } from './dto/update-user-friends.dto';
 import { ApiTags, ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from './entities/user.entity';
@@ -46,6 +47,12 @@ export class UsersController {
   @ApiCreatedResponse({ type: User })
   update(@Param('username') username: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(username, updateUserDto);
+  }
+
+  @Patch(':username/friends')
+  @ApiCreatedResponse({ type: User })
+  updateFriendList(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
+    return this.usersService.updateFriendList(username, updateUserFriendsDto);
   }
 
   @Delete(':id')

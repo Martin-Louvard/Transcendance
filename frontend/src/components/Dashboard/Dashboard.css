@@ -124,6 +124,8 @@
 .friend-list{
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
+
 }
 
 .friend-item{
