@@ -31,11 +31,6 @@ const FriendsCard = () =>{
 
     const addFriend = async (event: React.FormEvent<HTMLFormElement>) =>{
       event.preventDefault();
-      if (newFriendUsername == user.username)
-      {
-        alert("you can't add yourself")
-        return;
-      }
       const requestOptions = {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -54,6 +49,8 @@ const FriendsCard = () =>{
         }
         else if (response.status === 404)
           alert("User not found")
+        else if (response.status === 406)
+          alert("You can't add yourself as a friend")
       }catch(err) {
         console.log("coucou de erreur")
 

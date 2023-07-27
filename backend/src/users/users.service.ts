@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, NotAcceptableException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -45,6 +45,8 @@ export class UsersService {
   }
 
   async updateFriendList(username: string, updateUserFriendsDto: UpdateUserFriendsDto) {
+    if (username == updateUserFriendsDto.friend_username)
+      throw new NotAcceptableException(`You can't add yourself as a friend`);
     const userFriend = await this.prisma.user.findUnique({where: {username: updateUserFriendsDto.friend_username}});
     if (!userFriend)
       throw new NotFoundException(`No user found for username: ${username}`);
