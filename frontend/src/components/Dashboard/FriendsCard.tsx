@@ -6,11 +6,14 @@ import { setUser } from "../Authentication/userReducer";
 
 const FriendsCard = () =>{
     const storedFriends = useAppSelector((state) => state.user.friends);
+    const storedSymetricFriends = useAppSelector((state) => state.user.friendUserFriends);
     const user = useAppSelector((state) => state.user);
     const [showFriend, setShowFriend] = useState(false)
     const [selectedFriend, setSelectedFriend] = useState(Object)
     const [friends, setFriends] = useState(storedFriends)
+    const [symetricFriends, setSymetricFriends] = useState(storedSymetricFriends)
     const [newFriendUsername, setNewFriendUsername] = useState('');
+    const [allFriends, setAllFriends] = useState(Array);
     const dispatch = useAppDispatch();
 
     
@@ -28,6 +31,28 @@ const FriendsCard = () =>{
     
       fetchFriendsWithInfos();
     }, [storedFriends]);
+
+    useEffect(() => {
+      const fetchSymetricFriendsWithInfos = async () => {
+        const SymetricriendsWithInfos = await Promise.all(
+          storedSymetricFriends.map(async (item) => {
+            const response = await fetch(`http://localhost:3001/users/id/${item.user_id}?id=${item.user_id}`);
+            const data = await response.json();
+            return data;
+          })
+        );
+        setSymetricFriends(SymetricriendsWithInfos);
+      };
+    
+      fetchSymetricFriendsWithInfos();
+    }, [storedSymetricFriends]);
+
+    useEffect(() => {
+      const all = friends.concat(symetricFriends)
+      all.sort((a, b) => (a.username > b.username ? 1 : -1))
+      setAllFriends(all)
+    }, [friends, symetricFriends]);
+
 
     const addFriend = async (event: React.FormEvent<HTMLFormElement>) =>{
       event.preventDefault();
@@ -77,7 +102,7 @@ const FriendsCard = () =>{
       </Form>
       <h2>My Friends</h2>
         <ul className="friend-list">
-          {friends.map((friend, index) => (
+          {allFriends.map((friend, index) => (
             <li className="friend-item" onClick={() => displayFriendProfile(friend)} key={index}>
             <div className='friend-picture'>
                 <img src='./default.jpg'/>

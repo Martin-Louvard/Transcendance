@@ -67,7 +67,7 @@ async function main() {
   });
 
 
-  await prisma.user.upsert({
+    /*await prisma.user.upsert({
     where: { username: 'admin' },
     update: { password: adminpassword,        
       friends: {
@@ -80,7 +80,7 @@ async function main() {
 
       },
   });
-  /*const martin42 = await prisma.user.upsert({
+const martin42 = await prisma.user.upsert({
     where: { username: 'martin42' },
     update: { password: commonpassword },
     create: {

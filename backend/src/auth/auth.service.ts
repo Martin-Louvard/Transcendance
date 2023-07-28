@@ -12,7 +12,7 @@ export class AuthService {
     
     //Need to find the right type for the Promise return
     async login(username: string, pass: string): Promise<any> {
-        const user = await this.prisma.user.findUnique({where:{username}, include: {friends: true, games: true, JoinedChatChannels: true}});
+        const user = await this.prisma.user.findUnique({where:{username}, include: {friends: true,  friendUserFriends: true, games: true, JoinedChatChannels: true}});
         if (!user) {
             throw new NotFoundException(`No user found for username: ${username}`);
         }
@@ -51,11 +51,11 @@ export class AuthService {
             const data = await response.json();
             const token_42 = data.access_token ;
             const userInfo =  await this.get42UserInfo(token_42)
-            let dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}, include: {friends: true, games: true, JoinedChatChannels: true}});
+            let dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}, include: {friends: true,  friendUserFriends: true, games: true, JoinedChatChannels: true}});
             if (!dbUser)
             {
                 await this.prisma.user.create({data: {username: userInfo.login, email42: userInfo.email, email: userInfo.email}});
-                dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}, include: {friends: true, games: true, JoinedChatChannels: true}});
+                dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}, include: {friends: true,  friendUserFriends: true, games: true, JoinedChatChannels: true}});
             }
             let { password, ...result} = dbUser;
             const payload = { sub: dbUser.id, username: dbUser.username };
