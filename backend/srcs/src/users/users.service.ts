@@ -19,19 +19,47 @@ export class UsersService {
   }
 
   findAll() {
-    return this.prisma.user.findMany({include: {friends: true, games: true, JoinedChatChannels: true}});
+    return this.prisma.user.findMany({include: {
+      friends: true,
+      games: true,
+      JoinedChatChannels: true,
+      OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true
+    }});
   }
 
   findOne(username: string) {
-    return this.prisma.user.findUnique({where: {username}, include: {friends: true, games: true, JoinedChatChannels: true}});
+    return this.prisma.user.findUnique({where: {username}, include: {
+      friends: true,
+      games: true,
+      JoinedChatChannels: true,
+      OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true
+    }});
   }
 
   findById(id: number) {
-    return this.prisma.user.findUnique({where: {id}, include: {friends: true, games: true, JoinedChatChannels: true}});
+    return this.prisma.user.findUnique({where: {id}, include: {
+      friends: true,
+      games: true,
+      JoinedChatChannels: true,
+      OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true
+    }});
   }
 
   findBy42Email(email42: string) {
-    return this.prisma.user.findUnique({where: {email42}, include: {friends: true, games: true, JoinedChatChannels: true}});
+    return this.prisma.user.findUnique({where: {email42}, include: {
+      friends: true,
+      games: true,
+      JoinedChatChannels: true,
+      OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true
+    }});
   }
 
   async update(username: string, updateUserDto: UpdateUserDto) {
