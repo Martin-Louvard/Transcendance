@@ -12,25 +12,18 @@ export class AuthService {
     
     //Need to find the right type for the Promise return
     async login(username: string, pass: string): Promise<any> {
-        const user = await this.prisma.user.findUnique({where:{username}, include: {friends: true,  friendUserFriends: true, games: true, JoinedChatChannels: true}});
-        if (!user) {
+        const userWithPass = await this.prisma.user.findUnique({where:{username}});
+        if (!userWithPass) {
             throw new NotFoundException(`No user found for username: ${username}`);
         }
-        const isPasswordValid = await bcrypt.compare(pass, user.password);
+        const isPasswordValid = await bcrypt.compare(pass, userWithPass.password);
         if (!isPasswordValid) {
             throw new UnauthorizedException('Invalid password');
         }
         //strip the password from the user object
-        let { password, ...result} = user;
+        const user = await this.usersService.findOne(username);
         const payload = { sub: user.id, username: user.username };
-        return {...result, access_token: await this.jwtService.signAsync(payload)};
-    }
-
-    async login42(user)
-    {
-        let { password, ...result} = user;
-        const payload = { sub: user.id, username: user.username };
-        return {...result, access_token: await this.jwtService.signAsync(payload)};
+        return {...user, access_token: await this.jwtService.signAsync(payload)};
     }
 
     async auth42(code): Promise<any>{
@@ -51,15 +44,15 @@ export class AuthService {
             const data = await response.json();
             const token_42 = data.access_token ;
             const userInfo =  await this.get42UserInfo(token_42)
-            let dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}, include: {friends: true,  friendUserFriends: true, games: true, JoinedChatChannels: true}});
+            let dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}});
             if (!dbUser)
             {
                 await this.prisma.user.create({data: {username: userInfo.login, email42: userInfo.email, email: userInfo.email}});
-                dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}, include: {friends: true,  friendUserFriends: true, games: true, JoinedChatChannels: true}});
+                dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}});
             }
-            let { password, ...result} = dbUser;
             const payload = { sub: dbUser.id, username: dbUser.username };
-            return {...result, access_token: await this.jwtService.signAsync(payload)};
+            dbUser = await this.usersService.findBy42Email(userInfo.email)
+            return {...dbUser, access_token: await this.jwtService.signAsync(payload)};
 
           }catch(err) {
             return(err);

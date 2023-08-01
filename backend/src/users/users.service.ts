@@ -24,44 +24,128 @@ export class UsersService {
     return this.prisma.user.findMany({include: {friends: true, friendUserFriends: true, games: true, JoinedChatChannels: true}});
   }
 
-  findOne(username: string) {
-    return this.prisma.user.findUnique({where: {username}, include: {friends: true, friendUserFriends: true, games: true, JoinedChatChannels: true}});
+  async findOne(username: string) {
+    const userRaw = await this.prisma.user.findUnique({where: {username}, include: {games: true, JoinedChatChannels: true}});
+    if (!userRaw)
+      throw new NotFoundException(`No user found for username: ${username}`);
+    const friends = await this.prisma.friends.findMany({
+      where: { 
+        OR:[
+          { user_id: userRaw.id},
+          { friend_id: userRaw.id }
+        ]
+      },
+    });
+    const user = { ...userRaw, friends: friends };
+    return user
   }
 
-  findById(id: number) {
-    return this.prisma.user.findUnique({where: {id}, include: {friends: true, friendUserFriends: true, games: true, JoinedChatChannels: true}});
+  async findById(id: number) {
+    const userRaw = await this.prisma.user.findUnique({where: {id}, include: {games: true, JoinedChatChannels: true}});
+    if (!userRaw)
+      throw new NotFoundException(`No user found for id: ${id}`);
+      
+    const friends = await this.prisma.friends.findMany({
+      where: { 
+        OR:[
+          { user_id: id},
+          { friend_id: id }
+        ]
+      },
+    });
+    const user = { ...userRaw, friends: friends };
+    return user
   }
 
-  findBy42Email(email42: string) {
-    return this.prisma.user.findUnique({where: {email42}, include: {friends: true, friendUserFriends: true, games: true, JoinedChatChannels: true}});
+  async findBy42Email(email42: string) {
+    const userRaw = await this.prisma.user.findUnique({where: {email42}, include: {games: true, JoinedChatChannels: true}});
+    if (!userRaw)
+      throw new NotFoundException(`No user found for email: ${email42}`);
+
+    const friends = await this.prisma.friends.findMany({
+      where: { 
+        OR:[
+          { user_id: userRaw.id},
+          { friend_id: userRaw.id }
+        ]
+      },
+    });
+    const user = { ...userRaw, friends: friends };
+    return user
   }
 
   async update(username: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, roundsOfHashing);
     }
-
     return this.prisma.user.update({where: {username}, data: updateUserDto});
   }
 
-  async updateFriendList(username: string, updateUserFriendsDto: UpdateUserFriendsDto) {
+  async remove(id: number) {
+    const userRaw = await this.prisma.user.findUnique({where: {id}});
+    if (!userRaw)
+      throw new NotFoundException(`No user found for id: ${id}`);
+    await  this.prisma.user.update({ 
+        where: {id},
+        data:{
+          friends: {
+            deleteMany: {}
+          },
+          friendUserFriends: {
+            deleteMany: {}
+          }
+        }
+      })
+      return this.prisma.user.delete({ where: { id }});
+  }
+
+  async addFriend(username: string, updateUserFriendsDto: UpdateUserFriendsDto) {
     if (username == updateUserFriendsDto.friend_username)
-      throw new NotAcceptableException(`You can't add yourself as a friend`);
-    const userFriend = await this.prisma.user.findUnique({where: {username: updateUserFriendsDto.friend_username}});
+      throw new NotAcceptableException(`Self interaction prohibited`);
+  
+    const userFriend = await this.prisma.user.findUnique({where: {username: updateUserFriendsDto.friend_username}, include: {friends: true, friendUserFriends: true}});
     if (!userFriend)
       throw new NotFoundException(`No user found for username: ${username}`);
 
+    
     await this.prisma.user.update({
-      where: {username: username}, 
-      data: {
-        friends: {
-          create: [{friend_id: userFriend.id}]
-        }}
-        });
-    return this.prisma.user.findUnique({where: {username: username}, include: {friends: true, friendUserFriends: true,}});
+        where: {username: username}, 
+        data: {
+          friends: {
+            create: [{friend_id: userFriend.id}]
+          }}
+      });
+    
+    return this.findOne(username)
   }
 
-  remove(id: number) {
-    return this.prisma.user.delete({ where: { id } });
+  async removeFriend(username: string, updateUserFriendsDto: UpdateUserFriendsDto){
+    if (username == updateUserFriendsDto.friend_username)
+      throw new NotAcceptableException(`Self interaction prohibited`);
+    
+    const user = await this.prisma.user.findUnique({where: {username}});
+    if (!user)
+      throw new NotFoundException(`No user found for username: ${username}`);
+
+    const userFriend = await this.prisma.user.findUnique({where: {username: updateUserFriendsDto.friend_username}})
+    if (!userFriend)
+      throw new NotFoundException(`No user found for username: ${updateUserFriendsDto.friend_username}`);
+    
+    const friendship = await this.prisma.friends.findFirst({
+        where: { 
+          AND:[
+            { user_id: userFriend.id},
+            { friend_id: user.id }
+          ]
+        },
+      });
+
+    if (!friendship)
+      throw new NotFoundException(`No friendship found between: ${username} and ${updateUserFriendsDto.friend_username}`);
+    
+    await this.prisma.friends.delete({where: {id: friendship.id}})
+
+    return this.findOne(username);
   }
+
 }

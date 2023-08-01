@@ -16,7 +16,6 @@ interface userState {
   createdAt: string,
   access_token: string,
   friends: Array<Object>,
-  friendUserFriends: Array<Object>,
   isLoggedIn: boolean
 }
 
@@ -36,7 +35,6 @@ const initialState: userState = {
   createdAt: "",
   access_token: "",
   friends: [{}],
-  friendUserFriends: [{}],
   isLoggedIn: false
 }
 

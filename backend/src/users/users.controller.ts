@@ -49,11 +49,6 @@ export class UsersController {
     return this.usersService.update(username, updateUserDto);
   }
 
-  @Patch(':username/friends')
-  @ApiCreatedResponse({ type: User })
-  updateFriendList(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
-    return this.usersService.updateFriendList(username, updateUserFriendsDto);
-  }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
@@ -62,4 +57,16 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
+
+  @Post(':username/friends')
+  @ApiCreatedResponse({ type: User })
+  addFriend(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
+    return this.usersService.addFriend(username, updateUserFriendsDto);
+  }
+
+  @Delete(':username/friends')
+  removeFriend(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
+    return this.usersService.removeFriend(username, updateUserFriendsDto);
+  }
+
 }
