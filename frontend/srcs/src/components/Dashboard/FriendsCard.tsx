@@ -85,7 +85,7 @@ const FriendsCard = () =>{
           {friends ? friends.map((friend, index) => (
             <li className="friend-item" onClick={() => displayFriendProfile(friend)} key={index}>
             <div className='friend-picture'>
-                <img src='./default.jpg'/>
+              <img src={user.avatar}/>
             </div>
               <p>{friend.username}</p>
             </li>

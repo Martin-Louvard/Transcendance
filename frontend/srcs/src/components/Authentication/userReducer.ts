@@ -24,7 +24,7 @@ const initialState: userState = {
   id: 0,
   username: "",
   email: "",
-  avatar: "",
+  avatar: "/default.jpg",
   twoFAEnabled: false,
   status: "inactive",
   victoriesCount: 0,

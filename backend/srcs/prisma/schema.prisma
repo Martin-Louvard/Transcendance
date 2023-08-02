@@ -16,7 +16,7 @@ model User {
   email                   String   @unique
   email42                 String?  @unique
   password                String?
-  avatar                  String?
+  avatar                  String?  @default("/default.jpg")
   twoFAEnabled            Boolean  @default(false)
   status                  String   @default("inactive")
   victoriesCount          Int      @default(0)

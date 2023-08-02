@@ -156,4 +156,8 @@ export class UsersService {
     return this.findOne(username);
   }
 
+
+  async setAvatar(username: string, path: string){
+
+  }
 }

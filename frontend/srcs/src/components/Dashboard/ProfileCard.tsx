@@ -37,10 +37,19 @@ const ProfileCard = (user) =>{
       }
 
     const profile = () =>{
-        return         <>
-        <div className='profile-picture'>
-            <img src='./default.jpg'/>
-        </div>
+        return <>
+         {
+            user.username != currentUser.username ?
+            <div className='profile-picture'>
+              <img src={user.avatar}/>
+            </div>
+             : 
+             <div className="profile-picture form-picture">
+                <img src={user.avatar} id="photo"/>
+                <input type="file" id="file"/>
+                <label htmlFor="file" id="uploadBtn">Modify</label>
+            </div>
+        }
         <div className='user-info'>
             <h6> Username: {user.username}</h6>
             <h6> Email: {user.email}</h6>
@@ -50,7 +59,7 @@ const ProfileCard = (user) =>{
             user.username != currentUser.username ? <button onClick={() =>{setChatOpen(true)}}>Open Private Chat</button> : <button onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
         }
         {
-             user.username != currentUser.username ? <button onClick={() =>{deleteFriendship()}}>Delete Friend</button> : <></>
+             user.username != currentUser.username ? <button onClick={() =>{deleteFriendship()}}>Delete From Friends</button> : <></>
         }
     </>
     }

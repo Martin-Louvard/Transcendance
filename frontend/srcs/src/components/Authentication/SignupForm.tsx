@@ -48,19 +48,19 @@ const SignupForm: React.FC = () => {
 
   return (
     <Form onSubmit={handleSubmit} title="Signup" buttonText="Signup">
-      <div>
+      <div className='form-div'>
         <label htmlFor="email">Email:</label>
         <input type="email" id="email" value={email} onChange={handleChange} />
       </div>
-      <div>
+      <div className='form-div'>
         <label htmlFor="username">Username:</label>
         <input type="username" id="username" value={username} onChange={handleChange} />
       </div>
-      <div>
+      <div className='form-div'>
         <label htmlFor="password">Password:</label>
         <input type="password" id="password" value={password} onChange={handleChange} />
       </div>
-      <div>
+      <div className='form-div'>
         <label htmlFor="confirm-password">Confirm Password:</label>
         <input type="password" id="confirm-password" value={confirmPassword} onChange={handleChange} />
       </div>
