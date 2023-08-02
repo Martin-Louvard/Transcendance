@@ -20,7 +20,12 @@ let ChatChannelsService = exports.ChatChannelsService = class ChatChannelsServic
         return this.prisma.chatChannel.create({ data: createChatChannelDto });
     }
     findAll() {
-        return this.prisma.chatChannel.findMany({});
+        return this.prisma.chatChannel.findMany({ include: {
+                participants: true,
+                bannedUsers: true,
+                admins: true,
+                messages: true
+            } });
     }
     findOne(id) {
         return this.prisma.chatChannel.findUnique({ where: { id } });

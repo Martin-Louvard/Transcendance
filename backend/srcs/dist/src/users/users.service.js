@@ -24,16 +24,44 @@ let UsersService = exports.UsersService = class UsersService {
         return this.prisma.user.create({ data: createUserDto });
     }
     findAll() {
-        return this.prisma.user.findMany({ include: { friends: true, games: true, JoinedChatChannels: true } });
+        return this.prisma.user.findMany({ include: {
+                friends: true,
+                games: true,
+                JoinedChatChannels: true,
+                OwnedChatChannels: true,
+                BannedFromChatChannels: true,
+                AdminOnChatChannels: true
+            } });
     }
     findOne(username) {
-        return this.prisma.user.findUnique({ where: { username }, include: { friends: true, games: true, JoinedChatChannels: true } });
+        return this.prisma.user.findUnique({ where: { username }, include: {
+                friends: true,
+                games: true,
+                JoinedChatChannels: true,
+                OwnedChatChannels: true,
+                BannedFromChatChannels: true,
+                AdminOnChatChannels: true
+            } });
     }
     findById(id) {
-        return this.prisma.user.findUnique({ where: { id }, include: { friends: true, games: true, JoinedChatChannels: true } });
+        return this.prisma.user.findUnique({ where: { id }, include: {
+                friends: true,
+                games: true,
+                JoinedChatChannels: true,
+                OwnedChatChannels: true,
+                BannedFromChatChannels: true,
+                AdminOnChatChannels: true
+            } });
     }
     findBy42Email(email42) {
-        return this.prisma.user.findUnique({ where: { email42 }, include: { friends: true, games: true, JoinedChatChannels: true } });
+        return this.prisma.user.findUnique({ where: { email42 }, include: {
+                friends: true,
+                games: true,
+                JoinedChatChannels: true,
+                OwnedChatChannels: true,
+                BannedFromChatChannels: true,
+                AdminOnChatChannels: true
+            } });
     }
     async update(username, updateUserDto) {
         if (updateUserDto.password) {

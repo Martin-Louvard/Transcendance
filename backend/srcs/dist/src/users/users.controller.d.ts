@@ -41,6 +41,27 @@ export declare class UsersController {
             channelType: string;
             name: string;
         }, unknown> & {})[];
+        OwnedChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        BannedFromChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        AdminOnChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
     } & import("@prisma/client/runtime").GetResult<{
         id: number;
         username: string;
@@ -72,6 +93,27 @@ export declare class UsersController {
             createdAt: Date;
         }, unknown> & {})[];
         JoinedChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        OwnedChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        BannedFromChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        AdminOnChatChannels: (import("@prisma/client/runtime").GetResult<{
             id: number;
             ownerId: number;
             password: string;
@@ -115,6 +157,27 @@ export declare class UsersController {
             channelType: string;
             name: string;
         }, unknown> & {})[];
+        OwnedChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        BannedFromChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        AdminOnChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
     } & import("@prisma/client/runtime").GetResult<{
         id: number;
         username: string;
@@ -146,6 +209,27 @@ export declare class UsersController {
             createdAt: Date;
         }, unknown> & {})[];
         JoinedChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        OwnedChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        BannedFromChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        AdminOnChatChannels: (import("@prisma/client/runtime").GetResult<{
             id: number;
             ownerId: number;
             password: string;
