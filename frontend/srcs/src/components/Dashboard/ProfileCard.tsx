@@ -4,12 +4,37 @@ import Chat from '../Chat/Chat.tsx'
 import { useState } from 'react';
 import ChangeInfo from './ChangeInfo.tsx';
 import HistoryCard from './HistoryCard';
+import { useAppDispatch } from '../../hooks';
+import { setUser } from '../Authentication/userReducer.ts';
 
 const ProfileCard = (user) =>{
     const currentUser = useAppSelector((state) => state.user);
     const [chatOpen, setChatOpen] = useState(false)
     const [changeInfoOpen, setChangeInfoOpen] = useState(false)
     const [showGames, setShowGames] = useState(false)
+    const dispatch = useAppDispatch();
+
+    const deleteFriendship = async () =>{
+        const requestOptions = {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            friend_username: user.username
+           })
+        };
+  
+        try{
+          const response = await fetch(`http://localhost:3001/users/${currentUser.username}/friends`, requestOptions)
+          if (response.ok)
+          {
+            const result = await response.json()
+            const isLoggedIn = true
+            dispatch(setUser({...result, isLoggedIn}));
+          }
+        }catch(err) {
+          alert(err);
+        }
+      }
 
     const profile = () =>{
         return         <>
@@ -23,6 +48,9 @@ const ProfileCard = (user) =>{
         <button onClick={() =>{setShowGames(true)}}>Game History</button> 
         {
             user.username != currentUser.username ? <button onClick={() =>{setChatOpen(true)}}>Open Private Chat</button> : <button onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
+        }
+        {
+             user.username != currentUser.username ? <button onClick={() =>{deleteFriendship()}}>Delete Friend</button> : <></>
         }
     </>
     }

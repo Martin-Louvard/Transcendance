@@ -126,24 +126,32 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({where: {username}});
     if (!user)
       throw new NotFoundException(`No user found for username: ${username}`);
-
-    const userFriend = await this.prisma.user.findUnique({where: {username: updateUserFriendsDto.friend_username}})
+    
+      const userFriend = await this.prisma.user.findUnique({where: {username: updateUserFriendsDto.friend_username}})
     if (!userFriend)
       throw new NotFoundException(`No user found for username: ${updateUserFriendsDto.friend_username}`);
     
-    const friendship = await this.prisma.friends.findFirst({
-        where: { 
-          AND:[
-            { user_id: userFriend.id},
-            { friend_id: user.id }
-          ]
-        },
-      });
+    const result = await this.prisma.friends.deleteMany({
+      where: { 
+        OR : [
+          {
+            AND:[
+              { user_id: user.id},
+              { friend_id: userFriend.id }
+            ]
+          },
+          {
+            AND:[
+              { user_id: userFriend.id},
+              { friend_id: user.id }
+            ]
+          }
+        ]
 
-    if (!friendship)
+      },
+    })
+    if(result.count == 0)
       throw new NotFoundException(`No friendship found between: ${username} and ${updateUserFriendsDto.friend_username}`);
-    
-    await this.prisma.friends.delete({where: {id: friendship.id}})
 
     return this.findOne(username);
   }
