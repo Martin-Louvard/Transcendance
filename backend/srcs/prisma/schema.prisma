@@ -27,10 +27,10 @@ model User {
   friends                 Friends[] @relation(name: "user")
   friendUserFriends       Friends[] @relation(name: "friend_user")
   games                   Game[]
-  JoinedChatChannels      ChatChannel[] @relation("JoinedChannels")
-  OwnedChatChannels       ChatChannel[] @relation("OwnedChannels")
-  BannedFromChatChannels  ChatChannel[] @relation("BannedFromChannels")
-  AdminOnChatChannels	  ChatChannel[] @relation("AdminOnChannels")
+  JoinedChatChannels     ChatChannel[] @relation("JoinedChannels")
+  OwnedChatChannels      ChatChannel[] @relation("OwnedChannels")
+  BannedFromChatChannels ChatChannel[] @relation("BannedFromChannels")
+  AdminOnChatChannels	 ChatChannel[] @relation("AdminOnChannels")
   chatMessages            ChatMessage[]
   createdAt               DateTime @default(now())
 }

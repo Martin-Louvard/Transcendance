@@ -1,4 +1,4 @@
-export default interface User {
+export interface User {
   id: number;
   username: string;
   email: string;
@@ -13,21 +13,31 @@ export default interface User {
   createdAt: string;
   access_token: string;
   friends: Array<Object>;
-  isLoggedIn: boolean
+  isLoggedIn: boolean;
+  JoinedChatChannels: ChatChannels[];
+  BannedFromChatChannels: ChatChannels[];
+  AdminOnChatChannels: ChatChannels[];
+  OwnedChatChannels: ChatChannels[];
 }
 
-export default interface Message {
+export interface Message {
   id: number;
   channelId: number;
   content: string;
   sender: User
 }
 
-export default interface ChatChannels {
+export interface ChatChannels {
   id: number;
   Owner: User;
   Admins: User[];
   name?: string;
   password?: string;
   channelType?: string;
+}
+
+export interface ChatChannelsProps {
+  chatchannel: ChatChannels[];
+  onChatChannelClick: (channelID: number) => void;
+  onCreateChat: (Owner: User, name?: string, password?: string) => void;
 }

@@ -252,6 +252,7 @@ export declare class UsersController {
         achievements: import(".prisma/client").Prisma.JsonValue;
         createdAt: Date;
     }, unknown> & {}, never, import("@prisma/client/runtime").DefaultArgs>;
+    addToChannel(): any;
     update(username: string, updateUserDto: UpdateUserDto): Promise<import("@prisma/client/runtime").GetResult<{
         id: number;
         username: string;

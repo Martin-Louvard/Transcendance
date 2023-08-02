@@ -53,18 +53,6 @@ async function main() {
             }
         },
     });
-    await prisma.user.upsert({
-        where: { username: 'admin' },
-        update: { password: adminpassword,
-            friends: {
-                create: [{ friend_id: user1.id }, { friend_id: user2.id }, { friend_id: user42.id }]
-            } },
-        create: {
-            username: 'admin',
-            email: 'admin@gmail.com',
-            password: adminpassword,
-        },
-    });
     console.log({ user1, user2, user42, admin });
 }
 main()

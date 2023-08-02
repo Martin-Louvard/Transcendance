@@ -85,6 +85,14 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "findBy42Email", null);
 __decorate([
+    (0, common_1.Post)(':OwnedChatChannels'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiCreatedResponse)({ type: user_entity_1.User }),
+    (0, common_1.Post)(':AdminOnChatChannels'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiCreatedResponse)({ type: user_entity_1.User }),
     (0, common_1.Patch)(':username'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)(),

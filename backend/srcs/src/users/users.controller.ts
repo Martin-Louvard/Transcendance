@@ -40,6 +40,22 @@ export class UsersController {
     return this.usersService.findBy42Email(email42);
   }
 
+  @Post(':JoinedChatChannels')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: User })
+  addToChannel()
+
+  @Post(':OwnedChatChannels')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: User })
+
+  @Post(':AdminOnChatChannels')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: User })
+
   @Patch(':username')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
