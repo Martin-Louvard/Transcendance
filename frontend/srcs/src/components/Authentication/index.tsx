@@ -37,7 +37,6 @@ const Authentication: React.FC = () => {
       if (response.ok)
       {
         const user = await response.json();
-        console.log(user)
         const isLoggedIn = true
         dispatch(setUser({...user, isLoggedIn}))
       }

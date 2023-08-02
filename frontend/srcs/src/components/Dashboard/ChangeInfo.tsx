@@ -7,7 +7,7 @@ const ChangeInfo: React.FC = () => {
     const user = useAppSelector((state) => state.user);
     const [email, setEmail] = useState(user.email);
     const [username, setUsername] = useState(user.username);
-    const [password, setPassword] = useState(user.password);
+    const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState('');
     const [twoFAEnabled, setTwoFAEnabled] = useState(user.twoFAEnabled)
 
@@ -26,12 +26,13 @@ const ChangeInfo: React.FC = () => {
          })
       };
       try{
-        await fetch(`http://localhost:3001/users/${username}`, requestOptions)
-        .then(response => response.json())
-        .then(data => console.log(data));
-  
-        const isLoggedIn = true
-        dispatch(setUser({email, username, password, isLoggedIn}))
+        const response =  await fetch(`http://localhost:3001/users/${username}`, requestOptions)
+        if (response.ok)
+        {
+            const user = await response.json();
+            const isLoggedIn = true
+            dispatch(setUser({...user, isLoggedIn}))
+        }
       }catch(err) {
         alert(err);
       }

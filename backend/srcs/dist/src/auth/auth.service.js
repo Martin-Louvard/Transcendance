@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
@@ -23,22 +24,17 @@ let AuthService = exports.AuthService = class AuthService {
         this.usersService = usersService;
     }
     async login(username, pass) {
-        const user = await this.prisma.user.findUnique({ where: { username }, include: { friends: true, games: true, JoinedChatChannels: true } });
-        if (!user) {
+        const userWithPass = await this.prisma.user.findUnique({ where: { username } });
+        if (!userWithPass) {
             throw new common_1.NotFoundException(`No user found for username: ${username}`);
         }
-        const isPasswordValid = await bcrypt.compare(pass, user.password);
+        const isPasswordValid = await bcrypt.compare(pass, userWithPass.password);
         if (!isPasswordValid) {
             throw new common_1.UnauthorizedException('Invalid password');
         }
-        let { password, ...result } = user;
+        const user = await this.usersService.findOne(username);
         const payload = { sub: user.id, username: user.username };
-        return { ...result, access_token: await this.jwtService.signAsync(payload) };
-    }
-    async login42(user) {
-        let { password, ...result } = user;
-        const payload = { sub: user.id, username: user.username };
-        return { ...result, access_token: await this.jwtService.signAsync(payload) };
+        return { ...user, access_token: await this.jwtService.signAsync(payload) };
     }
     async auth42(code) {
         const requestOptions = {
@@ -57,14 +53,14 @@ let AuthService = exports.AuthService = class AuthService {
             const data = await response.json();
             const token_42 = data.access_token;
             const userInfo = await this.get42UserInfo(token_42);
-            let dbUser = await this.prisma.user.findUnique({ where: { email42: userInfo.email }, include: { friends: true, games: true, JoinedChatChannels: true } });
+            let dbUser = await this.prisma.user.findUnique({ where: { email42: userInfo.email } });
             if (!dbUser) {
                 await this.prisma.user.create({ data: { username: userInfo.login, email42: userInfo.email, email: userInfo.email } });
-                dbUser = await this.prisma.user.findUnique({ where: { email42: userInfo.email }, include: { friends: true, games: true, JoinedChatChannels: true } });
+                dbUser = await this.prisma.user.findUnique({ where: { email42: userInfo.email } });
             }
-            let { password, ...result } = dbUser;
             const payload = { sub: dbUser.id, username: dbUser.username };
-            return { ...result, access_token: await this.jwtService.signAsync(payload) };
+            dbUser = await this.usersService.findBy42Email(userInfo.email);
+            return { ...dbUser, access_token: await this.jwtService.signAsync(payload) };
         }
         catch (err) {
             return (err);
@@ -87,6 +83,6 @@ let AuthService = exports.AuthService = class AuthService {
 };
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, jwt_1.JwtService, users_service_1.UsersService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, typeof (_a = typeof jwt_1.JwtService !== "undefined" && jwt_1.JwtService) === "function" ? _a : Object, users_service_1.UsersService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -48,14 +48,14 @@ volumes:
         driver_opts:
             type: 'none'
             o: 'bind'
-            device: "$PWD/frontend/srcs"
+            device: "$PWD/frontend/srcs/"
     postgres:
     nestjs:
         driver: local
         driver_opts:
             type: 'none'
             o: 'bind'
-            device: "$PWD/backend/srcs"
+            device: "$PWD/backend/srcs/"
 networks:
     transcendence:
         driver: bridge

@@ -124,6 +124,8 @@
 .friend-list{
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
+
 }
 
 .friend-item{
@@ -166,7 +168,7 @@
   padding: 10px;
   background-color: #312f2f;
   height: 100%;
-  width: 100%;
+  width: 20%;
   overflow: hidden;
 }
 

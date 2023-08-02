@@ -7,7 +7,6 @@ export declare class AuthService {
     private readonly usersService;
     constructor(prisma: PrismaService, jwtService: JwtService, usersService: UsersService);
     login(username: string, pass: string): Promise<any>;
-    login42(user: any): Promise<any>;
     auth42(code: any): Promise<any>;
     get42UserInfo(token: string): Promise<any>;
 }

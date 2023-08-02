@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } f
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserFriendsDto } from './dto/update-user-friends.dto';
 import { ApiTags, ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from './entities/user.entity';
@@ -40,22 +41,6 @@ export class UsersController {
     return this.usersService.findBy42Email(email42);
   }
 
-  @Post(':JoinedChatChannels')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiCreatedResponse({ type: User })
-  addToChannel()
-
-  @Post(':OwnedChatChannels')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiCreatedResponse({ type: User })
-
-  @Post(':AdminOnChatChannels')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiCreatedResponse({ type: User })
-
   @Patch(':username')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -64,6 +49,7 @@ export class UsersController {
     return this.usersService.update(username, updateUserDto);
   }
 
+
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -71,4 +57,16 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
+
+  @Post(':username/friends')
+  @ApiCreatedResponse({ type: User })
+  addFriend(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
+    return this.usersService.addFriend(username, updateUserFriendsDto);
+  }
+
+  @Delete(':username/friends')
+  removeFriend(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
+    return this.usersService.removeFriend(username, updateUserFriendsDto);
+  }
+
 }

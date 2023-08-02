@@ -12,12 +12,7 @@ export class ChatChannelsService {
   }
 
   findAll() {
-    return this.prisma.chatChannel.findMany({include: {
-      participants: true,
-      bannedUsers: true,
-      admins: true,
-      messages: true 
-    }});
+    return this.prisma.chatChannel.findMany({});
   }
 
   findOne(id: number) {
