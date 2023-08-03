@@ -8,7 +8,7 @@ export class ChatChannelsService {
   constructor(private prisma: PrismaService) {}
 
   create(createChatChannelDto: CreateChatChannelDto) {
-    return this.prisma.chatChannel.create({data: createChatChannelDto});
+    return this.prisma.chatChannel.create({ data: createChatChannelDto });
   }
 
   findAll() {
@@ -16,11 +16,14 @@ export class ChatChannelsService {
   }
 
   findOne(id: number) {
-    return this.prisma.chatChannel.findUnique({where: {id}});
+    return this.prisma.chatChannel.findUnique({ where: { id } });
   }
 
   update(id: number, updateChatChannelDto: UpdateChatChannelDto) {
-    return this.prisma.chatChannel.update({where: {id}, data: updateChatChannelDto});
+    return this.prisma.chatChannel.update({
+      where: { id },
+      data: updateChatChannelDto,
+    });
   }
 
   remove(id: number) {

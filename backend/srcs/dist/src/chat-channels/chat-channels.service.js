@@ -26,7 +26,10 @@ let ChatChannelsService = exports.ChatChannelsService = class ChatChannelsServic
         return this.prisma.chatChannel.findUnique({ where: { id } });
     }
     update(id, updateChatChannelDto) {
-        return this.prisma.chatChannel.update({ where: { id }, data: updateChatChannelDto });
+        return this.prisma.chatChannel.update({
+            where: { id },
+            data: updateChatChannelDto,
+        });
     }
     remove(id) {
         return this.prisma.chatChannel.delete({ where: { id } });
