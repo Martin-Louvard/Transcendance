@@ -16,7 +16,9 @@ const Navbar: React.FC<NavbarProps> = () => {
   const logout = () =>{
     const isLoggedIn = false
     window.location.href="http://localhost:3000/"
-    dispatch(setUser({...user, isLoggedIn}))
+    dispatch(setUser(isLoggedIn))
+    localStorage.removeItem('persist:root')
+
   }
 
   return (

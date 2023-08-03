@@ -16,7 +16,7 @@ model User {
   email                   String   @unique
   email42                 String?  @unique
   password                String?
-  avatar                  String?
+  avatar                  String?  @default("default.jpg")
   twoFAEnabled            Boolean  @default(false)
   status                  String   @default("inactive")
   victoriesCount          Int      @default(0)
@@ -30,6 +30,7 @@ model User {
   JoinedChatChannels      ChatChannel[] @relation("JoinedChannels")
   OwnedChatChannels       ChatChannel[] @relation("OwnedChannels")
   BannedFromChatChannels  ChatChannel[] @relation("BannedFromChannels")
+
   AdminOnChatChannels	  ChatChannel[] @relation("AdminOnChannels")
   chatMessages            ChatMessage[]
   createdAt               DateTime @default(now())
