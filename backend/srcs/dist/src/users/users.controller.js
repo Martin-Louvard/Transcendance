@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const update_user_dto_1 = require("./dto/update-user.dto");
+const update_user_friends_dto_1 = require("./dto/update-user-friends.dto");
 const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const user_entity_1 = require("./entities/user.entity");
@@ -44,6 +45,12 @@ let UsersController = exports.UsersController = class UsersController {
     }
     remove(id) {
         return this.usersService.remove(+id);
+    }
+    addFriend(username, updateUserFriendsDto) {
+        return this.usersService.addFriend(username, updateUserFriendsDto);
+    }
+    removeFriend(username, updateUserFriendsDto) {
+        return this.usersService.removeFriend(username, updateUserFriendsDto);
     }
 };
 __decorate([
@@ -85,14 +92,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "findBy42Email", null);
 __decorate([
-    (0, common_1.Post)(':OwnedChatChannels'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiCreatedResponse)({ type: user_entity_1.User }),
-    (0, common_1.Post)(':AdminOnChatChannels'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
-    (0, swagger_1.ApiCreatedResponse)({ type: user_entity_1.User }),
     (0, common_1.Patch)(':username'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiBearerAuth)(),
@@ -113,6 +112,23 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)(':username/friends'),
+    (0, swagger_1.ApiCreatedResponse)({ type: user_entity_1.User }),
+    __param(0, (0, common_1.Param)('username')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_user_friends_dto_1.UpdateUserFriendsDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "addFriend", null);
+__decorate([
+    (0, common_1.Delete)(':username/friends'),
+    __param(0, (0, common_1.Param)('username')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_user_friends_dto_1.UpdateUserFriendsDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "removeFriend", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, swagger_1.ApiTags)('users'),
