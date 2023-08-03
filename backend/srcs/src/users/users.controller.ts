@@ -1,4 +1,4 @@
-import { UseInterceptors, UploadedFile, Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { UseInterceptors, UploadedFile, Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,7 +8,11 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer'
-import { extname } from 'path'
+import { v4 as uuidv4 } from 'uuid';
+import { of } from 'rxjs';
+import { join } from 'path';
+
+const path = require('path');
 
 @Controller('users')
 @ApiTags('users')
@@ -75,16 +79,21 @@ export class UsersController {
   @Post(':username/avatar')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: './avatars'
+      destination: './uploads/avatars'
       , filename: (req, file, cb) => {
-        // Generating a 32 random chars long string
-        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-        //Calling the callback passing the random name generated with the original extension name
-        cb(null, `${randomName}${extname(file.originalname)}`)
+        const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+        const extension: string = path.parse(file.originalname).ext;
+        cb(null, `${filename}${extension}`)
       }
     })
   }))
-  uploadAvatar(@Param('username') username, @UploadedFile() file) {
-    this.usersService.setAvatar(username, `${this.SERVER_URL}${file.path}`);
+  uploadAvatar(@Param('username') username: string, @UploadedFile() file) {
+    console.log(file)
+    return  this.usersService.updateAvatar(username, file);
+  }
+
+  @Get('avatar/:username')
+  findAvatar(@Param('username') username: string, @Res() res){
+    return this.usersService.findAvatar(username, res)
   }
 }

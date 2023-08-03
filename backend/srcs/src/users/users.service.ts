@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException, NotAcceptableException } from '@nestjs/common';
+import { Injectable, NotFoundException, NotAcceptableException, Res } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserFriendsDto } from './dto/update-user-friends.dto';
+import { of } from 'rxjs';
+import { join } from 'path';
 
 import * as bcrypt from 'bcrypt';
 
@@ -36,6 +38,7 @@ export class UsersService {
         ]
       },
     });
+    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
     const user = { ...userRaw, friends: friends };
     return user
   }
@@ -53,6 +56,7 @@ export class UsersService {
         ]
       },
     });
+    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
     const user = { ...userRaw, friends: friends };
     return user
   }
@@ -70,6 +74,7 @@ export class UsersService {
         ]
       },
     });
+    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
     const user = { ...userRaw, friends: friends };
     return user
   }
@@ -78,7 +83,8 @@ export class UsersService {
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, roundsOfHashing);
     }
-    return this.prisma.user.update({where: {username}, data: updateUserDto});
+    await this.prisma.user.update({where: {username}, data: updateUserDto});
+    return this.findOne(username)
   }
 
   async remove(id: number) {
@@ -157,7 +163,19 @@ export class UsersService {
   }
 
 
-  async setAvatar(username: string, path: string){
+  async updateAvatar(username: string, file){
+    await this.prisma.user.update({where: {username}, 
+      data: {
+        avatar: file.path
+    }});
 
+    return this.findOne(username)
+  }
+
+  async findAvatar(username:string, res){
+    const user = await this.prisma.user.findUnique({where: {username}});
+    if (!user)
+      throw new NotFoundException(`No user found for username: ${username}`);
+    return of(res.sendFile(join(process.cwd(), user.avatar)))
   }
 }

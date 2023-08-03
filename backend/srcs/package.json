@@ -34,7 +34,8 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^10.2.4",
@@ -47,7 +48,9 @@
     "@types/multer": "^1.4.7",
     "@types/node": "^20.3.1",
     "@types/passport-jwt": "^3.0.9",
+    "@types/path-parse": "^1.0.19",
     "@types/supertest": "^2.0.12",
+    "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "@typescript-eslint/parser": "^5.59.11",
     "eslint": "^8.42.0",
