@@ -7,6 +7,7 @@ import HistoryCard from './HistoryCard';
 import { useAppDispatch } from '../../hooks';
 import { setUser } from '../Authentication/userReducer.ts';
 
+
 const ProfileCard = (user) =>{
     const currentUser = useAppSelector((state) => state.user);
     const [chatOpen, setChatOpen] = useState(false)
@@ -87,6 +88,7 @@ const ProfileCard = (user) =>{
         {
              user.username != currentUser.username ? <button onClick={() =>{deleteFriendship()}}>Delete From Friends</button> : <></>
         }
+
     </>
     }
     

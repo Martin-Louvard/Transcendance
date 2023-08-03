@@ -11,7 +11,6 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = () => {
   const logo = '/pong.svg'
   const user = useAppSelector((state) => state.user);
-
   const dispatch = useAppDispatch();
 
   const logout = () =>{
@@ -19,6 +18,7 @@ const Navbar: React.FC<NavbarProps> = () => {
     window.location.href="http://localhost:3000/"
     dispatch(setUser(isLoggedIn))
     localStorage.removeItem('persist:root')
+
   }
 
   return (

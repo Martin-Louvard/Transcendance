@@ -3,20 +3,23 @@ import { createSlice } from '@reduxjs/toolkit'
 // Define a type for the slice state
 interface userState {
   id: number,
-  username: string,
-  email: string,
-  avatar: string,
-  twoFAEnabled: boolean,
-  status: string,
-  victoriesCount: number,
-  defeatCount: number,
-  rank: string,
-  level: number,
-  achievements: JSON | null,
-  createdAt: string,
-  access_token: string,
-  friends: Array<Object>,
-  isLoggedIn: boolean
+    username: string,
+    email: string,
+    avatar: string,
+    twoFAEnabled: boolean,
+    status: string,
+    victoriesCount: number,
+    defeatCount: number,
+    rank: string,
+    level: number,
+    achievements: JSON | null,
+    createdAt: string,
+    access_token: string,
+    friends: Array<Object>,
+    isLoggedIn: boolean,
+    JoinedChatChannels: Array<Object>,
+    OwnedChatChannels: Array<Object>,
+    BannedFromChatChannels: Array<Object>
 }
 
 // Define the initial state using that type
@@ -24,7 +27,7 @@ const initialState: userState = {
   id: 0,
   username: "",
   email: "",
-  avatar: "/default.jpg",
+  avatar: "",
   twoFAEnabled: false,
   status: "inactive",
   victoriesCount: 0,
@@ -35,9 +38,11 @@ const initialState: userState = {
   createdAt: "",
   access_token: "",
   friends: [{}],
-  isLoggedIn: false
+  isLoggedIn: false,
+  JoinedChatChannels: [{}],
+  OwnedChatChannels: [{}],
+  BannedFromChatChannels: [{}]
 }
-
 
 export const sessionSlice = createSlice({
   name: 'user',
@@ -52,4 +57,5 @@ export const sessionSlice = createSlice({
 
 // Action creators are generated for each case reducer function
 export const { setUser } = sessionSlice.actions
+
 export default sessionSlice.reducer

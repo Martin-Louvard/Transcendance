@@ -5,7 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserFriendsDto } from './dto/update-user-friends.dto';
 import { of } from 'rxjs';
 import { join } from 'path';
-
 import * as bcrypt from 'bcrypt';
 
 export const roundsOfHashing = 10;
@@ -23,11 +22,15 @@ export class UsersService {
   }
 
   findAll() {
-    return this.prisma.user.findMany({include: {friends: true, friendUserFriends: true, games: true, JoinedChatChannels: true}});
+    return this.prisma.user.findMany({include: {friends: true, friendUserFriends: true, games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true}});
   }
 
   async findOne(username: string) {
-    const userRaw = await this.prisma.user.findUnique({where: {username}, include: {games: true, JoinedChatChannels: true}});
+    const userRaw = await this.prisma.user.findUnique({where: {username}, include: {games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true}});
     if (!userRaw)
       throw new NotFoundException(`No user found for username: ${username}`);
     const friends = await this.prisma.friends.findMany({
@@ -44,7 +47,9 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    const userRaw = await this.prisma.user.findUnique({where: {id}, include: {games: true, JoinedChatChannels: true}});
+    const userRaw = await this.prisma.user.findUnique({where: {id}, include: {games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true}});
     if (!userRaw)
       throw new NotFoundException(`No user found for id: ${id}`);
       
@@ -62,7 +67,9 @@ export class UsersService {
   }
 
   async findBy42Email(email42: string) {
-    const userRaw = await this.prisma.user.findUnique({where: {email42}, include: {games: true, JoinedChatChannels: true}});
+    const userRaw = await this.prisma.user.findUnique({where: {email42}, include: {games: true, JoinedChatChannels: true,  OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true}});
     if (!userRaw)
       throw new NotFoundException(`No user found for email: ${email42}`);
 
@@ -77,6 +84,7 @@ export class UsersService {
     userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
     const user = { ...userRaw, friends: friends };
     return user
+
   }
 
   async update(username: string, updateUserDto: UpdateUserDto) {
@@ -177,5 +185,6 @@ export class UsersService {
     if (!user)
       throw new NotFoundException(`No user found for username: ${username}`);
     return of(res.sendFile(join(process.cwd(), user.avatar)))
+
   }
 }

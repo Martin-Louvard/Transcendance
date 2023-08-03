@@ -14,6 +14,7 @@ import { join } from 'path';
 
 const path = require('path');
 
+
 @Controller('users')
 @ApiTags('users')
 export class UsersController {
@@ -56,7 +57,6 @@ export class UsersController {
     return this.usersService.update(username, updateUserDto);
   }
 
-
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -96,4 +96,5 @@ export class UsersController {
   findAvatar(@Param('username') username: string, @Res() res){
     return this.usersService.findAvatar(username, res)
   }
+
 }

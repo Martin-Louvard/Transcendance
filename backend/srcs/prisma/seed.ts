@@ -67,31 +67,6 @@ async function main() {
   });
 
 
-    /*await prisma.user.upsert({
-    where: { username: 'admin' },
-    update: { password: adminpassword,        
-      friends: {
-      create:[{friend_id: user1.id}, {friend_id: user2.id}, {friend_id: user42.id}]
-    } },
-    create: {
-        username: 'admin',
-        email: 'admin@gmail.com',
-        password: adminpassword,
-
-      },
-  });
-const martin42 = await prisma.user.upsert({
-    where: { username: 'martin42' },
-    update: { password: commonpassword },
-    create: {
-        username: 'mlouvar',
-        email: 'fakeEmailMartin42@gmail.com',
-        email42: 'malouvar@student.42.fr',
-        password: commonpassword ,
-    },
-  });*/
-
-
   console.log({ user1, user2, user42, admin });
 }
 
