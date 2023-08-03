@@ -23,8 +23,9 @@ export class UsersService {
       JoinedChatChannels: true,
       OwnedChatChannels: true,
       BannedFromChatChannels: true,
-      AdminOnChatChannels: true
-    }
+      AdminOnChatChannels: true,
+    }});
+  }
 
   async findOne(username: string) {
     const userRaw = await this.prisma.user.findUnique({where: {username}, include: {games: true, JoinedChatChannels: true}});
@@ -50,7 +51,7 @@ export class UsersService {
       OwnedChatChannels: true,
       BannedFromChatChannels: true,
       AdminOnChatChannels: true
-    }
+    }});
     if (!userRaw)
       throw new NotFoundException(`No user found for id: ${id}`);
       
@@ -74,7 +75,7 @@ export class UsersService {
       OwnedChatChannels: true,
       BannedFromChatChannels: true,
       AdminOnChatChannels: true
-    }
+    }});
     if (!userRaw)
       throw new NotFoundException(`No user found for email: ${email42}`);
 
@@ -91,11 +92,11 @@ export class UsersService {
   }
 
   async update(username: string, updateUserDto: UpdateUserDto) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, roundsOfHashing);
     if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, roundsOfHashing);
     }
-  }
     return this.prisma.user.update({where: {username}, data: updateUserDto});
+  }
 
   async remove(id: number) {
     const userRaw = await this.prisma.user.findUnique({where: {id}});
@@ -146,18 +147,18 @@ export class UsersService {
       const userFriend = await this.prisma.user.findUnique({where: {username: updateUserFriendsDto.friend_username}})
     if (!userFriend)
       throw new NotFoundException(`No user found for username: ${updateUserFriendsDto.friend_username}`);
-    
+
     const result = await this.prisma.friends.deleteMany({
+      where: {
         OR : [
-      where: { 
           {
             AND:[
               { user_id: user.id},
               { friend_id: userFriend.id }
             ]
           },
-            AND:[
           {
+            AND:[
               { user_id: userFriend.id},
               { friend_id: user.id }
             ]
@@ -168,8 +169,7 @@ export class UsersService {
     })
     if(result.count == 0)
       throw new NotFoundException(`No friendship found between: ${username} and ${updateUserFriendsDto.friend_username}`);
-
-  }
     return this.findOne(username);
+  }
 
 }
