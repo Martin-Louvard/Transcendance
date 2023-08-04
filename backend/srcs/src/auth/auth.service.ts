@@ -17,6 +17,7 @@ export class AuthService {
             throw new NotFoundException(`No user found for username: ${username}`);
         }
         const isPasswordValid = await bcrypt.compare(pass, userWithPass.password);
+
         if (!isPasswordValid) {
             throw new UnauthorizedException('Invalid password');
         }
@@ -53,6 +54,7 @@ export class AuthService {
             const payload = { sub: dbUser.id, username: dbUser.username };
             dbUser = await this.usersService.findBy42Email(userInfo.email)
             return {...dbUser, access_token: await this.jwtService.signAsync(payload)};
+
 
           }catch(err) {
             return(err);

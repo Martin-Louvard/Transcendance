@@ -29,11 +29,11 @@ const LoginForm: React.FC = () => {
 
   return (
     <Form onSubmit={handleSubmit} title="Login" buttonText="Login">
-      <div>
+      <div className='form-div'>
         <label htmlFor="username">Username:</label>
         <input type="username" id="username" value={username} onChange={handleChange} />
       </div>
-      <div>
+      <div className='form-div'>
         <label htmlFor="password">Password:</label>
         <input type="password" id="password" value={password} onChange={handleChange}  />
       </div>

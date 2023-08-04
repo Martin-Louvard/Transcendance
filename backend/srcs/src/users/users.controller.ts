@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { UseInterceptors, UploadedFile, Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,6 +6,14 @@ import { UpdateUserFriendsDto } from './dto/update-user-friends.dto';
 import { ApiTags, ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from './entities/user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer'
+import { v4 as uuidv4 } from 'uuid';
+import { of } from 'rxjs';
+import { join } from 'path';
+
+const path = require('path');
+
 
 @Controller('users')
 @ApiTags('users')
@@ -49,7 +57,6 @@ export class UsersController {
     return this.usersService.update(username, updateUserDto);
   }
 
-
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -67,6 +74,27 @@ export class UsersController {
   @Delete(':username/friends')
   removeFriend(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
     return this.usersService.removeFriend(username, updateUserFriendsDto);
+  }
+
+  @Post(':username/avatar')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: './uploads/avatars'
+      , filename: (req, file, cb) => {
+        const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+        const extension: string = path.parse(file.originalname).ext;
+        cb(null, `${filename}${extension}`)
+      }
+    })
+  }))
+  uploadAvatar(@Param('username') username: string, @UploadedFile() file) {
+    console.log(file)
+    return  this.usersService.updateAvatar(username, file);
+  }
+
+  @Get('avatar/:username')
+  findAvatar(@Param('username') username: string, @Res() res){
+    return this.usersService.findAvatar(username, res)
   }
 
 }

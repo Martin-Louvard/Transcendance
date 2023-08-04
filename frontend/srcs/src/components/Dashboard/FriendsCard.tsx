@@ -23,7 +23,6 @@ const FriendsCard = () =>{
               response = await fetch(`http://localhost:3001/users/id/${item.friend_id}?id=${item.friend_id}`);
             else
               response = await fetch(`http://localhost:3001/users/id/${item.user_id}?id=${item.user_id}`);
-
             const data = await response.json();
             return data;
           })
@@ -85,11 +84,12 @@ const FriendsCard = () =>{
           {friends ? friends.map((friend, index) => (
             <li className="friend-item" onClick={() => displayFriendProfile(friend)} key={index}>
             <div className='friend-picture'>
-                <img src='./default.jpg'/>
+              <img src={friend.avatar}/>
             </div>
               <p>{friend.username}</p>
             </li>
           )) : <></>}
+
         </ul>
         </div>
     }

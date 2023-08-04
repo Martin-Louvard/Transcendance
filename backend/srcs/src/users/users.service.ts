@@ -7,6 +7,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserFriendsDto } from './dto/update-user-friends.dto';
+import { of } from 'rxjs';
+import { join } from 'path';
 import { UpdateChatChannelDto } from '../chat-channels/dto/update-chat-channel.dto';
 import { CreateChatChannelDto } from '../chat-channels/dto/create-chat-channel.dto';
 import * as bcrypt from 'bcrypt';
@@ -25,23 +27,15 @@ export class UsersService {
   }
 
   findAll() {
-    return this.prisma.user.findMany({
-      include: {
-        friends: true,
-        games: true,
-        JoinedChatChannels: true,
-        OwnedChatChannels: true,
-        BannedFromChatChannels: true,
-        AdminOnChatChannels: true,
-      },
-    });
+    return this.prisma.user.findMany({include: {friends: true, friendUserFriends: true, games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true}});
   }
 
   async findOne(username: string) {
-    const userRaw = await this.prisma.user.findUnique({
-      where: { username },
-      include: { games: true, JoinedChatChannels: true },
-    });
+    const userRaw = await this.prisma.user.findUnique({where: {username}, include: {games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true}});
     if (!userRaw)
       throw new NotFoundException(`No user found for username: ${username}`);
     const friends = await this.prisma.friends.findMany({
@@ -49,45 +43,32 @@ export class UsersService {
         OR: [{ user_id: userRaw.id }, { friend_id: userRaw.id }],
       },
     });
+    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
     const user = { ...userRaw, friends: friends };
     return user;
   }
 
   async findById(id: number) {
-    const userRaw = await this.prisma.user.findUnique({
-      where: { id },
-      include: {
-        friends: true,
-        games: true,
-        JoinedChatChannels: true,
-        OwnedChatChannels: true,
-        BannedFromChatChannels: true,
-        AdminOnChatChannels: true,
-      },
-    });
-    if (!userRaw) throw new NotFoundException(`No user found for id: ${id}`);
-
+    const userRaw = await this.prisma.user.findUnique({where: {id}, include: {games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true}});
+    if (!userRaw)
+      throw new NotFoundException(`No user found for id: ${id}`);
+      
     const friends = await this.prisma.friends.findMany({
       where: {
         OR: [{ user_id: id }, { friend_id: id }],
       },
     });
+    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
     const user = { ...userRaw, friends: friends };
     return user;
   }
 
   async findBy42Email(email42: string) {
-    const userRaw = await this.prisma.user.findUnique({
-      where: { email42 },
-      include: {
-        friends: true,
-        games: true,
-        JoinedChatChannels: true,
-        OwnedChatChannels: true,
-        BannedFromChatChannels: true,
-        AdminOnChatChannels: true,
-      },
-    });
+    const userRaw = await this.prisma.user.findUnique({where: {email42}, include: {games: true, JoinedChatChannels: true,  OwnedChatChannels: true,
+      BannedFromChatChannels: true,
+      AdminOnChatChannels: true}});
     if (!userRaw)
       throw new NotFoundException(`No user found for email: ${email42}`);
 
@@ -96,8 +77,10 @@ export class UsersService {
         OR: [{ user_id: userRaw.id }, { friend_id: userRaw.id }],
       },
     });
+    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
     const user = { ...userRaw, friends: friends };
-    return user;
+    return user
+
   }
 
   async update(username: string, updateUserDto: UpdateUserDto) {
@@ -107,10 +90,8 @@ export class UsersService {
         roundsOfHashing,
       );
     }
-    return this.prisma.user.update({
-      where: { username },
-      data: updateUserDto,
-    });
+    await this.prisma.user.update({where: {username}, data: updateUserDto});
+    return this.findOne(username)
   }
 
   async remove(id: number) {
@@ -194,4 +175,21 @@ export class UsersService {
     return this.findOne(username);
   }
 
+
+  async updateAvatar(username: string, file){
+    await this.prisma.user.update({where: {username}, 
+      data: {
+        avatar: file.path
+    }});
+
+    return this.findOne(username)
+  }
+
+  async findAvatar(username:string, res){
+    const user = await this.prisma.user.findUnique({where: {username}});
+    if (!user)
+      throw new NotFoundException(`No user found for username: ${username}`);
+    return of(res.sendFile(join(process.cwd(), user.avatar)))
+
+  }
 }
