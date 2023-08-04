@@ -13,12 +13,15 @@ exports.UpdateChatChannelDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const create_chat_channel_dto_1 = require("./create-chat-channel.dto");
 const swagger_2 = require("@nestjs/swagger");
-const user_entity_1 = require("../../users/entities/user.entity");
 class UpdateChatChannelDto extends (0, swagger_1.PartialType)(create_chat_channel_dto_1.CreateChatChannelDto) {
 }
 exports.UpdateChatChannelDto = UpdateChatChannelDto;
 __decorate([
     (0, swagger_2.ApiProperty)(),
-    __metadata("design:type", user_entity_1.User)
+    __metadata("design:type", Array)
 ], UpdateChatChannelDto.prototype, "bannedUsers", void 0);
+__decorate([
+    (0, swagger_2.ApiProperty)(),
+    __metadata("design:type", Array)
+], UpdateChatChannelDto.prototype, "participants", void 0);
 //# sourceMappingURL=update-chat-channel.dto.js.map

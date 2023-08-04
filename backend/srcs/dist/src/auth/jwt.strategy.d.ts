@@ -27,11 +27,11 @@ export declare class JwtStrategy extends JwtStrategy_base {
             channelType: string;
             name: string;
         }, unknown> & {})[];
+        password: string;
         id: number;
         username: string;
         email: string;
         email42: string;
-        password: string;
         avatar: string;
         twoFAEnabled: boolean;
         status: string;

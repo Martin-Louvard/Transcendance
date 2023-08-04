@@ -1,19 +1,22 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from 'src/users/entities/user.entity';
 
 export class CreateChatChannelDto {
-    @ApiProperty()
-    owner: User
+  @ApiProperty()
+  owner_username: string;
 
-    @ApiProperty()
-    password: string
+  @ApiPropertyOptional()
+  password: string;
 
-    @ApiProperty()
-    channelType: string
+  @ApiPropertyOptional()
+  channelType: string;
 
-    @ApiProperty()
-    name: string
+  @ApiPropertyOptional()
+  name: string;
 
-    @ApiProperty()
-    participants: User
+  @ApiPropertyOptional()
+  bannedUsers: Array<User>;
+
+  @ApiPropertyOptional()
+  participants: Array<User>;
 }

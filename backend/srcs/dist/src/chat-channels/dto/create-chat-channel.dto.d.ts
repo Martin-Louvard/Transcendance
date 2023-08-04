@@ -1,8 +1,9 @@
 import { User } from 'src/users/entities/user.entity';
 export declare class CreateChatChannelDto {
-    owner: User;
+    owner_username: string;
     password: string;
     channelType: string;
     name: string;
-    participants: User;
+    bannedUsers: Array<User>;
+    participants: Array<User>;
 }

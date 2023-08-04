@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ChatChannelsService } from './chat-channels.service';
 import { CreateChatChannelDto } from './dto/create-chat-channel.dto';
 import { UpdateChatChannelDto } from './dto/update-chat-channel.dto';
@@ -25,7 +33,10 @@ export class ChatChannelsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChatChannelDto: UpdateChatChannelDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateChatChannelDto: UpdateChatChannelDto,
+  ) {
     return this.chatChannelsService.update(+id, updateChatChannelDto);
   }
 

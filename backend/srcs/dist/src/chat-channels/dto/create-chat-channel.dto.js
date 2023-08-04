@@ -11,28 +11,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateChatChannelDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-const user_entity_1 = require("../../users/entities/user.entity");
 class CreateChatChannelDto {
 }
 exports.CreateChatChannelDto = CreateChatChannelDto;
 __decorate([
     (0, swagger_1.ApiProperty)(),
-    __metadata("design:type", user_entity_1.User)
-], CreateChatChannelDto.prototype, "owner", void 0);
+    __metadata("design:type", String)
+], CreateChatChannelDto.prototype, "owner_username", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiPropertyOptional)(),
     __metadata("design:type", String)
 ], CreateChatChannelDto.prototype, "password", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiPropertyOptional)(),
     __metadata("design:type", String)
 ], CreateChatChannelDto.prototype, "channelType", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiPropertyOptional)(),
     __metadata("design:type", String)
 ], CreateChatChannelDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
-    __metadata("design:type", user_entity_1.User)
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", Array)
+], CreateChatChannelDto.prototype, "bannedUsers", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", Array)
 ], CreateChatChannelDto.prototype, "participants", void 0);
 //# sourceMappingURL=create-chat-channel.dto.js.map

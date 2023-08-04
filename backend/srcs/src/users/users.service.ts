@@ -7,6 +7,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserFriendsDto } from './dto/update-user-friends.dto';
+import { UpdateChatChannelDto } from '../chat-channels/dto/update-chat-channel.dto';
+import { CreateChatChannelDto } from '../chat-channels/dto/create-chat-channel.dto';
 import * as bcrypt from 'bcrypt';
 export const roundsOfHashing = 10;
 @Injectable()
@@ -191,4 +193,5 @@ export class UsersService {
       );
     return this.findOne(username);
   }
+
 }

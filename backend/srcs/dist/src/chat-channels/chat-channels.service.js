@@ -16,8 +16,15 @@ let ChatChannelsService = exports.ChatChannelsService = class ChatChannelsServic
     constructor(prisma) {
         this.prisma = prisma;
     }
-    create(createChatChannelDto) {
-        return this.prisma.chatChannel.create({ data: createChatChannelDto });
+    async create(createChatChannelDto) {
+        const user = await this.prisma.user.findUnique({
+            where: { username: createChatChannelDto.owner_username },
+        });
+        return this.prisma.chatChannel.create({
+            data: {
+                ownerId: user.id,
+            },
+        });
     }
     findAll() {
         return this.prisma.chatChannel.findMany({});
@@ -25,10 +32,11 @@ let ChatChannelsService = exports.ChatChannelsService = class ChatChannelsServic
     findOne(id) {
         return this.prisma.chatChannel.findUnique({ where: { id } });
     }
-    update(id, updateChatChannelDto) {
+    async update(id, updateChatChannelDto) {
+        const channel = await this.prisma.chatChannel.findUnique({ where: { id } });
         return this.prisma.chatChannel.update({
-            where: { id },
-            data: updateChatChannelDto,
+            where: { id: channel.id },
+            data: channel,
         });
     }
     remove(id) {
