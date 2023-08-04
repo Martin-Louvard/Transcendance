@@ -31,7 +31,7 @@ export class ChatChannelsService {
     const channel = await this.prisma.chatChannel.findUnique({ where: { id } });
     return this.prisma.chatChannel.update({
       where: { id: channel.id },
-      data: channel,
+      data: { ...channel },
     });
   }
 

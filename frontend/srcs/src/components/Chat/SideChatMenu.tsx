@@ -25,8 +25,10 @@ const SideChatMenu: React.FC<Props> = ({ chatchannel, onChatChannelClick, onCrea
       body: JSON.stringify({ owner: userInfo, name: newChatName, password: newChatPasswd})
     })
       .then((response) => response.json)
-      .then((data) => {
-        const newChat: ChatChannels = { id: data.id, Owner: data.owner}
+      .then((data: ChatChannels) => {
+        const newChat: ChatChannels = {
+          id: data.id, Owner: data.Owner, Participants: [userInfo], Admins: [userInfo] };
+        dispatch()
       })
   }
 }

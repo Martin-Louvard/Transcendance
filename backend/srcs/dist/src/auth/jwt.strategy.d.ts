@@ -27,6 +27,27 @@ export declare class JwtStrategy extends JwtStrategy_base {
             channelType: string;
             name: string;
         }, unknown> & {})[];
+        OwnedChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        BannedFromChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
+        AdminOnChatChannels: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            ownerId: number;
+            password: string;
+            channelType: string;
+            name: string;
+        }, unknown> & {})[];
         id: number;
         username: string;
         email: string;

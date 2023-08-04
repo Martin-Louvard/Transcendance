@@ -21,6 +21,10 @@ const update_user_friends_dto_1 = require("./dto/update-user-friends.dto");
 const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const user_entity_1 = require("./entities/user.entity");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
+const uuid_1 = require("uuid");
+const path = require('path');
 let UsersController = exports.UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -51,6 +55,13 @@ let UsersController = exports.UsersController = class UsersController {
     }
     removeFriend(username, updateUserFriendsDto) {
         return this.usersService.removeFriend(username, updateUserFriendsDto);
+    }
+    uploadAvatar(username, file) {
+        console.log(file);
+        return this.usersService.updateAvatar(username, file);
+    }
+    findAvatar(username, res) {
+        return this.usersService.findAvatar(username, res);
     }
 };
 __decorate([
@@ -129,6 +140,32 @@ __decorate([
     __metadata("design:paramtypes", [String, update_user_friends_dto_1.UpdateUserFriendsDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "removeFriend", null);
+__decorate([
+    (0, common_1.Post)(':username/avatar'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads/avatars',
+            filename: (req, file, cb) => {
+                const filename = path.parse(file.originalname).name.replace(/\s/g, '') + (0, uuid_1.v4)();
+                const extension = path.parse(file.originalname).ext;
+                cb(null, `${filename}${extension}`);
+            }
+        })
+    })),
+    __param(0, (0, common_1.Param)('username')),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "uploadAvatar", null);
+__decorate([
+    (0, common_1.Get)('avatar/:username'),
+    __param(0, (0, common_1.Param)('username')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "findAvatar", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, swagger_1.ApiTags)('users'),

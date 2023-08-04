@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = exports.roundsOfHashing = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const rxjs_1 = require("rxjs");
+const path_1 = require("path");
 const bcrypt = require("bcrypt");
 exports.roundsOfHashing = 10;
 let UsersService = exports.UsersService = class UsersService {
@@ -24,53 +26,168 @@ let UsersService = exports.UsersService = class UsersService {
         return this.prisma.user.create({ data: createUserDto });
     }
     findAll() {
-        return this.prisma.user.findMany({ include: {
+        return this.prisma.user.findMany({
+            include: {
                 friends: true,
+                friendUserFriends: true,
                 games: true,
                 JoinedChatChannels: true,
                 OwnedChatChannels: true,
                 BannedFromChatChannels: true,
-                AdminOnChatChannels: true
-            } });
+                AdminOnChatChannels: true,
+            },
+        });
     }
-    findOne(username) {
-        return this.prisma.user.findUnique({ where: { username }, include: {
-                friends: true,
+    async findOne(username) {
+        const userRaw = await this.prisma.user.findUnique({
+            where: { username },
+            include: {
                 games: true,
                 JoinedChatChannels: true,
                 OwnedChatChannels: true,
                 BannedFromChatChannels: true,
-                AdminOnChatChannels: true
-            } });
+                AdminOnChatChannels: true,
+            },
+        });
+        if (!userRaw)
+            throw new common_1.NotFoundException(`No user found for username: ${username}`);
+        const friends = await this.prisma.friends.findMany({
+            where: {
+                OR: [{ user_id: userRaw.id }, { friend_id: userRaw.id }],
+            },
+        });
+        userRaw.avatar = 'http://localhost:3001/users/avatar/' + userRaw.username;
+        const user = { ...userRaw, friends: friends };
+        return user;
     }
-    findById(id) {
-        return this.prisma.user.findUnique({ where: { id }, include: {
-                friends: true,
+    async findById(id) {
+        const userRaw = await this.prisma.user.findUnique({
+            where: { id },
+            include: {
                 games: true,
                 JoinedChatChannels: true,
                 OwnedChatChannels: true,
                 BannedFromChatChannels: true,
-                AdminOnChatChannels: true
-            } });
+                AdminOnChatChannels: true,
+            },
+        });
+        if (!userRaw)
+            throw new common_1.NotFoundException(`No user found for id: ${id}`);
+        const friends = await this.prisma.friends.findMany({
+            where: {
+                OR: [{ user_id: id }, { friend_id: id }],
+            },
+        });
+        userRaw.avatar = 'http://localhost:3001/users/avatar/' + userRaw.username;
+        const user = { ...userRaw, friends: friends };
+        return user;
     }
-    findBy42Email(email42) {
-        return this.prisma.user.findUnique({ where: { email42 }, include: {
-                friends: true,
+    async findBy42Email(email42) {
+        const userRaw = await this.prisma.user.findUnique({
+            where: { email42 },
+            include: {
                 games: true,
                 JoinedChatChannels: true,
                 OwnedChatChannels: true,
                 BannedFromChatChannels: true,
-                AdminOnChatChannels: true
-            } });
+                AdminOnChatChannels: true,
+            },
+        });
+        if (!userRaw)
+            throw new common_1.NotFoundException(`No user found for email: ${email42}`);
+        const friends = await this.prisma.friends.findMany({
+            where: {
+                OR: [{ user_id: userRaw.id }, { friend_id: userRaw.id }],
+            },
+        });
+        userRaw.avatar = 'http://localhost:3001/users/avatar/' + userRaw.username;
+        const user = { ...userRaw, friends: friends };
+        return user;
     }
     async update(username, updateUserDto) {
         if (updateUserDto.password) {
             updateUserDto.password = await bcrypt.hash(updateUserDto.password, exports.roundsOfHashing);
         }
-        return this.prisma.user.update({ where: { username }, data: updateUserDto });
+        await this.prisma.user.update({ where: { username }, data: updateUserDto });
+        return this.findOne(username);
     }
-    remove(id) {
+    async remove(id) {
+        const userRaw = await this.prisma.user.findUnique({ where: { id } });
+        if (!userRaw)
+            throw new common_1.NotFoundException(`No user found for id: ${id}`);
+        await this.prisma.user.update({
+            where: { id },
+            data: {
+                friends: {
+                    deleteMany: {},
+                },
+                friendUserFriends: {
+                    deleteMany: {},
+                },
+            },
+        });
         return this.prisma.user.delete({ where: { id } });
+    }
+    async addFriend(username, updateUserFriendsDto) {
+        if (username == updateUserFriendsDto.friend_username)
+            throw new common_1.NotAcceptableException(`Self interaction prohibited`);
+        const userFriend = await this.prisma.user.findUnique({
+            where: { username: updateUserFriendsDto.friend_username },
+            include: { friends: true, friendUserFriends: true },
+        });
+        if (!userFriend)
+            throw new common_1.NotFoundException(`No user found for username: ${username}`);
+        await this.prisma.user.update({
+            where: { username: username },
+            data: {
+                friends: {
+                    create: [{ friend_id: userFriend.id }],
+                },
+            },
+        });
+        return this.findOne(username);
+    }
+    async removeFriend(username, updateUserFriendsDto) {
+        if (username == updateUserFriendsDto.friend_username)
+            throw new common_1.NotAcceptableException(`Self interaction prohibited`);
+        const user = await this.prisma.user.findUnique({ where: { username } });
+        if (!user)
+            throw new common_1.NotFoundException(`No user found for username: ${username}`);
+        const userFriend = await this.prisma.user.findUnique({
+            where: { username: updateUserFriendsDto.friend_username },
+        });
+        if (!userFriend)
+            throw new common_1.NotFoundException(`No user found for username: ${updateUserFriendsDto.friend_username}`);
+        const result = await this.prisma.friends.deleteMany({
+            where: {
+                OR: [
+                    {
+                        AND: [{ user_id: user.id }, { friend_id: userFriend.id }],
+                    },
+                    {
+                        AND: [{ user_id: userFriend.id }, { friend_id: user.id }],
+                    },
+                ],
+            },
+        });
+        if (result.count == 0)
+            throw new common_1.NotFoundException(`No friendship found between: ${username} and ${updateUserFriendsDto.friend_username}`);
+        return this.findOne(username);
+    }
+    async updateAvatar(username, file) {
+        await this.prisma.user.update({
+            where: { username },
+            data: {
+                avatar: file.path,
+            },
+        });
+        return this.findOne(username);
+    }
+    async findAvatar(username, res) {
+        const user = await this.prisma.user.findUnique({ where: { username } });
+        if (!user)
+            throw new common_1.NotFoundException(`No user found for username: ${username}`);
+        return (0, rxjs_1.of)(res.sendFile((0, path_1.join)(process.cwd(), user.avatar)));
     }
 };
 exports.UsersService = UsersService = __decorate([

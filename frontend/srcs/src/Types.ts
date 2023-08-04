@@ -30,6 +30,7 @@ export interface Message {
 export interface ChatChannels {
   id: number;
   Owner: User;
+  Participants: User[];
   Admins: User[];
   name?: string;
   password?: string;
