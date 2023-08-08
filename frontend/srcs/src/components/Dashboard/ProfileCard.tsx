@@ -1,7 +1,7 @@
 import './Dashboard.css'
 import { useAppSelector } from "../../hooks";
 import Chat from '../Chat/Chat.tsx'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ChangeInfo from './ChangeInfo.tsx';
 import HistoryCard from './HistoryCard';
 import { useAppDispatch } from '../../hooks';
@@ -17,7 +17,7 @@ const ProfileCard = (user) =>{
     const [avatarUrl, setAvatarUrl] = useState(user.avatar)
     const [twoFaQrcode, setTwoFaQrcode] = useState("")
     const [codeInput, setCodeInput] = useState("")
-
+    
     const deleteFriendship = async () =>{
         const requestOptions = {
           method: 'DELETE',
@@ -53,8 +53,8 @@ const ProfileCard = (user) =>{
           if (response.ok)
           {
             const result = await response.json()
-            console.log(result)
             dispatch(setUser({...result, access_token: user.access_token}));
+            setAvatarUrl(result.avatar);
           }
         }catch(err) {
           alert(err);
@@ -148,7 +148,7 @@ const ProfileCard = (user) =>{
             </div>
              : 
              <div className="profile-picture form-picture">
-                <img src={avatarUrl} id="photo"/>
+                <img src={avatarUrl} id={avatarUrl} />
                 <form>
                   <input type="file" id="file" onChange={ (e) => {updateAvatar(e.target.files)}} />
                   <label htmlFor="file" id="uploadBtn">Modify</label>
@@ -159,18 +159,18 @@ const ProfileCard = (user) =>{
             <h6> Username: {user.username}</h6>
             <h6> Email: {user.email}</h6>
         </div>
-        <button onClick={() =>{setShowGames(true)}}>Game History</button> 
+        <button className='form-div' onClick={() =>{setShowGames(true)}}>Game History</button> 
         {
-             user.username == currentUser.username && !user.twoFAEnabled ? <button onClick={() =>{activate2fa()}}>Activate 2fa</button> : <></>
+             user.username == currentUser.username && !user.twoFAEnabled ? <button className='form-div' onClick={() =>{activate2fa()}}>Activate 2fa</button> : <></>
         }
         {
-             user.username == currentUser.username && user.twoFAEnabled ? <button onClick={() =>{disable2fa()}}>Disable 2fa</button> : <></>
+             user.username == currentUser.username && user.twoFAEnabled ? <button className='form-div' onClick={() =>{disable2fa()}}>Disable 2fa</button> : <></>
         }
         {
-            user.username != currentUser.username ? <button onClick={() =>{setChatOpen(true)}}>Open Private Chat</button> : <button onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
+            user.username != currentUser.username ? <button className='form-div' onClick={() =>{setChatOpen(true)}}>Open Private Chat</button> : <button className='form-div' onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
         }
         {
-             user.username != currentUser.username ? <button onClick={() =>{deleteFriendship()}}>Delete From Friends</button> : <></>
+             user.username != currentUser.username ? <button className='form-div' onClick={() =>{deleteFriendship()}}>Delete From Friends</button> : <></>
         }
         {
           
