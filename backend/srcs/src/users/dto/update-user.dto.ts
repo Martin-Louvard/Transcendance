@@ -1,24 +1,25 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateUserDto } from './create-user.dto';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from '../entities/user.entity';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-    @ApiProperty()
-    twoFAEnabled: boolean;
 
-    @ApiProperty()
+    @ApiPropertyOptional()
     victoriesCount: number;
 
-    @ApiProperty()
+    @ApiPropertyOptional()
     defeatCount: number;
 
-    @ApiProperty()
+    @ApiPropertyOptional()
     rank: string;
 
-    @ApiProperty()
+    @ApiPropertyOptional()
     level: number;
 
-    @ApiProperty()
+    @ApiPropertyOptional()
     friends: User;
+
+    @ApiPropertyOptional()
+    twoFASecret: string;
 }

@@ -14,9 +14,8 @@ const Navbar: React.FC<NavbarProps> = () => {
   const dispatch = useAppDispatch();
 
   const logout = () =>{
-    const isLoggedIn = false
     window.location.href="http://localhost:3000/"
-    dispatch(setUser(isLoggedIn))
+    dispatch(setUser({}))
     localStorage.removeItem('persist:root')
 
   }
@@ -32,7 +31,7 @@ const Navbar: React.FC<NavbarProps> = () => {
           <Link className="nav-link" to="/about">About</Link>
         </li>
         <li >
-        { user.isLoggedIn ? <button className="nav-link" onClick={logout}>Logout</button> : null }
+        {  user.id && user.id != 0 ? <button className="nav-link" onClick={logout}>Logout</button> : null }
         </li>
       </ul>
     </nav>

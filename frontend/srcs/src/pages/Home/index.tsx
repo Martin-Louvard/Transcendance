@@ -7,7 +7,7 @@ const Home = () => {
     
     return <>
     {
-        user.isLoggedIn ?  <Dashboard/> : <Authentication/>
+        user.id && user.id != 0 ?  <Dashboard/> : <Authentication/>
     }
     </>
 }

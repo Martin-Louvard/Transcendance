@@ -9,8 +9,7 @@ import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer'
 import { v4 as uuidv4 } from 'uuid';
-import { of } from 'rxjs';
-import { join } from 'path';
+
 
 const path = require('path');
 

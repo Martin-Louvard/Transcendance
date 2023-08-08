@@ -5,7 +5,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserFriendsDto } from './dto/update-user-friends.dto';
 import { of } from 'rxjs';
 import { join } from 'path';
+import { authenticator } from 'otplib';
 import * as bcrypt from 'bcrypt';
+import { toDataURL } from 'qrcode';
 
 export const roundsOfHashing = 10;
 
@@ -30,7 +32,8 @@ export class UsersService {
   async findOne(username: string) {
     const userRaw = await this.prisma.user.findUnique({where: {username}, include: {games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
       BannedFromChatChannels: true,
-      AdminOnChatChannels: true}});
+      AdminOnChatChannels: true,
+    }});
     if (!userRaw)
       throw new NotFoundException(`No user found for username: ${username}`);
     const friends = await this.prisma.friends.findMany({
@@ -84,13 +87,13 @@ export class UsersService {
     userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
     const user = { ...userRaw, friends: friends };
     return user
-
   }
 
   async update(username: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, roundsOfHashing);
     }
+
     await this.prisma.user.update({where: {username}, data: updateUserDto});
     return this.findOne(username)
   }
@@ -170,7 +173,6 @@ export class UsersService {
     return this.findOne(username);
   }
 
-
   async updateAvatar(username: string, file){
     await this.prisma.user.update({where: {username}, 
       data: {
@@ -186,5 +188,43 @@ export class UsersService {
       throw new NotFoundException(`No user found for username: ${username}`);
     return of(res.sendFile(join(process.cwd(), user.avatar)))
 
+  }
+
+  async setTwoFactorAuthenticationSecret(secret: string, username: string) {
+    const user = await this.prisma.user.findUnique({where: {username}})
+    if (!user)
+      throw new NotFoundException(`No user found for username: ${username}`);
+    
+    await this.prisma.user.update({where: {username},
+      data: {
+        twoFASecret: secret
+    }});
+  }
+
+  async generateTwoFactorAuthenticationSecret(username: string) {
+    const secret = authenticator.generateSecret();
+    const otpauthUrl = authenticator.keyuri(username, 'PONGED AUTHENTICATOR', secret);
+
+    await this.setTwoFactorAuthenticationSecret(secret, username);
+
+    return {
+      secret,
+      otpauthUrl
+    }
+  }
+
+  async generateQrCodeDataURL(otpAuthUrl: string) {
+    return toDataURL(otpAuthUrl);
+  }
+
+  async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, username: string) {
+    const user = await this.findOne(username)
+    if (!user)
+      throw new NotFoundException(`No user found for username: ${username}`);
+      
+    return authenticator.verify({
+      token: twoFactorAuthenticationCode,
+      secret: user.twoFASecret,
+    });
   }
 }

@@ -9,7 +9,6 @@ const ChangeInfo: React.FC = () => {
     const [username, setUsername] = useState(user.username);
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [twoFAEnabled, setTwoFAEnabled] = useState(user.twoFAEnabled)
 
 
     const dispatch = useAppDispatch()
@@ -18,20 +17,23 @@ const ChangeInfo: React.FC = () => {
 
     const requestOptions = {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.access_token}`
+        },
         body: JSON.stringify({
           username: username,
           email: email,
-          password: password
+          password: password,
          })
       };
       try{
         const response =  await fetch(`http://localhost:3001/users/${username}`, requestOptions)
         if (response.ok)
         {
-            const user = await response.json();
-            const isLoggedIn = true
-            dispatch(setUser({...user, isLoggedIn}))
+            const newUser = await response.json();
+            console.log(newUser)
+            dispatch(setUser({...newUser, access_token: user.access_token}))
         }
       }catch(err) {
         alert(err);
@@ -41,7 +43,6 @@ const ChangeInfo: React.FC = () => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         event.target.id === "email" ? setEmail(event.target.value): 
         event.target.id === "username" ? setUsername(event.target.value): 
-        event.target.id === "twoFAEnabled" ? setTwoFAEnabled(event.target.checked): 
         event.target.id === "password" ? setPassword(event.target.value):
         event.target.id === "confirm-password" ? setConfirmPassword(event.target.value):
         ()=>{}
@@ -61,10 +62,6 @@ const ChangeInfo: React.FC = () => {
         <div className='form-div'>
             <label htmlFor="username">Username:</label>
             <input type="username" id="username" value={username} onChange={handleChange} />
-        </div>
-        <div className='form-div'>
-            <label htmlFor="twoFAEnabled">Enable 2FA:</label>
-            <input type="checkbox" id="twoFAEnabled" checked={twoFAEnabled} onChange={handleChange} />
         </div>
         <div className='form-div'>
             <label htmlFor="password">Password:</label>

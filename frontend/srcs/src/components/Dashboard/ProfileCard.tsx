@@ -15,6 +15,8 @@ const ProfileCard = (user) =>{
     const [showGames, setShowGames] = useState(false)
     const dispatch = useAppDispatch();
     const [avatarUrl, setAvatarUrl] = useState(user.avatar)
+    const [twoFaQrcode, setTwoFaQrcode] = useState("")
+    const [codeInput, setCodeInput] = useState("")
 
     const deleteFriendship = async () =>{
         const requestOptions = {
@@ -30,8 +32,7 @@ const ProfileCard = (user) =>{
           if (response.ok)
           {
             const result = await response.json()
-            const isLoggedIn = true
-            dispatch(setUser({...result, isLoggedIn}));
+            dispatch(setUser({...result, access_token: user.access_token }));
           }
         }catch(err) {
           alert(err);
@@ -53,12 +54,70 @@ const ProfileCard = (user) =>{
           {
             const result = await response.json()
             console.log(result)
-            const isLoggedIn = true
-            dispatch(setUser({...result, isLoggedIn}));
+            dispatch(setUser({...result, access_token: user.access_token}));
           }
         }catch(err) {
           alert(err);
         }
+      }
+
+      const activate2fa = async () =>{
+        const requestOptions = {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${user.access_token}`},
+        };
+
+        try{
+          const response = await fetch(`http://localhost:3001/2fa/${currentUser.username}/generate`, requestOptions)
+          if (response.ok) {
+            const blobData = await response.blob();
+            const blobText = await blobData.text()
+            setTwoFaQrcode(blobText);
+
+          }
+        }catch(err) {
+          alert(err);
+        }
+      }
+
+      const handleSubmit = async (event: React.FormEvent<HTMLFormElement>)=>{
+        event.preventDefault();
+        const requestOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.access_token}`
+         },
+          body: JSON.stringify({
+            twoFactorAuthenticationCode: codeInput
+           })
+        };
+
+        try{
+          const response = await fetch(`http://localhost:3001/2fa/${user.username}/turn-on`, requestOptions)
+          if (response.ok)
+          {
+            const result = await response.json()
+            console.log(result)
+            dispatch(setUser({...result, access_token: user.access_token }));
+          }
+        }catch(err) {
+          alert(err);
+        }
+      }
+
+      const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>{
+        event.target.id === "code" ? setCodeInput(event.target.value) : ()=>{}
+      }
+
+      const QrCode = ()=>{
+        return <>
+        <p>Scan this QRcode with the google authenticator app and enter your code below</p>
+        <img src={twoFaQrcode}/>
+        <form onSubmit={handleSubmit}>
+          <input type="text" id="code" value={codeInput} onChange={handleChange} ></input>
+          <button type="submit">Confirm</button>
+        </form>
+        </>
       }
 
     const profile = () =>{
@@ -83,10 +142,17 @@ const ProfileCard = (user) =>{
         </div>
         <button onClick={() =>{setShowGames(true)}}>Game History</button> 
         {
+             user.username == currentUser.username && !user.twoFAEnabled ? <button onClick={() =>{activate2fa()}}>Activate 2fa</button> : <></>
+        }
+        {
             user.username != currentUser.username ? <button onClick={() =>{setChatOpen(true)}}>Open Private Chat</button> : <button onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
         }
         {
              user.username != currentUser.username ? <button onClick={() =>{deleteFriendship()}}>Delete From Friends</button> : <></>
+        }
+        {
+          
+          twoFaQrcode.length ? QrCode() : <></>
         }
 
     </>

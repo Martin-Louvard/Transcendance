@@ -16,7 +16,6 @@ interface userState {
     createdAt: string,
     access_token: string,
     friends: Array<Object>,
-    isLoggedIn: boolean,
     JoinedChatChannels: Array<Object>,
     OwnedChatChannels: Array<Object>,
     BannedFromChatChannels: Array<Object>
@@ -38,7 +37,6 @@ const initialState: userState = {
   createdAt: "",
   access_token: "",
   friends: [{}],
-  isLoggedIn: false,
   JoinedChatChannels: [{}],
   OwnedChatChannels: [{}],
   BannedFromChatChannels: [{}]
