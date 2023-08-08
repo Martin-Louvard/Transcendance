@@ -80,6 +80,25 @@ const ProfileCard = (user) =>{
         }
       }
 
+      const disable2fa = async () =>{
+        const requestOptions = {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${user.access_token}`},
+        };
+
+        try{
+          const response = await fetch(`http://localhost:3001/2fa/${currentUser.username}/`, requestOptions)
+          if (response.ok) {
+            const result = await response.json()
+            dispatch(setUser({...result, access_token: user.access_token }));
+            alert("2fa disabled")
+          }
+        }catch(err) {
+          alert(err);
+        }
+
+      }
+
       const handleSubmit = async (event: React.FormEvent<HTMLFormElement>)=>{
         event.preventDefault();
         const requestOptions = {
@@ -97,8 +116,8 @@ const ProfileCard = (user) =>{
           if (response.ok)
           {
             const result = await response.json()
-            console.log(result)
             dispatch(setUser({...result, access_token: user.access_token }));
+            alert("2fa enabled")
           }
         }catch(err) {
           alert(err);
@@ -143,6 +162,9 @@ const ProfileCard = (user) =>{
         <button onClick={() =>{setShowGames(true)}}>Game History</button> 
         {
              user.username == currentUser.username && !user.twoFAEnabled ? <button onClick={() =>{activate2fa()}}>Activate 2fa</button> : <></>
+        }
+        {
+             user.username == currentUser.username && user.twoFAEnabled ? <button onClick={() =>{disable2fa()}}>Disable 2fa</button> : <></>
         }
         {
             user.username != currentUser.username ? <button onClick={() =>{setChatOpen(true)}}>Open Private Chat</button> : <button onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>

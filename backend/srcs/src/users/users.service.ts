@@ -45,7 +45,8 @@ export class UsersService {
       },
     });
     userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
-    const user = { ...userRaw, friends: friends };
+    const {password, twoFASecret, ...userWithoutSecrets} = userRaw;
+    const user = { ...userWithoutSecrets, friends: friends };
     return user
   }
 
@@ -218,7 +219,7 @@ export class UsersService {
   }
 
   async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, username: string) {
-    const user = await this.findOne(username)
+    const user = await this.prisma.user.findUnique({where: {username}})
     if (!user)
       throw new NotFoundException(`No user found for username: ${username}`);
       

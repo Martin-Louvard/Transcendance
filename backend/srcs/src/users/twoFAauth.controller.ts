@@ -1,4 +1,4 @@
-import {Controller, Post, UseGuards, UnauthorizedException, Body} from '@nestjs/common';
+import {Controller, Post, Delete, UseGuards, UnauthorizedException, Body} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
@@ -48,5 +48,13 @@ import { AuthService } from 'src/auth/auth.service';
       }
       return this.userService.findOne(username)
     }
+
+    @Delete(':username')
+    @UseGuards(JwtAuthGuard)
+    async delete2fa(@Param('username') username: string){
+      await this.prisma.user.update({where: {username}, data: {twoFAEnabled: false}});
+      return this.userService.findOne(username)
+    }
+
 
 }
