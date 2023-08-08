@@ -44,7 +44,7 @@ export class UsersService {
         ]
       },
     });
-    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
+    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username + "/" + userRaw.avatar.split("/").reverse()[0]
     const {password, twoFASecret, ...userWithoutSecrets} = userRaw;
     const user = { ...userWithoutSecrets, friends: friends };
     return user

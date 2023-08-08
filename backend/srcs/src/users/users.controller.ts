@@ -87,8 +87,12 @@ export class UsersController {
     })
   }))
   uploadAvatar(@Param('username') username: string, @UploadedFile() file) {
-    console.log(file)
     return  this.usersService.updateAvatar(username, file);
+  }
+
+  @Get('avatar/:username/:randomString')
+  findAvatarWithRefresh(@Param('username') username: string, @Res() res){
+    return this.usersService.findAvatar(username, res)
   }
 
   @Get('avatar/:username')
