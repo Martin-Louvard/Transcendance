@@ -20,24 +20,38 @@ let ChatChannelsService = exports.ChatChannelsService = class ChatChannelsServic
         const user = await this.prisma.user.findUnique({
             where: { username: createChatChannelDto.owner_username },
         });
+        createChatChannelDto.ownerId = user.id;
         return this.prisma.chatChannel.create({
             data: {
                 ownerId: user.id,
             },
         });
     }
-    findAll() {
-        return this.prisma.chatChannel.findMany({});
+    async findAll() {
+        const chatChannels = await this.prisma.chatChannel.findMany({
+            include: { participants: true },
+        });
+        return chatChannels;
     }
-    findOne(id) {
-        return this.prisma.chatChannel.findUnique({ where: { id } });
+    async findOne(id) {
+        const channelRaw = await this.prisma.chatChannel.findUnique({
+            where: { id },
+            include: {
+                participants: true,
+                bannedUsers: true,
+            },
+        });
+        if (!channelRaw)
+            throw new common_1.NotFoundException(`No Channel found for id: ${id}`);
+        return channelRaw;
     }
     async update(id, updateChatChannelDto) {
         const channel = await this.prisma.chatChannel.findUnique({ where: { id } });
-        return this.prisma.chatChannel.update({
+        await this.prisma.chatChannel.update({
             where: { id: channel.id },
-            data: { ...channel },
+            data: updateChatChannelDto,
         });
+        return this.prisma.chatChannel.findUnique({ where: { id } });
     }
     remove(id) {
         return this.prisma.chatChannel.delete({ where: { id } });

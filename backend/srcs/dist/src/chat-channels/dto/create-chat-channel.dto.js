@@ -16,6 +16,10 @@ class CreateChatChannelDto {
 exports.CreateChatChannelDto = CreateChatChannelDto;
 __decorate([
     (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], CreateChatChannelDto.prototype, "ownerId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
     __metadata("design:type", String)
 ], CreateChatChannelDto.prototype, "owner_username", void 0);
 __decorate([

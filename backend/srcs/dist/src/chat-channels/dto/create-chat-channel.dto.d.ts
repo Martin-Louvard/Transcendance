@@ -1,5 +1,6 @@
 import { User } from 'src/users/entities/user.entity';
 export declare class CreateChatChannelDto {
+    ownerId: number;
     owner_username: string;
     password: string;
     channelType: string;

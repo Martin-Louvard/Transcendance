@@ -11,20 +11,70 @@ export declare class ChatChannelsController {
         channelType: string;
         name: string;
     }, unknown> & {}>;
-    findAll(): import(".prisma/client").Prisma.PrismaPromise<(import("@prisma/client/runtime").GetResult<{
+    findAll(): Promise<({
+        participants: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            username: string;
+            email: string;
+            email42: string;
+            password: string;
+            avatar: string;
+            twoFAEnabled: boolean;
+            status: string;
+            victoriesCount: number;
+            defeatCount: number;
+            rank: string;
+            level: number;
+            achievements: import(".prisma/client").Prisma.JsonValue;
+            createdAt: Date;
+        }, unknown> & {})[];
+    } & import("@prisma/client/runtime").GetResult<{
         id: number;
         ownerId: number;
         password: string;
         channelType: string;
         name: string;
     }, unknown> & {})[]>;
-    findOne(id: string): import(".prisma/client").Prisma.Prisma__ChatChannelClient<import("@prisma/client/runtime").GetResult<{
+    findOne(id: string): Promise<{
+        participants: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            username: string;
+            email: string;
+            email42: string;
+            password: string;
+            avatar: string;
+            twoFAEnabled: boolean;
+            status: string;
+            victoriesCount: number;
+            defeatCount: number;
+            rank: string;
+            level: number;
+            achievements: import(".prisma/client").Prisma.JsonValue;
+            createdAt: Date;
+        }, unknown> & {})[];
+        bannedUsers: (import("@prisma/client/runtime").GetResult<{
+            id: number;
+            username: string;
+            email: string;
+            email42: string;
+            password: string;
+            avatar: string;
+            twoFAEnabled: boolean;
+            status: string;
+            victoriesCount: number;
+            defeatCount: number;
+            rank: string;
+            level: number;
+            achievements: import(".prisma/client").Prisma.JsonValue;
+            createdAt: Date;
+        }, unknown> & {})[];
+    } & import("@prisma/client/runtime").GetResult<{
         id: number;
         ownerId: number;
         password: string;
         channelType: string;
         name: string;
-    }, unknown> & {}, never, import("@prisma/client/runtime").DefaultArgs>;
+    }, unknown> & {}>;
     update(id: string, updateChatChannelDto: UpdateChatChannelDto): Promise<import("@prisma/client/runtime").GetResult<{
         id: number;
         ownerId: number;
