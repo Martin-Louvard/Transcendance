@@ -13,8 +13,9 @@ const login2fa = async (code: string | null, user: Object) =>{
       const response = await fetch(`http://localhost:3001/2fa/${user.username}/login`, requestOptions);
       if (response.ok)
       {
-        const user = await response.json();
-        return user
+        const user2fa = await response.json();
+        user2fa.access_token = user.access_token
+        return user2fa
       }
     }catch(err) {
       alert(err);
