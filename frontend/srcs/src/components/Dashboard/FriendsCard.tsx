@@ -50,8 +50,7 @@ const FriendsCard = () =>{
         if (response.ok)
         {
           const result = await response.json()
-          const isLoggedIn = true
-          dispatch(setUser({...result, isLoggedIn}));
+          dispatch(setUser({...result, access_token: user.access_token}));
         }
         else if (response.status === 404)
           alert("User not found")

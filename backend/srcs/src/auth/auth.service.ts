@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, Body } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from './../prisma/prisma.service';
@@ -26,6 +26,21 @@ export class AuthService {
         const payload = { sub: user.id, username: user.username };
         return {...user, access_token: await this.jwtService.signAsync(payload)};
     }
+
+    async loginWith2fa(username: string,  code: string) {
+        const isCodeValid = await 
+        this.usersService.isTwoFactorAuthenticationCodeValid(
+          code,
+          username,
+        );
+
+        if (!isCodeValid) {
+        throw new UnauthorizedException('Wrong authentication code');
+      }
+
+      const user = await this.usersService.findOne(username);
+      return {...user}
+      }
 
     async auth42(code): Promise<any>{
         const requestOptions = {

@@ -3,6 +3,7 @@ import LoginForm from './LoginForm.tsx';
 import SignupForm from './SignupForm.tsx';
 import { useAppDispatch } from '../../hooks';
 import { setUser } from './userReducer';
+import  login2fa  from './login2fa.ts'
 
 const Authentication: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
@@ -23,6 +24,7 @@ const Authentication: React.FC = () => {
     setShowLogin(false);
   };
 
+
   const login42 = async (code42: string | null) => {
     const requestOptions = {
       method: 'POST',
@@ -37,8 +39,16 @@ const Authentication: React.FC = () => {
       if (response.ok)
       {
         const user = await response.json();
-        const isLoggedIn = true
-        dispatch(setUser({...user, isLoggedIn}))
+        if (!user.twoFAEnabled)
+        {
+          dispatch(setUser({...user}))
+          return
+        }
+        const code = window.prompt("Enter your code from google authenticator", "000000");
+        const user2fa = await login2fa(code, user);
+        if (user2fa)
+          dispatch(setUser({...user2fa}))
+
       }
     }catch(err) {
       alert(err);

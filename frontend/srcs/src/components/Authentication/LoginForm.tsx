@@ -3,6 +3,7 @@ import Form from './Form';
 import  login  from './login.ts'
 import { setUser } from './userReducer';
 import { useAppDispatch } from '../../hooks';
+import login2fa from './login2fa.ts';
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -21,9 +22,15 @@ const LoginForm: React.FC = () => {
     username.length && password.length 
     const user = await login(username,password)
     if(user)
-    {    
-      const isLoggedIn = true
-      dispatch(setUser({...user, isLoggedIn}))
+    { 
+      if (!user.twoFAEnabled){
+        dispatch(setUser({...user}))
+        return
+      }
+      const code = window.prompt("Enter your code from google authenticator", "000000");
+      const user2fa = await login2fa(code, user);
+      if (user2fa)
+        dispatch(setUser({...user2fa}))
     }
   };
 

@@ -13,7 +13,6 @@ export default interface User {
   createdAt: string;
   access_token: string;
   friends: Array<Object>;
-  isLoggedIn: boolean
 }
 
 export default interface Message {

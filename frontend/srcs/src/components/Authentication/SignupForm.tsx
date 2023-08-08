@@ -26,8 +26,7 @@ const SignupForm: React.FC = () => {
       await fetch('http://localhost:3001/users', requestOptions)
       .then(response => {if (response.status !== 201) return(alert ("Signup failed"))})
       const user = await login(username,password)
-      const isLoggedIn = true
-      dispatch(setUser({...user, isLoggedIn}))
+      dispatch(setUser({...user}))
     }catch(err) {
       alert(err);
     }
