@@ -31,7 +31,6 @@ model User {
   JoinedChatChannels      ChatChannel[] @relation("JoinedChannels")
   OwnedChatChannels       ChatChannel[] @relation("OwnedChannels")
   BannedFromChatChannels  ChatChannel[] @relation("BannedFromChannels")
-
   AdminOnChatChannels	  ChatChannel[] @relation("AdminOnChannels")
   chatMessages            ChatMessage[]
   createdAt               DateTime @default(now())

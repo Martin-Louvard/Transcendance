@@ -1,76 +1,35 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
+import io, { Socket } from "socket.io-client";
 import './Chat.css'
+import Messages from "../Messages/Messages";
+import MessageInput from "../Messages/MessageInput";
 
 const Chat = () => {
-  const [messages, setMessages] = useState([]);
-  const [currentMessage, setCurrentMessage] = useState("");
-  const [messagesCount, setMessagesCount] = useState(0)
-  const chatMessagesRef = useRef(null);
+  const [socket, setSocket] = useState<Socket>()
+  const [messages, setMessages] = useState<string[]>([]);
 
   useEffect(()=>{
-    receiveMessage();
-  },[messagesCount])
+    const newSocket=io("http://localhost:3001/");
+    setSocket(newSocket)
+  },[setSocket])
 
-  useEffect(() => {
-    const chatMessagesContainer = chatMessagesRef.current;
-    const newMessageElement = chatMessagesContainer.lastChild;
-    
-    if (newMessageElement) {
-      newMessageElement.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
-
-  const handleSendMessage = () => {
-    if (currentMessage.trim() !== "") {
-      const newMessage = {
-        sender: "User1",
-        content: currentMessage,
-      };
-      setMessages([...messages, newMessage]);
-      setMessagesCount(messagesCount + 1)
-      setCurrentMessage("");
-    }
+  const handleSendMessage = (value: string) => {
+    socket?.emit("message", value)
   };
 
-  const receiveMessage = () => {
-      const newMessage = {
-        sender: "User2",
-        content: "Message received",
-      };
-      setMessages([...messages, newMessage]);
-      setCurrentMessage("");
+  const messageListener = (message:string) =>{
+    setMessages([...messages, message])
+  }
 
-    };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      handleSendMessage()
-
-    }
-  };
-
+  useEffect(()=>{
+    socket?.on("message", messageListener)
+    return () => {socket?.off("message", messageListener)}
+  },[messageListener])
 
   return (
     <div className="chat-container">
-      <div className="chat-messages" ref={chatMessagesRef}>
-      {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`chat-message ${message.sender === "User1" ? "user1" : "user2"}`}
-          >
-            <span className="content">{message.content}</span>
-          </div>
-        ))}
-      </div>
-      <div className="chat-input">
-        <textarea
-          placeholder="Type a message..."
-          value={currentMessage}
-          onChange={(e) => setCurrentMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <button onClick={handleSendMessage}>Send</button>
-      </div>
+      <Messages messages={messages}/>
+      <MessageInput handleSendMessage={handleSendMessage}/>
     </div>
   );
 };
