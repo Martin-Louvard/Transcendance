@@ -2,7 +2,7 @@ import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @WebSocketGateway({ cors: '*'})
-export class ChatChannelsGateway {
+export class AppGateway {
   constructor(private prisma: PrismaService){}
 
   @WebSocketServer()
