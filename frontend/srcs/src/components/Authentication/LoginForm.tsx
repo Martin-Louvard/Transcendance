@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Form from './Form';
 import  login  from './login.ts'
-import { setUser } from './userReducer';
+import { setUser } from '../../userReducer.ts';
 import { useAppDispatch } from '../../hooks';
 import login2fa from './login2fa.ts';
 

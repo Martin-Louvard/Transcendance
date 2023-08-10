@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Form from './Form';
 import login from './login';
-import { setUser } from './userReducer';
+import { setUser } from '../../userReducer';
 import { useAppDispatch } from '../../hooks';
 
 const SignupForm: React.FC = () => {

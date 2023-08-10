@@ -1,7 +1,7 @@
 import React from 'react';
 import './NavBar.css'
 import { Link } from 'react-router-dom'
-import { setUser } from '../Authentication/userReducer'
+import { setUser } from '../../userReducer'
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
 interface NavbarProps {

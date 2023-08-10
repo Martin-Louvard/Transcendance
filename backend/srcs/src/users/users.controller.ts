@@ -48,6 +48,11 @@ export class UsersController {
     return this.usersService.findBy42Email(email42);
   }
 
+  @Get('friends/:id')
+  findAllFriends(@Query('id') id: string){
+    return this.usersService.findAllFriends(+id)
+  }
+
   @Patch(':username')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

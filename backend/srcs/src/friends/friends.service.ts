@@ -19,8 +19,8 @@ export class FriendsService {
     return `This action returns all friends`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} friend`;
+  async findOne(id: number) {
+    return this.prisma.friends.findUnique({where: {id}});
   }
 
   update(id: number, updateFriendDto: UpdateFriendDto) {

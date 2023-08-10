@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import ChangeInfo from './ChangeInfo.tsx';
 import HistoryCard from './HistoryCard';
 import { useAppDispatch } from '../../hooks';
-import { setUser } from '../Authentication/userReducer.ts';
+import { setUser } from '../../userReducer.ts';
 
 const ProfileCard = (user) =>{
     const currentUser = useAppSelector((state) => state.user);
