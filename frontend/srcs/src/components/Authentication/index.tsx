@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import LoginForm from './LoginForm.tsx';
 import SignupForm from './SignupForm.tsx';
 import { useAppDispatch } from '../../hooks';
-import { setUser } from './userReducer';
+import { setUser } from '../../userReducer.ts';
 import  login2fa  from './login2fa.ts'
 
 const Authentication: React.FC = () => {

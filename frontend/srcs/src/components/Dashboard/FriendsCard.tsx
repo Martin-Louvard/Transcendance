@@ -2,7 +2,7 @@ import ProfileCard from "./ProfileCard";
 import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import Form from "../Authentication/Form";
-import { setUser } from "../Authentication/userReducer";
+import { setUser } from "../../userReducer";
 
 const FriendsCard = () =>{
     const storedFriendsList = useAppSelector((state) => state.user.friends);

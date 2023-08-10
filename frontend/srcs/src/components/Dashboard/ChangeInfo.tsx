@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Form from '../Authentication/Form';
-import { setUser } from '../Authentication/userReducer'
+import { setUser } from '../../userReducer'
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
 const ChangeInfo: React.FC = () => {
