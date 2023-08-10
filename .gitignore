@@ -38,4 +38,5 @@ lerna-debug.log*
 .env
 
 /backend/srcs/uploads
+/backend/srcs/core
 

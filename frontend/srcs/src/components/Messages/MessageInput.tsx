@@ -6,7 +6,7 @@ const MessageInput = ({handleSendMessage}: {handleSendMessage: (currentMessage: 
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
-          handleSendMessage(currentMessage)
+          {handleSendMessage(currentMessage); setCurrentMessage("")}
         }
       };
 
@@ -18,7 +18,7 @@ const MessageInput = ({handleSendMessage}: {handleSendMessage: (currentMessage: 
           onChange={(e) => setCurrentMessage(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button onClick={() => handleSendMessage(currentMessage)}>Send</button>
+        <button onClick={() => {handleSendMessage(currentMessage); setCurrentMessage("")} }>Send</button>
       </div>
     </>
 }

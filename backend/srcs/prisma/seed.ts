@@ -33,9 +33,9 @@ async function main() {
         username: 'User1',
         email: 'fakeEmail@gmail.com',
         password: commonpassword ,
-        friends: {
-          create:[{friend_id: admin.id}]
-        }
+        //friends: {
+         // create:[{friend_id: admin.id}]
+        //}
     },
   });
 
@@ -46,9 +46,9 @@ async function main() {
         username: 'User2',
         email: 'fakeEmail2@gmail.com',
         password: commonpassword,
-        friends: {
-          create:[{friend_id: admin.id}]
-        }
+        //friends: {
+         // create:[{friend_id: admin.id}]
+        //}
       },
   });
 
@@ -60,9 +60,9 @@ async function main() {
         email: 'fakeEmail42@gmail.com',
         email42: '42email@stud42.fr',
         password: commonpassword ,
-        friends: {
-          create:[{friend_id: admin.id}]
-        }
+        //friends: {
+        //  create:[{friend_id: admin.id}]
+        //}
     },
   });
 

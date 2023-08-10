@@ -7,7 +7,6 @@ import HistoryCard from './HistoryCard';
 import { useAppDispatch } from '../../hooks';
 import { setUser } from '../Authentication/userReducer.ts';
 
-
 const ProfileCard = (user) =>{
     const currentUser = useAppSelector((state) => state.user);
     const [chatOpen, setChatOpen] = useState(false)
@@ -17,6 +16,38 @@ const ProfileCard = (user) =>{
     const [avatarUrl, setAvatarUrl] = useState(user.avatar)
     const [twoFaQrcode, setTwoFaQrcode] = useState("")
     const [codeInput, setCodeInput] = useState("")
+    const [chatId, setChatId] = useState(0)
+    const [chat, setChat] = useState({})
+
+    useEffect(()=>{
+      let friendship;
+      if (user != currentUser)
+        friendship = user.friends.filter(o => currentUser.friends.some(({id}) => o.id == id))[0]
+      if (friendship && friendship.chat_id)
+        setChatId(friendship.chat_id)
+    },[])
+
+    useEffect(()=>{
+      const getChat = async() => {
+        const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      };
+      try{
+        const response = await fetch(`http://localhost:3001/chat-channels/${chatId}`, requestOptions)
+        if (response.ok)
+        {
+          const result = await response.json()
+          setChat(result)
+        }
+      }catch(err) {
+        alert(err);
+      }
+    }
+    if (chatId != 0)
+      getChat();
+    },[chatId])
+  
     
     const deleteFriendship = async () =>{
         const requestOptions = {
@@ -182,7 +213,7 @@ const ProfileCard = (user) =>{
     
     return <>
         <div className="profile-card-wrapper">
-        {chatOpen ? <Chat/>: 
+        {chatOpen ? <Chat {...chat}/>: 
         changeInfoOpen ? <ChangeInfo/>:
         showGames ? <HistoryCard/> :
         profile()}
