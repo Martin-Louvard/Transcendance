@@ -7,10 +7,11 @@ import { ChatChannelsModule } from './chat-channels/chat-channels.module';
 import { ChatMessagesModule } from './chat-messages/chat-messages.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendsModule } from './friends/friends.module';
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: [PrismaModule, UsersModule, ChatChannelsModule, ChatMessagesModule, AuthModule, FriendsModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppGateway],
 })
 export class AppModule {}
