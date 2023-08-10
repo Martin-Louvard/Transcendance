@@ -21,6 +21,7 @@ const Dashboard: React.FC = () => {
   const connectedUsersListener = (connected_users_id: Array<number>) =>{
     setConnectedUsersId(connected_users_id)
   }
+
   useEffect(()=>{
     socket?.on("connected_users", connectedUsersListener)
     return () => {socket?.off("connected_users", connectedUsersListener)}
