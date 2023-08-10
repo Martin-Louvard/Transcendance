@@ -29,6 +29,25 @@ export class UsersService {
       AdminOnChatChannels: true}});
   }
 
+  async findAllFriends(id: number){
+    const friendships = await this.prisma.friends.findMany({
+      where: { 
+        OR : [
+              {user_id: id},
+              {friend_id: id}
+            ]
+          }})
+    const friends_id = friendships.map((friend)=>{
+        return (friend.user_id == id ? friend.friend_id : friend.user_id)
+    })
+    const friends = await this.prisma.user.findMany({
+      where: {
+        id: {in: friends_id}
+      }
+    })
+    return friends;
+  }
+
   async findOne(username: string) {
     const userRaw = await this.prisma.user.findUnique({where: {username}, include: {games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
       BannedFromChatChannels: true,

@@ -28,7 +28,6 @@ export class FriendsController {
   }
 
   @Get(':id')
-  @ApiCreatedResponse({ type: Friend })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   findOne(@Param('id') id: string) {
