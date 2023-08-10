@@ -12,7 +12,6 @@ export class ChatChannelsService {
   }
 
   findAll() {
-
     return this.prisma.chatChannel.findMany({include: {
       participants: true,
       bannedUsers: true,
@@ -22,7 +21,7 @@ export class ChatChannelsService {
   }
 
   findOne(id: number) {
-    return this.prisma.chatChannel.findUnique({where: {id}});
+    return this.prisma.chatChannel.findUnique({where: {id}, include: {messages: true}});
   }
 
   update(id: number, updateChatChannelDto: UpdateChatChannelDto) {

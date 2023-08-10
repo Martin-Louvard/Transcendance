@@ -8,18 +8,18 @@ import { join } from 'path';
 import { authenticator } from 'otplib';
 import * as bcrypt from 'bcrypt';
 import { toDataURL } from 'qrcode';
+import { FriendsService } from 'src/friends/friends.service';
 
 export const roundsOfHashing = 10;
 
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private friendsService: FriendsService) {}
   
   async create(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash( createUserDto.password, roundsOfHashing);
     createUserDto.password = hashedPassword;
-
     return this.prisma.user.create({data: createUserDto});
   }
 
@@ -120,19 +120,16 @@ export class UsersService {
   async addFriend(username: string, updateUserFriendsDto: UpdateUserFriendsDto) {
     if (username == updateUserFriendsDto.friend_username)
       throw new NotAcceptableException(`Self interaction prohibited`);
-  
+    
+    const user = await this.prisma.user.findUnique({where: {username}})
+    if (!user)
+      throw new NotFoundException(`No user found for username: ${username}`);
+    
     const userFriend = await this.prisma.user.findUnique({where: {username: updateUserFriendsDto.friend_username}, include: {friends: true, friendUserFriends: true}});
     if (!userFriend)
-      throw new NotFoundException(`No user found for username: ${username}`);
-
+      throw new NotFoundException(`No user found for username: ${updateUserFriendsDto.friend_username}`);
     
-    await this.prisma.user.update({
-        where: {username: username}, 
-        data: {
-          friends: {
-            create: [{friend_id: userFriend.id}]
-          }}
-      });
+    await this.friendsService.create({user_id: user.id, friend_id: userFriend.id, chat_id: 0})
     
     return this.findOne(username)
   }
