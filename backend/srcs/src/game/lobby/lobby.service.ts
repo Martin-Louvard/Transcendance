@@ -93,8 +93,7 @@ export class LobbyService {
 
 	// TODO: Pour le moment on clear tout toues les 1 minutes, une fois le jeu codé il faudra
 	// TODO... clear que les games terminé toutes les 5 minutes
-	//@Cron("0 */1 * * * *") // toutes les minutes
-	@Cron(CronExpression.EVERY_MINUTE,
+	@Cron(CronExpression.EVERY_5_MINUTES,
 		{name: 'lobby_cleaner'})
 	clearLobbies() {
 		this.lobbies.forEach((lobby: Lobby) => {
