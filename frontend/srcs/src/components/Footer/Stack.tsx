@@ -1,3 +1,5 @@
+import './Stack.scss'
+
 const Stack = () =>{
   const reactLogo = '/react.svg'
   const viteLogo = '/vite.svg'

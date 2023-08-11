@@ -1,8 +1,8 @@
 import ProfileCard from "./ProfileCard";
 import { useState, useEffect } from "react";
-import { useAppSelector, useAppDispatch } from "../../hooks";
-import Form from "../Authentication/Form";
-import { setUser } from "../../userReducer";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import Form from "../Forms/Form";
+import { setUser } from "../../redux/userReducer";
 
 const FriendsCard = () =>{
     const storedFriendsList = useAppSelector((state) => state.user.friends);
@@ -64,7 +64,7 @@ const FriendsCard = () =>{
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       event.target.id === "FriendUsername" ? setNewFriendUsername(event.target.value): 
        ()=>{}
-     };
+    };
 
     const displayFriendProfile = (userFriend: object) =>{
       setShowFriend(true)

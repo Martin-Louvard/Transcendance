@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import LoginForm from './LoginForm.tsx';
-import SignupForm from './SignupForm.tsx';
-import { useAppDispatch } from '../../hooks';
-import { setUser } from '../../userReducer.ts';
-import  login2fa  from './login2fa.ts'
+import LoginForm from '../Forms/LoginForm.js';
+import SignupForm from '../Forms/SignupForm.js';
+import { useAppDispatch } from '../../redux/hooks.js';
+import { setUser } from '../../redux/userReducer.js';
+import  login2fa  from './login2fa.js'
+import './Authentication.scss'
 
 const Authentication: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
@@ -57,18 +58,18 @@ const Authentication: React.FC = () => {
 
   return (
     <div className="auth-wrapper">
-      <div className="card-block">
-        <div className="card">
+      <div className="auth-card-block">
+        <div className="auth-card">
           <button onClick={handleLoginClick}>
             Login
           </button>
         </div>
-        <div className="card">
+        <div className="auth-card">
           <button onClick={handleSignupClick}>
             Signup
           </button>
         </div>
-        <div className="card">
+        <div className="auth-card">
           <a href={`https://api.intra.42.fr/oauth/authorize?client_id=${Api42uid}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&response_type=code`}>
               Login with 42
           </a>

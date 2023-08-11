@@ -1,4 +1,4 @@
-import React from "react";
+import './Cards.scss'
 
 const HistoryCard = () => {
   const gameScores = [

@@ -1,9 +1,9 @@
-import './Dashboard.css'
 import React, { useState } from 'react';
-import ProfileCard from './ProfileCard';
-import FriendsCard from './FriendsCard';
-import HistoryCard from './HistoryCard';
-import { useAppSelector } from "../../hooks";
+import ProfileCard from '../UserProfileCards/ProfileCard';
+import FriendsCard from '../UserProfileCards/FriendsCard';
+import HistoryCard from '../UserProfileCards/HistoryCard';
+import { useAppSelector } from "../../redux/hooks";
+import './LeftMenu.scss'
 
 const LeftMenu = ({hideMenu}) =>{
     const [showProfile, setShowProfile] = useState(false)
@@ -38,14 +38,18 @@ const LeftMenu = ({hideMenu}) =>{
 
     return <>
      {
-                hideMenu ? "" :<>
-    {(showProfile || showFriends || showGames) ? <img id={"back"} onClick={handleClick} className='exit-button' src={'cross.svg/'}/> : ""}
-    {
-        showProfile ? <ProfileCard {...user}/> : 
-        showFriends ? <FriendsCard/> :
-        showGames ? <HistoryCard/> :
-        menu()
-    } </>}
+        hideMenu ? "" :
+        <>
+            {(showProfile || showFriends || showGames) ? <img id={"back"} onClick={handleClick} className='exit-button' src={'cross.svg/'}/> : ""}
+            {
+                
+                showProfile ? <ProfileCard {...user}/> : 
+                showFriends ? <FriendsCard/> :
+                showGames ? <HistoryCard/> :
+                menu()
+            } 
+        </>
+    }
     </>
 }
 
