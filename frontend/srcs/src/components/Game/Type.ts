@@ -59,11 +59,19 @@ export type ClientPayloads = {
 	},
 };
 
+export interface PlayerBody {
+	position: [number, number, number];
+	size: [number, number, number];
+}
 
+export interface Ball {
+	position: [number, number, number],
+	size: number,
+}
 
-
-  export interface GameData {
+export interface GameData {
+	balls: Ball[],
+	players: PlayerBody[],
 	mapWidth: number,
 	mapHeight: number,
-	ballPosition: [number, number, number];
 }
