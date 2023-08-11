@@ -20,7 +20,7 @@ const Dashboard: React.FC = () => {
           </> 
           : 
           <div>
-            <button className="play-button" onClick={()=>{setIsPlaying(true);}}>Play</button>
+            <button className="play-button" onClick={()=>{setIsPlaying(true);}}>PLAY</button>
           </div>
           }
       </div>

@@ -1,165 +1,130 @@
+$card-padding: 10px;
+$main-bg-color: #312f2f;
+$secondary-bg-color: #4d4848;
+$overlay-bg-color: rgba(0, 0, 0, 0.7);
+$font-color: wheat;
+$picture-size: 150px;
+$friend-picture-size: 50px;
 
-.profile-card-wrapper{
-    padding-right: 10px;
-    padding-left: 10px;
-    background-color: #312f2f;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-    height: 110%;
-    z-index: 1;
+.profile-card-wrapper {
+  padding: $card-padding;
+  background-color: $main-bg-color;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  height: 110%;
+  z-index: 1;
   
-  }
-  
-  .profile-card-wrapper button{
+  button {
     width: 90%;
   }
-  
-  .profile-picture {
-      width: 150px; /* Adjust the size as needed */
-      height: 150px; /* Adjust the size as needed */
-      border-radius: 50%;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-    
-    .profile-picture img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  
-    .form-picture{
-      border-radius: 50%;
-      overflow: hidden;
-      border: 1px solid grey;
-      position: relative ;
-    }
-    
-    
-  #photo{
-      height: 100%;
-      width: 100%;
-  }
-  
-  #file{
-      display: none;
-  }
-  
-  #uploadBtn{
-      height: 40px;
-      width: 100%;
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-      background: rgba(0, 0, 0, 0.7);
-      color: wheat;
-      line-height: 30px;
-      font-family: sans-serif;
-      font-size: 15px;
-      cursor: pointer;
-      
-  }
-  
-    .user-info h6 {
-      margin: 5px;
-      text-align: left;
-    }
-  
-    .friends-card-wrapper {
-      padding-right: 10px;
-      padding-left: 10px;
-      background-color: #312f2f;
-      width: 100%;
-      overflow: hidden;
-    }
-    
-    .friends-card-wrapper h2 {
-      margin-bottom: 10px;
-    }
-    
-    .friends-card-wrapper ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      overflow-y: auto;
-      height: 100%;
-    }
-    
-    .friends-card-wrapper li {
-      background-color: #4d4848;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      padding: 10px;
-    }
-    
-    .friends-card-wrapper h3,
-    .friends-card-wrapper p {
-      margin: 5px 0;
-    }
-    
-    
-    .friend-picture {
-      width: 50px; /* Adjust the size as needed */
-      height: 50px; /* Adjust the size as needed */
-      border-radius: 50%;
-      overflow: hidden;
-    }
-    
-    .friend-picture img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .friend-list{
-      display: flex;
-      flex-direction: column;
-      overflow-y: scroll;
-    
-    }
-    
-    .friend-item{
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      cursor: pointer;
-    }
-    
 
+  .profile-picture,
+  .form-picture {
+    width: $picture-size;
+    height: $picture-size;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .form-picture {
+    border: 1px solid grey;
+    position: relative;
+  }
+
+  #photo {
+    height: 100%;
+    width: 100%;
+  }
+
+  #file {
+    display: none;
+  }
+
+  #uploadBtn {
+    height: 40px;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    background: $overlay-bg-color;
+    color: $font-color;
+    line-height: 30px;
+    font-family: sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .user-info h6 {
+    margin: 5px;
+    text-align: left;
+  }
+}
+
+.friends-card-wrapper,
 .history-card-wrapper {
-  padding-right: 10px;
-  padding-left: 10px;
-  background-color: #312f2f;
+  background-color: $main-bg-color;
   width: 100%;
   overflow: hidden;
+
+  h2 {
+    margin-bottom: 10px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  li {
+    background-color: $secondary-bg-color;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+
+    h3,
+    p {
+      margin: 5px 0;
+    }
+  }
 }
 
-.history-card-wrapper h2 {
-  margin-bottom: 10px;
+.friend-picture {
+  width: $friend-picture-size;
+  height: $friend-picture-size;
+  border-radius: 50%;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
-.history-card-wrapper ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  overflow-y: auto;
-  height: 100%;
-}
+.friend-list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
 
-.history-card-wrapper li {
-  background-color: #4d4848;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  padding: 10px;
+  .friend-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    cursor: pointer;
+  }
 }
-
-.history-card-wrapper h3,
-.history-card-wrapper p {
-  margin: 5px 0;
-}
-
