@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './NavBar.css'
 import { Link } from 'react-router-dom'
 import { setUser } from '../../userReducer'
@@ -17,8 +17,9 @@ const Navbar: React.FC<NavbarProps> = () => {
     window.location.href="http://localhost:3000/"
     dispatch(setUser({}))
     localStorage.removeItem('persist:root')
-
   }
+
+
 
   return (
     <nav className="navbar">
@@ -26,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = () => {
           <img src={logo} className="logo-nav" alt="PONGƎD logo" />
           <div className="navbar-brand">PONGƎD</div>
         </Link>
-      <ul className="navbar-nav">
+      <ul className="brand-wrapper">
         <li className="nav-item">
           <Link className="nav-link" to="/about">About</Link>
         </li>

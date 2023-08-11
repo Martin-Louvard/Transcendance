@@ -23,6 +23,9 @@ const LeftMenu = ({hideMenu}) =>{
          ()=>{}
        };
 
+
+
+
     const menu = () =>{
         return  (<>
             {
@@ -38,14 +41,18 @@ const LeftMenu = ({hideMenu}) =>{
 
     return <>
      {
-                hideMenu ? "" :<>
-    {(showProfile || showFriends || showGames) ? <img id={"back"} onClick={handleClick} className='exit-button' src={'cross.svg/'}/> : ""}
-    {
-        showProfile ? <ProfileCard {...user}/> : 
-        showFriends ? <FriendsCard/> :
-        showGames ? <HistoryCard/> :
-        menu()
-    } </>}
+        hideMenu ? "" :
+        <>
+            {(showProfile || showFriends || showGames) ? <img id={"back"} onClick={handleClick} className='exit-button' src={'cross.svg/'}/> : ""}
+            {
+                
+                showProfile ? <ProfileCard {...user}/> : 
+                showFriends ? <FriendsCard/> :
+                showGames ? <HistoryCard/> :
+                menu()
+            } 
+        </>
+    }
     </>
 }
 
