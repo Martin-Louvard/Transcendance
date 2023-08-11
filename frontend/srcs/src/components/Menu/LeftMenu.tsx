@@ -1,74 +1,78 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ProfileCard from '../UserProfileCards/ProfileCard';
 import FriendsCard from '../UserProfileCards/FriendsCard';
 import HistoryCard from '../UserProfileCards/HistoryCard';
 import { useAppSelector } from "../../redux/hooks";
-import './LeftMenu.scss'
+import './LeftMenu.scss';
 
-const LeftMenu = () =>{
-    const [showProfile, setShowProfile] = useState(false)
-    const [showFriends, setShowFriends] = useState(false)
-    const [showGames, setShowGames] = useState(false)
-    const user = useAppSelector((state) => state.user);
-    const [fullscreen, setFullScreen] = useState(false)
-    const [menuCss, setmenuCss] = useState("open-menu")
-  
-    const toggleMenu = () =>{
-      if (menuCss.charAt(0) == 'o')
-        setmenuCss("close-menu menu-transition-close")
-      else
-        setmenuCss("open-menu menu-transition-open")
-      setFullScreen(!fullscreen);
-    }
-    
-    useEffect(()=>{}, [fullscreen])
+const LeftMenu = () => {
+  const user = useAppSelector((state) => state.user);
+  const [fullscreen, setFullScreen] = useState(false);
+  const [menuCss, setMenuCss] = useState("open-menu");
+  const [contentToShow, setContentToShow] = useState("menu");
 
-    const handleClick = (event: React.MouseEvent<any>) => {
-        event.preventDefault()
+  const toggleMenu = () => {
+    setMenuCss((prevCss) =>
+      prevCss.startsWith("open") ? "close-menu menu-transition-close" : "open-menu menu-transition-open"
+    );
+    setFullScreen((prevFullscreen) => !prevFullscreen);
+  };
 
-        event.currentTarget.id === "profile" ? setShowProfile(true): 
-        event.currentTarget.id === "friends" ?  setShowFriends(true):
-        event.currentTarget.id === "history" ? setShowGames(true) :
-        event.currentTarget.id === "back" ? (setShowGames(false), setShowFriends(false), setShowProfile(false)) :
+  const handleClick = (event: React.MouseEvent<any>) => {
+    event.preventDefault();
 
-         ()=>{}
-       };
+    const targetId = event.currentTarget.id;
+    if (targetId === "profile") setContentToShow("profile");
+    else if (targetId === "friends") setContentToShow("friends");
+    else if (targetId === "history") setContentToShow("games");
+    else if (targetId === "back") setContentToShow("menu");
+  };
 
-    const menu = () =>{
-        return  (<>
-            {
-                fullscreen ? "" :  
-                <>
-                <button id={"friends"} onClick={handleClick}>Friends</button>
-                <button id={"history"} onClick={handleClick}>LeaderBoard</button>
-                <button id={"profile"} onClick={handleClick}>My Profile</button>
-                </>
-            }
-        </>
-        )
-    }
+  const renderContent = () => {
+    if (fullscreen) return null;
 
-    return <>
-    <div className={`menu-wrapper ${menuCss}`}>
-        {(showProfile || showFriends || showGames) ? <img id={"back"} onClick={handleClick} className='exit-button' src={'cross.svg/'}/> : ""}
-        <img className={`logo-nav menu-icon`} src={'/menu.svg'} onClick={toggleMenu}/>
-        <div className="inner-menu-wrapper">
-        {
-            fullscreen ? "" :
-            <>
-                {
-                    
-                    showProfile ? <ProfileCard {...user}/> : 
-                    showFriends ? <FriendsCard/> :
-                    showGames ? <HistoryCard/> :
-                    menu()
-                } 
-            </>
-        }
-        </div>
-    </div>
+    if (contentToShow === "profile") return <ProfileCard {...user} />;
+    if (contentToShow === "friends") return <FriendsCard />;
+    if (contentToShow === "games") return <HistoryCard />;
+    return renderMenuButtons();
+  };
 
+  const renderMenuButtons = () => (
+    <>
+      <button id="friends" onClick={handleClick}>
+        Friends
+      </button>
+      <button id="history" onClick={handleClick}>
+        LeaderBoard
+      </button>
+      <button id="profile" onClick={handleClick}>
+        My Profile
+      </button>
     </>
-}
+  );
 
-export default LeftMenu
+  return (
+    <>
+      <div className={`menu-wrapper ${menuCss}`}>
+        {(contentToShow !== "menu" || fullscreen) && (
+          <img
+            id="back"
+            onClick={handleClick}
+            className="exit-button"
+            src={'cross.svg'}
+            alt="Close"
+          />
+        )}
+        <img
+          className={`logo-nav menu-icon`}
+          src={'/menu.svg'}
+          alt="Menu"
+          onClick={toggleMenu}
+        />
+        <div className="inner-menu-wrapper">{renderContent()}</div>
+      </div>
+    </>
+  );
+};
+
+export default LeftMenu;
