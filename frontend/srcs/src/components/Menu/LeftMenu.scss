@@ -1,5 +1,6 @@
 .menu-wrapper{
     width: 20%;
+    min-width: 240px;
     background-color: #312f2f;
     position:fixed ;
     height: 100%;
@@ -15,10 +16,23 @@
     width: 90%;
 }
 
+.exit-button{
+  height: 5%;
+  width: auto;
+  border-radius: 20px;
+  position: absolute;
+  cursor: pointer;
+  left: 10px;
+  z-index: 10;
+}
+
+
 .menu-icon{
     position: absolute;
     cursor: pointer;
     left: 20vw;
+    z-index: 10;
+
   }
   
   .close-menu{

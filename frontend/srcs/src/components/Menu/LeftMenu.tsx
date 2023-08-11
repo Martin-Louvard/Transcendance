@@ -50,12 +50,12 @@ const LeftMenu = () =>{
 
     return <>
     <div className={`menu-wrapper ${menuCss}`}>
+        {(showProfile || showFriends || showGames) ? <img id={"back"} onClick={handleClick} className='exit-button' src={'cross.svg/'}/> : ""}
         <img className={`logo-nav menu-icon`} src={'/menu.svg'} onClick={toggleMenu}/>
         <div className="inner-menu-wrapper">
         {
             fullscreen ? "" :
             <>
-                {(showProfile || showFriends || showGames) ? <img id={"back"} onClick={handleClick} className='exit-button' src={'cross.svg/'}/> : ""}
                 {
                     
                     showProfile ? <ProfileCard {...user}/> : 
