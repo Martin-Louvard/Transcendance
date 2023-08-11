@@ -28,6 +28,19 @@ const Dashboard: React.FC = () => {
     
       <div className={`dashboard-wrapper`}>
         <LeftMenu />
+        <div className="canvas-wrapper">
+        {isPlaying ?
+          <>
+            <Canvas >
+              <Experience/>
+            </Canvas>
+          </> 
+          : 
+          <div>
+            <button className="play-button" onClick={()=>{setIsPlaying(true);}}>Play</button>
+          </div>
+          }
+      </div>
       </div>
 
   </>

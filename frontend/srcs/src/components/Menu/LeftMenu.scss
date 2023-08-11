@@ -1,8 +1,9 @@
 .menu-wrapper{
     width: 20%;
     background-color: #312f2f;
-    position: absolute;
+    position:fixed ;
     height: 100%;
+    z-index: 111;
 }
 
 .inner-menu-wrapper{
