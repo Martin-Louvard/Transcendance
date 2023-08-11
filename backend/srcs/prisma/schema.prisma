@@ -69,6 +69,7 @@ model ChatMessage {
   channel                  ChatChannel  @relation(fields: [channelId], references: [id])
   channelId                Int
   sender                   User         @relation(fields: [senderId], references: [id])
+  reader_user_Id		   Int[]
   senderId                 Int
   content                  String
   createdAt                DateTime     @default(now())

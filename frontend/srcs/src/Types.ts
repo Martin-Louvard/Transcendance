@@ -24,8 +24,8 @@ export default interface Message {
 
 export default interface ChatChannels {
   id: number;
-  Owner: User;
-  Admins: User[];
+  ownerId: User;
+  admins: User[];
   name?: string;
   password?: string;
   channelType?: string;

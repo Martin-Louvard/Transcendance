@@ -3,6 +3,7 @@ import userReducer from './components/Authentication/userReducer.ts'
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import thunk from 'redux-thunk';
+import ChatChannelReducer from './components/Chat/ChatChannelReducer.ts'
 
 
 const persistConfig = {
@@ -15,6 +16,7 @@ const persistedReducer = persistReducer(persistConfig, userReducer)
 export const store = configureStore({
   reducer: {
     user: persistedReducer,
+    chatChannels: ChatChannelReducer,
   },
   middleware: [thunk]
 });

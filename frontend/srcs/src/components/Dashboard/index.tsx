@@ -3,6 +3,7 @@ import LeftMenu from './LeftMenu';
 import './Dashboard.css'
 import Experience from '../../Experience';
 import { Canvas } from '@react-three/fiber';
+import SideChatMenu from '../Chat/SideChatMenu';
 
 const Dashboard: React.FC = () => {
   const [isPlaying , setIsPlaying ] = useState(false)
@@ -27,10 +28,11 @@ const Dashboard: React.FC = () => {
           <div>
             <button className="play-button" onClick={()=>{setIsPlaying(true);}}>Play</button>
           </div>}
-      </div>
+        </div>
+        <SideChatMenu />
     </div>
   </>
   );
 };
 
-export default Dashboard;
+export default Dashboard; 

@@ -6,9 +6,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class ChatMessagesService {
   constructor(private prisma: PrismaService) {}
-  
+
   create(createChatMessageDto: CreateChatMessageDto) {
-    return this.prisma.chatMessage.create({data: createChatMessageDto });
+    return this.prisma.chatMessage.create({ data: createChatMessageDto });
   }
 
   findAll() {
@@ -16,7 +16,7 @@ export class ChatMessagesService {
   }
 
   findOne(id: number) {
-    return this.prisma.chatMessage.findUnique({where: {id}});
+    return this.prisma.chatMessage.findUnique({ where: { id } });
   }
 
   update(id: number, updateChatMessageDto: UpdateChatMessageDto) {

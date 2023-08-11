@@ -4,6 +4,7 @@ import './Chat.css'
 import Messages from "../Messages/Messages";
 import MessageInput from "../Messages/MessageInput";
 import { useAppSelector } from "../../hooks";
+
 const Chat = (chat) => {
   const user = useAppSelector((state)=>state.user)
   const [socket, setSocket] = useState<Socket>()

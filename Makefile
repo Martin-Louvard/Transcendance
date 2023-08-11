@@ -24,5 +24,10 @@ VOL:=$(shell docker volume ls -q)
 rmvol    :
 	docker volume rm $(VOL)
 
+fclean:
+	make stop
+	make purge
+	make rmvol
+
 
 .PHONY: all, build, up, stop, purge, re, rmvol, backend
