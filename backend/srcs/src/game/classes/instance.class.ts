@@ -1,5 +1,5 @@
 import { Timeout } from "@nestjs/schedule";
-import { GameData, ServerEvents, ServerPayloads } from "../../Types";
+import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads } from "../../Types";
 import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
@@ -9,13 +9,17 @@ interface Sphere {
 	body: CANNON.Body | null;
 }
 
+interface Paddle {
+	size: [number, number, number],
+	body: CANNON.Body | null;
+}
+
 interface World {
 	world: CANNON.World | null;
 	groundBody: CANNON.Body | null;
-	players: Player[] | null;
+	players: Paddle[] | null;
 	balls: Sphere[] | null;
 }
-
 
 
 export class Instance {
@@ -34,9 +38,10 @@ export class Instance {
 	private startTriggered: boolean = false; // Permet de savoir si le Start a deja été trigger pour annuler un start si
 	// un player quitte pendant le temps d'attente du demarage
 	private data: GameData = {
-		mapHeight:  20,
-		mapWidth: 20,
-		ballPosition: [0, 0, 0],
+		mapHeight:  100,
+		mapWidth: 200,
+		balls: null,
+		players: null,
 	};
 	private world: World = {
 		world: null,
@@ -49,10 +54,6 @@ export class Instance {
 		this.hasStarted = true;
 		this.startTriggered = true;
 		this.generate();
-		this.world.players = new Array<Player>();
-		this.lobby.players.forEach((player) => { // On copie tout les players du lobby dans ce tableau
-			this.world.players.push(player);
-		})
 		const payload: ServerPayloads[ServerEvents.LobbyState] = {
 			lobbyId: this.lobby.id,
 			mode: this.lobby.mode,
@@ -80,18 +81,42 @@ export class Instance {
 		})
 		groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0) // make it face up
 		this.world.world.addBody(groundBody);
-
+		const radius = 5;
 		let sphere: Sphere = {
-			radius: 4,
+			radius: radius,
 			body: new CANNON.Body({
 				mass: 5, // kg
-				shape: new CANNON.Sphere(4),
+				shape: new CANNON.Sphere(radius),
 			}),
 		};
 		sphere.body.position.set(0, 10, 0) // m
 		this.world.world.addBody(sphere.body);
 		this.world.balls = new Array<Sphere>();
 		this.world.balls.push(sphere);
+		this.data.balls = new Array<Ball>();
+		this.data.balls.push({position: [sphere.body.position.x, sphere.body.position.y, sphere.body.position.z], size: radius});
+	
+		this.world.players = new Array<Paddle>();
+		this.data.players = new Array<PlayerBody>();
+		// [x, y, z] : Y gere la HAUTEUR (donc l'axe non jouable)
+		const playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
+		for (let index = 0; index < (this.lobby.mode == LobbyMode.duel ? 2 : 4); index++) {
+			const paddleSize:[number, number, number] = [12, 3, 2];
+			const paddle: Paddle = {
+				size: paddleSize,
+				body: new CANNON.Body({
+						mass: 1, // kg (peut être ajusté)
+						shape: new CANNON.Box(new CANNON.Vec3(paddleSize[0] / 2, paddleSize[1] / 2, paddleSize[2] / 2)),
+					})
+			}
+			paddle.body.position.set(playerSpawnPos[index][0], playerSpawnPos[index][1], playerSpawnPos[index][2]); // Position du joueur 1
+			this.world.world.addBody(paddle.body);
+			this.world.players.push(paddle);
+			this.data.players.push({position: [paddle.body.position.x, paddle.body.position.y, paddle.body.position.z], size: paddleSize});
+
+			
+		}
+	
 	}
 
 	clear() {
@@ -110,15 +135,24 @@ export class Instance {
 		this.lobby.emit<ServerPayloads[ServerEvents.GameState]>(ServerEvents.GameState, payload);
 	}
 
+	copyData() {
+		this.world.balls.forEach((ball) => {
+			this.data.balls[0] = {position: [ball.body.position.x, ball.body.position.y, ball.body.position.z], size: ball.radius}
+		})
+		this.world.players.forEach((player, index) => {
+			this.data.players[index] = {position: [player.body.position.x, player.body.position.y, player.body.position.z], size: player.size};
+		})
+	}
+
 	animate() {
 		//requestAnimationFrame(this.animate)
 		this.interval = setInterval(() => {
 			this.world.world.fixedStep()
-			this.data.ballPosition = [this.world.balls[0].body.position.x, this.world.balls[0].body.position.y, this.world.balls[0].body.position.z];
+			this.copyData();
 			this.dispatchGameState();
-			console.log(`[Game] Sphere y position: ${this.world.balls[0].body.position.y}`)
+			//console.log(`[Game] Sphere y position: ${this.world.balls[0].body.position.y}`)
 
-		}, 500);
+		}, 5);
 	  }
 
 	gameLogic() {

@@ -96,6 +96,7 @@ export class Lobby {
 	
 	clear() {
 		this.players.forEach((player) => {
+			console.log("player deleting");
 			this.removePlayer(player);
 			this.players.delete(player.socket);
 		})
