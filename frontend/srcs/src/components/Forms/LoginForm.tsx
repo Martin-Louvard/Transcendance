@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import Form from './Form';
-import  login  from './login.ts'
-import { setUser } from '../../userReducer.ts';
-import { useAppDispatch } from '../../hooks';
-import login2fa from './login2fa.ts';
 import { socket } from '../../socket.ts';
 import { ClientPayloads, ClientEvents } from '../Game/Type.ts';
+import Form from './Form.js';
+import  login  from '../Authentication/login.js'
+import { setUser } from '../../redux/userReducer.js';
+import { useAppDispatch } from '../../redux/hooks.js';
+import login2fa from '../Authentication/login2fa.js';
+import './Forms.scss'
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -48,11 +49,11 @@ const LoginForm: React.FC = () => {
 
   return (
     <Form onSubmit={handleSubmit} title="Login" buttonText="Login">
-      <div className='form-div'>
+      <div >
         <label htmlFor="username">Username:</label>
         <input type="username" id="username" value={username} onChange={handleChange} />
       </div>
-      <div className='form-div'>
+      <div>
         <label htmlFor="password">Password:</label>
         <input type="password" id="password" value={password} onChange={handleChange}  />
       </div>

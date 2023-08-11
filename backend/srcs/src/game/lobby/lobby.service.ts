@@ -59,16 +59,18 @@ export class LobbyService {
 		try {
 			const index = this.lobbies.indexOf(lobby);
 			if (index > -1) {
+				this.lobbies[index].players.forEach((player) => {
+					this.leaveLobby(player);
+				})
 				this.lobbies.splice(index, 1);
+				this.logger.log(`lobby ${lobby.id} removed`);
 			}
-			this.logger.log(`lobby ${lobby.id} removed`);
 		} catch (error) {
 			console.log(error);
 		}
 	}
 	autoFindLobby(player: Player, mode: LobbyMode, server: Server):boolean {
 		try {
-			
 			if (player.lobby != null)
 				return false;
 			let lobbyFinded: boolean = false;

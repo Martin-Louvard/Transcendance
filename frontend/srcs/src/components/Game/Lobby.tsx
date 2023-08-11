@@ -90,14 +90,14 @@ export const Lobby: React.FC = () => {
     </div>
     :
     player.isPlaying && player.lobbyId? 
-    <div className='current-game-block' style={{color:"white"}}>
+    <div className='current-game-block'>
       <p>You are currently in a game : </p>
       <button className="join-current-game" onClick={() => {navigate('/game/' + player.lobbyId)}}>Join Game</button>
     </div>
       
     :
       <div>
-        <p style={{ color:"white" }}>Waiting for a game...</p>
+        <p >Waiting for a game...</p>
         <button onClick={leaveLobby}>Stop Searching</button>
       </div>
   );

@@ -1,5 +1,4 @@
 import Footer from "../../components/Footer/Footer";
-import "./index.css"
 const About = () => {
 
     return <>

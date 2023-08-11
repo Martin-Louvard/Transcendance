@@ -1,0 +1,62 @@
+// Variables
+$primary-color: #312f2f;
+$secondary-color: #646cffaa;
+$react-color: #61dafbaa;
+
+// Navbar
+.navbar {
+  height: 9vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: $primary-color;
+  padding: 0 20px;
+}
+
+// Elem Wrapper
+.nav-elem-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+// Navbar Brand
+.navbar-brand {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: white;
+  margin-left: 10px;
+}
+
+// Navbar items
+.nav-item {
+  padding: 0.6em 0.6em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: white;
+}
+
+// Logo Nav
+.logo-nav {
+  height: 3em;
+  will-change: filter;
+  transition: filter 300ms;
+
+  &:hover {
+    filter: drop-shadow(0 0 2em $secondary-color);
+  }
+
+  &.react:hover {
+    filter: drop-shadow(0 0 2em $react-color);
+  }
+}
+

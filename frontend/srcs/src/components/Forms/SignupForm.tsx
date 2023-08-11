@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Form from './Form';
-import login from './login';
-import { setUser } from '../../userReducer';
-import { useAppDispatch } from '../../hooks';
-import { socket } from '../../socket';
+import login from '../Authentication/login';
+import { setUser } from '../../redux/userReducer';
+import { useAppDispatch } from '../../redux/hooks';
+import './Forms.scss'
 import { ClientEvents, ClientPayloads } from '../Game/Type';
+import { socket } from '../../socket';
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -54,19 +55,19 @@ const SignupForm: React.FC = () => {
 
   return (
     <Form onSubmit={handleSubmit} title="Signup" buttonText="Signup">
-      <div className='form-div'>
+      <div >
         <label htmlFor="email">Email:</label>
         <input type="email" id="email" value={email} onChange={handleChange} />
       </div>
-      <div className='form-div'>
+      <div >
         <label htmlFor="username">Username:</label>
         <input type="username" id="username" value={username} onChange={handleChange} />
       </div>
-      <div className='form-div'>
+      <div >
         <label htmlFor="password">Password:</label>
         <input type="password" id="password" value={password} onChange={handleChange} />
       </div>
-      <div className='form-div'>
+      <div >
         <label htmlFor="confirm-password">Confirm Password:</label>
         <input type="password" id="confirm-password" value={confirmPassword} onChange={handleChange} />
       </div>

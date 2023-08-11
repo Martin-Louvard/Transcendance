@@ -47,10 +47,16 @@ export class Lobby {
 		player.socket.leave(this.id);
 		let isDeleted = this.players.delete(player.socket);
 		if (isDeleted) {
-			player.lobby = null;
+			console.log("player deleted");
 			player.isReady = false;
+			player.lobby = null;
 			this.nbPlayers--;
 			this.full = false; // normalement pas besoin de check.
+			const payload: ServerPayloads[ServerEvents.AuthState] = {
+				lobbyId: null,
+				hasStarted: null,
+			  }
+			player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 			return false;
 		}
 		return true;

@@ -1,8 +1,8 @@
 import React from 'react';
-import './NavBar.css'
+import './NavBar.scss'
 import { Link } from 'react-router-dom'
-import { setUser } from '../../userReducer'
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import { setUser } from '../../redux/userReducer'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
 interface NavbarProps {
   // Define any props you need for the navbar
@@ -17,23 +17,24 @@ const Navbar: React.FC<NavbarProps> = () => {
     window.location.href="http://localhost:3000/"
     dispatch(setUser({}))
     localStorage.removeItem('persist:root')
-
   }
+
+
 
   return (
     <nav className="navbar">
-        <Link  to="/" className="brand-wrapper">
+        <Link  to="/" className="nav-elem-wrapper">
           <img src={logo} className="logo-nav" alt="PONGƎD logo" />
           <div className="navbar-brand">PONGƎD</div>
         </Link>
-      <ul className="navbar-nav">
-        <li className="nav-item">
-          <Link className="nav-link" to="/about">About</Link>
-        </li>
-        <li >
-        {  user.id && user.id != 0 ? <button className="nav-link" onClick={logout}>Logout</button> : null }
-        </li>
-      </ul>
+        <ul className="nav-elem-wrapper">
+          <li className="nav-item">
+            <Link className="nav-link" to="/about">About</Link>
+          </li>
+          <li className="nav-item">
+          {  user.id && user.id != 0 ? <button className="nav-link" onClick={logout}>Logout</button> : null }
+          </li>
+        </ul>
     </nav>
   );
 }

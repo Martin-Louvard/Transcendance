@@ -95,7 +95,6 @@ export class Instance {
 	}
 
 	clear() {
-		console.log("ON DEMANDE LE CLEAR");
 		delete this.world.balls;
 		delete this.world.players;
 		delete this.world.groundBody;

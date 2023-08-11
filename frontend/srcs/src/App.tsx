@@ -1,18 +1,14 @@
-import './App.css'
 import { BrowserRouter as Router } from 'react-router-dom';
-import {
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar/NavBar.tsx'
 import Home from './pages/Home/index.tsx';
 import About from './pages/About/index.tsx';
 import { usePlayerStore } from './components/Game/PlayerStore.ts';
 import { useEffect } from 'react';
 import { socket } from './socket.ts';
-import { useAppSelector } from './hooks.ts';
 import { Game } from './components/Game/Game.tsx';
 import { ClientPayloads, ServerEvents, ServerPayloads, ClientEvents } from './components/Game/Type.ts';
+import { useAppSelector } from './redux/hooks.ts';
 
 function App() {
   const player = usePlayerStore();

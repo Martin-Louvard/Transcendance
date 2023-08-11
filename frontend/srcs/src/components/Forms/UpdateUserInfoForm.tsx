@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Form from '../Authentication/Form';
-import { setUser } from '../../userReducer'
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import Form from './Form';
+import { setUser } from '../../redux/userReducer'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
 const ChangeInfo: React.FC = () => {
     const user = useAppSelector((state) => state.user);
@@ -55,19 +55,19 @@ const ChangeInfo: React.FC = () => {
 
     return (
         <Form onSubmit={handleSubmit} title="Change Infos" buttonText="Confirm">
-        <div className='form-div'>
+        <div >
             <label htmlFor="email">Email:</label>
             <input type="email" id="email" value={email} onChange={handleChange} />
         </div>
-        <div className='form-div'>
+        <div >
             <label htmlFor="username">Username:</label>
             <input type="username" id="username" value={username} onChange={handleChange} />
         </div>
-        <div className='form-div'>
+        <div >
             <label htmlFor="password">Password:</label>
             <input type="password" id="password" value={password} onChange={handleChange} />
         </div>
-        <div className='form-div'>
+        <div >
             <label htmlFor="confirm-password">Confirm Password:</label>
             <input type="password" id="confirm-password" value={confirmPassword} onChange={handleChange} />
         </div>
