@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProfileCard from '../UserProfileCards/ProfileCard';
 import FriendsCard from '../UserProfileCards/FriendsCard';
 import HistoryCard from '../UserProfileCards/HistoryCard';
 import { useAppSelector } from "../../redux/hooks";
 import './LeftMenu.scss'
 
-const LeftMenu = ({hideMenu}) =>{
+const LeftMenu = () =>{
     const [showProfile, setShowProfile] = useState(false)
     const [showFriends, setShowFriends] = useState(false)
     const [showGames, setShowGames] = useState(false)
     const user = useAppSelector((state) => state.user);
-
+    const [fullscreen, setFullScreen] = useState(false)
+    const [menuCss, setmenuCss] = useState("open-menu")
+  
+    const toggleMenu = () =>{
+      if (menuCss.charAt(0) == 'o')
+        setmenuCss("close-menu menu-transition-close")
+      else
+        setmenuCss("open-menu menu-transition-open")
+      setFullScreen(!fullscreen);
+    }
+    
+    useEffect(()=>{}, [fullscreen])
 
     const handleClick = (event: React.MouseEvent<any>) => {
         event.preventDefault()
@@ -26,30 +37,37 @@ const LeftMenu = ({hideMenu}) =>{
     const menu = () =>{
         return  (<>
             {
-                hideMenu ? "" :  <div className="menu-wrapper">
+                fullscreen ? "" :  
+                <>
                 <button id={"friends"} onClick={handleClick}>Friends</button>
                 <button id={"history"} onClick={handleClick}>LeaderBoard</button>
                 <button id={"profile"} onClick={handleClick}>My Profile</button>
-            </div>
+                </>
             }
         </>
         )
     }
 
     return <>
-     {
-        hideMenu ? "" :
-        <>
-            {(showProfile || showFriends || showGames) ? <img id={"back"} onClick={handleClick} className='exit-button' src={'cross.svg/'}/> : ""}
-            {
-                
-                showProfile ? <ProfileCard {...user}/> : 
-                showFriends ? <FriendsCard/> :
-                showGames ? <HistoryCard/> :
-                menu()
-            } 
-        </>
-    }
+    <div className={`menu-wrapper ${menuCss}`}>
+        <img className={`logo-nav menu-icon`} src={'/menu.svg'} onClick={toggleMenu}/>
+        <div className="inner-menu-wrapper">
+        {
+            fullscreen ? "" :
+            <>
+                {(showProfile || showFriends || showGames) ? <img id={"back"} onClick={handleClick} className='exit-button' src={'cross.svg/'}/> : ""}
+                {
+                    
+                    showProfile ? <ProfileCard {...user}/> : 
+                    showFriends ? <FriendsCard/> :
+                    showGames ? <HistoryCard/> :
+                    menu()
+                } 
+            </>
+        }
+        </div>
+    </div>
+
     </>
 }
 
