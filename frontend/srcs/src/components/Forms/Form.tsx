@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import './Forms.scss'
 
 interface FormProps {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -9,7 +10,7 @@ interface FormProps {
 
 const Form: React.FC<FormProps> = ({ onSubmit, title, buttonText, children }) => {
   return (
-    <form onSubmit={onSubmit} className='form'>
+    <form onSubmit={onSubmit} >
       <h2>{title}</h2>
       {children}
       <button type="submit">{buttonText}</button>

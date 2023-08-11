@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import LeftMenu from './LeftMenu';
-import './Dashboard.css'
-import Experience from '../../Experience';
+import LeftMenu from '../Menu/LeftMenu';
+import './Dashboard.scss'
+import Experience from '../Game/Experience';
 import { Canvas } from '@react-three/fiber';
 
 const Dashboard: React.FC = () => {
@@ -20,23 +20,26 @@ const Dashboard: React.FC = () => {
   useEffect(()=>{}, [fullscreen])
 
   return (<>
-    <div className={`dashboard-wrapper ${menuCss}`}>
-      <img className={`logo-nav menu-icon`} src={'/menu.svg'} onClick={toggleMenu}/>
-      <LeftMenu hideMenu={fullscreen}/>
+    
+      <div className={`dashboard-wrapper ${menuCss}`}>
+        <img className={`logo-nav menu-icon`} src={'/menu.svg'} onClick={toggleMenu}/>
+        <LeftMenu hideMenu={fullscreen}/>
       </div>
 
       <div className="canvas-wrapper">
         {isPlaying ?
-        <>
-        <img id={"back"} onClick={() =>{ setIsPlaying(false); setFullScreen(false)}} className='exit-button align-right' src={'cross.svg/'} />
-          <Canvas >
-            <Experience/>
-          </Canvas>
-        </> : 
+          <>
+            <Canvas >
+              <Experience/>
+            </Canvas>
+          </> 
+          : 
           <div>
             <button className="play-button" onClick={()=>{setIsPlaying(true);}}>Play</button>
-          </div>}
+          </div>
+          }
       </div>
+
   </>
   );
 };
