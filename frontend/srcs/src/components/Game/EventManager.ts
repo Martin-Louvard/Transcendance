@@ -1,0 +1,3 @@
+const EventManager = (data: any) => {
+	
+}

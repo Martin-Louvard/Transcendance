@@ -3,6 +3,7 @@ import LeftMenu from './LeftMenu';
 import './Dashboard.css'
 import Experience from '../../Experience';
 import { Canvas } from '@react-three/fiber';
+import { Lobby } from '../Game/Lobby';
 
 const Dashboard: React.FC = () => {
   const [isPlaying , setIsPlaying ] = useState(false)
@@ -15,8 +16,8 @@ const Dashboard: React.FC = () => {
     <div className="dashboard-wrapper">
       <LeftMenu hideMenu={fullscreen}/>
       <div className="canvas-wrapper">
-
-        {isPlaying ?
+        <Lobby/>
+        {/*{isPlaying ?
         <>
         <img id={"back"} onClick={() =>{ setFullScreen(!fullscreen);}} className='fullscreen-button' src={'fullscreen.svg/'} />
         <img id={"back"} onClick={() =>{ setIsPlaying(false); setFullScreen(false)}} className='exit-button align-right' src={'cross.svg/'} />
@@ -26,7 +27,7 @@ const Dashboard: React.FC = () => {
         </> : 
           <div>
             <button className="play-button" onClick={()=>{setIsPlaying(true);}}>Play</button>
-          </div>}
+          </div>}*/}
       </div>
     </div>
   </>

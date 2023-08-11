@@ -3,6 +3,8 @@ import Form from './Form';
 import login from './login';
 import { setUser } from '../../userReducer';
 import { useAppDispatch } from '../../hooks';
+import { socket } from '../../socket';
+import { ClientEvents, ClientPayloads } from '../Game/Type';
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -27,6 +29,11 @@ const SignupForm: React.FC = () => {
       .then(response => {if (response.status !== 201) return(alert ("Signup failed"))})
       const user = await login(username,password)
       dispatch(setUser({...user}))
+      const payloads: ClientPayloads[ClientEvents.AuthState] = {
+        id: user.id,
+        token: user.access_token,
+      }
+      socket.emit(ClientEvents.AuthState, payloads);
     }catch(err) {
       alert(err);
     }
