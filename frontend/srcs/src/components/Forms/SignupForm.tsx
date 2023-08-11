@@ -4,6 +4,8 @@ import login from '../Authentication/login';
 import { setUser } from '../../redux/userReducer';
 import { useAppDispatch } from '../../redux/hooks';
 import './Forms.scss'
+import { ClientEvents, ClientPayloads } from '../Game/Type';
+import { socket } from '../../socket';
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -28,6 +30,11 @@ const SignupForm: React.FC = () => {
       .then(response => {if (response.status !== 201) return(alert ("Signup failed"))})
       const user = await login(username,password)
       dispatch(setUser({...user}))
+      const payloads: ClientPayloads[ClientEvents.AuthState] = {
+        id: user.id,
+        token: user.access_token,
+      }
+      socket.emit(ClientEvents.AuthState, payloads);
     }catch(err) {
       alert(err);
     }

@@ -1,42 +1,28 @@
-import { Client } from "socket.io/dist/client";
-import { Player } from "./game/player/player.class";
 
 export enum LobbyMode {
 	duel = 0,
 	double = 1,
 }
 
-export enum LobbySlotType {
-	friend = 0,
-	online = 1,
-	bot = 2,
-}
-
-export type LobbySlot  = () => {
-	full: boolean;
-	type: LobbySlot;
-	player: Player | null;
-}
-
 export enum ServerEvents
 {
   // General
-  	Pong = 'server.pong',
-  	// Lobby
-  	LobbyState = 'server.lobby.state',
+  Pong = 'server.pong',
+  // Lobby
+  LobbyState = 'server.lobby.state',
 
-  	GameState = 'server.game.state',
+  GameState = 'server.game.state',
 
-  	AuthState = 'server.auth.state',
+  AuthState = 'server.auth.state',
 }
 
 export enum ClientEvents
 {
-	LobbyState = 'client.lobby.state',
+  GameState = 'client.game.state',
 
-  	GameState = 'client.game.state',
+  AuthState = 'client.auth.state',
 
-  	AuthState = 'client.auth.state',
+  LobbyState = 'client.lobby.state',
 }
 
 export type ServerPayloads = {
@@ -71,8 +57,7 @@ export type ClientPayloads = {
 	[ClientEvents.GameState]: {
 		test: number,
 	},
-}
-
+};
 
 export interface PlayerBody {
 	position: [number, number, number];

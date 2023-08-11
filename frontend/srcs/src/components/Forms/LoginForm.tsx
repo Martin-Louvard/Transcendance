@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { socket } from '../../socket.ts';
+import { ClientPayloads, ClientEvents } from '../Game/Type.ts';
 import Form from './Form.js';
 import  login  from '../Authentication/login.js'
 import { setUser } from '../../redux/userReducer.js';
@@ -26,12 +28,22 @@ const LoginForm: React.FC = () => {
     { 
       if (!user.twoFAEnabled){
         dispatch(setUser({...user}))
+        const payloads: ClientPayloads[ClientEvents.AuthState] = {
+          id: user.id,
+          token: user.access_token,
+        }
+        socket.emit(ClientEvents.AuthState, payloads);
         return
       }
       const code = window.prompt("Enter your code from google authenticator", "000000");
       const user2fa = await login2fa(code, user);
       if (user2fa)
         dispatch(setUser({...user2fa}))
+        const payloads: ClientPayloads[ClientEvents.AuthState] = {
+          id: user.id,
+          token: user.access_token,
+        }
+        socket.emit(ClientEvents.AuthState, payloads);
     }
   };
 
