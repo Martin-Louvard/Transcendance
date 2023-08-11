@@ -40,7 +40,6 @@ export class PlayerService {
 			if (data.id == e.id) {
 				e.setOnline(data.socket);
 				this.logger.log(`${e.id} is Online`);
-				console.log(e.lobby);
 				const payload: ServerPayloads[ServerEvents.AuthState] = {
 					lobbyId: e.lobby == null ? null : e.lobby.id,
 					hasStarted: e.lobby == null ? false : e.lobby.instance.hasStarted,
