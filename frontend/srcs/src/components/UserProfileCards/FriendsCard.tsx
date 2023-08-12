@@ -52,10 +52,8 @@ const FriendsCard = () =>{
           const result = await response.json()
           dispatch(setUser({...result, access_token: user.access_token}));
         }
-        else if (response.status === 404)
-          alert("User not found")
-        else if (response.status === 406)
-          alert("You can't add yourself as a friend")
+        else if (response.status === 404 || response.status === 406)
+          alert(response.statusText)
       }catch(err) {
         alert(err);
       }
