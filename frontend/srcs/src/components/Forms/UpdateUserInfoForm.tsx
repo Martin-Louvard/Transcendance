@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Form from './Form';
 import { setUser } from '../../redux/userReducer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { toast } from 'react-hot-toast';
 
 const ChangeInfo: React.FC = () => {
     const user = useAppSelector((state) => state.user);
@@ -32,11 +33,11 @@ const ChangeInfo: React.FC = () => {
         if (response.ok)
         {
             const newUser = await response.json();
-            console.log(newUser)
+            toast.success("Information updated")
             dispatch(setUser({...newUser, access_token: user.access_token}))
         }
       }catch(err) {
-        alert(err);
+        console.log(err);
       }
     }
 

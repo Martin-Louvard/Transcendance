@@ -6,6 +6,7 @@ import { useAppDispatch } from '../../redux/hooks';
 import './Forms.scss'
 import { ClientEvents, ClientPayloads } from '../Game/Type';
 import { socket } from '../../socket';
+import toast from "react-hot-toast"
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -27,8 +28,11 @@ const SignupForm: React.FC = () => {
 
     try{
       await fetch('http://localhost:3001/users', requestOptions)
-      .then(response => {if (response.status !== 201) return(alert ("Signup failed"))})
+      .then(response => {if (response.status !== 201) return toast.error("Signup failed")})
       const user = await login(username,password)
+      if (!user)
+        return toast.error("Account created but signin failed")
+      toast.success("Logged in")
       dispatch(setUser({...user}))
       const payloads: ClientPayloads[ClientEvents.AuthState] = {
         id: user.id,
@@ -36,7 +40,7 @@ const SignupForm: React.FC = () => {
       }
       socket.emit(ClientEvents.AuthState, payloads);
     }catch(err) {
-      alert(err);
+      console.log(err);
     }
   }
 

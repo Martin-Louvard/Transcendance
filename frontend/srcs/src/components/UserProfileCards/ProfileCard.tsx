@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import ChangeInfo from '../Forms/UpdateUserInfoForm';
 import HistoryCard from './HistoryCard';
 import { setUser } from '../../redux/userReducer';
+import toast from 'react-hot-toast'
 
 const ProfileCard = (user) =>{
     const currentUser = useAppSelector((state) => state.user);
@@ -40,7 +41,7 @@ const ProfileCard = (user) =>{
           setChat(result)
         }
       }catch(err) {
-        alert(err);
+        console.log(err);
       }
     }
     if (chatId != 0)
@@ -65,7 +66,7 @@ const ProfileCard = (user) =>{
             dispatch(setUser({...result, access_token: user.access_token }));
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
       }
 
@@ -87,7 +88,7 @@ const ProfileCard = (user) =>{
             setAvatarUrl(result.avatar);
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
       }
 
@@ -106,7 +107,7 @@ const ProfileCard = (user) =>{
 
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
       }
 
@@ -121,10 +122,10 @@ const ProfileCard = (user) =>{
           if (response.ok) {
             const result = await response.json()
             dispatch(setUser({...result, access_token: user.access_token }));
-            alert("2fa disabled")
+            toast.success("2fa disabled")
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
 
       }
@@ -147,10 +148,10 @@ const ProfileCard = (user) =>{
           {
             const result = await response.json()
             dispatch(setUser({...result, access_token: user.access_token }));
-            alert("2fa enabled")
+            toast.success("2fa enabled")
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
       }
 

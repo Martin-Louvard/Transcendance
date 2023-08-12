@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
 import { setUser } from "../../redux/userReducer";
+import { toast } from "react-hot-toast";
 
 const FriendsCard = () =>{
     const storedFriendsList = useAppSelector((state) => state.user.friends);
@@ -53,9 +54,9 @@ const FriendsCard = () =>{
           dispatch(setUser({...result, access_token: user.access_token}));
         }
         else if (response.status === 404 || response.status === 406)
-          alert(response.statusText)
+          toast.error(response.statusText)
       }catch(err) {
-        alert(err);
+        console.log(err);
       }
     }
 
