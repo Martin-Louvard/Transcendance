@@ -12,7 +12,7 @@ stop    :
 	docker compose -f docker-compose.yml stop
 
 purge    :
-	docker-compose -f docker-compose.yml down -v --rmi 'all'
+	docker compose -f docker-compose.yml down -v --rmi 'all'
 
 re         :
 	make stop
