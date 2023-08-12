@@ -9,4 +9,4 @@ EXPOSE 5555
 COPY tools/nestscript.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/nestscript.sh
 
-ENTRYPOINT ["bash", "nestscript.sh"]
+ENTRYPOINT ["bash", "nestscript.sh", "${NPM_DEV_FLAGS}"]
