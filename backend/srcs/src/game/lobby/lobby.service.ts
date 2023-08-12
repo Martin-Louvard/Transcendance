@@ -43,7 +43,7 @@ export class LobbyService {
 			this.lobbies.push(lobby);
 			lobby.dispatchLobbyState();
 		} catch (error) {
-			console.log(error);
+			return error
 		}
 	}
 	getPlayerLobby(player: Player): Lobby | null {
@@ -66,7 +66,7 @@ export class LobbyService {
 				this.logger.log(`lobby ${lobby.id} removed`);
 			}
 		} catch (error) {
-			console.log(error);
+			return error
 		}
 	}
 	autoFindLobby(player: Player, mode: LobbyMode, server: Server):boolean {
@@ -87,11 +87,11 @@ export class LobbyService {
 			}
 			return true;
 		} catch (error) {
-			console.log(error);
+			return error
 		}
 	}
 
-	// TODO: Pour le moment on clear tout toues les 1 minutes, une fois le jeu codé il faudra
+	// TODO: Pour le moment on clear tout toues les 5 minutes, une fois le jeu codé il faudra
 	// TODO... clear que les games terminé toutes les 5 minutes
 	@Cron(CronExpression.EVERY_5_MINUTES,
 		{name: 'lobby_cleaner'})

@@ -28,7 +28,7 @@ export class GameService {
     try {
 		this.playerService.disconnectPlayer(client);
     } catch (error) {
-      console.log(error);
+		return (error);
     }
   }
 
@@ -38,7 +38,7 @@ export class GameService {
         this.playerService.connectPlayer({id: data.id, socket: client});
     } catch (error) {
 		console.log("Cant identify socket due to :");
-      	console.log(error);
+		return (error);
     }
   }
 
@@ -64,7 +64,7 @@ export class GameService {
       player.setReady(true);
       return true;
     } catch (error) {
-      console.log(error);
+		return (error);
     }
   }
 
@@ -76,7 +76,7 @@ export class GameService {
 				return ;
 			return this.lobbyService.autoFindLobby(player, mode, this.server);
 		} catch (error) {
-			console.log(error);
+			return (error)
 		}
   }
 
@@ -93,7 +93,7 @@ export class GameService {
 		}
 		player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 	} catch (error) {
-		console.log(error);
+		return (error)
 	}
   }
   findAll() {
