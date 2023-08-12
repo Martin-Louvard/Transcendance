@@ -14,6 +14,7 @@ const SignupForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const dispatch = useAppDispatch()
+  const validEmailRegex = /^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$/
 
   const signup = async () =>{
     const requestOptions = {
@@ -54,14 +55,22 @@ const SignupForm: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    username.length && email.length && password.length && password === confirmPassword && signup()
+    if (username.length < 1)
+      return toast.error("Username should be at least 1 Character long")
+    if (!email.match(validEmailRegex)) 
+        return toast.error("Invalid email");
+    if (password.length < 3)
+        return toast.error("Password should have at least 3 characters")
+    if ( password !== confirmPassword)
+        return toast.error("Passwords do not match")
+    signup()
   };
 
   return (
     <Form onSubmit={handleSubmit} title="Signup" buttonText="Signup">
       <div >
         <label htmlFor="email">Email:</label>
-        <input type="email" id="email" value={email} onChange={handleChange} />
+        <input type="text" id="email" value={email} onChange={handleChange} />
       </div>
       <div >
         <label htmlFor="username">Username:</label>
