@@ -7,6 +7,7 @@ import { setUser } from '../../redux/userReducer.js';
 import { useAppDispatch } from '../../redux/hooks.js';
 import login2fa from '../Authentication/login2fa.js';
 import './Forms.scss'
+import toast from "react-hot-toast"
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -27,6 +28,7 @@ const LoginForm: React.FC = () => {
     if(user)
     { 
       if (!user.twoFAEnabled){
+        toast.success("Logged in")
         dispatch(setUser({...user}))
         const payloads: ClientPayloads[ClientEvents.AuthState] = {
           id: user.id,
@@ -38,13 +40,18 @@ const LoginForm: React.FC = () => {
       const code = window.prompt("Enter your code from google authenticator", "000000");
       const user2fa = await login2fa(code, user);
       if (user2fa)
+      {
+        toast.success("Logged in")
         dispatch(setUser({...user2fa}))
+      }
         const payloads: ClientPayloads[ClientEvents.AuthState] = {
           id: user.id,
           token: user.access_token,
         }
         socket.emit(ClientEvents.AuthState, payloads);
     }
+    else
+      toast.error("Invalid username or password")
   };
 
   return (

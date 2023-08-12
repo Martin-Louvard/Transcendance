@@ -9,6 +9,7 @@ import { socket } from './socket.ts';
 import { Game } from './components/Game/Game.tsx';
 import { ClientPayloads, ServerEvents, ServerPayloads, ClientEvents } from './components/Game/Type.ts';
 import { useAppSelector } from './redux/hooks.ts';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const player = usePlayerStore();
@@ -36,6 +37,7 @@ function App() {
   return (
     <>
     <Router>
+      <Toaster/>
       <Navbar/>
         <Routes>
           <Route path="/" element={<Home />} />
