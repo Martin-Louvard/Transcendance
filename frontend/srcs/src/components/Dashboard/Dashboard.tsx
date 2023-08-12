@@ -2,6 +2,7 @@ import React from 'react';
 import LeftMenu from '../Menu/LeftMenu';
 import './Dashboard.scss'
 import { Lobby } from '../Game/Lobby';
+import SideChatMenu from '../Chat/SideChatMenu'
 
 const Dashboard: React.FC = () => {
   return (<>
@@ -11,6 +12,7 @@ const Dashboard: React.FC = () => {
         <div className="canvas-wrapper">
           <Lobby/>
         </div>
+        <SideChatMenu />
       </div>
 
   </>

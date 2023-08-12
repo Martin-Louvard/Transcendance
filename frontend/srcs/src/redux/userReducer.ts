@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
+import  chatChannel  from '../Types'
 
 // Define a type for the slice state
-interface userState {
+export interface userState {
   id: number,
     username: string,
     email: string,
@@ -16,9 +17,9 @@ interface userState {
     createdAt: string,
     access_token: string,
     friends: Array<Object>,
-    JoinedChatChannels: Array<Object>,
-    OwnedChatChannels: Array<Object>,
-    BannedFromChatChannels: Array<Object>
+    JoinedChatChannels: chatChannel[],
+    OwnedChatChannels: chatChannel[],
+    BannedFromChatChannels: chatChannel[]
 }
 
 // Define the initial state using that type
@@ -37,9 +38,9 @@ const initialState: userState = {
   createdAt: "",
   access_token: "",
   friends: [{}],
-  JoinedChatChannels: [{}],
-  OwnedChatChannels: [{}],
-  BannedFromChatChannels: [{}]
+  JoinedChatChannels: [],
+  OwnedChatChannels: [],
+  BannedFromChatChannels: []
 }
 
 export const sessionSlice = createSlice({
