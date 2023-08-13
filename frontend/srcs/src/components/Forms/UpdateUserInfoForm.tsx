@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import Form from '../Authentication/Form';
-import { setUser } from '../../userReducer'
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import Form from './Form';
+import { setUser } from '../../redux/userReducer'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { toast } from 'react-hot-toast';
 
 const ChangeInfo: React.FC = () => {
     const user = useAppSelector((state) => state.user);
@@ -9,9 +10,8 @@ const ChangeInfo: React.FC = () => {
     const [username, setUsername] = useState(user.username);
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState('');
-
-
     const dispatch = useAppDispatch()
+    const validEmailRegex = /^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$/
 
     const changeInfo = async () =>{
 
@@ -32,13 +32,14 @@ const ChangeInfo: React.FC = () => {
         if (response.ok)
         {
             const newUser = await response.json();
-            console.log(newUser)
+            toast.success("Information updated")
             dispatch(setUser({...newUser, access_token: user.access_token}))
         }
       }catch(err) {
-        alert(err);
+        console.log(err);
       }
     }
+
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         event.target.id === "email" ? setEmail(event.target.value): 
@@ -50,24 +51,32 @@ const ChangeInfo: React.FC = () => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        username.length && email.length && password.length && password === confirmPassword && changeInfo()
+        if (username.length < 1)
+            return toast.error("Username should be at least 1 Character long")
+        if (!email.match(validEmailRegex)) 
+            return toast.error("Invalid email");
+        if (password.length < 3)
+            return toast.error("Password should have at least 3 characters")
+        if ( password !== confirmPassword)
+            return toast.error("Passwords do not match")
+        changeInfo()
     };
 
     return (
         <Form onSubmit={handleSubmit} title="Change Infos" buttonText="Confirm">
-        <div className='form-div'>
+        <div >
             <label htmlFor="email">Email:</label>
-            <input type="email" id="email" value={email} onChange={handleChange} />
+            <input type="text" id="email" value={email} onChange={handleChange} />
         </div>
-        <div className='form-div'>
+        <div >
             <label htmlFor="username">Username:</label>
             <input type="username" id="username" value={username} onChange={handleChange} />
         </div>
-        <div className='form-div'>
+        <div >
             <label htmlFor="password">Password:</label>
             <input type="password" id="password" value={password} onChange={handleChange} />
         </div>
-        <div className='form-div'>
+        <div >
             <label htmlFor="confirm-password">Confirm Password:</label>
             <input type="password" id="confirm-password" value={confirmPassword} onChange={handleChange} />
         </div>

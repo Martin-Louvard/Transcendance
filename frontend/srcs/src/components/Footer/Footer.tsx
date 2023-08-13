@@ -7,7 +7,7 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = () => {
   return (
-    <div id='footer'>
+    <div>
       <Stack/>
     </div>
   );

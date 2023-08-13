@@ -1,28 +1,34 @@
-all        :    build up
+NPM_DEV_FLAGS	?=
+VOL				:= $(shell docker volume ls -q)
 
-build    :
+all: build up
+
+build:
 	docker compose -f docker-compose.yml build
 
-up        :
+restart:
+	docker compose -f docker-compose.yml restart
+
+up:
 	docker compose -f docker-compose.yml up --detach
 
-stop    :
+stop:
 	docker compose -f docker-compose.yml stop
 
-purge    :
-	docker system prune -af
-
-re         :
+purge:
+	docker compose -f docker-compose.yml down -v --rmi 'all'
+re:
 	make stop
 	make purge
-	make rmvol
 	make build
 	make up
 
-VOL:=$(shell docker volume ls -q)
-
-rmvol    :
+rmvol:
 	docker volume rm $(VOL)
 
+fclean:
+	make stop
+	make purge
+	make rmvol
 
-.PHONY: all, build, up, stop, purge, re, rmvol, backend
+.PHONY: all, build, restart, up, stop, purge, re, rmvol, fclean

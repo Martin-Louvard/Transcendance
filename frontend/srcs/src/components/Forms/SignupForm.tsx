@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import Form from './Form';
-import login from './login';
-import { setUser } from '../../userReducer';
-import { useAppDispatch } from '../../hooks';
+import login from '../Authentication/login';
+import { setUser } from '../../redux/userReducer';
+import { useAppDispatch } from '../../redux/hooks';
+import './Forms.scss'
+import { ClientEvents, ClientPayloads } from '../Game/Type';
+import { socket } from '../../socket';
+import toast from "react-hot-toast"
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +14,7 @@ const SignupForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const dispatch = useAppDispatch()
+  const validEmailRegex = /^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$/
 
   const signup = async () =>{
     const requestOptions = {
@@ -24,11 +29,19 @@ const SignupForm: React.FC = () => {
 
     try{
       await fetch('http://localhost:3001/users', requestOptions)
-      .then(response => {if (response.status !== 201) return(alert ("Signup failed"))})
+      .then(response => {if (response.status !== 201) return toast.error("Signup failed")})
       const user = await login(username,password)
+      if (!user)
+        return toast.error("Account created but signin failed")
+      toast.success("Logged in")
       dispatch(setUser({...user}))
+      const payloads: ClientPayloads[ClientEvents.AuthState] = {
+        id: user.id,
+        token: user.access_token,
+      }
+      socket.emit(ClientEvents.AuthState, payloads);
     }catch(err) {
-      alert(err);
+      console.log(err);
     }
   }
 
@@ -42,24 +55,32 @@ const SignupForm: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    username.length && email.length && password.length && password === confirmPassword && signup()
+    if (username.length < 1)
+      return toast.error("Username should be at least 1 Character long")
+    if (!email.match(validEmailRegex)) 
+        return toast.error("Invalid email");
+    if (password.length < 3)
+        return toast.error("Password should have at least 3 characters")
+    if ( password !== confirmPassword)
+        return toast.error("Passwords do not match")
+    signup()
   };
 
   return (
     <Form onSubmit={handleSubmit} title="Signup" buttonText="Signup">
-      <div className='form-div'>
+      <div >
         <label htmlFor="email">Email:</label>
-        <input type="email" id="email" value={email} onChange={handleChange} />
+        <input type="text" id="email" value={email} onChange={handleChange} />
       </div>
-      <div className='form-div'>
+      <div >
         <label htmlFor="username">Username:</label>
         <input type="username" id="username" value={username} onChange={handleChange} />
       </div>
-      <div className='form-div'>
+      <div >
         <label htmlFor="password">Password:</label>
         <input type="password" id="password" value={password} onChange={handleChange} />
       </div>
-      <div className='form-div'>
+      <div >
         <label htmlFor="confirm-password">Confirm Password:</label>
         <input type="password" id="confirm-password" value={confirmPassword} onChange={handleChange} />
       </div>

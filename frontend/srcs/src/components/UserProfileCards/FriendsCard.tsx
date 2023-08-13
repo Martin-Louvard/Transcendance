@@ -1,8 +1,9 @@
 import ProfileCard from "./ProfileCard";
 import { useState, useEffect } from "react";
-import { useAppSelector, useAppDispatch } from "../../hooks";
-import Form from "../Authentication/Form";
-import { setUser } from "../../userReducer";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import Form from "../Forms/Form";
+import { setUser } from "../../redux/userReducer";
+import { toast } from "react-hot-toast";
 
 const FriendsCard = () =>{
     const storedFriendsList = useAppSelector((state) => state.user.friends);
@@ -52,19 +53,17 @@ const FriendsCard = () =>{
           const result = await response.json()
           dispatch(setUser({...result, access_token: user.access_token}));
         }
-        else if (response.status === 404)
-          alert("User not found")
-        else if (response.status === 406)
-          alert("You can't add yourself as a friend")
+        else if (response.status === 404 || response.status === 406)
+          toast.error(response.statusText)
       }catch(err) {
-        alert(err);
+        console.log(err);
       }
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       event.target.id === "FriendUsername" ? setNewFriendUsername(event.target.value): 
        ()=>{}
-     };
+    };
 
     const displayFriendProfile = (userFriend: object) =>{
       setShowFriend(true)

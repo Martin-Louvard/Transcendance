@@ -1,0 +1,82 @@
+$menu-width: 20%;
+$menu-min-width: 240px;
+$menu-bg-color: #312f2f;
+$exit-button-height: 5%;
+$exit-button-radius: 20px;
+$menu-icon-left: 20vw;
+$menu-animation-range: 20vw;
+
+.menu-wrapper {
+  width: $menu-width;
+  min-width: $menu-min-width;
+  background-color: $menu-bg-color;
+  position: fixed;
+  height: 100%;  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 111;
+}
+
+.inner-menu-wrapper {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: space-evenly;
+  width: 90%;
+}
+
+.exit-button {
+  height: $exit-button-height;
+  width: auto;
+  border-radius: $exit-button-radius;
+  position: absolute;
+  cursor: pointer;
+  left: 10px;
+  z-index: 10;
+}
+
+.menu-icon {
+  position: absolute;
+  cursor: pointer;
+  left: $menu-icon-left;
+  z-index: 10;
+}
+
+.close-menu {
+  left: -$menu-animation-range;
+}
+
+.open-menu {
+  left: 0;
+}
+
+.menu-transition-close {
+  animation: 100ms slide_menu_left ease-in-out;
+  transition: opacity 0.3s ease;
+  background-color: inherit;
+}
+
+.menu-transition-open {
+  animation: 100ms slide_menu_right ease-in-out;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes slide_menu_left {
+  @for $i from 0 through 11 {
+    $percentage: $i * 10;
+    #{$percentage + '%'} {
+      left: ($i * -0.5)vw;
+    }
+  }
+}
+
+@keyframes slide_menu_right {
+  @for $i from 0 through 11 {
+    $percentage: $i * 10;
+    #{$percentage + '%'} {
+      left: ($menu-animation-range - $i * 0.5)vw;
+    }
+  }
+}

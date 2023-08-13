@@ -1,11 +1,11 @@
-import './Dashboard.css'
-import { useAppSelector } from "../../hooks";
-import Chat from '../Chat/Chat.tsx'
+import './Cards.scss'
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import Chat from '../Chat/Chat'
 import { useEffect, useState } from 'react';
-import ChangeInfo from './ChangeInfo.tsx';
+import ChangeInfo from '../Forms/UpdateUserInfoForm';
 import HistoryCard from './HistoryCard';
-import { useAppDispatch } from '../../hooks';
-import { setUser } from '../../userReducer.ts';
+import { setUser } from '../../redux/userReducer';
+import toast from 'react-hot-toast'
 
 const ProfileCard = (user) =>{
     const currentUser = useAppSelector((state) => state.user);
@@ -41,7 +41,7 @@ const ProfileCard = (user) =>{
           setChat(result)
         }
       }catch(err) {
-        alert(err);
+        console.log(err);
       }
     }
     if (chatId != 0)
@@ -66,7 +66,7 @@ const ProfileCard = (user) =>{
             dispatch(setUser({...result, access_token: user.access_token }));
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
       }
 
@@ -88,7 +88,7 @@ const ProfileCard = (user) =>{
             setAvatarUrl(result.avatar);
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
       }
 
@@ -107,7 +107,7 @@ const ProfileCard = (user) =>{
 
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
       }
 
@@ -122,10 +122,10 @@ const ProfileCard = (user) =>{
           if (response.ok) {
             const result = await response.json()
             dispatch(setUser({...result, access_token: user.access_token }));
-            alert("2fa disabled")
+            toast.success("2fa disabled")
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
 
       }
@@ -148,10 +148,10 @@ const ProfileCard = (user) =>{
           {
             const result = await response.json()
             dispatch(setUser({...result, access_token: user.access_token }));
-            alert("2fa enabled")
+            toast.success("2fa enabled")
           }
         }catch(err) {
-          alert(err);
+          console.log(err);
         }
       }
 
@@ -190,18 +190,18 @@ const ProfileCard = (user) =>{
             <h6> Username: {user.username}</h6>
             <h6> Email: {user.email}</h6>
         </div>
-        <button className='form-div' onClick={() =>{setShowGames(true)}}>Game History</button> 
+        <button  onClick={() =>{setShowGames(true)}}>Game History</button> 
         {
-             user.username == currentUser.username && !user.twoFAEnabled ? <button className='form-div' onClick={() =>{activate2fa()}}>Activate 2fa</button> : <></>
+             user.username == currentUser.username && !user.twoFAEnabled ? <button  onClick={() =>{activate2fa()}}>Activate 2fa</button> : <></>
         }
         {
-             user.username == currentUser.username && user.twoFAEnabled ? <button className='form-div' onClick={() =>{disable2fa()}}>Disable 2fa</button> : <></>
+             user.username == currentUser.username && user.twoFAEnabled ? <button  onClick={() =>{disable2fa()}}>Disable 2fa</button> : <></>
         }
         {
-            user.username != currentUser.username ? <button className='form-div' onClick={() =>{setChatOpen(true)}}>Open Private Chat</button> : <button className='form-div' onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
+            user.username != currentUser.username ? <button  onClick={() =>{setChatOpen(true)}}>Open Private Chat</button> : <button  onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
         }
         {
-             user.username != currentUser.username ? <button className='form-div' onClick={() =>{deleteFriendship()}}>Delete From Friends</button> : <></>
+             user.username != currentUser.username ? <button  onClick={() =>{deleteFriendship()}}>Delete From Friends</button> : <></>
         }
         {
           

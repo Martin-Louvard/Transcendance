@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import Authentication from "../../components/Authentication";
-import Dashboard from "../../components/Dashboard";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { setFriend } from "../../friendsReducer";
+import Authentication from "../../components/Authentication/Authentication";
+import Dashboard from "../../components/Dashboard/Dashboard";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import { setFriend } from "../../redux/friendsReducer";
 
 const Home = () => {
     const user = useAppSelector((state) => state.user);

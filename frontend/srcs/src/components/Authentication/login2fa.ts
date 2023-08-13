@@ -18,7 +18,7 @@ const login2fa = async (code: string | null, user: Object) =>{
         return user2fa
       }
     }catch(err) {
-      alert(err);
+      console.log(err);
     }
 
   }
