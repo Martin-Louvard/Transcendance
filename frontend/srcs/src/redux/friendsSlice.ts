@@ -11,7 +11,7 @@ const initialState: friendsState = {
    users: []
 }
 
-export const sessionSlice = createSlice({
+export const friendSlice = createSlice({
   name: 'friends',
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
@@ -23,6 +23,6 @@ export const sessionSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setFriend } = sessionSlice.actions
+export const { setFriend } = friendSlice.actions
 
-export default sessionSlice.reducer
+export default friendSlice.reducer

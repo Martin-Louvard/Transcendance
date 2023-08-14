@@ -2,7 +2,7 @@ import ProfileCard from "./ProfileCard";
 import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
-import { setUser } from "../../redux/userReducer";
+import { setUser } from "../../redux/userSlice";
 import { toast } from "react-hot-toast";
 
 const FriendsCard = () =>{

@@ -4,7 +4,7 @@ import Chat from '../Chat/Chat'
 import { useEffect, useState } from 'react';
 import ChangeInfo from '../Forms/UpdateUserInfoForm';
 import HistoryCard from './HistoryCard';
-import { setUser } from '../../redux/userReducer';
+import { setUser } from '../../redux/userSlice';
 import toast from 'react-hot-toast'
 
 const ProfileCard = (user) =>{

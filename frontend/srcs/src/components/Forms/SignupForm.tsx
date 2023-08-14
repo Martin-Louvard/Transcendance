@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Form from './Form';
 import login from '../Authentication/login';
-import { setUser } from '../../redux/userReducer';
+import { setUser } from '../../redux/userSlice';
 import { useAppDispatch } from '../../redux/hooks';
 import './Forms.scss'
 import { ClientEvents, ClientPayloads } from '../Game/Type';

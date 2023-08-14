@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import LoginForm from '../Forms/LoginForm.js';
 import SignupForm from '../Forms/SignupForm.js';
 import { useAppDispatch } from '../../redux/hooks.js';
-import { setUser } from '../../redux/userReducer.js';
+import { setUser } from '../../redux/userSlice.js';
 import  login2fa  from './login2fa.js'
 import './Authentication.scss'
 import toast from 'react-hot-toast'

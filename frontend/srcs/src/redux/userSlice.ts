@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 // Define a type for the slice state
 interface userState {
-  id: number,
+    id: number,
     username: string,
     email: string,
     avatar: string,

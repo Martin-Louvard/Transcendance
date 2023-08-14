@@ -1,7 +1,7 @@
 import React from 'react';
 import './NavBar.scss'
 import { Link } from 'react-router-dom'
-import { setUser } from '../../redux/userReducer'
+import { setUser } from '../../redux/userSlice'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 
 interface NavbarProps {

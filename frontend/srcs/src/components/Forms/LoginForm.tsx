@@ -3,7 +3,7 @@ import { socket } from '../../socket.ts';
 import { ClientPayloads, ClientEvents } from '../Game/Type.ts';
 import Form from './Form.js';
 import  login  from '../Authentication/login.js'
-import { setUser } from '../../redux/userReducer.js';
+import { setUser } from '../../redux/userSlice.js';
 import { useAppDispatch } from '../../redux/hooks.js';
 import login2fa from '../Authentication/login2fa.js';
 import './Forms.scss'

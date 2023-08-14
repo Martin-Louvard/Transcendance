@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Form from './Form';
-import { setUser } from '../../redux/userReducer'
+import { setUser } from '../../redux/userSlice'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { toast } from 'react-hot-toast';
 
