@@ -40,7 +40,7 @@ export class AuthService {
 
       const user = await this.usersService.findOne(username);
       return {...user}
-      }
+    }
 
     async auth42(code): Promise<any>{
         const requestOptions = {
@@ -60,17 +60,16 @@ export class AuthService {
             const data = await response.json();
             const token_42 = data.access_token ;
             const userInfo =  await this.get42UserInfo(token_42)
-            let dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}});
-            if (!dbUser)
-            {
+            let dbUser;
+            try{
+                dbUser = await this.usersService.findBy42Email(userInfo.email)
+            }
+            catch(err){
                 await this.prisma.user.create({data: {username: userInfo.login, email42: userInfo.email, email: userInfo.email}});
-                dbUser = await this.prisma.user.findUnique({where:{email42: userInfo.email}});
+                dbUser = await this.usersService.findBy42Email(userInfo.email)
             }
             const payload = { sub: dbUser.id, username: dbUser.username };
-            dbUser = await this.usersService.findBy42Email(userInfo.email)
             return {...dbUser, access_token: await this.jwtService.signAsync(payload)};
-
-
           }catch(err) {
             return(err);
           }

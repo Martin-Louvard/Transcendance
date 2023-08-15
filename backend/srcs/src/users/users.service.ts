@@ -100,22 +100,12 @@ export class UsersService {
   }
 
   async findBy42Email(email42: string) {
-    const userRaw = await this.prisma.user.findUnique({where: {email42}, include: {games: true, JoinedChatChannels: true,  OwnedChatChannels: true,
-      BannedFromChatChannels: true,
-      AdminOnChatChannels: true}});
+    const userRaw = await this.prisma.user.findUnique({where: {email42}})
     if (!userRaw)
       throw new NotFoundException(`No user found for email: ${email42}`);
-
-    const friends = await this.prisma.friends.findMany({
-      where: { 
-        OR:[
-          { user_id: userRaw.id},
-          { friend_id: userRaw.id }
-        ]
-      },
-    });
-    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
-    const user = { ...userRaw, friends: friends };
+    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username + "/" + userRaw.avatar.split("/").reverse()[0]
+    const {password, twoFASecret, ...userWithoutSecrets} = userRaw;
+    const user = { ...userWithoutSecrets };
     return user
   }
 
