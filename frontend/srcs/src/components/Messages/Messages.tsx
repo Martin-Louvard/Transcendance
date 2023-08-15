@@ -1,9 +1,9 @@
-import React, {useRef, useEffect} from "react";
+import {useRef, useEffect} from "react";
 import { useAppSelector } from "../../redux/hooks";
 
 const Messages = ({messages}: {messages:Object[]}) =>{
     const chatMessagesRef = useRef(null);
-    const user = useAppSelector((state)=>state.user)
+    const user = useAppSelector((state)=>state.session.user)
 
     useEffect(() => {
         const chatMessagesContainer = chatMessagesRef.current;

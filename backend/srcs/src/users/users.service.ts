@@ -37,8 +37,20 @@ export class UsersService {
     const friends = await this.prisma.user.findMany({
       where: {
         id: {in: friends_id}
+      },
+      include:{
+        friends:{
+         where: {
+            OR : [
+                  {user_id: id},
+                  {friend_id: id}
+                ]
+          }
+        }
       }
     })
+
+
     return friends;
   }
 

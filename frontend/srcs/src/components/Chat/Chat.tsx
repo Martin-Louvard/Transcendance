@@ -4,6 +4,7 @@ import './Chat.scss'
 import Messages from "../Messages/Messages";
 import MessageInput from "../Messages/MessageInput";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+
 const Chat = (chat) => {
   const user = useAppSelector((state)=>state.session.user)
   const [socket, setSocket] = useState<Socket>()

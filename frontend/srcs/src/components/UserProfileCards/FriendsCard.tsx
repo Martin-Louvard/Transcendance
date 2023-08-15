@@ -1,4 +1,4 @@
-import ProfileCard from "./ProfileCard";
+import FriendCard from "./FriendCard"
 import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
@@ -24,7 +24,7 @@ const FriendsCard = () =>{
       };
 
       try{
-        const response = await fetch(`http://localhost:3001/users/${user.username}/friends`, requestOptions)
+        const response = await fetch(`http://localhost:3001/users/${user?.username}/friends`, requestOptions)
         if (response.ok)
         {
           const result = await response.json()
@@ -74,7 +74,7 @@ const FriendsCard = () =>{
     <>
 
         {
-          showFriend ? <ProfileCard {...selectedFriend}/> : friendList()
+          showFriend ? <FriendCard {...selectedFriend}/> : friendList()
         }
 
     </>
