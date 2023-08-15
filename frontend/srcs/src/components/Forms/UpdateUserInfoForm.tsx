@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Form from './Form';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { toast } from 'react-hot-toast';
 import { setSessionUser } from '../../redux/sessionSlice';
+import type { Dispatch, SetStateAction } from 'react';
 
-const ChangeInfo: React.FC = () => {
+const ChangeInfo = ({setChangeInfoOpen}: {setChangeInfoOpen: Dispatch<SetStateAction<boolean>>}) => {
     const user = useAppSelector((state) => state.session.user);
     const access_token = useAppSelector((state) => state.session.access_token)
     const [email, setEmail] = useState(user?.email);
@@ -29,17 +30,20 @@ const ChangeInfo: React.FC = () => {
          })
       };
       try{
-        const response =  await fetch(`http://localhost:3001/users/${username}`, requestOptions)
+        console.log(requestOptions.body)
+        const response =  await fetch(`http://localhost:3001/users/${user?.username}`, requestOptions)
         if (response.ok)
         {
             const newUser = await response.json();
             toast.success("Information updated")
             dispatch(setSessionUser(newUser))
+            setChangeInfoOpen(false)
         }
       }catch(err) {
         console.log(err);
       }
     }
+    useEffect(()=>{},[changeInfo])
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         event.target.id === "email" ? setEmail(event.target.value): 

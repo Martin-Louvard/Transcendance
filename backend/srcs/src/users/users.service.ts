@@ -123,9 +123,8 @@ export class UsersService {
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, roundsOfHashing);
     }
-
-    await this.prisma.user.update({where: {username}, data: updateUserDto});
-    return this.findOne(username)
+    const user = await this.prisma.user.update({where: {username}, data: updateUserDto});
+    return this.findOne(user.username)
   }
 
   async remove(id: number) {

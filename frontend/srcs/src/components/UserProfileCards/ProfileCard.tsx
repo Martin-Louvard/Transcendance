@@ -9,7 +9,7 @@ import { setSessionUser } from '../../redux/sessionSlice';
 const ProfileCard = () =>{
     const user = useAppSelector((state) => state.session.user);
     const access_token = useAppSelector((state) => state.session.access_token)
-    const [changeInfoOpen, setChangeInfoOpen] = useState(false)
+    const [changeInfoOpen, setChangeInfoOpen] = useState<boolean>(false)
     const [showGames, setShowGames] = useState(false)
     const dispatch = useAppDispatch();
     const [avatarUrl, setAvatarUrl] = useState(user?.avatar)
@@ -119,7 +119,6 @@ const ProfileCard = () =>{
 
     const profile = () =>{
         return <>
-
           <div className="profile-picture form-picture">
             <img src={avatarUrl} id={avatarUrl} />
             <form>
@@ -135,28 +134,23 @@ const ProfileCard = () =>{
         <button  onClick={() =>{setShowGames(true)}}>Game History</button> 
         {
           !user?.twoFAEnabled ? <button  onClick={() =>{activate2fa()}}>Activate 2fa</button> : <button  onClick={() =>{disable2fa()}}>Disable 2fa</button>
-
         }
-
         <button  onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
-      
         {
           
           twoFaQrcode.length ? QrCode() : <></>
         }
-
     </>
     }
     
     return <>
         <div className="profile-card-wrapper">
         {
-          changeInfoOpen ? <ChangeInfo/>:
+          changeInfoOpen ? <ChangeInfo setChangeInfoOpen={setChangeInfoOpen}/>:
           showGames ? <HistoryCard/> :
           profile()
         }
         </div>
-     
     </>
 }
 
