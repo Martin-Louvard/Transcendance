@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { FriendsService } from './friends.service';
 import { CreateFriendDto } from './dto/create-friend.dto';
 import { UpdateFriendDto } from './dto/update-friend.dto';
@@ -32,6 +32,11 @@ export class FriendsController {
   @ApiBearerAuth()
   findOne(@Param('id') id: string) {
     return this.friendsService.findOne(+id);
+  }
+
+  @Get('user/:id')
+  findAllFriends(@Query('id') id: string){
+    return this.friendsService.findAllFriendships(+id)
   }
 
   @Patch(':id')

@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import ProfileCard from '../UserProfileCards/ProfileCard';
 import FriendsCard from '../UserProfileCards/FriendsCard';
 import HistoryCard from '../UserProfileCards/HistoryCard';
-import { useAppSelector } from "../../redux/hooks";
 import './LeftMenu.scss';
 
 const LeftMenu = () => {
-  const user = useAppSelector((state) => state.user);
   const [fullscreen, setFullScreen] = useState(false);
   const [menuCss, setMenuCss] = useState("open-menu");
   const [contentToShow, setContentToShow] = useState("menu");
@@ -31,7 +29,7 @@ const LeftMenu = () => {
   const renderContent = () => {
     if (fullscreen) return null;
 
-    if (contentToShow === "profile") return <ProfileCard {...user} />;
+    if (contentToShow === "profile") return <ProfileCard />;
     if (contentToShow === "friends") return <FriendsCard />;
     if (contentToShow === "games") return <HistoryCard />;
     return renderMenuButtons();

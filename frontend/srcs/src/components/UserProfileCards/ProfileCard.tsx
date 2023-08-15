@@ -1,74 +1,21 @@
 import './Cards.scss'
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import Chat from '../Chat/Chat'
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ChangeInfo from '../Forms/UpdateUserInfoForm';
 import HistoryCard from './HistoryCard';
-import { setUser } from '../../redux/userReducer';
 import toast from 'react-hot-toast'
+import { setSessionUser } from '../../redux/sessionSlice';
 
-const ProfileCard = (user) =>{
-    const currentUser = useAppSelector((state) => state.user);
-    const [chatOpen, setChatOpen] = useState(false)
+const ProfileCard = () =>{
+    const user = useAppSelector((state) => state.session.user);
+    const access_token = useAppSelector((state) => state.session.access_token)
     const [changeInfoOpen, setChangeInfoOpen] = useState(false)
     const [showGames, setShowGames] = useState(false)
     const dispatch = useAppDispatch();
-    const [avatarUrl, setAvatarUrl] = useState(user.avatar)
+    const [avatarUrl, setAvatarUrl] = useState(user?.avatar)
     const [twoFaQrcode, setTwoFaQrcode] = useState("")
     const [codeInput, setCodeInput] = useState("")
-    const [chatId, setChatId] = useState(0)
-    const [chat, setChat] = useState({})
 
-    useEffect(()=>{
-      let friendship;
-      if (user != currentUser)
-        friendship = user.friends.filter(o => currentUser.friends.some(({id}) => o.id == id))[0]
-      if (friendship && friendship.chat_id)
-        setChatId(friendship.chat_id)
-    },[])
-
-    useEffect(()=>{
-      const getChat = async() => {
-        const requestOptions = {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      };
-      try{
-        const response = await fetch(`http://localhost:3001/chat-channels/${chatId}`, requestOptions)
-        if (response.ok)
-        {
-          const result = await response.json()
-          setChat(result)
-        }
-      }catch(err) {
-        console.log(err);
-      }
-    }
-    if (chatId != 0)
-      getChat();
-    },[chatId])
-  
-    
-    const deleteFriendship = async () =>{
-        const requestOptions = {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            friend_username: user.username
-           })
-        };
-  
-        try{
-          const response = await fetch(`http://localhost:3001/users/${currentUser.username}/friends`, requestOptions)
-          if (response.ok)
-          {
-            const result = await response.json()
-            dispatch(setUser({...result, access_token: user.access_token }));
-          }
-        }catch(err) {
-          console.log(err);
-        }
-      }
 
     const updateAvatar = async (selectorFiles: FileList ) =>{
       if(!selectorFiles[0])
@@ -80,11 +27,11 @@ const ProfileCard = (user) =>{
           body: formData
         };    
         try{
-          const response = await fetch(`http://localhost:3001/users/${user.username}/avatar`, requestOptions)
+          const response = await fetch(`http://localhost:3001/users/${user?.username}/avatar`, requestOptions)
           if (response.ok)
           {
             const result = await response.json()
-            dispatch(setUser({...result, access_token: user.access_token}));
+            dispatch(setSessionUser(result))
             setAvatarUrl(result.avatar);
           }
         }catch(err) {
@@ -95,11 +42,11 @@ const ProfileCard = (user) =>{
       const activate2fa = async () =>{
         const requestOptions = {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${user.access_token}`},
+          headers: { 'Authorization': `Bearer ${access_token}`},
         };
 
         try{
-          const response = await fetch(`http://localhost:3001/2fa/${currentUser.username}/generate`, requestOptions)
+          const response = await fetch(`http://localhost:3001/2fa/${user?.username}/generate`, requestOptions)
           if (response.ok) {
             const blobData = await response.blob();
             const blobText = await blobData.text()
@@ -114,14 +61,14 @@ const ProfileCard = (user) =>{
       const disable2fa = async () =>{
         const requestOptions = {
           method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${user.access_token}`},
+          headers: { 'Authorization': `Bearer ${access_token}`},
         };
 
         try{
-          const response = await fetch(`http://localhost:3001/2fa/${currentUser.username}/`, requestOptions)
+          const response = await fetch(`http://localhost:3001/2fa/${user?.username}/`, requestOptions)
           if (response.ok) {
             const result = await response.json()
-            dispatch(setUser({...result, access_token: user.access_token }));
+            dispatch(setSessionUser(result))
             toast.success("2fa disabled")
           }
         }catch(err) {
@@ -135,7 +82,7 @@ const ProfileCard = (user) =>{
         const requestOptions = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.access_token}`
+          'Authorization': `Bearer ${access_token}`
          },
           body: JSON.stringify({
             twoFactorAuthenticationCode: codeInput
@@ -143,11 +90,11 @@ const ProfileCard = (user) =>{
         };
 
         try{
-          const response = await fetch(`http://localhost:3001/2fa/${user.username}/turn-on`, requestOptions)
+          const response = await fetch(`http://localhost:3001/2fa/${user?.username}/turn-on`, requestOptions)
           if (response.ok)
           {
             const result = await response.json()
-            dispatch(setUser({...result, access_token: user.access_token }));
+            dispatch(setSessionUser(result));
             toast.success("2fa enabled")
           }
         }catch(err) {
@@ -172,37 +119,27 @@ const ProfileCard = (user) =>{
 
     const profile = () =>{
         return <>
-         {
-            user.username != currentUser.username ?
-            <div className='profile-picture'>
-              <img src={avatarUrl}/>
-            </div>
-             : 
-             <div className="profile-picture form-picture">
-                <img src={avatarUrl} id={avatarUrl} />
-                <form>
-                  <input type="file" id="file" onChange={ (e) => {updateAvatar(e.target.files)}} />
-                  <label htmlFor="file" id="uploadBtn">Modify</label>
-                </form>
-            </div>
-        }
+
+          <div className="profile-picture form-picture">
+            <img src={avatarUrl} id={avatarUrl} />
+            <form>
+              <input type="file" id="file" onChange={ (e) => {if(e.target.files) updateAvatar(e.target.files)}} />
+              <label htmlFor="file" id="uploadBtn">Modify</label>
+            </form>
+        </div>
+        
         <div className='user-info'>
-            <h6> Username: {user.username}</h6>
-            <h6> Email: {user.email}</h6>
+            <h6> Username: {user?.username}</h6>
+            <h6> Email: {user?.email}</h6>
         </div>
         <button  onClick={() =>{setShowGames(true)}}>Game History</button> 
         {
-             user.username == currentUser.username && !user.twoFAEnabled ? <button  onClick={() =>{activate2fa()}}>Activate 2fa</button> : <></>
+          !user?.twoFAEnabled ? <button  onClick={() =>{activate2fa()}}>Activate 2fa</button> : <button  onClick={() =>{disable2fa()}}>Disable 2fa</button>
+
         }
-        {
-             user.username == currentUser.username && user.twoFAEnabled ? <button  onClick={() =>{disable2fa()}}>Disable 2fa</button> : <></>
-        }
-        {
-            user.username != currentUser.username ? <button  onClick={() =>{setChatOpen(true)}}>Open Private Chat</button> : <button  onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
-        }
-        {
-             user.username != currentUser.username ? <button  onClick={() =>{deleteFriendship()}}>Delete From Friends</button> : <></>
-        }
+
+        <button  onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
+      
         {
           
           twoFaQrcode.length ? QrCode() : <></>
@@ -213,10 +150,11 @@ const ProfileCard = (user) =>{
     
     return <>
         <div className="profile-card-wrapper">
-        {chatOpen ? <Chat {...chat}/>: 
-        changeInfoOpen ? <ChangeInfo/>:
-        showGames ? <HistoryCard/> :
-        profile()}
+        {
+          changeInfoOpen ? <ChangeInfo/>:
+          showGames ? <HistoryCard/> :
+          profile()
+        }
         </div>
      
     </>

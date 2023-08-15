@@ -3,11 +3,11 @@ import Dashboard from "../../components/Dashboard/Dashboard";
 import { useAppSelector } from "../../redux/hooks";
 
 const Home = () => {
-    const user = useAppSelector((state) => state.user);
-    
+    const user = useAppSelector((state) => state.session.user);
+
     return <>
     {
-        user.id && user.id != 0 ?  <Dashboard/> : <Authentication/>
+        user && user?.id && user.id != 0 ?  <Dashboard/> : <Authentication/>
     }
     </>
 }

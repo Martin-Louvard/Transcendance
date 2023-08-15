@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import Form from './Form';
-import { setUser } from '../../redux/userReducer'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { toast } from 'react-hot-toast';
+import { setSessionUser } from '../../redux/sessionSlice';
 
 const ChangeInfo: React.FC = () => {
-    const user = useAppSelector((state) => state.user);
-    const [email, setEmail] = useState(user.email);
-    const [username, setUsername] = useState(user.username);
+    const user = useAppSelector((state) => state.session.user);
+    const access_token = useAppSelector((state) => state.session.access_token)
+    const [email, setEmail] = useState(user?.email);
+    const [username, setUsername] = useState(user?.username);
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState('');
     const dispatch = useAppDispatch()
@@ -19,7 +20,7 @@ const ChangeInfo: React.FC = () => {
         method: 'PATCH',
         headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.access_token}`
+            'Authorization': `Bearer ${access_token}`
         },
         body: JSON.stringify({
           username: username,
@@ -33,13 +34,12 @@ const ChangeInfo: React.FC = () => {
         {
             const newUser = await response.json();
             toast.success("Information updated")
-            dispatch(setUser({...newUser, access_token: user.access_token}))
+            dispatch(setSessionUser(newUser))
         }
       }catch(err) {
         console.log(err);
       }
     }
-
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         event.target.id === "email" ? setEmail(event.target.value): 
@@ -51,9 +51,9 @@ const ChangeInfo: React.FC = () => {
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (username.length < 1)
+        if (username && username.length < 1 || username == undefined)
             return toast.error("Username should be at least 1 Character long")
-        if (!email.match(validEmailRegex)) 
+        if (email && !email.match(validEmailRegex) || email == undefined) 
             return toast.error("Invalid email");
         if (password.length < 3)
             return toast.error("Password should have at least 3 characters")

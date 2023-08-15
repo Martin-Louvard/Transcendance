@@ -8,16 +8,22 @@ import { useEffect } from 'react';
 import { socket } from './socket.ts';
 import { Game } from './components/Game/Game.tsx';
 import { ClientPayloads, ServerEvents, ServerPayloads, ClientEvents } from './components/Game/Type.ts';
-import { useAppSelector } from './redux/hooks.ts';
+import { useAppSelector, useAppDispatch } from './redux/hooks.ts';
 import { Toaster } from 'react-hot-toast';
 
 function App() {
   const player = usePlayerStore();
-  const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.session.user);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    // Dispatch WebSocket actions
+    dispatch({ type: 'WEBSOCKET_CONNECT'});
+  }, [dispatch]);
 
   useEffect(() => {
     socket.on("connect", () => {
-      if (user.id) {
+      if (user?.id) {
         const payloads: ClientPayloads[ClientEvents.AuthState] = {
           id: user.id,
           token: user.access_token,

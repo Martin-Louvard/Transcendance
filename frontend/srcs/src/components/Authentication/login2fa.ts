@@ -1,10 +1,11 @@
-const login2fa = async (code: string | null, user: Object) =>{
+import { User } from "../../Types";
 
-    console.log(user)
+const login2fa = async (code: string | null, user: User, access_token: string) =>{
+
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json',
-      'Authorization': `Bearer ${user.access_token}` },
+      'Authorization': `Bearer ${access_token}` },
       body: JSON.stringify({
         twoFactorAuthenticationCode: code
        })
@@ -14,7 +15,7 @@ const login2fa = async (code: string | null, user: Object) =>{
       if (response.ok)
       {
         const user2fa = await response.json();
-        user2fa.access_token = user.access_token
+        user2fa.access_token = access_token
         return user2fa
       }
     }catch(err) {

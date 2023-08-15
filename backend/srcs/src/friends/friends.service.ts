@@ -27,6 +27,17 @@ export class FriendsService {
     return this.prisma.friends.findUnique({where: {id}});
   }
 
+  async findAllFriendships(id: number){
+    const friendships = await this.prisma.friends.findMany({
+      where: { 
+        OR : [
+              {user_id: id},
+              {friend_id: id}
+            ]
+          }})
+    return friendships;
+  }
+
   update(id: number, updateFriendDto: UpdateFriendDto) {
     return `This action updates a #${id} friend`;
   }
