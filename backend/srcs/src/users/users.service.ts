@@ -57,11 +57,13 @@ export class UsersService {
          },
       }
     })
-    unParsedfriends.forEach((friend)=>{
+    const friends = unParsedfriends.map((friend)=>{
       friend.friends.push(...friend.friendUserFriends)
-      friend.friendUserFriends = null
+      friend.avatar = "http://localhost:3001/users/avatar/" + friend.username + "/" + friend.avatar.split("/").reverse()[0]
+      const {friendUserFriends, ...parsedFriend} = friend
+      return parsedFriend
     })
-    const friends = unParsedfriends
+    
     return friends;
   }
 
@@ -69,17 +71,9 @@ export class UsersService {
     const userRaw = await this.prisma.user.findUnique({where: {username}});
     if (!userRaw)
       throw new NotFoundException(`No user found for username: ${username}`);
-    const friends = await this.prisma.friends.findMany({
-      where: { 
-        OR:[
-          { user_id: userRaw.id},
-          { friend_id: userRaw.id }
-        ]
-      },
-    });
     userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username + "/" + userRaw.avatar.split("/").reverse()[0]
     const {password, twoFASecret, ...userWithoutSecrets} = userRaw;
-    const user = { ...userWithoutSecrets, friends: friends };
+    const user = { ...userWithoutSecrets };
     return user
   }
 
