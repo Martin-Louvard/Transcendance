@@ -1,8 +1,8 @@
 import React from 'react';
 import './NavBar.scss'
 import { Link } from 'react-router-dom'
-import { setUser } from '../../redux/userSlice'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { cleanSession } from '../../redux/sessionSlice';
 
 interface NavbarProps {
   // Define any props you need for the navbar
@@ -10,16 +10,14 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = () => {
   const logo = '/pong.svg'
-  const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
 
   const logout = () =>{
     window.location.href="http://localhost:3000/"
-    dispatch(setUser({}))
+    dispatch(cleanSession())
     localStorage.removeItem('persist:root')
   }
-
-
 
   return (
     <nav className="navbar">
@@ -32,7 +30,7 @@ const Navbar: React.FC<NavbarProps> = () => {
             <Link className="nav-link" to="/about">About</Link>
           </li>
           <li className="nav-item">
-          {  user.id && user.id != 0 ? <button className="nav-link" onClick={logout}>Logout</button> : null }
+          {  user?.id && user.id != 0 ? <button className="nav-link" onClick={logout}>Logout</button> : null }
           </li>
         </ul>
     </nav>

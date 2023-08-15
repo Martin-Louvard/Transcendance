@@ -1,15 +1,14 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';import userReducer from './userSlice';
-import friendsReducer from './friendsSlice';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import sessionReducer from './sessionSlice.ts';
+import websocketReducer from './websocketSlice';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import createWebSocketMiddleware from './websocketMiddleware.ts';
-import websocketReducer from './websocketSlice';
 
 // Combine all reducers including persisted user reducer
 const rootReducer = combineReducers({
-  user: userReducer,
-  friends: friendsReducer,
+  session: sessionReducer,
   websocket: websocketReducer,
 });
 
@@ -24,7 +23,8 @@ const websocketMiddleware = createWebSocketMiddleware();
 // Configure the store
 export const store = configureStore({
   reducer: persistedReducer, // Use the persisted root reducer
-  middleware: [websocketMiddleware], // Apply the WebSocket middleware,
+  middleware: (getDefaultMiddleware) =>
+  getDefaultMiddleware({serializableCheck: false}).concat(websocketMiddleware), // Apply the WebSocket middleware,
 });
 
 // Configure listeners using the provided defaults

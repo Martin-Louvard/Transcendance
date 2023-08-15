@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import Form from './Form';
 import login from '../Authentication/login';
-import { setUser } from '../../redux/userSlice';
 import { useAppDispatch } from '../../redux/hooks';
 import './Forms.scss'
 import { ClientEvents, ClientPayloads } from '../Game/Type';
 import { socket } from '../../socket';
 import toast from "react-hot-toast"
+import { setSessionUser, setToken } from '../../redux/sessionSlice';
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -34,7 +34,9 @@ const SignupForm: React.FC = () => {
       if (!user)
         return toast.error("Account created but signin failed")
       toast.success("Logged in")
-      dispatch(setUser({...user}))
+      dispatch(setSessionUser(user))
+      dispatch(setToken(user.access_token))
+
       const payloads: ClientPayloads[ClientEvents.AuthState] = {
         id: user.id,
         token: user.access_token,

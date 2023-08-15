@@ -4,11 +4,11 @@ import Chat from '../Chat/Chat'
 import { useEffect, useState } from 'react';
 import ChangeInfo from '../Forms/UpdateUserInfoForm';
 import HistoryCard from './HistoryCard';
-import { setUser } from '../../redux/userSlice';
 import toast from 'react-hot-toast'
+import { setSessionUser } from '../../redux/sessionSlice';
 
 const ProfileCard = (user) =>{
-    const currentUser = useAppSelector((state) => state.user);
+    const currentUser = useAppSelector((state) => state.session.user);
     const [chatOpen, setChatOpen] = useState(false)
     const [changeInfoOpen, setChangeInfoOpen] = useState(false)
     const [showGames, setShowGames] = useState(false)
@@ -63,7 +63,7 @@ const ProfileCard = (user) =>{
           if (response.ok)
           {
             const result = await response.json()
-            dispatch(setUser({...result, access_token: user.access_token }));
+            dispatch(setSessionUser(result))
           }
         }catch(err) {
           console.log(err);
@@ -84,7 +84,7 @@ const ProfileCard = (user) =>{
           if (response.ok)
           {
             const result = await response.json()
-            dispatch(setUser({...result, access_token: user.access_token}));
+            dispatch(setSessionUser(result))
             setAvatarUrl(result.avatar);
           }
         }catch(err) {
@@ -121,7 +121,7 @@ const ProfileCard = (user) =>{
           const response = await fetch(`http://localhost:3001/2fa/${currentUser.username}/`, requestOptions)
           if (response.ok) {
             const result = await response.json()
-            dispatch(setUser({...result, access_token: user.access_token }));
+            dispatch(setSessionUser(result))
             toast.success("2fa disabled")
           }
         }catch(err) {
@@ -147,7 +147,7 @@ const ProfileCard = (user) =>{
           if (response.ok)
           {
             const result = await response.json()
-            dispatch(setUser({...result, access_token: user.access_token }));
+            dispatch(setSessionUser(result));
             toast.success("2fa enabled")
           }
         }catch(err) {

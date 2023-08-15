@@ -1,40 +1,17 @@
 import ProfileCard from "./ProfileCard";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
-import { setUser } from "../../redux/userSlice";
 import { toast } from "react-hot-toast";
+import { setSessionUser } from "../../redux/sessionSlice";
 
 const FriendsCard = () =>{
-    const storedFriendsList = useAppSelector((state) => state.user.friends);
-    const user = useAppSelector((state) => state.user);
+    const user = useAppSelector((state) => state.session.user);
+    const friends = useAppSelector((state) => state.session.friends);
     const [showFriend, setShowFriend] = useState(false)
     const [selectedFriend, setSelectedFriend] = useState(Object)
-    const [friends, setFriends] = useState(storedFriendsList)
     const [newFriendUsername, setNewFriendUsername] = useState('');
     const dispatch = useAppDispatch();
-
-    
-    useEffect(() => {
-      const fetchFriendsWithInfos = async () => {
-        const friendsWithInfos = await Promise.all(
-          storedFriendsList.map(async (item) => {
-            let response;
-            if (item.friend_id !== user.id)
-              response = await fetch(`http://localhost:3001/users/id/${item.friend_id}?id=${item.friend_id}`);
-            else
-              response = await fetch(`http://localhost:3001/users/id/${item.user_id}?id=${item.user_id}`);
-            const data = await response.json();
-            return data;
-          })
-        );
-        setFriends(friendsWithInfos);
-      };
-    
-      fetchFriendsWithInfos();
-    }, [storedFriendsList]);
-
-
 
     const updateFriend = async (event: React.FormEvent<HTMLFormElement>) =>{
       event.preventDefault();
@@ -51,7 +28,7 @@ const FriendsCard = () =>{
         if (response.ok)
         {
           const result = await response.json()
-          dispatch(setUser({...result, access_token: user.access_token}));
+          dispatch(setSessionUser(result));
         }
         else if (response.status === 404 || response.status === 406)
           toast.error(response.statusText)

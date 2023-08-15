@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import './Chat.scss'
 import Messages from "../Messages/Messages";
 import MessageInput from "../Messages/MessageInput";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 const Chat = (chat) => {
-  const user = useAppSelector((state)=>state.user)
+  const user = useAppSelector((state)=>state.session.user)
   const [socket, setSocket] = useState<Socket>()
   const [messages, setMessages] = useState(chat.messages);
   const dispatch = useAppDispatch();
@@ -16,7 +16,7 @@ const Chat = (chat) => {
   },[setSocket])
 
   const handleSendMessage = (value: string) => {
-    dispatch({ type: 'WEBSOCKET_SEND_MESSAGE', payloads: [chat.id, user.id ,value] });
+    dispatch({ type: 'WEBSOCKET_SEND_MESSAGE', payloads: [chat.id, user?.id ,value] });
     //socket?.emit("message", [chat.id, user.id ,value])
   };
 

@@ -6,7 +6,7 @@ import { useAppSelector } from "../../redux/hooks";
 import './LeftMenu.scss';
 
 const LeftMenu = () => {
-  const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.session.user);
   const [fullscreen, setFullScreen] = useState(false);
   const [menuCss, setMenuCss] = useState("open-menu");
   const [contentToShow, setContentToShow] = useState("menu");

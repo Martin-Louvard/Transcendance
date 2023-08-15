@@ -1,4 +1,4 @@
-export default interface User {
+export interface User {
   id: number;
   username: string;
   email: string;
@@ -12,21 +12,30 @@ export default interface User {
   achievements: JSON | null;
   createdAt: string;
   access_token: string;
-  friends: Array<Object>;
 }
 
-export default interface Message {
+export interface Friendships {
+  id: number,
+  user_id: number,
+  friend_id: number,
+  chat_id: number,
+  createdAt: string,
+  updatedAt: string
+}
+
+export interface Message {
   id: number;
   channelId: number;
   content: string;
   sender: User
 }
 
-export default interface ChatChannels {
+export interface ChatChannels {
   id: number;
   Owner: User;
   Admins: User[];
   name?: string;
   password?: string;
   channelType?: string;
+  messages: Message[];
 }

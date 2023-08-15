@@ -21,7 +21,6 @@ const websocketSlice = createSlice({
       state.isConnected = false;
     },
     receiveMessage: (state, action: PayloadAction<string>) => {
-        console.log("coucou from receive message")
       state.messages.push(action.payload);
     },
   },

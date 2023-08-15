@@ -3,11 +3,11 @@ import { socket } from '../../socket.ts';
 import { ClientPayloads, ClientEvents } from '../Game/Type.ts';
 import Form from './Form.js';
 import  login  from '../Authentication/login.js'
-import { setUser } from '../../redux/userSlice.js';
 import { useAppDispatch } from '../../redux/hooks.js';
 import login2fa from '../Authentication/login2fa.js';
 import './Forms.scss'
 import toast from "react-hot-toast"
+import { setSessionUser, setToken, fetchRelatedUserData} from '../../redux/sessionSlice.ts';
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -29,7 +29,10 @@ const LoginForm: React.FC = () => {
     { 
       if (!user.twoFAEnabled){
         toast.success("Logged in")
-        dispatch(setUser({...user}))
+        dispatch(setSessionUser(user))
+        dispatch(setToken(user.access_token))
+        if (user.id)
+          dispatch(fetchRelatedUserData(user.id))
         const payloads: ClientPayloads[ClientEvents.AuthState] = {
           id: user.id,
           token: user.access_token,
@@ -38,11 +41,14 @@ const LoginForm: React.FC = () => {
         return
       }
       const code = window.prompt("Enter your code from google authenticator", "000000");
-      const user2fa = await login2fa(code, user);
+      const user2fa = await login2fa(code, user, user.access_token);
       if (user2fa)
       {
         toast.success("Logged in")
-        dispatch(setUser({...user2fa}))
+        dispatch(setSessionUser(user2fa))
+        dispatch(setToken(user2fa.access_token))
+        if (user2fa.id)
+          dispatch(fetchRelatedUserData(user2fa.id))
       }
         const payloads: ClientPayloads[ClientEvents.AuthState] = {
           id: user.id,

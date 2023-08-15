@@ -30,13 +30,7 @@ export class UsersService {
   }
 
   async findAllFriends(id: number){
-    const friendships = await this.prisma.friends.findMany({
-      where: { 
-        OR : [
-              {user_id: id},
-              {friend_id: id}
-            ]
-          }})
+    const friendships = await this.friendsService.findAllFriendships(id)
     const friends_id = friendships.map((friend)=>{
         return (friend.user_id == id ? friend.friend_id : friend.user_id)
     })
@@ -76,16 +70,12 @@ export class UsersService {
     if (!userRaw)
       throw new NotFoundException(`No user found for id: ${id}`);
       
-    const friends = await this.prisma.friends.findMany({
-      where: { 
-        OR:[
-          { user_id: id},
-          { friend_id: id }
-        ]
-      },
-    });
-    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username
-    const user = { ...userRaw, friends: friends };
+    const friendships = await this.friendsService.findAllFriendships(id)
+    const friends = await this.findAllFriends(id)
+
+    userRaw.avatar = "http://localhost:3001/users/avatar/" + userRaw.username + "/" + userRaw.avatar.split("/").reverse()[0]
+    const {password, twoFASecret, ...userWithoutSecrets} = userRaw;
+    const user = { ...userWithoutSecrets, friendships: friendships, friends: friends };
     return user
   }
 

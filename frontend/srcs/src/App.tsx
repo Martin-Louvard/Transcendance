@@ -13,7 +13,7 @@ import { Toaster } from 'react-hot-toast';
 
 function App() {
   const player = usePlayerStore();
-  const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -23,7 +23,7 @@ function App() {
 
   useEffect(() => {
     socket.on("connect", () => {
-      if (user.id) {
+      if (user?.id) {
         const payloads: ClientPayloads[ClientEvents.AuthState] = {
           id: user.id,
           token: user.access_token,
