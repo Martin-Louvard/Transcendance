@@ -26,8 +26,8 @@ export interface Friendships {
 export interface Message {
   id: number;
   channelId: number;
+  senderId: number;
   content: string;
-  sender: User
 }
 
 export interface ChatChannels {

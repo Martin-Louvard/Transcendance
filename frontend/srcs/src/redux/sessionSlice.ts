@@ -54,6 +54,9 @@ export const sessionSlice = createSlice({
     setBannedFromChatChannels: (state, action) => {
       state.BannedFromChatChannels = action.payload;
     },
+    receiveMessage: (state, action) => {
+      state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages.push(action.payload);
+    },
     cleanSession: (state) =>{
       state.user= null,
       state.access_token = null,
@@ -86,6 +89,6 @@ export const sessionSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const {setSessionUser, setToken, setFriends, setFriendships, setJoinedChatChannels, setOwnedChatChannels, setBannedFromChatChannels, cleanSession } = sessionSlice.actions
+export const {setSessionUser, setToken, setFriends, setFriendships, setJoinedChatChannels, setOwnedChatChannels, setBannedFromChatChannels, cleanSession, receiveMessage } = sessionSlice.actions
 export { fetchRelatedUserData };
 export default sessionSlice.reducer

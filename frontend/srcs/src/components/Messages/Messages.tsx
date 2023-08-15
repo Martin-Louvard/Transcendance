@@ -1,7 +1,7 @@
 import {useRef, useEffect} from "react";
 import { useAppSelector } from "../../redux/hooks";
-
-const Messages = ({messages}: {messages:Object[]}) =>{
+import { Message } from "../../Types";
+const Messages = ({messages}: {messages:Message[] | undefined}) =>{
     const chatMessagesRef = useRef(null);
     const user = useAppSelector((state)=>state.session.user)
 
@@ -18,10 +18,10 @@ const Messages = ({messages}: {messages:Object[]}) =>{
 
     return <>
     <div className="chat-messages" ref={chatMessagesRef}>
-      {messages.map((message, index) => (
+      {messages?.map((message, index) => (
           <div
             key={index}
-            className={`chat-message ${message.senderId == user.id ? 'user1' : 'user2'} `}
+            className={`chat-message ${message.senderId == user?.id ? 'user1' : 'user2'} `}
           >
             <span className="content">{message.content}</span>
           </div>

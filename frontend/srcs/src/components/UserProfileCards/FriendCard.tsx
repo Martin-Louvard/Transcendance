@@ -1,7 +1,7 @@
 import './Cards.scss'
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Chat from '../Chat/Chat'
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import HistoryCard from './HistoryCard';
 import { setSessionUser } from '../../redux/sessionSlice';
 
@@ -10,28 +10,7 @@ const FriendCard = (user) =>{
     const [chatOpen, setChatOpen] = useState(false)
     const [showGames, setShowGames] = useState(false)
     const dispatch = useAppDispatch();
-    const chatId = user.friends[0].chat_id
-    const [chat, setChat] = useState({}) 
-
-    useEffect(()=>{
-        const getChat = async() => {
-          const requestOptions = {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        };
-        try{
-          const response = await fetch(`http://localhost:3001/chat-channels/${chatId}`, requestOptions)
-          if (response.ok)
-          {
-            const result = await response.json()
-            setChat(result)
-          }
-        }catch(err) {
-          console.log(err);
-        }
-      }
-        getChat();
-      },[])
+    const chatId: number = user.friends[0].chat_id
 
     const deleteFriendship = async () =>{
         const requestOptions = {
@@ -72,7 +51,7 @@ const FriendCard = (user) =>{
     
     return <>
         <div className="profile-card-wrapper">
-        {chatOpen ? <Chat {...chat}/>: 
+        {chatOpen ? <Chat chatId={chatId}/>: 
         showGames ? <HistoryCard/> :
         profile()}
         </div>

@@ -18,7 +18,7 @@ const MessageInput = ({handleSendMessage}: {handleSendMessage: (currentMessage: 
           onChange={(e) => setCurrentMessage(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button onClick={() => {handleSendMessage(currentMessage); setCurrentMessage("")} }>Send</button>
+        <button onClick={() => { handleSendMessage(currentMessage); setCurrentMessage("")} }>Send</button>
       </div>
     </>
 }

@@ -34,7 +34,7 @@ export class UsersService {
     const friends_id = friendships.map((friend)=>{
         return (friend.user_id == id ? friend.friend_id : friend.user_id)
     })
-    const friends = await this.prisma.user.findMany({
+    const unParsedfriends = await this.prisma.user.findMany({
       where: {
         id: {in: friends_id}
       },
@@ -46,19 +46,27 @@ export class UsersService {
                   {friend_id: id}
                 ]
           }
-        }
+        },
+        friendUserFriends:{
+          where: {
+             OR : [
+                   {user_id: id},
+                   {friend_id: id}
+                 ]
+           }
+         },
       }
     })
-
-
+    unParsedfriends.forEach((friend)=>{
+      friend.friends.push(...friend.friendUserFriends)
+      friend.friendUserFriends = null
+    })
+    const friends = unParsedfriends
     return friends;
   }
 
   async findOne(username: string) {
-    const userRaw = await this.prisma.user.findUnique({where: {username}, include: {games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
-      BannedFromChatChannels: true,
-      AdminOnChatChannels: true,
-    }});
+    const userRaw = await this.prisma.user.findUnique({where: {username}});
     if (!userRaw)
       throw new NotFoundException(`No user found for username: ${username}`);
     const friends = await this.prisma.friends.findMany({
@@ -76,9 +84,15 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    const userRaw = await this.prisma.user.findUnique({where: {id}, include: {games: true, JoinedChatChannels: true,   OwnedChatChannels: true,
-      BannedFromChatChannels: true,
-      AdminOnChatChannels: true}});
+    const userRaw = await this.prisma.user.findUnique(
+      {where: {id}, 
+      include: {
+        games: true, 
+        JoinedChatChannels: {include: {messages: true}},   
+        OwnedChatChannels:  {include: {messages: true}},
+        BannedFromChatChannels:  {include: {messages: true}},
+        AdminOnChatChannels:  {include: {messages: true}}
+      }});
     if (!userRaw)
       throw new NotFoundException(`No user found for id: ${id}`);
       
