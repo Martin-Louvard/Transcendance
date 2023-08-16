@@ -34,15 +34,3 @@ export async function fetchFriendsApi(userId: string) {
     }
   }
   
-  export async function fetchChatChannelsApi(userId: string, type: 'joined' | 'owned' | 'banned') {
-    try {
-      // Replace with actual API call
-      //const response = await fetch(`/api/users/${userId}/chat-channels?type=${type}`);
-      //const data = await response.json();
-      const data = null
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  }
-  
