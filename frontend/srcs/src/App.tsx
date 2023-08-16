@@ -8,23 +8,14 @@ import { useEffect } from 'react';
 import { socket } from './socket.ts';
 import { Game } from './components/Game/Game.tsx';
 import { ClientPayloads, ServerEvents, ServerPayloads, ClientEvents } from './components/Game/Type.ts';
-import { useAppSelector, useAppDispatch } from './redux/hooks.ts';
+import { useAppSelector } from './redux/hooks.ts';
 import { Toaster } from 'react-hot-toast';
-import { useRef } from 'react';
+
 
 function App() {
   const player = usePlayerStore();
   const user = useAppSelector((state) => state.session.user);
-  const dispatch = useAppDispatch();
-  const isInitialLoadRef = useRef(true); 
 
-  useEffect(() => {
-    // Dispatch WebSocket actions
-    if (isInitialLoadRef.current){
-      isInitialLoadRef.current = false
-      dispatch({ type: 'WEBSOCKET_CONNECT'});
-    }
-  }, [dispatch]);
 
   useEffect(() => {
     socket.on("connect", () => {

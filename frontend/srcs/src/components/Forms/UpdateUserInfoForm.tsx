@@ -30,7 +30,6 @@ const ChangeInfo = ({setChangeInfoOpen}: {setChangeInfoOpen: Dispatch<SetStateAc
          })
       };
       try{
-        console.log(requestOptions.body)
         const response =  await fetch(`http://localhost:3001/users/${user?.username}`, requestOptions)
         if (response.ok)
         {

@@ -1,13 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit'
-import {User, ChatChannels, Friendships} from '../Types'
+import {User, ChatChannels, Friendships, Friend} from '../Types'
 import { fetchRelatedUserData } from './sessionThunks'
 
 // Define a type for the slice state
 export interface sessionState {
     user: User | null,
     access_token: string | null
-    friends: User[] | null,
+    friends: Friend[] | null,
     friendships: Friendships[] | null,
+    friendRequests: Friendships[] | null,
     JoinedChatChannels: ChatChannels[] | null,
     OwnedChatChannels: ChatChannels[] | null,
     BannedFromChatChannels: ChatChannels[] | null,
@@ -21,6 +22,7 @@ const initialState: sessionState = {
   access_token : null,
   friends: null,
   friendships: null,
+  friendRequests: null,
   JoinedChatChannels: null,
   OwnedChatChannels: null,
   BannedFromChatChannels: null,
@@ -57,6 +59,17 @@ export const sessionSlice = createSlice({
     receiveMessage: (state, action) => {
       state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages.push(action.payload);
     },
+    addFriendRequest: (state, action)=>{
+      state.friendships?.push(action.payload)
+    },
+    updateFriendRequest: (state, action)=>{
+      if (state.friendships)
+        state.friendships =  state.friendships.map((f) => {
+          if (f.id == action.payload.id)
+            return action.payload
+          return f
+        });
+    },
     cleanSession: (state) =>{
       state.user= null,
       state.access_token = null,
@@ -89,6 +102,6 @@ export const sessionSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const {setSessionUser, setToken, setFriends, setFriendships, setJoinedChatChannels, setOwnedChatChannels, setBannedFromChatChannels, cleanSession, receiveMessage } = sessionSlice.actions
+export const {setSessionUser, setToken, setFriends, setFriendships, setJoinedChatChannels, setOwnedChatChannels, setBannedFromChatChannels, cleanSession, receiveMessage, updateFriendRequest, addFriendRequest } = sessionSlice.actions
 export { fetchRelatedUserData };
 export default sessionSlice.reducer

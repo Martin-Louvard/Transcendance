@@ -20,22 +20,53 @@ export class FriendsService {
   }
 
   findAll() {
-    return `This action returns all friends`;
+    return this.prisma.friends.findMany();
   }
 
   async findOne(id: number) {
-    return this.prisma.friends.findUnique({where: {id}});
+    const unParsedFriendship = await this.prisma.friends.findUnique({
+      where: {id},
+      include:{
+        user: true,
+        friend: true
+      }
+    });
+    const {user, friend, ...friendship} = unParsedFriendship;
+    user.avatar =  "http://localhost:3001/users/avatar/" + user.username + "/" + user.avatar.split("/").reverse()[0]
+    friend.avatar =  "http://localhost:3001/users/avatar/" + friend.username + "/" + friend.avatar.split("/").reverse()[0]
+    const { password: userPassword, twoFASecret: userTwoFASecret, ...parsedUser } = user;
+    const { password: friendPassword, twoFASecret: friendTwoFASecret, ...parsedFriend } = friend;
+
+    return {...friendship, friend: parsedFriend, user: parsedUser };
   }
 
-  async findAllFriendships(id: number){
+  async findWithFriend(id:number, userToIncludeId: number) {
+    const unParsedFriendship = await this.findOne(id);
+    const {user, friend, ...friendship} = unParsedFriendship;
+    const userToIncludeInFriendship = user.id === userToIncludeId ? user : friend;
+    return { ...friendship, friend: userToIncludeInFriendship };
+  }
+
+  async findAllFriendships(id: number) {
     const friendships = await this.prisma.friends.findMany({
       where: { 
         OR : [
               {user_id: id},
               {friend_id: id}
             ]
-          }})
-    return friendships;
+          },
+        include:{
+          user:true,
+          friend: true
+        }})
+    return friendships.map(oldFriendship => {
+      const {user, friend, ...friendship} = oldFriendship;
+      user.avatar = "http://localhost:3001/users/avatar/" + user.username + "/" + user.avatar.split("/").reverse()[0]
+      friend.avatar = "http://localhost:3001/users/avatar/" + friend.username + "/" + friend.avatar.split("/").reverse()[0]
+      const { password: friendPassword, twoFASecret: friendTwoFASecret, ...parsedFriend } = friend;
+      const { password: userPassword, twoFASecret: userTwoFASecret, ...parsedUser } = user;
+      return { ...friendship, friend: parsedFriend, user: parsedUser };
+    });
   }
 
   update(id: number, updateFriendDto: UpdateFriendDto) {
@@ -74,7 +105,6 @@ export class FriendsService {
 
       },
     })
-    console.log(result)
     if (result != null)
       return true;
     return false

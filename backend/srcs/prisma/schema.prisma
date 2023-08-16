@@ -11,6 +11,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status{
+  PENDING 
+  ACCEPTED 
+  DECLINED 
+  CANCELED
+}
 
 model User {
   id                      Int           @id @default(autoincrement())
@@ -37,10 +43,13 @@ model User {
   createdAt               DateTime      @default(now())
 }
 
+
+
 model Friends {
   id                      Int           @id @default(autoincrement())
   user_id                 Int
   friend_id               Int
+  status                  Status        @default(PENDING)
   chat_id                 Int?          @unique
   chat                    ChatChannel?  @relation(fields: [chat_id], references: [id])
   user                    User          @relation(name: "user", fields: [user_id], references: [id])
@@ -50,6 +59,8 @@ model Friends {
 
   @@unique([user_id, friend_id])
 }
+
+
 
 model ChatChannel {
   id                      Int           @id @default(autoincrement())

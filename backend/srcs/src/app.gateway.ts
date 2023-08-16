@@ -1,14 +1,17 @@
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads } from './Types';
-
+import {Status} from "@prisma/client";
+import { FriendsService } from './friends/friends.service';
 
 @WebSocketGateway({ cors: '*'})
-export class AppGateway {
-  constructor(private prisma: PrismaService, private readonly gameService: GameService){}
-
+export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private prisma: PrismaService, private readonly gameService: GameService, private friendService: FriendsService){}
+  
+  connected_clients = new Map<number, Socket>
+  
   @WebSocketServer()
   server: Server;
 
@@ -16,9 +19,14 @@ export class AppGateway {
     return this.gameService.afterInit(server);
   }
 
+  handleConnection(client: Socket){
+    this.connected_clients.set(Number(client.handshake.headers.user_id), client)
+  }
+
   handleDisconnect(client: Socket) {
     // Cela fait quitter le lobby du joeur, peut etre pas une bonne idée si 
     // le socket se reset et que le player est tej de son lobby. A voir selon le comportement.
+    this.connected_clients.delete(Number(client.handshake.headers.user_id))
     return this.gameService.handleDisconnect(client);
   }
 
@@ -48,8 +56,37 @@ export class AppGateway {
   }
 
   @SubscribeMessage('message')
-  async handleMessage(@MessageBody() body: Array<any>): Promise<void> {
+  async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Array<any>): Promise<void> {
     const message = await this.prisma.chatMessage.create({data: {channelId: body[0], senderId: body[1] ,content: body[2]}})
     this.server.emit('message', message);
   }
+
+  @SubscribeMessage('friend_request')
+  async handleNewFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() body: Array<any>): Promise<void> {
+      const friend = await this.prisma.user.findUnique({where:{username: body[1]}})
+      const friend_id = friend.id;
+      const newFriendship = await this.friendService.create({user_id: body[0], friend_id: friend_id, chat_id: 0})
+      const friendship = await this.friendService.findOne(newFriendship.id)
+      const friend_socket = this.connected_clients.get(friend_id)
+      client.emit('friend_request', friendship);
+      if (friend_socket)
+        friend_socket.emit('friend_request', friendship);
+
+  }
+
+  @SubscribeMessage('update_friend_request')
+  async handleUpdateFriendshipStatus(@ConnectedSocket() client: Socket, @MessageBody() body: Array<any>): Promise<void> {
+    const friendshipToUpdate = await this.prisma.friends.update({
+      where: {id: body[0]},
+      data: {status: body[2] }
+    })
+    const friend_id = Number(body[1])
+    const friendship = await this.friendService.findOne(friendshipToUpdate.id)
+    const friend_socket = this.connected_clients.get(friend_id)
+    client.emit('update_friend_request', friendship);
+    if (friend_socket)
+      friend_socket.emit('update_friend_request', friendship);
+  }
+
+
 }

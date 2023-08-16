@@ -31,39 +31,9 @@ export class UsersService {
 
   async findAllFriends(id: number){
     const friendships = await this.friendsService.findAllFriendships(id)
-    const friends_id = friendships.map((friend)=>{
-        return (friend.user_id == id ? friend.friend_id : friend.user_id)
-    })
-    const unParsedfriends = await this.prisma.user.findMany({
-      where: {
-        id: {in: friends_id}
-      },
-      include:{
-        friends:{
-         where: {
-            OR : [
-                  {user_id: id},
-                  {friend_id: id}
-                ]
-          }
-        },
-        friendUserFriends:{
-          where: {
-             OR : [
-                   {user_id: id},
-                   {friend_id: id}
-                 ]
-           }
-         },
-      }
-    })
-    const friends = unParsedfriends.map((friend)=>{
-      friend.friends.push(...friend.friendUserFriends)
-      friend.avatar = "http://localhost:3001/users/avatar/" + friend.username + "/" + friend.avatar.split("/").reverse()[0]
-      const {friendUserFriends, ...parsedFriend} = friend
-      return parsedFriend
-    })
-    
+    const friends = friendships.map((friendship)=>{
+      return friendship.friend
+    })    
     return friends;
   }
 
