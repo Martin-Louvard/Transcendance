@@ -120,12 +120,15 @@ $friend-picture-size: 50px;
 .friend-list {
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
 
   .friend-item {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content:space-between;
     cursor: pointer;
+
+    button{
+      background: none;
+  }
   }
 }

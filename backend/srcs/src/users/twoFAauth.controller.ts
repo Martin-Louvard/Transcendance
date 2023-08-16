@@ -42,7 +42,6 @@ import { AuthService } from 'src/auth/auth.service';
         body.twoFactorAuthenticationCode,
         username,
       );
-      console.log(isCodeValid)
       if (!isCodeValid) {
         throw new UnauthorizedException('Wrong authentication code');
       }
