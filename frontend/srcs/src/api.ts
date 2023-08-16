@@ -1,5 +1,5 @@
-import { Friendships, User } from "../Types";
-import { sessionState } from "./sessionSlice";
+import { Friendships, User } from "./Types";
+import { sessionState } from "./redux/sessionSlice";
 
 export async function fetchAllRelatedInfoApi(userId: string) {
   try {

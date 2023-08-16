@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchAllRelatedInfoApi } from './api.ts';
+import { fetchAllRelatedInfoApi } from '../api.ts';
 
 export const fetchRelatedUserData = createAsyncThunk(
   'session/fetchRelatedUserData',
