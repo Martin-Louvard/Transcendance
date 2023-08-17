@@ -10,8 +10,16 @@ export class FriendsService {
 
   async create(createFriendDto: CreateFriendDto) {
     const friendshipExists = await this.friendshipExists(createFriendDto.user_id, createFriendDto.friend_id)
-    if(friendshipExists)
-      throw new NotAcceptableException("Friendship already exists!");
+
+    if(friendshipExists){
+      const updatedFriendship = await this.prisma.friends.update({
+        where: {id: friendshipExists.id}, 
+        data:{
+          status: "PENDING", 
+          sender_id: createFriendDto.sender_id
+        }})
+      return updatedFriendship
+    }
 
     const chat =  await this.chatChannelsService.create({ownerId: createFriendDto.user_id, participants:{connect:[{id: createFriendDto.user_id}, {id: createFriendDto.friend_id}]}})
     createFriendDto.chat_id = chat.id
@@ -105,8 +113,6 @@ export class FriendsService {
 
       },
     })
-    if (result != null)
-      return true;
-    return false
+    return result
   }
 }

@@ -63,15 +63,18 @@ export const sessionSlice = createSlice({
       state.friendships?.push(action.payload)
     },
     updateFriendRequest: (state, action)=>{
-      if (state.friendships)
+      if (!state.friendships)
+        state.friendships = [action.payload]
+      else if (state.friendships.find(f=>f.id == action.payload.id))
         state.friendships =  state.friendships.map((f) => {
           if (f.id == action.payload.id)
             return action.payload
           return f
         });
+      else
+        state.friendships.push(action.payload)
     },
     updateFriendStatus: (state, action)=>{
-      console.log(action.payload)
       if (state.friendships)
         state.friendships =  state.friendships.map((f) => {
           if (f.friend.id === action.payload.user_id)

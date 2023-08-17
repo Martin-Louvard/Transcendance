@@ -25,7 +25,7 @@ const LoginForm: React.FC = () => {
     event.preventDefault();
     username.length && password.length 
     const user = await login(username,password)
-    if(user)
+    if(user.id)
     { 
       if (!user.twoFAEnabled){
         dispatch(setSessionUser(user))

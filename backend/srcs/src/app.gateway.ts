@@ -4,6 +4,7 @@ import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads } from './Types';
 import { FriendsService } from './friends/friends.service';
+import { Friend } from './friends/entities/friend.entity';
 
 @WebSocketGateway({ cors: '*'})
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -18,20 +19,27 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.gameService.afterInit(server);
   }
 
-  handleConnection(client: Socket){
-    const user_id = Number(client.handshake.headers.user_id)
-    this.connected_clients.set(user_id, client)
-    this.prisma.user.update({where: {id: user_id}, data: {status: "ONLINE"}})
-    this.server.emit('update_friend_connection_state', {user_id: user_id, status: "ONLINE"})
+  async handleConnection(client: Socket){
+    if (client.handshake.headers.user_id){
+      const user_id_string = client.handshake.headers.user_id[0]
+      const user_id = parseInt(user_id_string)
+      this.connected_clients.set(user_id, client)
+      this.server.emit('update_friend_connection_state', {user_id: user_id, status: "ONLINE"})
+      await this.prisma.user.update({where: {id: user_id}, data: {status: "ONLINE"}})
+    }
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
+    if (client.handshake.headers.user_id){
+      const user_id_string = client.handshake.headers.user_id[0]
+      const user_id = parseInt(user_id_string)
+      this.connected_clients.delete(user_id)
+      this.server.emit('update_friend_connection_state', {user_id: user_id, status: "OFFLINE"})
+      await this.prisma.user.update({where: {id:user_id}, data: {status: "OFFLINE"}})
+    }
+    
     // Cela fait quitter le lobby du joeur, peut etre pas une bonne idée si 
     // le socket se reset et que le player est tej de son lobby. A voir selon le comportement.
-    const user_id = Number(client.handshake.headers.user_id)
-    this.connected_clients.delete(user_id)
-    this.prisma.user.update({where: {id: user_id}, data: {status: "OFFLINE"}})
-    this.server.emit('update_friend_connection_state', {user_id: user_id, status: "OFFLINE"})
     return this.gameService.handleDisconnect(client);
   }
 
@@ -68,27 +76,25 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('friend_request')
   async handleNewFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() body: Array<any>): Promise<void> {
+    if (client.handshake.headers.user_id){
+      const user_id_string = client.handshake.headers.user_id[0]
+      const user_id = parseInt(user_id_string)
       const friend = await this.prisma.user.findUnique({where:{username: body[1]}})
-      const friend_id = friend.id;
-      const newFriendship = await this.friendService.create({user_id: body[0], friend_id: friend_id, chat_id: 0})
-      const friendship = await this.friendService.findOne(newFriendship.id)
+      const friend_id = friend?.id;
+      let update;
+      if (body[2]){
+        update = await this.prisma.friends.update({
+          where: {id: body[0]},
+          data: {status: body[2]}
+        })
+      }
+      else
+        update = await this.friendService.create({user_id: user_id, friend_id: friend_id, sender_id: user_id, chat_id: 0})
+      const friendship = await this.friendService.findOne(update.id)
       const friend_socket = this.connected_clients.get(friend_id)
       client.emit('friend_request', friendship);
       if (friend_socket)
         friend_socket.emit('friend_request', friendship);
-  }
-
-  @SubscribeMessage('update_friend_request')
-  async handleUpdateFriendshipStatus(@ConnectedSocket() client: Socket, @MessageBody() body: Array<any>): Promise<void> {
-    const friendshipToUpdate = await this.prisma.friends.update({
-      where: {id: body[0]},
-      data: {status: body[2] }
-    })
-    const friend_id = Number(body[1])
-    const friendship = await this.friendService.findOne(friendshipToUpdate.id)
-    const friend_socket = this.connected_clients.get(friend_id)
-    client.emit('update_friend_request', friendship);
-    if (friend_socket)
-      friend_socket.emit('update_friend_request', friendship);
+    }
   }
 }

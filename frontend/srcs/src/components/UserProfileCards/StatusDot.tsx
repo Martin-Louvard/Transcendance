@@ -1,5 +1,4 @@
 import React from "react";
-import './StatusDot.scss'
 
 enum colors{
     "ONLINE" = '#4cd06d',

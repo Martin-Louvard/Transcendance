@@ -7,6 +7,9 @@ export class CreateFriendDto {
     @ApiProperty()
     friend_id: number
 
+    @ApiProperty()
+    sender_id: number
+
     @ApiPropertyOptional()
     chat_id: number
 }
