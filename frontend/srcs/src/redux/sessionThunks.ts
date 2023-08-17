@@ -3,7 +3,7 @@ import { fetchAllRelatedInfoApi } from '../api.ts';
 
 export const fetchRelatedUserData = createAsyncThunk(
   'session/fetchRelatedUserData',
-  async (userId: string) => {
+  async (userId: number) => {
     try {
       // Fetch friends data using userId
       const data = await fetchAllRelatedInfoApi(userId);

@@ -108,7 +108,7 @@ const ProfileCard: React.FC = () => {
       }
     }
 
-    const QrCode: React.FC = ()=>{
+    const QrCode = ()=> {
       return(
           <>
           <p>Scan this QRcode with the google authenticator app and enter your code below</p>
@@ -121,7 +121,7 @@ const ProfileCard: React.FC = () => {
       )
     }
 
-    const Profile: React.FC = () =>{
+    const Profile = () =>{
       return( <>
         <div className="profile-picture form-picture">
           <img src={avatarUrl} id={avatarUrl} />
@@ -140,7 +140,7 @@ const ProfileCard: React.FC = () => {
         !user?.twoFAEnabled ? <button  onClick={() =>{activate2fa()}}>Activate 2fa</button> : <button  onClick={() =>{disable2fa()}}>Disable 2fa</button>
       }
       <button  onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
-      {twoFaQrcode.length ? <QrCode /> : null}
+      {twoFaQrcode.length ? QrCode() : null}
     </>)
     }
     
@@ -149,7 +149,7 @@ const ProfileCard: React.FC = () => {
         {
           changeInfoOpen ? <ChangeInfo setChangeInfoOpen={setChangeInfoOpen}/>:
           showGames ? <HistoryCard/> :
-          <Profile/>
+          Profile()
         }
         </div>
     </>
