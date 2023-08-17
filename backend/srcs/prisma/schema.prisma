@@ -18,6 +18,12 @@ enum Status{
   CANCELED
 }
 
+enum UserStatus{
+  OFFLINE
+  ONLINE
+  INGAME
+}
+
 model User {
   id                      Int           @id @default(autoincrement())
   username                String        @unique
@@ -25,6 +31,7 @@ model User {
   email42                 String?       @unique
   password                String?
   avatar                  String?       @default("default.jpg")
+  status                  UserStatus    @default(OFFLINE)
   twoFAEnabled            Boolean       @default(false)
   twoFASecret             String?
   victoriesCount          Int           @default(0)

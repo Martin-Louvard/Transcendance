@@ -121,14 +121,15 @@ $friend-picture-size: 50px;
   display: flex;
   flex-direction: column;
 
-  .friend-item {
-    display: flex;
-    flex-direction: row;
-    justify-content:space-between;
-    cursor: pointer;
+.friend-item {
+  display: flex;
+  flex-direction: row;
+  justify-content:space-between;
+  align-items: center;
+  cursor: pointer;
 
-    button{
-      background: none;
+  button{
+    background: none;
   }
   }
 }

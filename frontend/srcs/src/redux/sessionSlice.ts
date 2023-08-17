@@ -70,6 +70,23 @@ export const sessionSlice = createSlice({
           return f
         });
     },
+    updateFriendStatus: (state, action)=>{
+      console.log(action.payload)
+      if (state.friendships)
+        state.friendships =  state.friendships.map((f) => {
+          if (f.friend.id === action.payload.user_id)
+            f.friend.status = action.payload.status
+          else if (f.user.id === action.payload.user_id)
+            f.user.status = action.payload.status
+          return f
+        });
+        if (state.friends)
+        state.friends =  state.friends.map((f) => {
+          if (f.id === action.payload.user_id)
+            f.status = action.payload.status
+          return f
+        });
+    },
     cleanSession: (state) =>{
       state.user= null,
       state.access_token = null,
@@ -101,7 +118,19 @@ export const sessionSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
-export const {setSessionUser, setToken, setFriends, setFriendships, setJoinedChatChannels, setOwnedChatChannels, setBannedFromChatChannels, cleanSession, receiveMessage, updateFriendRequest, addFriendRequest } = sessionSlice.actions
+export const { 
+  setSessionUser, 
+  setToken, 
+  setFriends, 
+  setFriendships, 
+  setJoinedChatChannels, 
+  setOwnedChatChannels, 
+  setBannedFromChatChannels, 
+  cleanSession, 
+  receiveMessage, 
+  updateFriendRequest, 
+  addFriendRequest, 
+  updateFriendStatus,
+} = sessionSlice.actions
 export { fetchRelatedUserData };
 export default sessionSlice.reducer
