@@ -1,9 +1,8 @@
 $menu-width: 20%;
 $menu-min-width: 240px;
 $menu-bg-color: #312f2f;
-$exit-button-height: 5%;
-$exit-button-radius: 20px;
-$menu-icon-left: 20vw;
+$exit-button-height: 30px;
+$menu-icon-right: -50px;
 $menu-animation-range: 20vw;
 
 .menu-wrapper {
@@ -30,7 +29,6 @@ $menu-animation-range: 20vw;
 .exit-button {
   height: $exit-button-height;
   width: auto;
-  border-radius: $exit-button-radius;
   position: absolute;
   cursor: pointer;
   left: 10px;
@@ -40,7 +38,7 @@ $menu-animation-range: 20vw;
 .menu-icon {
   position: absolute;
   cursor: pointer;
-  left: $menu-icon-left;
+  right: $menu-icon-right;
   z-index: 10;
 }
 
