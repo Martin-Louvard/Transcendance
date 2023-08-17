@@ -6,14 +6,15 @@ import './LeftMenu.scss';
 import { useAppSelector } from '../../redux/hooks';
 import { Status } from '../../Types';
 import { useAppDispatch } from '../../redux/hooks';
+import { Friendships } from '../../Types';
 
-const LeftMenu = () => {
+const LeftMenu: React.FC = () => {
   const user = useAppSelector((state) => state.session.user)
   const [fullscreen, setFullScreen] = useState(false);
   const [menuCss, setMenuCss] = useState("open-menu");
-  const [contentToShow, setContentToShow] = useState("menu");
+  const [contentToShow, setContentToShow] = useState<"menu" | "profile" | "friends" | "games">("menu");
   const friendships = useAppSelector((state)=> state.session.friendships)
-  const [friendRequests, setFriendRequest] = useState(friendships)
+  const [friendRequests, setFriendRequest] = useState<Friendships[] | null>(friendships)
   const dispatch = useAppDispatch();
 
   useEffect(()=>{
@@ -29,7 +30,7 @@ const LeftMenu = () => {
     setFullScreen((prevFullscreen) => !prevFullscreen);
   };
 
-  const handleClick = (event: React.MouseEvent<any>) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLImageElement>) => {
     event.preventDefault();
 
     const targetId = event.currentTarget.id;

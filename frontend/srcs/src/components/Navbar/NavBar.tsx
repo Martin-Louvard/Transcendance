@@ -4,11 +4,7 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { cleanSession } from '../../redux/sessionSlice';
 
-interface NavbarProps {
-  // Define any props you need for the navbar
-}
-
-const Navbar: React.FC<NavbarProps> = () => {
+const Navbar: React.FC = () => {
   const logo = '/pong.svg'
   const user = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
