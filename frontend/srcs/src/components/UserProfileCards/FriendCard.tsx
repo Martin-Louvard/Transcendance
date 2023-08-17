@@ -36,10 +36,12 @@ const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
           <img src={friend.avatar} alt={`${friend.username}'s Avatar`} />
         </div>
 
-        <div className="user-info">
-          <h6>Username: {friend.username}</h6>
-          <h6>Email: {friend.email}</h6>
-        </div>
+        <div className='user-info'>
+          <h3> {friend.username} </h3>
+          <h6> {friend.rank} </h6>
+          <h6> Victories:{friend.victoriesCount} </h6>
+          <h6> Defeats:{friend.defeatCount} </h6>
+      </div>
         <button onClick={() => setShowGames(true)}>Game History</button>
         {options()}
       </>

@@ -132,8 +132,10 @@ const ProfileCard: React.FC = () => {
       </div>
       
       <div className='user-info'>
-          <h6> Username: {user?.username}</h6>
-          <h6> Email: {user?.email}</h6>
+          <h3> {user?.username} </h3>
+          <h6> {user?.rank} </h6>
+          <h6> Victories:{user?.victoriesCount} </h6>
+          <h6> Defeats:{user?.defeatCount} </h6>
       </div>
       <button  onClick={() =>{setShowGames(true)}}>Game History</button> 
       {
