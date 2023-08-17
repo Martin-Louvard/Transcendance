@@ -4,6 +4,7 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
 import { toast } from "react-hot-toast";
 import { Friendships, Status } from "../../Types";
+import StatusDot from "./StatusDot/StatusDot";
 
 const FriendsListCard: React.FC = () =>{
     const user = useAppSelector((state) => state.session.user);
@@ -63,6 +64,7 @@ const FriendsListCard: React.FC = () =>{
                   />
                 </div>
                 <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
+                <StatusDot status={friendship.friend_id == user?.id ? friendship.user.status:friendship.friend.status}/>
               </li>
             )) 
           : null}
