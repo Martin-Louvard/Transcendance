@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import Chat from '../Chat/Chat';
 import HistoryCard from './HistoryCard';
-import { setSessionUser } from '../../redux/sessionSlice';
-import { Friendships, User } from '../../Types';
+import { Friendships, Status } from '../../Types';
 
 interface FriendCardProps {
   friendship: Friendships;
@@ -17,24 +16,18 @@ const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
   const dispatch = useAppDispatch();
 
   const deleteFriendship = async () => {
-    const requestOptions = {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        friend_username: friend.username,
-      }),
-    };
-
-    try {
-      const response = await fetch(`http://localhost:3001/users/${user?.username}/friends`, requestOptions);
-      if (response.ok) {
-        const result: User = await response.json();
-        dispatch(setSessionUser(result));
-      }
-    } catch (err) {
-      console.log(err);
-    }
+     dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username, Status.DECLINED] })
   };
+
+  const options = () =>{
+    if (friendship.status === Status.ACCEPTED){
+      return(<>
+        <button onClick={() => setChatOpen(true)}>Open Private Chat</button>
+        <button onClick={() => deleteFriendship()}>Delete From Friends</button>
+      </>
+      )
+    }
+  }
 
   const Profile: React.FC = () => {
     return (
@@ -48,8 +41,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
           <h6>Email: {friend.email}</h6>
         </div>
         <button onClick={() => setShowGames(true)}>Game History</button>
-        <button onClick={() => setChatOpen(true)}>Open Private Chat</button>
-        <button onClick={() => deleteFriendship()}>Delete From Friends</button>
+        {options()}
       </>
     );
   };

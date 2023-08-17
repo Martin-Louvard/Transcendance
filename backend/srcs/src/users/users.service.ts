@@ -117,7 +117,7 @@ export class UsersService {
     if (!userFriend)
       throw new NotFoundException(`No user found for username: ${updateUserFriendsDto.friend_username}`);
     
-    await this.friendsService.create({user_id: user.id, friend_id: userFriend.id, chat_id: 0})
+    await this.friendsService.create({user_id: user.id, friend_id: userFriend.id, sender_id: user.id, chat_id: 0})
     
     return this.findOne(username)
   }

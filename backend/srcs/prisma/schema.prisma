@@ -57,6 +57,7 @@ model Friends {
   user_id                 Int
   friend_id               Int
   status                  Status        @default(PENDING)
+  sender_id               Int
   chat_id                 Int?          @unique
   chat                    ChatChannel?  @relation(fields: [chat_id], references: [id])
   user                    User          @relation(name: "user", fields: [user_id], references: [id])

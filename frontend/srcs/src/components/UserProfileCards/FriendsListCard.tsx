@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
 import { toast } from "react-hot-toast";
 import { Friendships, Status } from "../../Types";
-import StatusDot from "./StatusDot/StatusDot";
+import StatusDot from "./StatusDot";
 
 const FriendsListCard: React.FC = () =>{
     const user = useAppSelector((state) => state.session.user);
@@ -58,13 +58,15 @@ const FriendsListCard: React.FC = () =>{
           {friendshipsAccepted
             ? friendshipsAccepted.map((friendship, index) => (
               <li className="friend-item" onClick={() => displayFriendProfile(friendship)} key={index}>
-                <div className='friend-picture'>
-                  <img 
-                    src={friendship.friend_id == user?.id ? friendship.user.avatar:friendship.friend.avatar}
-                  />
+                <div className="picture-indicator">
+                  <div className='friend-picture'>
+                    <img 
+                      src={friendship.friend_id == user?.id ? friendship.user.avatar:friendship.friend.avatar}
+                    />
+                  </div>
+                  <StatusDot status={friendship.friend_id == user?.id ? friendship.user.status:friendship.friend.status}/>
                 </div>
                 <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
-                <StatusDot status={friendship.friend_id == user?.id ? friendship.user.status:friendship.friend.status}/>
               </li>
             )) 
           : null}

@@ -46,7 +46,8 @@ export interface Friendships {
   id: number,
   user_id: number,
   friend_id: number,
-  status: Status
+  status: Status,
+  sender_id: number,
   chat_id: number,
   createdAt: string,
   updatedAt: string,
