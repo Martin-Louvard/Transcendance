@@ -2,12 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface WebSocketState {
   isConnected: boolean;
-  messages: string[];
 }
 
 const initialState: WebSocketState = {
   isConnected: false,
-  messages: [],
 };
 
 const websocketSlice = createSlice({

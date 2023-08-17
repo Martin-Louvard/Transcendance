@@ -3,15 +3,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads } from './Types';
-import {Status} from "@prisma/client";
 import { FriendsService } from './friends/friends.service';
 
 @WebSocketGateway({ cors: '*'})
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private prisma: PrismaService, private readonly gameService: GameService, private friendService: FriendsService){}
-  
+
   connected_clients = new Map<number, Socket>
-  
+
   @WebSocketServer()
   server: Server;
 
@@ -20,13 +19,19 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleConnection(client: Socket){
-    this.connected_clients.set(Number(client.handshake.headers.user_id), client)
+    const user_id = Number(client.handshake.headers.user_id)
+    this.connected_clients.set(user_id, client)
+    this.prisma.user.update({where: {id: user_id}, data: {status: "ONLINE"}})
+    this.server.emit('update_friend_connection_state', {user_id: user_id, status: "ONLINE"})
   }
 
   handleDisconnect(client: Socket) {
     // Cela fait quitter le lobby du joeur, peut etre pas une bonne idée si 
     // le socket se reset et que le player est tej de son lobby. A voir selon le comportement.
-    this.connected_clients.delete(Number(client.handshake.headers.user_id))
+    const user_id = Number(client.handshake.headers.user_id)
+    this.connected_clients.delete(user_id)
+    this.prisma.user.update({where: {id: user_id}, data: {status: "OFFLINE"}})
+    this.server.emit('update_friend_connection_state', {user_id: user_id, status: "OFFLINE"})
     return this.gameService.handleDisconnect(client);
   }
 
@@ -71,7 +76,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.emit('friend_request', friendship);
       if (friend_socket)
         friend_socket.emit('friend_request', friendship);
-
   }
 
   @SubscribeMessage('update_friend_request')
@@ -87,6 +91,4 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (friend_socket)
       friend_socket.emit('update_friend_request', friendship);
   }
-
-
 }

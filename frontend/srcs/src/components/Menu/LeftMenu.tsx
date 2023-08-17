@@ -71,7 +71,7 @@ const LeftMenu: React.FC = () => {
           {friendRequests ? friendRequests.map((friendship, index) => (
             <li className="friend-item" key={index}>
             <div className='friend-picture'>
-              <img src={friendship.friend_id == user?.id ? friendship.user.avatar:friendship.friend.avatar}/>
+              <img src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
             </div>
               <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
               <button onClick={()=>{ dispatch({ type: 'WEBSOCKET_UPDATE_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id ? friendship.user.id:friendship.friend.id, Status.ACCEPTED] }) }}>✅</button>
