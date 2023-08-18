@@ -1,15 +1,15 @@
-$menu-width: 20%;
-$menu-min-width: 240px;
-$menu-bg-color: #312f2f;
-$exit-button-height: 5%;
-$exit-button-radius: 20px;
-$menu-icon-right: 20vw;
-$menu-animation-range: 20vw;
+$chat-menu-width: 20%;
+$chat-menu-min-width: 240px;
+$chat-menu-bg-color: #312f2f;
+$chat-exit-button-height: 5%;
+$chat-exit-button-radius: 20px;
+$chat-menu-icon-right: 20vw;
+$chat-menu-animation-range: 20vw;
 
 .chat-menu-wrapper {
-  width: $menu-width;
-  min-width: $menu-min-width;
-  background-color: $menu-bg-color;
+  width: $chat-menu-width;
+  min-width: $chat-menu-min-width;
+  background-color: $chat-menu-bg-color;
   position: fixed;
   right:0;
   height: 100%;  
@@ -29,43 +29,43 @@ $menu-animation-range: 20vw;
 	right: 0;
 }
 
-.exit-button {
-  height: $exit-button-height;
+.chat-exit-button {
+  height: $chat-exit-button-height;
   width: auto;
-  border-radius: $exit-button-radius;
+  border-radius: $chat-exit-button-radius;
   position: absolute;
   cursor: pointer;
   right: 10px;
   z-index: 10;
 }
 
-.menu-icon {
+.chat-menu-icon {
   position: absolute;
   cursor: pointer;
-  right: $menu-icon-right;
+  right: $chat-menu-icon-right;
   z-index: 10;
 }
 
 .close-chat-menu {
-  right: -$menu-animation-range;
+  right: -$chat-menu-animation-range;
 }
 
 .open-chat-menu {
   right: 0;
 }
 
-.menu-transition-close {
-  animation: 100ms slide_menu_right ease-in-out;
+.chat-menu-transition-close {
+  animation: 100ms slide_chat_menu_right ease-in-out;
   transition: opacity 0.3s ease;
   background-color: inherit;
 }
 
-.menu-transition-open {
-  animation: 100ms slide_menu_left ease-in-out;
+.chat-menu-transition-open {
+  animation: 100ms slide_chat_menu_left ease-in-out;
   transition: opacity 0.3s ease;
 }
 
-@keyframes slide_menu_right {
+@keyframes slide_chat_menu_right {
   @for $i from 0 through 11 {
     $percentage: $i * 10;
     #{$percentage + '%'} {
@@ -74,11 +74,11 @@ $menu-animation-range: 20vw;
   }
 }
 
-@keyframes slide_menu_left {
+@keyframes slide_chat_menu_left {
   @for $i from 0 through 11 {
     $percentage: $i * 10;
     #{$percentage + '%'} {
-      right: ($menu-animation-range - $i * 0.5)vw;
+      right: ($chat-menu-animation-range - $i * 0.5)vw;
     }
   }
 }

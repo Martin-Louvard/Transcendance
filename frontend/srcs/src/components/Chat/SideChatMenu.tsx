@@ -18,7 +18,7 @@ const SideChatMenu = () => {
   // ================================================================== //
   const toggleMenu = () => {
     setMenuCss((prevCss) =>
-      prevCss.startsWith("open") ? "close-chat-menu menu-transition-close" : "open-chat-menu menu-transition-open"
+      prevCss.startsWith("open") ? "close-chat-menu chat-menu-transition-close" : "open-chat-menu chat-menu-transition-open"
     );
     setFullScreen((prevFullscreen) => !prevFullscreen);
   };
@@ -54,22 +54,6 @@ const SideChatMenu = () => {
   
   return (
       <div className={`chat-menu-wrapper`}>
-
-        {(contentToShow !== "menu" || fullscreen) && (
-          <img
-            id="back"
-            onClick={handleClick}
-            className="exit-button"
-            src={'cross.svg'}
-            alt="Close"
-          />
-        )}
-        <img
-          className={`logo-nav menu-icon`}
-          src={'/menu.svg'}
-          alt="Menu"
-          onClick={toggleMenu}
-        />
       <ul className="inner-chat-menu-wrapper">{storedJoinedChannels?.map((chat: ChatChannels) => (
         <li className={`chat-item${chatBox === chat ? "-active" : ""}`} key={chat.id}>{getName(chat, userName)}</li>
       ))}
