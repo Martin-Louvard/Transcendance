@@ -63,4 +63,5 @@ export interface ChatChannels {
   password?: string;
   channelType?: string;
   messages: Message[];
+  participants: User[];
 }

@@ -1,57 +1,80 @@
 import React, { useState, useEffect } from "react";
-import  { chatChannel }  from '../../redux/chatChannelReducer.ts';
+import  { ChatChannels }  from '../../Types.ts';
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import { setUser } from '../../redux/userReducer.ts';
-import { setChatChannels } from '../../redux/chatChannelReducer.ts'
-import { RootState } from '../../redux/store.ts'
-import io, { Socket } from "socket.io-client";
-import Chat from './Chat'
+import './SideChatMenu.scss';
 
 const SideChatMenu = () => {
 
-  const currentUser = useAppSelector((state)=>state.user);
+  const currentUser = useAppSelector((state)=>state.session.user);
   const dispatch = useAppDispatch();
-  const storedJoinedChannels = useAppSelector((state: RootState)=> state.chatChannels.channels);
-  const [chatBox, setChatBox] = useState<chatChannel | null>(null);
-  const [socket, setSocket] = useState<Socket>();
+  const storedJoinedChannels = useAppSelector((state)=>state.session.JoinedChatChannels);
+  const [chatBox, setChatBox] = useState<ChatChannels | null>(null);
+  const [menuCss, setMenuCss] = useState("open-menu");
+  const [fullscreen, setFullScreen] = useState(false);
+  const [contentToShow, setContentToShow] = useState("menu");
+  // ================================================================== //
+  const userName = currentUser?.username;
+  // La variable au dessus est dangereuse
+  // ================================================================== //
+  const toggleMenu = () => {
+    setMenuCss((prevCss) =>
+      prevCss.startsWith("open") ? "close-chat-menu menu-transition-close" : "open-chat-menu menu-transition-open"
+    );
+    setFullScreen((prevFullscreen) => !prevFullscreen);
+  };
 
-  useEffect(()=>{
-    const newSocket=io("http://localhost:3001/");
-    setSocket(newSocket)
-  },[setSocket])
-
-
-  useEffect(() => {
-    fetch(`http://localhost:3001/chat-channels/`)
-      .then((response) => {
-        if (!response.ok){
-          throw new Error('Erreur lors du fetch des chatChannels');
-        }
-        return response.json();
-      })
-      .then((data: chatChannel[]) => {
-        const joinedChannels = data.filter((channel) => 
-          channel.participants.some((participant) => participant.id === currentUser.id));
-        dispatch(setChatChannels(joinedChannels));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [currentUser.id, dispatch]);
-
-  const handleChatBoxClick = (chat: chatChannel) => {
+  const handleChatBoxClick = (chat: ChatChannels) => {
     setChatBox(chat);
+  };
+
+  function getName(chat: ChatChannels, userName: string | undefined) {
+    let chatName = chat.name;
+    let other = "";
+
+    if (!chatName && chat.participants.length > 1) {
+      chatName = chat.participants.filter((p) => {
+        if (p.username !== userName)
+          return p;
+      })[0].username;
+      if (chat.participants.length > 2)
+        other = "and others...";
+      return (`${chatName} ${other}`);
+    }
+    if (chat.participants.length > 1)
+      return (`${userName} (You)`);
+    return chatName;
+  }
+
+  const handleClick = (event: React.MouseEvent<any>) => {
+    event.preventDefault();
+
+    const targetId = event.currentTarget.id;
+    if (targetId === "back") setContentToShow("menu");
   };
   
   return (
-    <>
-    <div>
-      <ul className="side-chat-menu">{storedJoinedChannels.map((chat: chatChannel) => (
-        <li className={`chat-item${chatBox === chat ? "-active" : ""}`} key={chat.id}>{chat.participants[0].username}</li>
+      <div className={`chat-menu-wrapper`}>
+
+        {(contentToShow !== "menu" || fullscreen) && (
+          <img
+            id="back"
+            onClick={handleClick}
+            className="exit-button"
+            src={'cross.svg'}
+            alt="Close"
+          />
+        )}
+        <img
+          className={`logo-nav menu-icon`}
+          src={'/menu.svg'}
+          alt="Menu"
+          onClick={toggleMenu}
+        />
+      <ul className="inner-chat-menu-wrapper">{storedJoinedChannels?.map((chat: ChatChannels) => (
+        <li className={`chat-item${chatBox === chat ? "-active" : ""}`} key={chat.id}>{getName(chat, userName)}</li>
       ))}
       </ul>
     </div>
-  </>
   )
 } 
 export default SideChatMenu;

@@ -3,14 +3,15 @@ $menu-min-width: 240px;
 $menu-bg-color: #312f2f;
 $exit-button-height: 5%;
 $exit-button-radius: 20px;
-$menu-icon-left: 20vw;
+$menu-icon-right: 20vw;
 $menu-animation-range: 20vw;
 
-.menu-wrapper {
+.chat-menu-wrapper {
   width: $menu-width;
   min-width: $menu-min-width;
   background-color: $menu-bg-color;
   position: fixed;
+  right:0;
   height: 100%;  
   display: flex;
   flex-direction: column;
@@ -18,13 +19,14 @@ $menu-animation-range: 20vw;
   z-index: 111;
 }
 
-.inner-menu-wrapper {
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  justify-content: space-evenly;
-  width: 90%;
+.inner-chat-menu-wrapper {
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	justify-content: space-evenly;
+	width: 90%;
+	right: 0;
 }
 
 .exit-button {
@@ -33,50 +35,67 @@ $menu-animation-range: 20vw;
   border-radius: $exit-button-radius;
   position: absolute;
   cursor: pointer;
-  left: 10px;
+  right: 10px;
   z-index: 10;
 }
 
 .menu-icon {
   position: absolute;
   cursor: pointer;
-  left: $menu-icon-left;
+  right: $menu-icon-right;
   z-index: 10;
 }
 
-.close-menu {
-  left: -$menu-animation-range;
+.close-chat-menu {
+  right: -$menu-animation-range;
 }
 
-.open-menu {
-  left: 0;
+.open-chat-menu {
+  right: 0;
 }
 
 .menu-transition-close {
-  animation: 100ms slide_menu_left ease-in-out;
+  animation: 100ms slide_menu_right ease-in-out;
   transition: opacity 0.3s ease;
   background-color: inherit;
 }
 
 .menu-transition-open {
-  animation: 100ms slide_menu_right ease-in-out;
+  animation: 100ms slide_menu_left ease-in-out;
   transition: opacity 0.3s ease;
-}
-
-@keyframes slide_menu_left {
-  @for $i from 0 through 11 {
-    $percentage: $i * 10;
-    #{$percentage + '%'} {
-      left: ($i * -0.5)vw;
-    }
-  }
 }
 
 @keyframes slide_menu_right {
   @for $i from 0 through 11 {
     $percentage: $i * 10;
     #{$percentage + '%'} {
-      left: ($menu-animation-range - $i * 0.5)vw;
+      right: ($i * -0.5)vw;
     }
   }
+}
+
+@keyframes slide_menu_left {
+  @for $i from 0 through 11 {
+    $percentage: $i * 10;
+    #{$percentage + '%'} {
+      right: ($menu-animation-range - $i * 0.5)vw;
+    }
+  }
+}
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chat-item:hover {
+  background-color: #e0e0e0;
+}
+
+.chat-item-active {
+  background-color: #c0c0c0;
+  font-weight: bold;
 }
