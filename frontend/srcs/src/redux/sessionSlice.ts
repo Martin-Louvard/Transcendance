@@ -73,6 +73,18 @@ export const sessionSlice = createSlice({
         });
       else
         state.friendships.push(action.payload)
+      if (state.user && action.payload.status === "ACCEPTED")
+      {
+        if (!state.friends)
+          state.friends = [action.payload.user.id !== state.user.id ? action.payload.user :action.payload.friend]
+        else
+          state.friends.push(action.payload.user.id !== state.user.id ? action.payload.user :action.payload.friend)
+      }
+      else if (state.friends && state.user && (action.payload.status === "CANCELED" || action.payload.status === "DECLINED"))
+      {
+        state.friends = state.friends?.filter(f => f.id !== (action.payload.user.id !== state.user?.id ? action.payload.user.id :action.payload.friend.id))
+      }
+
     },
     updateFriendStatus: (state, action)=>{
       if (state.friendships)
@@ -89,6 +101,12 @@ export const sessionSlice = createSlice({
             f.status = action.payload.status
           return f
         });
+    },
+    createChat: (state, action) => {
+      if (state.JoinedChatChannels)
+        state.JoinedChatChannels.push(action.payload)
+      else
+        state.JoinedChatChannels = action.payload
     },
     cleanSession: (state) =>{
       state.user= null,
@@ -134,6 +152,7 @@ export const {
   updateFriendRequest, 
   addFriendRequest, 
   updateFriendStatus,
+  createChat
 } = sessionSlice.actions
 export { fetchRelatedUserData };
 export default sessionSlice.reducer

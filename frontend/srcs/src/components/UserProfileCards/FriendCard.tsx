@@ -16,7 +16,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
   const dispatch = useAppDispatch();
 
   const deleteFriendship = async () => {
-     dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username, Status.DECLINED] })
+     dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username, Status.CANCELED] })
   };
 
   const options = () =>{

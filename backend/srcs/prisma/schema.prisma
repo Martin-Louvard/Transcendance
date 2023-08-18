@@ -72,8 +72,8 @@ model Friends {
 
 model ChatChannel {
   id                      Int           @id @default(autoincrement())
-  owner                   User          @relation("OwnedChannels", fields: [ownerId], references: [id])
   ownerId                 Int
+  owner                   User          @relation("OwnedChannels", fields: [ownerId], references: [id])
   password                String?
   channelType             String?
   name                    String?
