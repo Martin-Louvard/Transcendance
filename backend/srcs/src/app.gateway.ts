@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSo
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
-import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads } from './Types';
+import { ClientEvents, ClientPayloads, LobbyMode} from './Types';
 import { FriendsService } from './friends/friends.service';
 
 @WebSocketGateway({ cors: '*'})
@@ -92,6 +92,12 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     })
    this.server.emit('create_chat', chatChannel);
+  }
+
+  @SubscribeMessage('update_chat')
+  async handleUpdateChat(@ConnectedSocket() client: Socket, @MessageBody() body): Promise<void> {
+    
+    this.server.emit('update_chat', updatedChatChannel);
   }
 
   @SubscribeMessage('friend_request')

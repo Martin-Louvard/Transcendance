@@ -43,24 +43,21 @@ export const sessionSlice = createSlice({
     },
     setFriends: (state, action) => {
       state.friends = action.payload;
-    }, 
+    },
     setFriendships: (state, action) => {
       state.friendships = action.payload;
-    }, 
+    },
     setJoinedChatChannels: (state, action) => {
       state.JoinedChatChannels = action.payload;
-    }, 
+    },
     setOwnedChatChannels: (state, action) => {
       state.OwnedChatChannels = action.payload;
-    }, 
+    },
     setBannedFromChatChannels: (state, action) => {
       state.BannedFromChatChannels = action.payload;
     },
     receiveMessage: (state, action) => {
       state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages.push(action.payload);
-    },
-    addFriendRequest: (state, action)=>{
-      state.friendships?.push(action.payload)
     },
     updateFriendRequest: (state, action)=>{
       if (!state.friendships)
@@ -107,6 +104,14 @@ export const sessionSlice = createSlice({
         state.JoinedChatChannels.push(action.payload)
       else
         state.JoinedChatChannels = action.payload
+    },
+    updateChat: (state, action) =>{
+      if (state.JoinedChatChannels)
+        state.JoinedChatChannels =  state.JoinedChatChannels.map((c) => {
+          if (c.id === action.payload.id)
+            c = action.payload
+        return c
+    });
     },
     cleanSession: (state) =>{
       state.user= null,
