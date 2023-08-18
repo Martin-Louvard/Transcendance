@@ -31,9 +31,12 @@ export class UsersService {
 
   async findAllFriends(id: number){
     const friendships = await this.friendsService.findAllFriendships(id)
-    const friends = friendships.map((friendship)=>{
-      return friendship.friend
-    })    
+    const friendships_accepted = friendships.filter((friendship)=>{
+      return friendship.status === "ACCEPTED"
+    })
+    const friends = friendships_accepted.map(f =>{
+      return f.friend.id === id ? f.user : f.friend
+    })
     return friends;
   }
 

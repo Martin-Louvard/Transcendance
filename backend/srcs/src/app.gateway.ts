@@ -4,7 +4,6 @@ import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads } from './Types';
 import { FriendsService } from './friends/friends.service';
-import { Friend } from './friends/entities/friend.entity';
 
 @WebSocketGateway({ cors: '*'})
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -72,6 +71,27 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() body: Array<any>): Promise<void> {
     const message = await this.prisma.chatMessage.create({data: {channelId: body[0], senderId: body[1] ,content: body[2]}})
     this.server.emit('message', message);
+  }
+
+  @SubscribeMessage('create_chat')
+  async handleCreateChat(@ConnectedSocket() client: Socket, @MessageBody() body: {ownerId: number, name: string, channelType: string, password: string, participants: number[]}): Promise<void> {
+    const newChatChannel = await this.prisma.chatChannel.create({data: {
+      owner: {connect: {id:body.ownerId}}, 
+      admins: {connect: {id: body.ownerId}}, 
+      name: body.name, 
+      channelType: body.channelType, 
+      password: body.password, 
+      participants: {connect: body.participants.map(p => {return{id: p}})}
+    }})
+    const chatChannel = await this.prisma.chatChannel.findUnique({
+      where: {id: newChatChannel.id},
+      include:{
+        owner: true,
+        admins: true,
+        messages: true
+      }
+    })
+   this.server.emit('create_chat', chatChannel);
   }
 
   @SubscribeMessage('friend_request')

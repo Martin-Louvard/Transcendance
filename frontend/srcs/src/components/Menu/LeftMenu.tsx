@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ProfileCard from '../UserProfileCards/ProfileCard';
 import FriendsListCard from '../UserProfileCards/FriendsListCard';
 import HistoryCard from '../UserProfileCards/HistoryCard';
+import ChatCreator from '../Chat/ChatCreator';
 import './LeftMenu.scss';
 import '../UserProfileCards/Cards.scss'
 import { useAppSelector } from '../../redux/hooks';
@@ -14,7 +15,7 @@ const LeftMenu: React.FC = () => {
   const user = useAppSelector((state) => state.session.user)
   const [fullscreen, setFullScreen] = useState(false);
   const [menuCss, setMenuCss] = useState("open-menu");
-  const [contentToShow, setContentToShow] = useState<"menu" | "profile" | "friends" | "games" | "friendUser">("menu");
+  const [contentToShow, setContentToShow] = useState<"menu" | "profile" | "friends" | "games" | "friendUser"| "chat">("menu");
   const friendships = useAppSelector((state)=> state.session.friendships)
   const [friendRequests, setFriendRequest] = useState<Friendships[] | null>(friendships)
   const [selectedFriendship, setSelectedFriendship] = useState(Object)
@@ -39,7 +40,8 @@ const LeftMenu: React.FC = () => {
     if (targetId === "profile") setContentToShow("profile");
     else if (targetId === "friends") setContentToShow("friends");
     else if (targetId === "history") setContentToShow("games");
-    else if (targetId === "back") setContentToShow("menu");
+    else if (targetId === "chat") setContentToShow("chat");
+    else if (targetId === "back") setContentToShow("menu");    
   };
 
   const renderContent = () => {
@@ -48,6 +50,7 @@ const LeftMenu: React.FC = () => {
     if (contentToShow === "profile") return <ProfileCard />;
     if (contentToShow === "friends") return <FriendsListCard />;
     if (contentToShow === "games") return <HistoryCard />;
+    if (contentToShow === "chat") return <ChatCreator />;
     if (contentToShow === "friendUser") return <FriendCard friendship={selectedFriendship}/>;
     return renderMenuButtons();
   };
@@ -59,6 +62,9 @@ const LeftMenu: React.FC = () => {
       </button>
       <button id="history" onClick={handleClick}>
         LeaderBoard
+      </button>
+      <button id="chat" onClick={handleClick}>
+        Chats
       </button>
       <button id="profile" onClick={handleClick}>
         My Profile
