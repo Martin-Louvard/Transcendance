@@ -3,15 +3,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads } from './Types';
-import {Status} from "@prisma/client";
 import { FriendsService } from './friends/friends.service';
 
 @WebSocketGateway({ cors: '*'})
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private prisma: PrismaService, private readonly gameService: GameService, private friendService: FriendsService){}
-  
+
   connected_clients = new Map<number, Socket>
-  
+
   @WebSocketServer()
   server: Server;
 
@@ -19,14 +18,27 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return this.gameService.afterInit(server);
   }
 
-  handleConnection(client: Socket){
-    this.connected_clients.set(Number(client.handshake.headers.user_id), client)
+  async handleConnection(client: Socket){
+    if (client.handshake.headers.user_id){
+      const user_id_string = client.handshake.headers.user_id[0]
+      const user_id = parseInt(user_id_string)
+      this.connected_clients.set(user_id, client)
+      this.server.emit('update_friend_connection_state', {user_id: user_id, status: "ONLINE"})
+      await this.prisma.user.update({where: {id: user_id}, data: {status: "ONLINE"}})
+    }
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
+    if (client.handshake.headers.user_id){
+      const user_id_string = client.handshake.headers.user_id[0]
+      const user_id = parseInt(user_id_string)
+      this.connected_clients.delete(user_id)
+      this.server.emit('update_friend_connection_state', {user_id: user_id, status: "OFFLINE"})
+      await this.prisma.user.update({where: {id:user_id}, data: {status: "OFFLINE"}})
+    }
+    
     // Cela fait quitter le lobby du joeur, peut etre pas une bonne idée si 
     // le socket se reset et que le player est tej de son lobby. A voir selon le comportement.
-    this.connected_clients.delete(Number(client.handshake.headers.user_id))
     return this.gameService.handleDisconnect(client);
   }
 
@@ -61,32 +73,48 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('message', message);
   }
 
+  @SubscribeMessage('create_chat')
+  async handleCreateChat(@ConnectedSocket() client: Socket, @MessageBody() body: {ownerId: number, name: string, channelType: string, password: string, participants: number[]}): Promise<void> {
+    const newChatChannel = await this.prisma.chatChannel.create({data: {
+      owner: {connect: {id:body.ownerId}}, 
+      admins: {connect: {id: body.ownerId}}, 
+      name: body.name, 
+      channelType: body.channelType, 
+      password: body.password, 
+      participants: {connect: body.participants.map(p => {return{id: p}})}
+    }})
+    const chatChannel = await this.prisma.chatChannel.findUnique({
+      where: {id: newChatChannel.id},
+      include:{
+        owner: true,
+        admins: true,
+        messages: true
+      }
+    })
+   this.server.emit('create_chat', chatChannel);
+  }
+
   @SubscribeMessage('friend_request')
   async handleNewFriendRequest(@ConnectedSocket() client: Socket, @MessageBody() body: Array<any>): Promise<void> {
+    if (client.handshake.headers.user_id){
+      const user_id_string = client.handshake.headers.user_id[0]
+      const user_id = parseInt(user_id_string)
       const friend = await this.prisma.user.findUnique({where:{username: body[1]}})
-      const friend_id = friend.id;
-      const newFriendship = await this.friendService.create({user_id: body[0], friend_id: friend_id, chat_id: 0})
-      const friendship = await this.friendService.findOne(newFriendship.id)
+      const friend_id = friend?.id;
+      let update;
+      if (body[2]){
+        update = await this.prisma.friends.update({
+          where: {id: body[0]},
+          data: {status: body[2]}
+        })
+      }
+      else
+        update = await this.friendService.create({user_id: user_id, friend_id: friend_id, sender_id: user_id, chat_id: 0})
+      const friendship = await this.friendService.findOne(update.id)
       const friend_socket = this.connected_clients.get(friend_id)
       client.emit('friend_request', friendship);
       if (friend_socket)
         friend_socket.emit('friend_request', friendship);
-
+    }
   }
-
-  @SubscribeMessage('update_friend_request')
-  async handleUpdateFriendshipStatus(@ConnectedSocket() client: Socket, @MessageBody() body: Array<any>): Promise<void> {
-    const friendshipToUpdate = await this.prisma.friends.update({
-      where: {id: body[0]},
-      data: {status: body[2] }
-    })
-    const friend_id = Number(body[1])
-    const friendship = await this.friendService.findOne(friendshipToUpdate.id)
-    const friend_socket = this.connected_clients.get(friend_id)
-    client.emit('update_friend_request', friendship);
-    if (friend_socket)
-      friend_socket.emit('update_friend_request', friendship);
-  }
-
-
 }

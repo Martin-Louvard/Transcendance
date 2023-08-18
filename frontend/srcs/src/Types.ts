@@ -1,10 +1,23 @@
+export enum Status {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  DECLINED = "DECLINED",
+  CANCELED = "CANCELED",
+}
+
+export enum UserStatus {
+  OFFLINE = "OFFLINE",
+  ONLINE = "ONLINE",
+  INGAME = "INGAME"
+}
+
 export interface User {
   id: number;
   username: string;
   email: string;
   avatar: string;
+  status: UserStatus;
   twoFAEnabled: boolean;
-  status: string;
   victoriesCount: number;
   defeatCount: number;
   rank: string;
@@ -19,8 +32,8 @@ export interface Friend {
   username: string;
   email: string;
   avatar: string;
+  status: UserStatus;
   twoFAEnabled: boolean;
-  status: string;
   victoriesCount: number;
   defeatCount: number;
   rank: string;
@@ -29,18 +42,12 @@ export interface Friend {
   createdAt: string;
 }
 
-export enum Status {
-  PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED",
-  DECLINED = "DECLINED",
-  CANCELED = "CANCELED",
-}
-
 export interface Friendships {
   id: number,
   user_id: number,
   friend_id: number,
-  status: Status
+  status: Status,
+  sender_id: number,
   chat_id: number,
   createdAt: string,
   updatedAt: string,

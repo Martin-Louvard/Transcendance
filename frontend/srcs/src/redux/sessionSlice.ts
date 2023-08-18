@@ -63,12 +63,50 @@ export const sessionSlice = createSlice({
       state.friendships?.push(action.payload)
     },
     updateFriendRequest: (state, action)=>{
-      if (state.friendships)
+      if (!state.friendships)
+        state.friendships = [action.payload]
+      else if (state.friendships.find(f=>f.id == action.payload.id))
         state.friendships =  state.friendships.map((f) => {
           if (f.id == action.payload.id)
             return action.payload
           return f
         });
+      else
+        state.friendships.push(action.payload)
+      if (state.user && action.payload.status === "ACCEPTED")
+      {
+        if (!state.friends)
+          state.friends = [action.payload.user.id !== state.user.id ? action.payload.user :action.payload.friend]
+        else
+          state.friends.push(action.payload.user.id !== state.user.id ? action.payload.user :action.payload.friend)
+      }
+      else if (state.friends && state.user && (action.payload.status === "CANCELED" || action.payload.status === "DECLINED"))
+      {
+        state.friends = state.friends?.filter(f => f.id !== (action.payload.user.id !== state.user?.id ? action.payload.user.id :action.payload.friend.id))
+      }
+
+    },
+    updateFriendStatus: (state, action)=>{
+      if (state.friendships)
+        state.friendships =  state.friendships.map((f) => {
+          if (f.friend.id === action.payload.user_id)
+            f.friend.status = action.payload.status
+          else if (f.user.id === action.payload.user_id)
+            f.user.status = action.payload.status
+          return f
+        });
+        if (state.friends)
+        state.friends =  state.friends.map((f) => {
+          if (f.id === action.payload.user_id)
+            f.status = action.payload.status
+          return f
+        });
+    },
+    createChat: (state, action) => {
+      if (state.JoinedChatChannels)
+        state.JoinedChatChannels.push(action.payload)
+      else
+        state.JoinedChatChannels = action.payload
     },
     cleanSession: (state) =>{
       state.user= null,
@@ -101,7 +139,20 @@ export const sessionSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
-export const {setSessionUser, setToken, setFriends, setFriendships, setJoinedChatChannels, setOwnedChatChannels, setBannedFromChatChannels, cleanSession, receiveMessage, updateFriendRequest, addFriendRequest } = sessionSlice.actions
+export const { 
+  setSessionUser, 
+  setToken, 
+  setFriends, 
+  setFriendships, 
+  setJoinedChatChannels, 
+  setOwnedChatChannels, 
+  setBannedFromChatChannels, 
+  cleanSession, 
+  receiveMessage, 
+  updateFriendRequest, 
+  addFriendRequest, 
+  updateFriendStatus,
+  createChat
+} = sessionSlice.actions
 export { fetchRelatedUserData };
 export default sessionSlice.reducer

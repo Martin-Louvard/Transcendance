@@ -2,20 +2,23 @@ import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
 import { websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
-import { receiveMessage, updateFriendRequest, addFriendRequest } from './sessionSlice';
+import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat } from './sessionSlice';
+
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
   let socket: Socket | null = null;
 
   return (next: Dispatch<AnyAction>) => (action: AnyAction) => {
     switch (action.type) {
       case 'WEBSOCKET_CONNECT':
-        socket = io("http://localhost:3001/",{extraHeaders: {user_id: action.payload}}); 
-        
+        socket = io("http://localhost:3001/", {extraHeaders: {user_id: action.payload}}); 
+
         socket.on('connect', () => store.dispatch(websocketConnected()));
         socket.on('disconnect', () => store.dispatch(websocketDisconnected()));
         socket.on('message', (data: any) => {store.dispatch(receiveMessage(data))});
-        socket.on('update_friend_request', (data: any) => {store.dispatch(updateFriendRequest(data))})
-        socket.on('friend_request', (data: any) => {store.dispatch(addFriendRequest(data))});
+        socket.on('friend_request', (data: any) => {store.dispatch(updateFriendRequest(data))});
+        socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
+        socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
+
         break;
 
       case 'WEBSOCKET_SEND_MESSAGE':
@@ -29,10 +32,10 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           socket.emit('friend_request', action.payload);
         }
         break;
-  
-      case 'WEBSOCKET_UPDATE_FRIEND_REQUEST':
+
+      case 'CREATE_CHAT':
         if (socket && socket.connected) {
-          socket.emit('update_friend_request', action.payload);
+          socket.emit('create_chat', action.payload);
         }
         break;
 

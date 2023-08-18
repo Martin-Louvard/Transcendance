@@ -18,6 +18,12 @@ enum Status{
   CANCELED
 }
 
+enum UserStatus{
+  OFFLINE
+  ONLINE
+  INGAME
+}
+
 model User {
   id                      Int           @id @default(autoincrement())
   username                String        @unique
@@ -25,6 +31,7 @@ model User {
   email42                 String?       @unique
   password                String?
   avatar                  String?       @default("default.jpg")
+  status                  UserStatus    @default(OFFLINE)
   twoFAEnabled            Boolean       @default(false)
   twoFASecret             String?
   victoriesCount          Int           @default(0)
@@ -50,6 +57,7 @@ model Friends {
   user_id                 Int
   friend_id               Int
   status                  Status        @default(PENDING)
+  sender_id               Int
   chat_id                 Int?          @unique
   chat                    ChatChannel?  @relation(fields: [chat_id], references: [id])
   user                    User          @relation(name: "user", fields: [user_id], references: [id])
@@ -64,8 +72,8 @@ model Friends {
 
 model ChatChannel {
   id                      Int           @id @default(autoincrement())
-  owner                   User          @relation("OwnedChannels", fields: [ownerId], references: [id])
   ownerId                 Int
+  owner                   User          @relation("OwnedChannels", fields: [ownerId], references: [id])
   password                String?
   channelType             String?
   name                    String?

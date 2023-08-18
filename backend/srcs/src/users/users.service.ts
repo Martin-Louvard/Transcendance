@@ -47,11 +47,14 @@ export class UsersService {
     });
   }
 
-  async findAllFriends(id: number) {
-    const friendships = await this.friendsService.findAllFriendships(id);
-    const friends = friendships.map((friendship) => {
-      return friendship.friend;
-    });
+  async findAllFriends(id: number){
+    const friendships = await this.friendsService.findAllFriendships(id)
+    const friendships_accepted = friendships.filter((friendship)=>{
+      return friendship.status === "ACCEPTED"
+    })
+    const friends = friendships_accepted.map(f =>{
+      return f.friend.id === id ? f.user : f.friend
+    })
     return friends;
   }
 
@@ -160,17 +163,11 @@ export class UsersService {
       include: { friends: true, friendUserFriends: true },
     });
     if (!userFriend)
-      throw new NotFoundException(
-        `No user found for username: ${updateUserFriendsDto.friend_username}`,
-      );
-
-    await this.friendsService.create({
-      user_id: user.id,
-      friend_id: userFriend.id,
-      chat_id: 0,
-    });
-
-    return this.findOne(username);
+      throw new NotFoundException(`No user found for username: ${updateUserFriendsDto.friend_username}`);
+    
+    await this.friendsService.create({user_id: user.id, friend_id: userFriend.id, sender_id: user.id, chat_id: 0})
+    
+    return this.findOne(username)
   }
 
   async removeFriend(
