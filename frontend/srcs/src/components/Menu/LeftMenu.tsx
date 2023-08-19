@@ -17,7 +17,7 @@ const LeftMenu: React.FC = () => {
   const [menuCss, setMenuCss] = useState("open-menu");
   const [contentToShow, setContentToShow] = useState<"menu" | "profile" | "friends" | "games" | "friendUser"| "chat">("menu");
   const friendships = useAppSelector((state)=> state.session.friendships)
-  const [friendRequests, setFriendRequest] = useState<Friendships[] | null>(friendships)
+  const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships)
   const [selectedFriendship, setSelectedFriendship] = useState(Object)
   const dispatch = useAppDispatch();
 
@@ -86,8 +86,8 @@ const LeftMenu: React.FC = () => {
             <div>
               <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
               <div className='accept-deny'>
-                <button onClick={()=>{ dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.sender_id !== user?.id ? friendship.user.username:friendship.friend.username, Status.ACCEPTED] }) }}>Add Friend ✅</button>
-                <button onClick={()=>{ dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.sender_id !== user?.id ? friendship.user.username:friendship.friend.username, Status.DECLINED] }) }}>Decline ❌</button>
+                <button onClick={()=>{ dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username, Status.ACCEPTED] }) }}>Add Friend ✅</button>
+                <button onClick={()=>{ dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id,friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username, Status.DECLINED] }) }}>Decline ❌</button>
               </div>
             </div>
             </li>

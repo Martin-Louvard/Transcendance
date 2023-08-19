@@ -4,32 +4,34 @@ import { fetchRelatedUserData } from './sessionThunks'
 
 // Define a type for the slice state
 export interface sessionState {
-    user: User | null,
-    access_token: string | null
-    friends: Friend[] | null,
-    friendships: Friendships[] | null,
-    friendRequests: Friendships[] | null,
-    JoinedChatChannels: ChatChannels[] | null,
-    OwnedChatChannels: ChatChannels[] | null,
-    BannedFromChatChannels: ChatChannels[] | null,
+    user: User | undefined,
+    access_token: string | undefined
+    friends: Friend[] | undefined,
+    friendships: Friendships[] | undefined,
+    friendRequests: Friendships[] | undefined,
+    JoinedChatChannels: ChatChannels[] | undefined,
+    OwnedChatChannels: ChatChannels[] | undefined,
+    BannedFromChatChannels: ChatChannels[] | undefined,
     loading: boolean,
-    error: string | null,
+    error: string | undefined,
 }
 
 // Define the initial state using that type
 const initialState: sessionState = {
-  user: null,
-  access_token : null,
-  friends: null,
-  friendships: null,
-  friendRequests: null,
-  JoinedChatChannels: null,
-  OwnedChatChannels: null,
-  BannedFromChatChannels: null,
+  user: undefined,
+  access_token : undefined,
+  friends: undefined,
+  friendships: undefined,
+  friendRequests: undefined,
+  JoinedChatChannels: undefined,
+  OwnedChatChannels: undefined,
+  BannedFromChatChannels: undefined,
   loading: false,
-  error: null,
+  error: undefined,
 }
 
+
+// Utiliser createSlice permet d'ecrire les reducers comme si on mutait le state car il marche avec Immer qui sous le capot s'occupe de transformer le state de maniere immutable
 export const sessionSlice = createSlice({
   name: 'session',
   // `createSlice` will infer the state type from the `initialState` argument
@@ -43,27 +45,24 @@ export const sessionSlice = createSlice({
     },
     setFriends: (state, action) => {
       state.friends = action.payload;
-    }, 
+    },
     setFriendships: (state, action) => {
       state.friendships = action.payload;
-    }, 
+    },
     setJoinedChatChannels: (state, action) => {
-      state.JoinedChatChannels = action.payload;
-    }, 
+      state.JoinedChatChannels = action.payload
+    },
     setOwnedChatChannels: (state, action) => {
       state.OwnedChatChannels = action.payload;
-    }, 
+    },
     setBannedFromChatChannels: (state, action) => {
       state.BannedFromChatChannels = action.payload;
     },
     receiveMessage: (state, action) => {
       state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages.push(action.payload);
     },
-    addFriendRequest: (state, action)=>{
-      state.friendships?.push(action.payload)
-    },
     updateFriendRequest: (state, action)=>{
-      if (!state.friendships)
+      if (state.friendships === undefined || state.friendships.length === 0)
         state.friendships = [action.payload]
       else if (state.friendships.find(f=>f.id == action.payload.id))
         state.friendships =  state.friendships.map((f) => {
@@ -73,9 +72,10 @@ export const sessionSlice = createSlice({
         });
       else
         state.friendships.push(action.payload)
+
       if (state.user && action.payload.status === "ACCEPTED")
       {
-        if (!state.friends)
+        if (state.friends === undefined || state.friends.length === 0)
           state.friends = [action.payload.user.id !== state.user.id ? action.payload.user :action.payload.friend]
         else
           state.friends.push(action.payload.user.id !== state.user.id ? action.payload.user :action.payload.friend)
@@ -84,7 +84,6 @@ export const sessionSlice = createSlice({
       {
         state.friends = state.friends?.filter(f => f.id !== (action.payload.user.id !== state.user?.id ? action.payload.user.id :action.payload.friend.id))
       }
-
     },
     updateFriendStatus: (state, action)=>{
       if (state.friendships)
@@ -95,12 +94,13 @@ export const sessionSlice = createSlice({
             f.user.status = action.payload.status
           return f
         });
-        if (state.friends)
-        state.friends =  state.friends.map((f) => {
-          if (f.id === action.payload.user_id)
-            f.status = action.payload.status
-          return f
-        });
+
+      if (state.friends?.length)
+      state.friends =  state.friends.map((f) => {
+        if (f.id === action.payload.user_id)
+          f.status = action.payload.status
+        return f
+      });
     },
     createChat: (state, action) => {
       if (state.JoinedChatChannels)
@@ -108,27 +108,39 @@ export const sessionSlice = createSlice({
       else
         state.JoinedChatChannels = action.payload
     },
+    updateChat: (state, action) =>{
+      if (state.JoinedChatChannels === undefined || state.JoinedChatChannels.length === 0)
+        state.JoinedChatChannels = [action.payload]
+      else{
+        const updatedChannels =  state.JoinedChatChannels.map((c) => {
+          if (c.id === action.payload.id)
+            c = action.payload
+        return c
+        })
+        state.JoinedChatChannels = updatedChannels.filter(c => c.friendship === undefined || c.friendship.status === "ACCEPTED")
+      }
+    },
     cleanSession: (state) =>{
-      state.user= null,
-      state.access_token = null,
-      state.friends = null,
-      state.friendships = null,
-      state.JoinedChatChannels = null,
-      state.OwnedChatChannels = null,
-      state.BannedFromChatChannels = null
+      state.user= undefined,
+      state.access_token = undefined,
+      state.friends = undefined,
+      state.friendships = undefined,
+      state.JoinedChatChannels = undefined,
+      state.OwnedChatChannels = undefined,
+      state.BannedFromChatChannels = undefined
     }
   },
   extraReducers: (builder) => {
       builder.addCase(fetchRelatedUserData.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
       });
       builder.addCase(fetchRelatedUserData.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = null;
+        state.error = undefined;
         state.friends = action.payload.friends,
         state.friendships = action.payload.friendships,
-        state.JoinedChatChannels = action.payload.JoinedChatChannels,
+        state.JoinedChatChannels = action.payload.JoinedChatChannels?.filter(c => !c.friendship || c.friendship.status === "ACCEPTED");
         state.OwnedChatChannels = action.payload.OwnedChatChannels,
         state.BannedFromChatChannels = action.payload.BannedFromChatChannels
       });
@@ -150,9 +162,9 @@ export const {
   cleanSession, 
   receiveMessage, 
   updateFriendRequest, 
-  addFriendRequest, 
   updateFriendStatus,
-  createChat
+  createChat,
+  updateChat
 } = sessionSlice.actions
 export { fetchRelatedUserData };
 export default sessionSlice.reducer
