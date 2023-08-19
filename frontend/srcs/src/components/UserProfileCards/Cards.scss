@@ -95,6 +95,8 @@ $friend-picture-size: 50px;
 .friend-picture {
   width: $friend-picture-size;
   height: $friend-picture-size;
+  min-width: $friend-picture-size;
+  min-height: $friend-picture-size;
   border-radius: 50%;
   overflow: hidden;
   position: relative;
