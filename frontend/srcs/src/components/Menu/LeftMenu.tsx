@@ -73,9 +73,8 @@ const LeftMenu: React.FC = () => {
     </>
   );
 
-// Rajourter une variable initiated by dans le modele friends pour gerer le passage d'une declined en pending
   const renderNotifications = () => (   
-     <>
+  <div className="friends-card-wrapper">
     <h2>Friend Requests</h2>
         <ul className="friend-list">
           {friendRequests ? friendRequests.map((friendship, index) => (
@@ -93,7 +92,7 @@ const LeftMenu: React.FC = () => {
             </li>
           )) : <></>}
         </ul>
-    </>
+    </div>
   )
 
   return (
