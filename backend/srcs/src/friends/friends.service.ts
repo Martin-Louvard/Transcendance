@@ -9,8 +9,9 @@ export class FriendsService {
   constructor(private prisma: PrismaService, private chatChannelsService: ChatChannelsService) {}
 
   async create(createFriendDto: CreateFriendDto) {
+    if (createFriendDto.user_id == createFriendDto.friend_id)
+      throw new NotAcceptableException("You cant add yourself as friend");
     const friendshipExists = await this.friendshipExists(createFriendDto.user_id, createFriendDto.friend_id)
-
     if(friendshipExists){
       const updatedFriendship = await this.prisma.friends.update({
         where: {id: friendshipExists.id}, 

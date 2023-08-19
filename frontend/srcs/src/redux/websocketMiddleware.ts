@@ -2,7 +2,7 @@ import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
 import { websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
-import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat } from './sessionSlice';
+import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat } from './sessionSlice';
 
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
   let socket: Socket | null = null;

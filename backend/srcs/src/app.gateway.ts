@@ -95,9 +95,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('update_chat')
-  async handleUpdateChat(@ConnectedSocket() client: Socket, @MessageBody() body): Promise<void> {
-    
-    this.server.emit('update_chat', updatedChatChannel);
+  async handleUpdateChat(@ConnectedSocket() client: Socket, @MessageBody() body: {id: number, password: string}): Promise<void> {
+    const updatedChatChannel = this.prisma.chatChannel.update({
+      where: {id: body[0]},
+      data: {password: body[1]}
+    })
+    const channel = this.prisma.chatChannel.findUnique({where: {id: body[0]}, include: {friendship: true}})
+    this.server.emit('update_chat', channel);
   }
 
   @SubscribeMessage('friend_request')
@@ -117,10 +121,15 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       else
         update = await this.friendService.create({user_id: user_id, friend_id: friend_id, sender_id: user_id, chat_id: 0})
       const friendship = await this.friendService.findOne(update.id)
+      const chat = await this.prisma.chatChannel.findUnique({where: {id: friendship.chat_id}, include: {friendship: true}})
       const friend_socket = this.connected_clients.get(friend_id)
       client.emit('friend_request', friendship);
+      client.emit('update_chat', chat);
       if (friend_socket)
+      {
         friend_socket.emit('friend_request', friendship);
+        friend_socket.emit('update_chat', chat);
+      }
     }
   }
 }

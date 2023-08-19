@@ -67,6 +67,7 @@ export interface ChatChannels {
   Owner: User;
   Admins: User[];
   name?: string;
+  friendship? : Friendships;
   password?: string;
   channelType?: string;
   messages: Message[];

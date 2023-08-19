@@ -55,7 +55,7 @@ export class UsersService {
       {where: {id}, 
       include: {
         games: true, 
-        JoinedChatChannels: {include: {messages: true}},   
+        JoinedChatChannels: {include: {messages: true, friendship: true}},   
         OwnedChatChannels:  {include: {messages: true}},
         BannedFromChatChannels:  {include: {messages: true}},
         AdminOnChatChannels:  {include: {messages: true}}
@@ -153,12 +153,10 @@ export class UsersService {
             ]
           }
         ]
-
       },
     })
     if(result.count == 0)
       throw new NotFoundException(`No friendship found between: ${username} and ${updateUserFriendsDto.friend_username}`);
-
     return this.findOne(username);
   }
 
@@ -176,7 +174,6 @@ export class UsersService {
     if (!user)
       throw new NotFoundException(`No user found for username: ${username}`);
     return of(res.sendFile(join(process.cwd(), user.avatar)))
-
   }
 
   async setTwoFactorAuthenticationSecret(secret: string, username: string) {
