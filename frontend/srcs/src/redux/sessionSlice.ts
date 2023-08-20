@@ -73,6 +73,7 @@ export const sessionSlice = createSlice({
       else
         state.friendships.push(action.payload)
 
+      //Add to friends if friendship accepted, else filter friends and remove friends that are no longer accepted if they are in the state
       if (state.user && action.payload.status === "ACCEPTED")
       {
         if (state.friends === undefined || state.friends.length === 0)
@@ -80,7 +81,7 @@ export const sessionSlice = createSlice({
         else
           state.friends.push(action.payload.user.id !== state.user.id ? action.payload.user :action.payload.friend)
       }
-      else if (state.friends && state.user && (action.payload.status === "CANCELED" || action.payload.status === "DECLINED"))
+      else if (state.friends && state.user && (action.payload.status === "CANCELED" || action.payload.status === "DECLINED" || action.payload.status === "BLOCKED"))
       {
         state.friends = state.friends?.filter(f => f.id !== (action.payload.user.id !== state.user?.id ? action.payload.user.id :action.payload.friend.id))
       }
@@ -110,7 +111,10 @@ export const sessionSlice = createSlice({
     },
     updateChat: (state, action) =>{
       if (state.JoinedChatChannels === undefined || state.JoinedChatChannels.length === 0)
-        state.JoinedChatChannels = [action.payload]
+      {
+        if (action.payload.friendship === undefined || action.payload.friendship.status === "ACCEPTED")
+          state.JoinedChatChannels = [action.payload]
+      }
       else{
         const updatedChannels =  state.JoinedChatChannels.map((c) => {
           if (c.id === action.payload.id)

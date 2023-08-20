@@ -14,8 +14,9 @@ datasource db {
 enum Status{
   PENDING 
   ACCEPTED 
-  DECLINED 
+  DECLINED
   CANCELED
+  BLOCKED
 }
 
 enum UserStatus{
