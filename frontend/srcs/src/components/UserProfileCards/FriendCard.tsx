@@ -19,11 +19,16 @@ const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
      dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username, Status.CANCELED] })
   };
 
+  const blockFriendship = async () => {
+    dispatch({type: "WEBSOCKET_SEND_FRIEND_REQUEST", payload: [friendship.id, friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username, Status.BLOCKED] })
+  }
+
   const options = () =>{
     if (friendship.status === Status.ACCEPTED){
       return(<>
         <button onClick={() => setChatOpen(true)}>Open Private Chat</button>
         <button onClick={() => deleteFriendship()}>Delete From Friends</button>
+        <button onClick={() => blockFriendship()}>Block From Friends</button>
       </>
       )
     }
