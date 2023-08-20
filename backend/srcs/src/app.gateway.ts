@@ -111,17 +111,20 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const user_id = parseInt(user_id_string)
       const friend = await this.prisma.user.findUnique({where:{username: body[1]}})
       const friend_id = friend?.id;
+      let friendship = await this.friendService.friendshipExists(user_id, friend_id)
+      if (friendship && friendship.status === "BLOCKED" && user_id !== friendship.sender_id)
+        return
       let update;
       if (body[2]){
         update = await this.prisma.friends.update({
           where: {id: body[0]},
-          data: {status: body[2]}
+          data: {status: body[2], sender_id: user_id}
         })
       }
       else
         update = await this.friendService.create({user_id: user_id, friend_id: friend_id, sender_id: user_id, chat_id: 0})
-      const friendship = await this.friendService.findOne(update.id)
-      const chat = await this.prisma.chatChannel.findUnique({where: {id: friendship.chat_id}, include: {friendship: true}})
+      friendship = await this.friendService.findOne(update.id)
+      const chat = await this.prisma.chatChannel.findUnique({where: {id: friendship.chat_id}, include: {friendship: true, messages: true}})
       const friend_socket = this.connected_clients.get(friend_id)
       client.emit('friend_request', friendship);
       client.emit('update_chat', chat);

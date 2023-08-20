@@ -3,6 +3,7 @@ export enum Status {
   ACCEPTED = "ACCEPTED",
   DECLINED = "DECLINED",
   CANCELED = "CANCELED",
+  BLOCKED = "BLOCKED"
 }
 
 export enum UserStatus {

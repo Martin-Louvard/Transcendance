@@ -13,6 +13,8 @@ export class FriendsService {
       throw new NotAcceptableException("You cant add yourself as friend");
     const friendshipExists = await this.friendshipExists(createFriendDto.user_id, createFriendDto.friend_id)
     if(friendshipExists){
+      if (friendshipExists.status == "ACCEPTED")
+        throw new NotAcceptableException("Request already sent");
       const updatedFriendship = await this.prisma.friends.update({
         where: {id: friendshipExists.id}, 
         data:{
