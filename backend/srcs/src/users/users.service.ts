@@ -76,14 +76,17 @@ export class UsersService {
     const userRaw = await this.prisma.user.findUnique({
       where: { id },
       include: {
-        games: true,
-        JoinedChatChannels: { include: { messages: true, participants: true } },
-        OwnedChatChannels: { include: { messages: true } },
-        BannedFromChatChannels: { include: { messages: true } },
-        AdminOnChatChannels: { include: { messages: true } },
-      },
-    });
-    if (!userRaw) throw new NotFoundException(`No user found for id: ${id}`);
+        games: true, 
+        JoinedChatChannels: {include: {messages: true, friendship: true}},   
+        OwnedChatChannels:  {include: {messages: true}},
+        BannedFromChatChannels:  {include: {messages: true}},
+        AdminOnChatChannels:  {include: {messages: true}}
+      }});
+    if (!userRaw)
+      throw new NotFoundException(`No user found for id: ${id}`);
+      
+    const friendships = await this.friendsService.findAllFriendships(id)
+    const friends = await this.findAllFriends(id)
 
     const friendships = await this.friendsService.findAllFriendships(id);
     const friends = await this.findAllFriends(id);
@@ -196,16 +199,16 @@ export class UsersService {
             AND: [{ user_id: user.id }, { friend_id: userFriend.id }],
           },
           {
-            AND: [{ user_id: userFriend.id }, { friend_id: user.id }],
-          },
-        ],
+            AND:[
+              { user_id: userFriend.id},
+              { friend_id: user.id }
+            ]
+          }
+        ]
       },
-    });
-    if (result.count == 0)
-      throw new NotFoundException(
-        `No friendship found between: ${username} and ${updateUserFriendsDto.friend_username}`,
-      );
-
+    })
+    if(result.count == 0)
+      throw new NotFoundException(`No friendship found between: ${username} and ${updateUserFriendsDto.friend_username}`);
     return this.findOne(username);
   }
 
@@ -224,7 +227,7 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({ where: { username } });
     if (!user)
       throw new NotFoundException(`No user found for username: ${username}`);
-    return of(res.sendFile(join(process.cwd(), user.avatar)));
+    return of(res.sendFile(join(process.cwd(), user.avatar)))
   }
 
   async setTwoFactorAuthenticationSecret(secret: string, username: string) {
