@@ -47,14 +47,14 @@ export class UsersService {
     });
   }
 
-  async findAllFriends(id: number){
-    const friendships = await this.friendsService.findAllFriendships(id)
-    const friendships_accepted = friendships.filter((friendship)=>{
-      return friendship.status === "ACCEPTED"
-    })
-    const friends = friendships_accepted.map(f =>{
-      return f.friend.id === id ? f.user : f.friend
-    })
+  async findAllFriends(id: number) {
+    const friendships = await this.friendsService.findAllFriendships(id);
+    const friendships_accepted = friendships.filter((friendship) => {
+      return friendship.status === 'ACCEPTED';
+    });
+    const friends = friendships_accepted.map((f) => {
+      return f.friend.id === id ? f.user : f.friend;
+    });
     return friends;
   }
 
@@ -76,17 +76,14 @@ export class UsersService {
     const userRaw = await this.prisma.user.findUnique({
       where: { id },
       include: {
-        games: true, 
-        JoinedChatChannels: {include: {messages: true, friendship: true}},   
-        OwnedChatChannels:  {include: {messages: true}},
-        BannedFromChatChannels:  {include: {messages: true}},
-        AdminOnChatChannels:  {include: {messages: true}}
-      }});
-    if (!userRaw)
-      throw new NotFoundException(`No user found for id: ${id}`);
-      
-    const friendships = await this.friendsService.findAllFriendships(id)
-    const friends = await this.findAllFriends(id)
+        games: true,
+        JoinedChatChannels: { include: { messages: true, friendship: true } },
+        OwnedChatChannels: { include: { messages: true } },
+        BannedFromChatChannels: { include: { messages: true } },
+        AdminOnChatChannels: { include: { messages: true } },
+      },
+    });
+    if (!userRaw) throw new NotFoundException(`No user found for id: ${id}`);
 
     const friendships = await this.friendsService.findAllFriendships(id);
     const friends = await this.findAllFriends(id);
@@ -166,11 +163,18 @@ export class UsersService {
       include: { friends: true, friendUserFriends: true },
     });
     if (!userFriend)
-      throw new NotFoundException(`No user found for username: ${updateUserFriendsDto.friend_username}`);
-    
-    await this.friendsService.create({user_id: user.id, friend_id: userFriend.id, sender_id: user.id, chat_id: 0})
-    
-    return this.findOne(username)
+      throw new NotFoundException(
+        `No user found for username: ${updateUserFriendsDto.friend_username}`,
+      );
+
+    await this.friendsService.create({
+      user_id: user.id,
+      friend_id: userFriend.id,
+      sender_id: user.id,
+      chat_id: 0,
+    });
+
+    return this.findOne(username);
   }
 
   async removeFriend(
@@ -199,16 +203,15 @@ export class UsersService {
             AND: [{ user_id: user.id }, { friend_id: userFriend.id }],
           },
           {
-            AND:[
-              { user_id: userFriend.id},
-              { friend_id: user.id }
-            ]
-          }
-        ]
+            AND: [{ user_id: userFriend.id }, { friend_id: user.id }],
+          },
+        ],
       },
-    })
-    if(result.count == 0)
-      throw new NotFoundException(`No friendship found between: ${username} and ${updateUserFriendsDto.friend_username}`);
+    });
+    if (result.count == 0)
+      throw new NotFoundException(
+        `No friendship found between: ${username} and ${updateUserFriendsDto.friend_username}`,
+      );
     return this.findOne(username);
   }
 
@@ -227,7 +230,7 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({ where: { username } });
     if (!user)
       throw new NotFoundException(`No user found for username: ${username}`);
-    return of(res.sendFile(join(process.cwd(), user.avatar)))
+    return of(res.sendFile(join(process.cwd(), user.avatar)));
   }
 
   async setTwoFactorAuthenticationSecret(secret: string, username: string) {

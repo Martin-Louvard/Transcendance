@@ -1,10 +1,11 @@
-$chat-menu-width: 20%;
-$chat-menu-min-width: 240px;
+$chat-menu-width: 20vh;
+$chat-menu-min-width: 20vh;
 $chat-menu-bg-color: #312f2f;
 $chat-exit-button-height: 5%;
 $chat-exit-button-radius: 20px;
-$chat-menu-icon-right: 20vw;
-$chat-menu-animation-range: 20vw;
+$chat-menu-icon-right: 20vh;
+$chat-menu-animation-range: 11vw;
+$chat-menu-icon-open: 20vh;
 
 .chat-menu-wrapper {
   width: $chat-menu-width;
@@ -21,6 +22,7 @@ $chat-menu-animation-range: 20vw;
 
 .inner-chat-menu-wrapper {
 	padding: 10px;
+	padding-top: 20px;
 	display: flex;
 	flex-direction: column;
 	text-align: center;
@@ -84,10 +86,9 @@ $chat-menu-animation-range: 20vw;
 }
 
 .chat-item {
-  display: flex;
-  align-items: center;
   padding: 10px 0;
   cursor: pointer;
+  border-radius: 10px;
   transition: background-color 0.2s;
 }
 
