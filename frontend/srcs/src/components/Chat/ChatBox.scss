@@ -20,7 +20,8 @@
 	transition: width 0.3s ease-in-out;
 
 	&.minimized {
-		width: 50px;
+		min-height: 45px;
+		min-width: 50px;
 		overflow: hidden;
 	}
 
@@ -54,5 +55,6 @@
 		display:flex;
 		width: 20px;
 		height: 20px;
+		margin-top:4px;
 	}
 }
