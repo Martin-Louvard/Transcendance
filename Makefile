@@ -1,3 +1,4 @@
+
 NPM_DEV_FLAGS	?=
 VOL				:= $(shell docker volume ls -q)
 
@@ -10,7 +11,7 @@ restart:
 	docker compose -f docker-compose.yml restart
 
 up:
-	docker compose -f docker-compose.yml up --detach
+	docker compose -f docker-compose.yml up --detach 
 
 stop:
 	docker compose -f docker-compose.yml stop

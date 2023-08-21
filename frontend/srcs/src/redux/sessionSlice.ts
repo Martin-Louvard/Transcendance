@@ -12,6 +12,7 @@ export interface sessionState {
     JoinedChatChannels: ChatChannels[] | undefined,
     OwnedChatChannels: ChatChannels[] | undefined,
     BannedFromChatChannels: ChatChannels[] | undefined,
+    OpenedChatChannels: ChatChannels[],
     loading: boolean,
     error: string | undefined,
 }
@@ -26,10 +27,10 @@ const initialState: sessionState = {
   JoinedChatChannels: undefined,
   OwnedChatChannels: undefined,
   BannedFromChatChannels: undefined,
+  OpenedChatChannels: [],
   loading: false,
   error: undefined,
 }
-
 
 // Utiliser createSlice permet d'ecrire les reducers comme si on mutait le state car il marche avec Immer qui sous le capot s'occupe de transformer le state de maniere immutable
 export const sessionSlice = createSlice({
@@ -37,6 +38,19 @@ export const sessionSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
+    addOpenedChatChannel: (state, action) => {
+      const chatChannel = action.payload;
+      if (!state.OpenedChatChannels?.some(channel => channel.id === chatChannel.id)) {
+          if (state.OpenedChatChannels?.length >= 3) {
+            state.OpenedChatChannels?.shift();
+          }
+        state.OpenedChatChannels.push(chatChannel);
+      }
+    },
+    removeOpenedChatChannel: (state, action) => {
+      const chatChannelId = action.payload;
+      state.OpenedChatChannels = state.OpenedChatChannels.filter(channel => channel.id !== chatChannelId);
+    },
     setSessionUser: (state, action) => {
       state.user = action.payload;
     },
@@ -168,7 +182,9 @@ export const {
   updateFriendRequest, 
   updateFriendStatus,
   createChat,
-  updateChat
+  updateChat,
+  addOpenedChatChannel,
+  removeOpenedChatChannel,
 } = sessionSlice.actions
 export { fetchRelatedUserData };
 export default sessionSlice.reducer
