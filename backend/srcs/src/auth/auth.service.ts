@@ -56,8 +56,10 @@ export class AuthService {
           };
 
           try{
+            console.log(requestOptions)
             const response = await fetch('https://api.intra.42.fr/oauth/token', requestOptions);
             const data = await response.json();
+            console.log(data)
             const token_42 = data.access_token ;
             const userInfo =  await this.get42UserInfo(token_42)
             let dbUser;

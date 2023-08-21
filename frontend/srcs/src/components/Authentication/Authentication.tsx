@@ -31,7 +31,7 @@ const Authentication: React.FC = () => {
 
   const auth42 = async (code42: string | null) => {
     const user = await login42(code42);
-    if (user) {
+    if (user.id) {
       if (!user.twoFAEnabled) {
         dispatch(setSessionUser(user));
         dispatch(setToken(user.access_token));

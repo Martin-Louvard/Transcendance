@@ -4,6 +4,7 @@ import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode} from './Types';
 import { FriendsService } from './friends/friends.service';
+import { connect } from 'http2';
 
 @WebSocketGateway({ cors: '*'})
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -86,22 +87,71 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const chatChannel = await this.prisma.chatChannel.findUnique({
       where: {id: newChatChannel.id},
       include:{
+        friendship: true,
         owner: true,
         admins: true,
-        messages: true
+        messages: true,
+        participants: true,
+        bannedUsers: true
       }
     })
    this.server.emit('create_chat', chatChannel);
   }
 
-  @SubscribeMessage('update_chat')
-  async handleUpdateChat(@ConnectedSocket() client: Socket, @MessageBody() body: {id: number, password: string}): Promise<void> {
-    const updatedChatChannel = this.prisma.chatChannel.update({
-      where: {id: body[0]},
-      data: {password: body[1]}
+  @SubscribeMessage('update_chat_password')
+  async handleUpdateChatPassword(@ConnectedSocket() client: Socket, @MessageBody() body: {chatId: number, channelType:string, password: string}): Promise<void> {
+    const user_id_string = client.handshake.headers.user_id[0]
+    const user_id = parseInt(user_id_string)
+    let channel = await this.prisma.chatChannel.findUnique({where: {id: body.chatId}})
+    if (channel.ownerId !== user_id)
+      return;
+    let update;
+    if (body.channelType === "Password")
+    update = await this.prisma.chatChannel.update({
+      where: {id: body.chatId},
+      data: {channelType: body.channelType, password: body.password}
     })
-    const channel = this.prisma.chatChannel.findUnique({where: {id: body[0]}, include: {friendship: true}})
-    this.server.emit('update_chat', channel);
+    else
+    update = await this.prisma.chatChannel.update({
+        where: {id: body.chatId},
+        data: {channelType: body.channelType, password: undefined}
+      })
+    const updatedChannel = await this.prisma.chatChannel.findUnique({
+      where: {id: body.chatId},
+      include:{
+        friendship: true,
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
+        bannedUsers: true
+      }})
+    this.server.emit('update_chat_password', updatedChannel);
+  }
+
+  @SubscribeMessage('update_chat_admins')
+  async handleUpdateChatAdmins(@ConnectedSocket() client: Socket, @MessageBody() body: {chatId: number, userId_to_update: string, actionType: string}): Promise<void> {
+    if (body.actionType === "ADD")
+      await this.prisma.user.update({
+      where: {id: parseInt(body.userId_to_update)}, 
+      data: {AdminOnChatChannels: {connect: {id: body.chatId}}}
+    })
+    else if (body.actionType === "REMOVE")
+      await this.prisma.user.update({
+      where: {id: parseInt(body.userId_to_update)}, 
+      data: {AdminOnChatChannels: {disconnect: {id: body.chatId}}}
+    })
+    const updatedChannel = await this.prisma.chatChannel.findUnique({
+      where: {id: body.chatId},
+      include:{
+        friendship: true,
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
+        bannedUsers: true
+      }})
+    this.server.emit('update_chat_admins', updatedChannel);
   }
 
   @SubscribeMessage('friend_request')

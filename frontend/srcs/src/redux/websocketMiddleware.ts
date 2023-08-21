@@ -19,6 +19,8 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
+        socket.on('update_chat_password', (data: any) => {store.dispatch(updateChat(data))});
+        socket.on('update_chat_admins', (data: any) => {store.dispatch(updateChat(data))});
         break;
 
       case 'WEBSOCKET_SEND_MESSAGE':
@@ -39,9 +41,15 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         }
         break;
 
-      case 'UPDATE_CHAT':
+      case 'UPDATE_CHAT_PASSWORD':
         if (socket && socket.connected) {
-          socket.emit('update_chat', action.payload);
+          socket.emit('update_chat_password', action.payload);
+        }
+        break;
+
+      case 'UPDATE_CHAT_ADMINS':
+        if (socket && socket.connected) {
+          socket.emit('update_chat_admins', action.payload);
         }
         break;
 
