@@ -77,7 +77,7 @@ export class UsersService {
       where: { id },
       include: {
         games: true,
-        JoinedChatChannels: { include: { messages: true, friendship: true } },
+        JoinedChatChannels: { include: { messages: true, friendship: true, participants: true } },
         OwnedChatChannels: { include: { messages: true } },
         BannedFromChatChannels: { include: { messages: true } },
         AdminOnChatChannels: { include: { messages: true } },
