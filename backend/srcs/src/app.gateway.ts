@@ -131,6 +131,11 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('update_chat_admins')
   async handleUpdateChatAdmins(@ConnectedSocket() client: Socket, @MessageBody() body: {chatId: number, userId_to_update: string, actionType: string}): Promise<void> {
+    const owner_id_string = client.handshake.headers.user_id[0]
+    const owner_id = parseInt(owner_id_string)
+    const chat = await this.prisma.chatChannel.findUnique({where: {id: body.chatId}})
+    if (chat.ownerId != owner_id)
+      return;
     if (body.actionType === "ADD")
       await this.prisma.user.update({
       where: {id: parseInt(body.userId_to_update)}, 
@@ -152,6 +157,40 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
         bannedUsers: true
       }})
     this.server.emit('update_chat_admins', updatedChannel);
+  }
+
+  @SubscribeMessage('update_chat_owner')
+  async handleUpdateChatOwner(@ConnectedSocket() client: Socket, @MessageBody() body: {chatId: number, new_owner_id: number}): Promise<void> {
+    const owner_id_string = client.handshake.headers.user_id[0]
+    const owner_id = parseInt(owner_id_string)
+    const chat = await this.prisma.chatChannel.findUnique({where: {id: body.chatId}, include:{admins: true, participants: true}})
+    let new_owner;
+    if (chat.ownerId != owner_id)
+      return;
+    if (chat.admins.length > 1)
+      new_owner = chat.admins.find(a => a.id != chat.ownerId)
+    else if (chat.participants.length > 1)
+      new_owner = chat.participants.find(a => a.id != chat.ownerId)
+    else
+      return;
+    if (body.new_owner_id)
+      new_owner = await this.prisma.user.findUnique({where: {id: body.new_owner_id}})
+    
+    await this.prisma.chatChannel.update({
+      where: {id: body.chatId},
+      data: {owner: {connect: new_owner.id}}
+    })
+    const updatedChannel = await this.prisma.chatChannel.findUnique({
+      where: {id: body.chatId},
+      include:{
+        friendship: true,
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
+        bannedUsers: true
+      }})
+    this.server.emit('update_chat_owner', updatedChannel);
   }
 
   @SubscribeMessage('friend_request')
