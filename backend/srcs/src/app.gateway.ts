@@ -202,9 +202,16 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       const friend_socket = this.connected_clients.get(friend_id);
       client.emit('friend_request', friendship);
-      client.emit('update_chat', chat);
+      if (body[2] === "ACCEPTED")
+      client.emit('create_chat', chat)
+      else
+      client.emit('update_chat', chat)
+
       if (friend_socket) {
         friend_socket.emit('friend_request', friendship);
+        if (body[2] === "ACCEPTED")
+        friend_socket.emit('create_chat', chat);
+        else
         friend_socket.emit('update_chat', chat);
       }
     }
