@@ -62,7 +62,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage(ClientEvents.AuthState)
   auth(@ConnectedSocket() client: Socket,@MessageBody() data: ClientPayloads[ClientEvents.AuthState]) {
-    
     if (data == undefined)
       return ;
     this.gameService.auth(client, data);
@@ -191,6 +190,34 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
         bannedUsers: true
       }})
     this.server.emit('update_chat_owner', updatedChannel);
+  }
+
+  @SubscribeMessage('update_chat_participants')
+  async handleUpdateChatParticipants(@ConnectedSocket() client: Socket, @MessageBody() body: {chatId: number, participants_id: number[], type: string}): Promise<void> {
+   if (body.type === "ADD"){
+    await this.prisma.chatChannel.update({
+      where: {id: body.chatId},
+      data: {participants: {connect: body.participants_id.map(p => {return{id: p}})}}
+    })
+   }
+   else if (body.type === "REMOVE"){
+    await this.prisma.chatChannel.update({
+      where: {id: body.chatId},
+      data: {participants: {disconnect: body.participants_id.map(p => {return{id: p}})}}
+    })
+   }
+
+    const updatedChannel = await this.prisma.chatChannel.findUnique({
+      where: {id: body.chatId},
+      include:{
+        friendship: true,
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
+        bannedUsers: true
+      }})
+    this.server.emit('update_chat_participants', updatedChannel);
   }
 
   @SubscribeMessage('friend_request')
