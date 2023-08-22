@@ -140,12 +140,13 @@ export const sessionSlice = createSlice({
     },
     cleanSession: (state) =>{
       state.user= undefined,
-      state.access_token = undefined,
-      state.friends = undefined,
-      state.friendships = undefined,
-      state.JoinedChatChannels = undefined,
-      state.OwnedChatChannels = undefined,
-      state.BannedFromChatChannels = undefined
+        state.access_token = undefined,
+        state.friends = undefined,
+        state.friendships = undefined,
+        state.JoinedChatChannels = undefined,
+        state.OwnedChatChannels = undefined,
+        state.BannedFromChatChannels = undefined,
+        state.OpenedChatChannels = []
     }
   },
   extraReducers: (builder) => {

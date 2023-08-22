@@ -37,7 +37,11 @@ const SideChatMenu = () => {
         onClick={toggleMenu} />
       <ul className="inner-chat-menu-wrapper">CHATS
         <hr></hr>{storedJoinedChannels?.map((chat: ChatChannels) => (
-          <li  className={`chat-item${chatBox === chat ? "-active" : ""}`} key={chat.id} onClick={() => handleChatBoxClick(chat)}>{getName(chat, userName)}</li>
+          <li className={`chat-item${chatBox === chat ? "-active" : ""}`}
+            key={chat.id}
+            onClick={() => handleChatBoxClick(chat)}>
+            {getName(chat, userName)}
+          </li>
       ))}
       </ul>
     </div>

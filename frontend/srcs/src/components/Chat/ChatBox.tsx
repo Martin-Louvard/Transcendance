@@ -40,8 +40,8 @@ const ChatBoxes = () => {
         {!minimizedChat.includes(chat.id) && <Chat chatId={chat.id} />}
       </div>
     );
+    console.log(`${getName(chat, currentUser?.username)} | ${currentUser?.username}`);
   };
-
   return (
     <div className="chat-boxes-wrapper">
       {openedChannels.map((chat) => (

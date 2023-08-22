@@ -9,15 +9,6 @@ interface MessagesProps {
 const Messages: React.FC<MessagesProps> = ({ messages }) => {
   const chatMessagesRef = useRef<HTMLDivElement | null>(null);
   const user = useAppSelector((state) => state.session.user);
-  const blockedFriendships = useAppSelector((state) => state.session.friendships?.filter(f => f.status === "BLOCKED"))
-  const [blockedUsersIds, setBlockedUsersIds] = useState<number[]>()
-
-  useEffect(()=>{
-    if (blockedFriendships)
-    setBlockedUsersIds(blockedFriendships.map(f=>{
-      return f.user_id === user?.id ? f.friend_id : f.user_id
-    }))
-  },[blockedFriendships])
 
   useEffect(() => {
     const chatMessagesContainer = chatMessagesRef.current;
@@ -33,7 +24,6 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
   return (
     <div className="chat-messages" ref={chatMessagesRef}>
       {messages?.map((message, index) => (
-        blockedUsersIds?.some(id => id === message.id) ? null:
         <div
           key={index}
           className={`chat-message ${
