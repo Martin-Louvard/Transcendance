@@ -1,7 +1,8 @@
 import { ClientEvents, Input, InputPacket} from '@shared/class';
-import { socket } from 'src/socket';
+import { socket } from '../../socket';
 
-export function emitInput(KeyboardInput: Input) {
+
+export function emitInput(KeyboardInput: Input, id: number) {
 	//const player = usePlayerStore();
 
 	if (KeyboardInput.up) {
@@ -10,7 +11,9 @@ export function emitInput(KeyboardInput: Input) {
 		const payload: InputPacket = {
 			code: code,
 			timestamp: timestamp,
+			id: id,
 		}
+		console.log('up');
 		socket.emit<InputPacket>(ClientEvents.InputState, payload);
 	}
 	if (KeyboardInput.right) {
@@ -19,6 +22,7 @@ export function emitInput(KeyboardInput: Input) {
 		const payload: InputPacket = {
 			code: code,
 			timestamp: timestamp,
+			id: id,
 		}
 		socket.emit<InputPacket>(ClientEvents.InputState, payload);
 	}
@@ -28,6 +32,7 @@ export function emitInput(KeyboardInput: Input) {
 		const payload: InputPacket = {
 			code: code,
 			timestamp: timestamp,
+			id: id,
 		}
 		socket.emit<InputPacket>(ClientEvents.InputState, payload);
 	}
@@ -37,6 +42,7 @@ export function emitInput(KeyboardInput: Input) {
 		const payload: InputPacket = {
 			code: code,
 			timestamp: timestamp,
+			id: id,
 		}
 		socket.emit<InputPacket>(ClientEvents.InputState, payload);
 	}
@@ -46,6 +52,7 @@ export function emitInput(KeyboardInput: Input) {
 		const payload: InputPacket = {
 			code: code,
 			timestamp: timestamp,
+			id: id,
 		}
 		socket.emit<InputPacket>(ClientEvents.InputState, payload);
 	}
@@ -55,6 +62,7 @@ export function emitInput(KeyboardInput: Input) {
 		const payload: InputPacket = {
 			code: code,
 			timestamp: timestamp,
+			id: id,
 		}
 		socket.emit<InputPacket>(ClientEvents.InputState, payload);	
 	}
@@ -64,6 +72,7 @@ export function emitInput(KeyboardInput: Input) {
 		const payload: InputPacket = {
 			code: code,
 			timestamp: timestamp,
+			id: id,
 		}
 		socket.emit<InputPacket>(ClientEvents.InputState, payload);	
 	}

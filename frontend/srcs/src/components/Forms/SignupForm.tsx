@@ -34,7 +34,8 @@ const SignupForm: React.FC = () => {
       if (!user)
         return toast.error("Account created but signin failed")
       toast.success("Logged in")
-      dispatch(setUser({...user}))
+      dispatch(setSessionUser(user))
+      dispatch(setToken(user.access_token))
       socket.auth = {token: user.access_token};
       socket.disconnect().connect();
     }catch(err) {

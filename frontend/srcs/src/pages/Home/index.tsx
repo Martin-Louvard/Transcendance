@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 function Home() {
     const navigate = useNavigate();
-    const user = useAppSelector((state) => state.user);
+    const user = useAppSelector((state) => state.session.user);
 
     useEffect(() => {
         async function verifyToken() {
@@ -15,7 +15,10 @@ function Home() {
             if (!await verify(user.access_token))
                 navigate('/login');
         }
-        verifyToken();
+        if (user && user.access_token)
+            verifyToken();
+        else
+            navigate('/login');
     }, [])
 
 

@@ -19,7 +19,8 @@ export class PlayerService {
 	}
 	connectPlayer(data: {id: number, socket: Socket}): void {
 		if (data) {
-			if (!this.isPlayer(data.socket.id)) {
+			if (!this.isPlayerById(data.id)) {
+				console.log("IL NEXISTE PAS")
 				const player = new Player(data.socket, data.id);
 				this.players.set(data.socket.id, player);
 				const payload: ServerPayloads[ServerEvents.AuthState] = {
@@ -38,36 +39,73 @@ export class PlayerService {
 		const player  = this.getPlayer(client);
 		if (!player)
 			return false;
+		player.setOffline();
 		this.logger.log(`${player.id} is Offline`);
 		return (true);
 	}
 	updatePlayer(data: {id: number, socket: Socket}): void {
-		this.players.forEach(e => {
-			if (data.id == e.id) {
-				e.setOnline(data.socket);
-				this.logger.log(`${e.id} is Online`);
-				const payload: ServerPayloads[ServerEvents.AuthState] = {
-					lobbyId: e.lobby == null ? null : e.lobby.id,
-					hasStarted: e.lobby == null ? false : e.lobby.instance.hasStarted,
-				  }
-				e.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
-			}
-		});
+		const player: Player = this.getPlayerById(data.id);
+		console.log(data.id);
+		this.removePlayerById(data.id);
+		player.setOnline(data.socket);
+		this.players.set(data.socket.id, player);
+		console.log(`player updated and in lobby : ${player.lobby ? player.lobby.id : "null"}`);
+		this.logger.log(`${player.id} is Online`);
+		const payload: ServerPayloads[ServerEvents.AuthState] = {
+			lobbyId: player.lobby == null ? null : player.lobby.id,
+			hasStarted: player.lobby == null ? false : player.lobby.instance.hasStarted,
+		};
+		player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 	}
-	getPlayerById(socketId: string) {
+	getPlayerBySocketId(socketId: string) {
 		return (this.players.get(socketId));
+	}
+	getPlayerById(id: number) {
+		let player: Player = null;
+		this.players.forEach((e) => {
+			if (e.id == id) {
+				player = e;
+				return ;
+			}
+		})
+		return (player);
 	}
 	getPlayer(socket: Socket): Player | undefined {
 		return (this.players.get(socket.id));
 	}
-	removePlayerById(id: string) {
+	removePlayerBySocketId(id: string) {
 		this.players.delete(id);
+	}
+	removePlayerById(id: number) {
+		//let toDelete: Player = null;
+		this.players.forEach((e, key) => {
+			if (e.id == id) {
+				this.players.delete(key);
+				return ;
+			}
+		})
+		//if (toDelete) {
+		//	console.log(toDelete.socket);
+
+		//	this.players.delete(toDelete.socket.id);
+		//}
 	}
 	removePlayer(player: Player) {
 		this.players.delete(player.socket.id);
 	}
 	isPlayer(socketId: string) {
 		return (this.players.get(socketId));
+	}
+	isPlayerById(id: number) {
+		let isPlayer: boolean = false;
+		this.players.forEach((e) => {
+			console.log(`${e.id} == ${id}`);
+			if (e.id == id) {
+				isPlayer = true;
+				return ;
+			}
+		})
+		return (isPlayer);
 	}
 	getPlayersOnline() {
 		return (this.players);

@@ -18,10 +18,10 @@ import verify from './components/Authentication/verify.ts';
 
 function App() {
   const player = usePlayerStore();
-  const user = useAppSelector((state) => state.user);
+  const user = useAppSelector((state) => state.session.user);
   
   useEffect(() => {
-      if (user.id) {
+      if (user && user.id) {
         socket.auth = {token: user.access_token};
         socket.disconnect().connect();
       }

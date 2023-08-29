@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import LoginForm from '../Forms/LoginForm.js';
 import SignupForm from '../Forms/SignupForm.js';
-import { useAppDispatch } from '../../redux/hooks.js';
-import { setUser } from '../../redux/userReducer.js';
-import  login2fa  from './login2fa.js'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks.js';
 import './Authentication.scss'
 import toast from 'react-hot-toast'
+import { useNavigate } from "react-router-dom";
+import verify from './verify.js';
+import { fetchRelatedUserData, setSessionUser, setToken } from '../../redux/sessionSlice.js';
+import { login2fa, login42 } from '../../api.js';
 
 const Authentication: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
   const queryParameters = new URLSearchParams(window.location.search)
   const Api42uid = import.meta.env.VITE_42API_UID;
+  const user = useAppSelector((state) => state.session.user);
+  const navigate = useNavigate();
   const dispatch = useAppDispatch()
   const isInitialLoadRef = useRef(true); 
 
@@ -26,9 +30,12 @@ const Authentication: React.FC = () => {
       if (await verify(user.access_token))
           navigate('/');
     }
-    verifyToken();
-  }, [user.access_token])
-
+    console.log("salut");
+    console.log(user);
+    if (user && user.access_token)
+      verifyToken();
+  }, [user])
+  
   const handleLoginClick = () => {
     setShowLogin(true);
   };
@@ -39,12 +46,12 @@ const Authentication: React.FC = () => {
 
   const auth42 = async (code42: string | null) => {
     const user = await login42(code42);
-    if (user) {
+    if (user && user.id) {
       if (!user.twoFAEnabled) {
         dispatch(setSessionUser(user));
         dispatch(setToken(user.access_token));
-        if (user.id) dispatch(fetchRelatedUserData(user.id));
-        toast.success('Logged in');
+        if (user) dispatch(fetchRelatedUserData(user.id));
+          toast.success('Logged in');
       } else {
         const code = window.prompt('Enter your code from google authenticator', '000000');
         const user2fa = await login2fa(code, user, user.access_token);

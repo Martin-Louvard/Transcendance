@@ -21,7 +21,7 @@ interface Paddle {
 interface World {
 	world: CANNON.World | null;
 	groundBody: CANNON.Body | null;
-	players: Map<string, Paddle> | null;
+	players: Map<number, Paddle> | null;
 	balls: Sphere[] | null;
 }
 
@@ -33,7 +33,7 @@ export class Instance {
 	}
 	lobby: Lobby;
 	private static nbInstances: number = 0;
-	public id: number = 0;
+	public readonly id: number = 0;
 	private interval;
 	private maxPlayer: number;
 	hasStarted: boolean = false; // A recuperer dans l'instance
@@ -63,11 +63,11 @@ export class Instance {
 
 
 	isInstanceOfInputPacket(object: any): boolean {
-		return ('code' in object &&  'timestamp' in object);
+		return ('code' in object && 'timestamp' in object);
 	}
-	processGameData<T extends InputPacket>(data: T, senderId: string) {
+	processGameData<T extends InputPacket>(data: T) {
 		if (this.isInstanceOfInputPacket(data)) {
-			const paddle = this.world.players.get(senderId);
+			const paddle = this.world.players.get(data.id);
 			const input: InputPacket = data;
 			let directionVector = new CANNON.Vec3();
 			let worldVelocity: CANNON.Vec3 = new CANNON.Vec3();
@@ -79,40 +79,35 @@ export class Instance {
 				return undefined; //player dont exist error
 			switch (input.code) {
 				case 0: // move up
-					directionVector.set(0, 0, this.moveDistance * 0.2);
+					directionVector.set(0, 0, this.moveDistance);
 					paddle.body.quaternion.vmult(directionVector, worldVelocity);
 					paddle.body.velocity.x = worldVelocity.x;
 					paddle.body.velocity.z = worldVelocity.z;
-					paddle.lastMovement = Date.now() / 1000;
-					//paddle.body.applyForce(worldVelocity, paddle.body.position);
+					console.log("caca");
 					break ;
 				case 1: // move right
 					directionVector.set( this.moveDistance, 0,0);
-					worldVelocity = paddle.body.quaternion.vmult(directionVector);
-					
-					paddle.body.applyForce(worldVelocity, paddle.body.position);
-					paddle.lastMovement = Date.now() / 1000;
-					break ;
-				case 2: // move down
-					directionVector.set(0, 0, -this.moveDistance * 0.2);
 					paddle.body.quaternion.vmult(directionVector, worldVelocity);
 					paddle.body.velocity.x = worldVelocity.x;
 					paddle.body.velocity.z = worldVelocity.z;
-					paddle.lastMovement = Date.now() / 1000;
-					//console.log(worldVelocity.z);
-					//paddle.body.applyForce(worldVelocity, paddle.body.position);
+					break ;
+				case 2: // move down
+					directionVector.set(0, 0, -this.moveDistance);
+					paddle.body.quaternion.vmult(directionVector, worldVelocity);
+					paddle.body.velocity.x = worldVelocity.x;
+					paddle.body.velocity.z = worldVelocity.z;
 					break ;
 				case 3: //move left
 					directionVector.set( -this.moveDistance, 0,0);
-					worldVelocity = paddle.body.quaternion.vmult(directionVector);
-					paddle.body.applyForce(worldVelocity, paddle.body.position);
-					paddle.lastMovement = Date.now() / 1000;
+					paddle.body.quaternion.vmult(directionVector, worldVelocity);
+					paddle.body.velocity.x = worldVelocity.x;
+					paddle.body.velocity.z = worldVelocity.z;
 					break ;
 				case 4: // boost
 					break ;
 				case 5: // rotate right
 					rotateAngle = Math.PI / 2 * (1 / 60);
-					rotationQuaternion.setFromAxisAngle(axisY, rotateAngle);
+					rotationQuaternion.setFromAxisAngle(axisY, -rotateAngle);
 					paddle.body.quaternion = rotationQuaternion.mult(paddle.body.quaternion);
 					console.log("right");
 					break ;
@@ -126,7 +121,6 @@ export class Instance {
 					break;
 			}
 			//paddle.lastMovement = 
-			paddle.body.velocity.y = 0;
 		}
 	}
 	triggerStart() {
@@ -154,14 +148,14 @@ export class Instance {
 	collision(event) {
 		const contact = event.contact;
 
-		console.log(contact);
+		//console.log(contact);
 	}
 
 	generate() {
 		this.world.world = new CANNON.World({
 			gravity: new CANNON.Vec3(0, -20, 0),
 		})
-		const groundPhysicMaterial = new CANNON.Material(); // new CANNON.Material('slippery')
+		const groundPhysicMaterial = new CANNON.Material('slippery'); // new CANNON.Material('slippery')
 		const groundBody = new CANNON.Body({
 			mass: 0,
 			material: groundPhysicMaterial,
@@ -184,13 +178,13 @@ export class Instance {
 		this.data.balls = new Array<Ball>();
 		this.data.balls.push({position: [sphere.body.position.x, sphere.body.position.y, sphere.body.position.z], size: radius});
 	
-		this.world.players = new Map<string, Paddle>();
+		this.world.players = new Map<number, Paddle>();
 		this.data.players = new Array<PlayerBody>();
 		const playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
 		let i: number = 0;
-		this.lobby.players.forEach((elem, index) => {
+		this.lobby.players.forEach((elem) => {
 			const paddleSize:[number, number, number] = [12, 3, 2];
-			const playerPhysicMaterial = new CANNON.Material();
+			const playerPhysicMaterial = new CANNON.Material('slippery');
 			const paddle: Paddle = {
 				size: paddleSize,
 				body: new CANNON.Body({
@@ -208,40 +202,17 @@ export class Instance {
 			paddle.body.quaternion.setFromEuler(0, i % 2  ? Math.PI : 0, 0);
 			paddle.body.position.set(playerSpawnPos[i][0], playerSpawnPos[i][1], playerSpawnPos[i][2]); // Position du joueur 1
 			const groundPlayerContactMaterial = new CANNON.ContactMaterial(groundPhysicMaterial, playerPhysicMaterial, {
-				friction: 0,
+				friction: 0.1,
 			});
 			this.world.world.addBody(paddle.body);
 			this.world.world.addContactMaterial(groundPlayerContactMaterial);
-			this.world.players.set(index.id, paddle);
-			//paddle.body.addEventListener('collide', this.collision);
-			this.data.players.push({position: [paddle.body.position.x, paddle.body.position.y, paddle.body.position.z], size: paddleSize});
+			this.world.players.set(elem.id, paddle);
+			paddle.body.addEventListener('collide', this.collision);
+			this.data.players.push({position: [paddle.body.position.x, paddle.body.position.y, paddle.body.position.z], size: paddleSize, id: elem.id, quaternion: paddle.body.quaternion, team: elem.team});
 			elem.team = i % 2 ? 'home' : 'visitor';
 			console.log(elem.team);
 			i++;
 		});
-		//this.world.players.forEach((paddle, index) => {
-		//	let dt = this.world.world.dt;
-		//	this.world.world.addEventListener('postStep', function(){
-		//		paddle.body.velocity.vsub(paddle.previousVelocity, paddle.acceleration);
-		//		//paddle.acceleration.x = paddle.body.velocity.x - paddle.previousVelocity.x;
-		//		//paddle.acceleration.z = paddle.body.velocity.z - paddle.previousVelocity.z;
-		//		paddle.acceleration.scale(30, paddle.acceleration);  // a = a / dt
-		//		paddle.acceleration.x =  Math.max(-30, Math.min(paddle.acceleration.x, 30))
-		//		paddle.acceleration.z = Math.max(-30, Math.min(paddle.acceleration.z, 30))
-		//		//if (paddle.body.velocity.x > 0.05 || paddle.body.velocity.z > 0.05) {
-		//		paddle.acceleration.y = 0;
-		//		//paddle.body.applyForce(paddle.acceleration, paddle.body.position);
-		//			//paddle.body.velocity.vadd(paddle.acceleration, paddle.body.velocity);
-		//		//}
-		//		paddle.previousVelocity.copy(paddle.body.velocity);
-		//		if (paddle.acceleration.z > 1 || paddle.acceleration.x > 1) {
-		//			console.log(`---- [${index}] ----- `);
-		//			console.log(paddle.acceleration);
-		//			console.log("-----------");
-
-		//		}
-		//	});
-		//})
 	
 	}
 
@@ -268,7 +239,7 @@ export class Instance {
 		})
 		i = 0
 		this.world.players.forEach((player) => {
-			this.data.players[i++] = {position: [player.body.position.x, player.body.position.y, player.body.position.z], size: player.size};
+			this.data.players[i++] = {position: [player.body.position.x, player.body.position.y, player.body.position.z], size: player.size, id: player.player.id, quaternion: player.body.quaternion, team: player.player.team};
 		})
 	}
 
@@ -276,24 +247,11 @@ export class Instance {
 	animate() {
 		//requestAnimationFrame(this.animate)
 		this.interval = setInterval(() => {
-			this.world.world.step(1/60);
-			this.world.players.forEach((elem) => {
-				if (elem.lastMovement != null)
-					console.log((Date.now() / 1000) - elem.lastMovement);
-				if (elem.body.velocity.z > 0 && elem.lastMovement != null && ((Date.now() / 1000) - elem.lastMovement) > 1.5) {
-					elem.body.velocity.z = 0
-					//elem.body.velocity.z -= ((Date.now() / 1000) - elem.lastMovement) * 0.5;
-					//if (elem.body.velocity.z < 0)
-					//	elem.body.velocity.z = 0;
-				}
-				if (elem.body.velocity.z < 0 && elem.lastMovement != null && ((Date.now() / 1000) - elem.lastMovement) > 1.5) {
-					elem.body.velocity.z = 0;
-					//elem.body.velocity.z += ((Date.now() / 1000) - elem.lastMovement) * 0.5;
-					//if (elem.body.velocity.z > 0)
-					//	elem.body.velocity.z = 0;
-				}
-			})
+			this.world.world.fixedStep(1/60);
 			this.copyData();
+			this.world.players.forEach((e) => {
+				e.body.velocity.y = 0;
+			})
 			this.dispatchGameState();
 		}, 1000/ 60);
 	  }

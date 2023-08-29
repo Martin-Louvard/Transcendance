@@ -23,7 +23,7 @@ export class LobbyService {
 	}
 	sendToInstance<T extends InputPacket>(id:string, data: T, senderId: string) {
 		const lobby = this.lobbies.get(id);
-		lobby.instance.processGameData<T>(data, senderId);
+		lobby.instance.processGameData<T>(data);
 	}
 	addLobby(lobby: Lobby) {
 		if (lobby)
@@ -100,10 +100,10 @@ export class LobbyService {
 	@Cron(CronExpression.EVERY_5_MINUTES,
 		{name: 'lobby_cleaner'})
 	clearLobbies() {
-		this.lobbies.forEach((lobby: Lobby) => {
-			lobby.clear();
-			this.lobbies.delete(lobby.id);
-		})
+		//this.lobbies.forEach((lobby: Lobby) => {
+		//	lobby.clear();
+		//	this.lobbies.delete(lobby.id);
+		//})
 		this.logger.log("Lobbies cleaned");
 	}
 }

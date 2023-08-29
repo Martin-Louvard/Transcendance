@@ -1,3 +1,5 @@
+import * as CANNON from 'cannon-es'
+
 export enum LobbyMode {
 	duel = 2,
 	double = 4,
@@ -61,6 +63,9 @@ export type ClientPayloads = {
 export interface PlayerBody {
 	position: [number, number, number];
 	size: [number, number, number];
+	quaternion: CANNON.Quaternion;
+	id: number;
+	team: 'home' | 'visitor',
 }
 
 export interface Ball {
@@ -93,4 +98,5 @@ export interface InputPacketInterface {
 export class InputPacket implements InputPacketInterface {
 	code: number;
 	timestamp: number;
+	id: number;
 } // A changer avec une methode de compression

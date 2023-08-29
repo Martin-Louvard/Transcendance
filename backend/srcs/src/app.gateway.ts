@@ -7,18 +7,20 @@ import { JwtService } from '@nestjs/jwt';
 import { AppService } from './app.service';
 import { LobbyService } from './game/lobby/lobby.service';
 import { PlayerService } from './game/player/player.service';
+import { FriendsService } from './friends/friends.service';
 
 @WebSocketGateway({ cors: '*' })
-export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
   constructor(
     private prisma: PrismaService,
     private readonly gameService: GameService,
     private friendService: FriendsService,
+    private readonly appService: AppService,
+    private readonly lobbyService: LobbyService,
+    private readonly playerService: PlayerService
   ) {}
 
-@WebSocketGateway({ cors: '*'})
-export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit{
-  constructor(private prisma: PrismaService, private readonly gameService: GameService, private readonly appService: AppService, private readonly lobbyService: LobbyService, private readonly playerService: PlayerService){}
+  connected_clients = new Map<number, Socket>();
 
   @WebSocketServer()
   server: Server;
@@ -37,7 +39,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
 
   @SubscribeMessage('automatch')
   autoMatch(@ConnectedSocket() client: Socket, @MessageBody() data: LobbyMode) {
-    console.log("salut");
     this.gameService.automatch(client, data);
   }
 
