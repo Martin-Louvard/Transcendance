@@ -1,7 +1,7 @@
 import { Socket } from "socket.io";
 import { Player } from "./player.class";
 import { Injectable, Logger } from '@nestjs/common';
-import { ServerEvents, ServerPayloads } from "src/Types";
+import { ServerEvents, ServerPayloads } from "@shared/class";
 
 @Injectable()
 export class PlayerService {
@@ -9,13 +9,19 @@ export class PlayerService {
 	}
 	private readonly logger = new Logger("PlayerService");
 	/* Player Handling */
-	players: Array<Player> = new Array<Player>();
+	players: Map<string, Player> = new Map<string, Player>();
 
+	getLobby(socketId: string) {
+		const player = this.players.get(socketId);
+		if (!player || !player.lobby)
+			return undefined;
+		return (player.lobby.id);
+	}
 	connectPlayer(data: {id: number, socket: Socket}): void {
 		if (data) {
-			if (!this.isPlayer(data.id)) {
+			if (!this.isPlayer(data.socket.id)) {
 				const player = new Player(data.socket, data.id);
-				this.players.push(player);
+				this.players.set(data.socket.id, player);
 				const payload: ServerPayloads[ServerEvents.AuthState] = {
 					lobbyId: null,
 					hasStarted: false,
@@ -48,27 +54,20 @@ export class PlayerService {
 			}
 		});
 	}
-	getPlayer(socket: Socket): Player | null {
-		let finded: Player | null = null;
-		this.players.forEach(e => {
-			if (socket && socket.id === e.socket.id)
-				finded = e;
-		})
-		return (finded);
+	getPlayerById(socketId: string) {
+		return (this.players.get(socketId));
+	}
+	getPlayer(socket: Socket): Player | undefined {
+		return (this.players.get(socket.id));
+	}
+	removePlayerById(id: string) {
+		this.players.delete(id);
 	}
 	removePlayer(player: Player) {
-		const index = this.players.indexOf(player);
-		if (index > -1) {
-		  this.players.splice(index, 1);
-		}
+		this.players.delete(player.socket.id);
 	}
-	isPlayer(id: number) {
-		for (let index = 0; index < this.players.length; index++) {
-			const e = this.players[index];
-			if (e.id == id)
-				return (true);
-		}
-		return (false);
+	isPlayer(socketId: string) {
+		return (this.players.get(socketId));
 	}
 	getPlayersOnline() {
 		return (this.players);

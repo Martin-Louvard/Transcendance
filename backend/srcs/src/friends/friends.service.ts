@@ -9,9 +9,20 @@ export class FriendsService {
   constructor(private prisma: PrismaService, private chatChannelsService: ChatChannelsService) {}
 
   async create(createFriendDto: CreateFriendDto) {
+    if (createFriendDto.user_id == createFriendDto.friend_id)
+      throw new NotAcceptableException("You cant add yourself as friend");
     const friendshipExists = await this.friendshipExists(createFriendDto.user_id, createFriendDto.friend_id)
-    if(friendshipExists)
-      throw new NotAcceptableException("Friendship already exists!");
+    if(friendshipExists){
+      if (friendshipExists.status == "ACCEPTED")
+        throw new NotAcceptableException("Request already sent");
+      const updatedFriendship = await this.prisma.friends.update({
+        where: {id: friendshipExists.id}, 
+        data:{
+          status: "PENDING", 
+          sender_id: createFriendDto.sender_id
+        }})
+      return updatedFriendship
+    }
 
     const chat =  await this.chatChannelsService.create({ownerId: createFriendDto.user_id, participants:{connect:[{id: createFriendDto.user_id}, {id: createFriendDto.friend_id}]}})
     createFriendDto.chat_id = chat.id
@@ -20,11 +31,53 @@ export class FriendsService {
   }
 
   findAll() {
-    return `This action returns all friends`;
+    return this.prisma.friends.findMany();
   }
 
   async findOne(id: number) {
-    return this.prisma.friends.findUnique({where: {id}});
+    const unParsedFriendship = await this.prisma.friends.findUnique({
+      where: {id},
+      include:{
+        user: true,
+        friend: true
+      }
+    });
+    const {user, friend, ...friendship} = unParsedFriendship;
+    user.avatar =  "http://localhost:3001/users/avatar/" + user.username + "/" + user.avatar.split("/").reverse()[0]
+    friend.avatar =  "http://localhost:3001/users/avatar/" + friend.username + "/" + friend.avatar.split("/").reverse()[0]
+    const { password: userPassword, twoFASecret: userTwoFASecret, ...parsedUser } = user;
+    const { password: friendPassword, twoFASecret: friendTwoFASecret, ...parsedFriend } = friend;
+
+    return {...friendship, friend: parsedFriend, user: parsedUser };
+  }
+
+  async findWithFriend(id:number, userToIncludeId: number) {
+    const unParsedFriendship = await this.findOne(id);
+    const {user, friend, ...friendship} = unParsedFriendship;
+    const userToIncludeInFriendship = user.id === userToIncludeId ? user : friend;
+    return { ...friendship, friend: userToIncludeInFriendship };
+  }
+
+  async findAllFriendships(id: number) {
+    const friendships = await this.prisma.friends.findMany({
+      where: { 
+        OR : [
+              {user_id: id},
+              {friend_id: id}
+            ]
+          },
+        include:{
+          user:true,
+          friend: true
+        }})
+    return friendships.map(oldFriendship => {
+      const {user, friend, ...friendship} = oldFriendship;
+      user.avatar = "http://localhost:3001/users/avatar/" + user.username + "/" + user.avatar.split("/").reverse()[0]
+      friend.avatar = "http://localhost:3001/users/avatar/" + friend.username + "/" + friend.avatar.split("/").reverse()[0]
+      const { password: friendPassword, twoFASecret: friendTwoFASecret, ...parsedFriend } = friend;
+      const { password: userPassword, twoFASecret: userTwoFASecret, ...parsedUser } = user;
+      return { ...friendship, friend: parsedFriend, user: parsedUser };
+    });
   }
 
   update(id: number, updateFriendDto: UpdateFriendDto) {
@@ -63,9 +116,6 @@ export class FriendsService {
 
       },
     })
-    console.log(result)
-    if (result != null)
-      return true;
-    return false
+    return result
   }
 }

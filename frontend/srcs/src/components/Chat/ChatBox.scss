@@ -1,0 +1,60 @@
+.chat-boxes-wrapper {
+	display: flex;
+	flex-direction: column-reverse;
+	position: fixed;
+	max-width: 20vh;
+	max-height: 10px;
+	bottom: 20px;
+	padding-right: 50px;
+	padding-top: 90vh;
+	right: 30vh;
+	gap: 10px;
+}
+
+.chat-box {
+	background-color: rgba(96, 98, 112, 1);
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+	width: 250px;
+	transition: width 0.3s ease-in-out;
+
+	&.minimized {
+		min-height: 45px;
+		min-width: 50px;
+		overflow: hidden;
+	}
+
+	&.expanded {
+		width: 250px;
+	}
+
+	.chat-name-wrapper {
+		display: flex;
+		background-color: rgba(79, 81, 93, 1);
+		padding: 5px;
+		font-weight: bold;
+		padding-right: 10px;
+	}
+
+	.chat-name {
+		display:flex;
+		margin-left: 10px;
+		margin-top:4px;
+	}
+
+	.minimized-box-button {
+		display:flex;
+		background-color: inherit;
+		border: none;
+		cursor: pointer;
+		padding: 5px;
+		margin-left:45%;
+	}
+	.box-close-button {
+		display:flex;
+		width: 20px;
+		height: 20px;
+		margin-top:4px;
+	}
+}

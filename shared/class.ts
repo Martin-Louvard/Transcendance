@@ -1,7 +1,6 @@
-
 export enum LobbyMode {
-	duel = 0,
-	double = 1,
+	duel = 2,
+	double = 4,
 }
 
 export enum ServerEvents
@@ -23,6 +22,8 @@ export enum ClientEvents
   AuthState = 'client.auth.state',
 
   LobbyState = 'client.lobby.state',
+
+  InputState = 'client.input.state'
 }
 
 export type ServerPayloads = {
@@ -54,9 +55,7 @@ export type ClientPayloads = {
 		id: number,
 		token: string,
 	},
-	[ClientEvents.GameState]: {
-		test: number,
-	},
+	[ClientEvents.InputState]: InputPacket
 };
 
 export interface PlayerBody {
@@ -74,4 +73,24 @@ export interface GameData {
 	players: PlayerBody[],
 	mapWidth: number,
 	mapHeight: number,
+} // A changer avec une methode de compression
+
+export interface Input {
+	up: Boolean,
+	right: Boolean,
+	down: Boolean,
+	left: Boolean,
+	boost: Boolean,
+	rotRight: Boolean,
+	rotLeft: Boolean,
 }
+
+export interface InputPacketInterface {
+	code: number;
+	timestamp: number;
+} 
+
+export class InputPacket implements InputPacketInterface {
+	code: number;
+	timestamp: number;
+} // A changer avec une methode de compression

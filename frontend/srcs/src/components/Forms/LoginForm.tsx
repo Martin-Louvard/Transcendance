@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { socket } from '../../socket.ts';
-import { ClientPayloads, ClientEvents } from '../Game/Type.ts';
 import Form from './Form.js';
-import  login  from '../Authentication/login.js'
-import { setUser } from '../../redux/userReducer.js';
+import { login } from '../../api.ts';
 import { useAppDispatch } from '../../redux/hooks.js';
-import login2fa from '../Authentication/login2fa.js';
+import { login2fa } from '../../api.ts';
 import './Forms.scss'
 import toast from "react-hot-toast"
+import { setSessionUser, setToken, fetchRelatedUserData} from '../../redux/sessionSlice.ts';
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -28,21 +27,29 @@ const LoginForm: React.FC = () => {
     if(user)
     { 
       if (!user.twoFAEnabled){
+        dispatch(setSessionUser(user))
+        dispatch(setToken(user.access_token))
+        if (user.id)
+          dispatch(fetchRelatedUserData(user.id))
         toast.success("Logged in")
         dispatch(setUser({...user}))
-        const payloads: ClientPayloads[ClientEvents.AuthState] = {
-          id: user.id,
-          token: user.access_token,
-        }
-        socket.emit(ClientEvents.AuthState, payloads);
+        socket.auth = {token: user.access_token};
+        socket.disconnect().connect();
         return
       }
       const code = window.prompt("Enter your code from google authenticator", "000000");
-      const user2fa = await login2fa(code, user);
-      if (user2fa)
-      {
+      const user2fa = await login2fa(code, user, user.access_token);
+      if (user2fa  && user2fa.id) {
+        dispatch(setSessionUser(user2fa))
+        dispatch(setToken(user2fa.access_token))
+        if (user2fa.id)
+          dispatch(fetchRelatedUserData(user2fa.id))
         toast.success("Logged in")
-        dispatch(setUser({...user2fa}))
+      } else if (user2fa.message)
+          toast.error(user2fa.message)
+      const payloads: ClientPayloads[ClientEvents.AuthState] = {
+        id: user.id,
+        token: user.access_token,
       }
         const payloads: ClientPayloads[ClientEvents.AuthState] = {
           id: user.id,

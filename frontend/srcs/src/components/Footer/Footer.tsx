@@ -1,11 +1,7 @@
 import React from 'react';
 import Stack from './Stack';
 
-interface FooterProps {
-  // Define any props you need for the Footer
-}
-
-const Footer: React.FC<FooterProps> = () => {
+const Footer: React.FC = () => {
   return (
     <div>
       <Stack/>

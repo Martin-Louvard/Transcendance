@@ -1,18 +1,16 @@
 
 import { Server, Socket } from "socket.io";
-import { LobbyMode, LobbySlot, LobbySlotType, ServerEvents, ServerPayloads } from "../../Types";
+import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket } from '@shared/class';
 import { Player } from "../player/player.class";
 import { v4 as uuidv4, v4 } from 'uuid';
-import { Instance } from "../classes/instance.class";
+import { Instance } from "./instance.class";
 import { Injectable } from '@nestjs/common';
+import { LobbySlot } from "src/Types";
 
 @Injectable()
 export class Lobby {
 	constructor(mode: LobbyMode, private readonly server: Server) {
-		if (mode == LobbyMode.double)
-			this.mode = mode;
-		else
-			this.mode = mode;
+		this.mode = mode;
 		this.id = uuidv4();
 		this.instance = new Instance(this);
 		this.full = false;
@@ -33,7 +31,7 @@ export class Lobby {
 		}
 		this.players.set(player.socket, player);
 		this.nbPlayers++;
-		if (this.nbPlayers == (this.mode == LobbyMode.duel ? 2 : 4)) {
+		if (this.nbPlayers == this.mode) {
 			this.full = true;
 			this.instance.triggerStart();
 		}

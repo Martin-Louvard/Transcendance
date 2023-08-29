@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
-import { Lobby } from "../lobby/lobby.class";
-import { ClientEvents, ServerEvents } from "src/Types";
+import { Lobby } from "../classes/lobby.class";
+import { ClientEvents, ServerEvents } from "@shared/class";
 
 export class Player {
 	constructor(socket: Socket, id :number) {
@@ -10,7 +10,7 @@ export class Player {
 		this.lobby = null;
 		this.isOnline = true;
 	};
-
+	team: 'home' | 'visitor';
 	id: number;
 	socket: Socket | null;
 	lobby: Lobby | null;

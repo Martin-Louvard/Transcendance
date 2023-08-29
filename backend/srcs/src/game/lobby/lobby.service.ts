@@ -1,25 +1,33 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Lobby } from './lobby.class';
-import { LobbyMode } from '../../Types';
+import { Lobby } from '../classes/lobby.class';
+import { LobbyMode, InputPacket } from '@shared/class';
 import { Player } from '../player/player.class';
 import { Server } from 'socket.io';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
+import { PlayerService } from '../player/player.service';
 
 //@Injectable()
 export class LobbyService {
-	public constructor() {
+	public constructor(private readonly playerService: PlayerService) {
 	}
 
 
 	/* Lobby Handling */
 	private readonly logger = new Logger("LobbyService");
-	private lobbies: Array<Lobby> = new Array<Lobby>();
+	private lobbies: Map<string, Lobby> = new Map<string, Lobby>();
 	test: number = 3;
 
+	findLobbyById(id: string) {
+		this.lobbies.get(id);
+	}
+	sendToInstance<T extends InputPacket>(id:string, data: T, senderId: string) {
+		const lobby = this.lobbies.get(id);
+		lobby.instance.processGameData<T>(data, senderId);
+	}
 	addLobby(lobby: Lobby) {
 		if (lobby)
-			this.lobbies.push(lobby);
+			this.lobbies.set(lobby.id, lobby);
 	}
 	leaveLobby(player: Player) {
 		if (!player.lobby)
@@ -32,7 +40,6 @@ export class LobbyService {
 		return (true);
 	}
 	createLobby(mode: LobbyMode, server: Server, creator: Player) {
-		this.logger.log(this.lobbies.length);
 		try {
 			const lobby = new Lobby(mode, server);
 			if (!lobby)
@@ -40,10 +47,10 @@ export class LobbyService {
 			this.logger.log(`Lobby ${lobby.id} created`);
 			lobby.connectPlayer(creator);
 			this.logger.log(`creator ${creator.id} joined ${lobby.id}`);
-			this.lobbies.push(lobby);
+			this.lobbies.set(lobby.id, lobby);
 			lobby.dispatchLobbyState();
 		} catch (error) {
-			console.log(error);
+			return error
 		}
 	}
 	getPlayerLobby(player: Player): Lobby | null {
@@ -55,18 +62,15 @@ export class LobbyService {
 		});
 		return (null)
 	}
+	removeLobbyById(id: string) {
+		this.lobbies.delete(id);
+	}
 	removeLobby(lobby: Lobby) {
 		try {
-			const index = this.lobbies.indexOf(lobby);
-			if (index > -1) {
-				this.lobbies[index].players.forEach((player) => {
-					this.leaveLobby(player);
-				})
-				this.lobbies.splice(index, 1);
-				this.logger.log(`lobby ${lobby.id} removed`);
-			}
+			this.lobbies.delete(lobby.id)
+			this.logger.log(`lobby ${lobby.id} removed`);
 		} catch (error) {
-			console.log(error);
+			return error
 		}
 	}
 	autoFindLobby(player: Player, mode: LobbyMode, server: Server):boolean {
@@ -75,7 +79,7 @@ export class LobbyService {
 				return false;
 			let lobbyFinded: boolean = false;
 			this.lobbies.forEach(lobby => {
-				if ( lobby.nbPlayers < (lobby.mode == LobbyMode.duel ? 2 : 4) && mode == lobby.mode ) {
+				if ( lobby.nbPlayers < lobby.mode && mode == lobby.mode ) {
 					this.logger.log(`player ${player.id} joined ${lobby.id}`);
 					lobby.connectPlayer(player);
 					lobbyFinded = true;
@@ -87,19 +91,18 @@ export class LobbyService {
 			}
 			return true;
 		} catch (error) {
-			console.log(error);
+			return error
 		}
 	}
 
-	// TODO: Pour le moment on clear tout toues les 1 minutes, une fois le jeu codé il faudra
+	// TODO: Pour le moment on clear tout toues les 5 minutes, une fois le jeu codé il faudra
 	// TODO... clear que les games terminé toutes les 5 minutes
 	@Cron(CronExpression.EVERY_5_MINUTES,
 		{name: 'lobby_cleaner'})
 	clearLobbies() {
 		this.lobbies.forEach((lobby: Lobby) => {
-			this.logger.log(`${lobby.id} cleared`);
 			lobby.clear();
-			this.lobbies.pop();
+			this.lobbies.delete(lobby.id);
 		})
 		this.logger.log("Lobbies cleaned");
 	}

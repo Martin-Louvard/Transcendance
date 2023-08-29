@@ -7,7 +7,6 @@ $picture-size: 150px;
 $friend-picture-size: 50px;
 
 .profile-card-wrapper {
-  padding: $card-padding;
   background-color: $main-bg-color;
   display: flex;
   flex-direction: column;
@@ -16,6 +15,8 @@ $friend-picture-size: 50px;
   width: 100%;
   height: 110%;
   z-index: 1;
+  overflow: hidden;
+
   
   button {
     width: 90%;
@@ -68,7 +69,7 @@ $friend-picture-size: 50px;
 
   .user-info h6 {
     margin: 5px;
-    text-align: left;
+    text-align: center;
   }
 }
 
@@ -89,26 +90,16 @@ $friend-picture-size: 50px;
     overflow-y: auto;
     height: 100%;
   }
-
-  li {
-    background-color: $secondary-bg-color;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    padding: 10px;
-
-    h3,
-    p {
-      margin: 5px 0;
-    }
-  }
 }
 
 .friend-picture {
   width: $friend-picture-size;
   height: $friend-picture-size;
+  min-width: $friend-picture-size;
+  min-height: $friend-picture-size;
   border-radius: 50%;
   overflow: hidden;
-
+  position: relative;
   img {
     width: 100%;
     height: 100%;
@@ -119,12 +110,45 @@ $friend-picture-size: 50px;
 .friend-list {
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
 
-  .friend-item {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    cursor: pointer;
+.friend-item {
+  background-color: $secondary-bg-color;
+  display: flex;
+  flex-direction: row;
+  justify-content:space-between;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+
+  h3,
+  p {
+    margin: 5px 0;
   }
+
+
+  .accept-deny{
+    button{
+      padding: 5px;
+      background: none;
+    }
+  }
+
+  }
+}
+
+.picture-indicator{
+  position: relative;
+}
+
+div .status-indicator {
+  display: inline-block;
+  position: absolute ;
+  right: 2px;
+  bottom: 2px;
+  z-index: 20;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }

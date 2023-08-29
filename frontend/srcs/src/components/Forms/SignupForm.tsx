@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import Form from './Form';
-import login from '../Authentication/login';
-import { setUser } from '../../redux/userReducer';
 import { useAppDispatch } from '../../redux/hooks';
 import './Forms.scss'
-import { ClientEvents, ClientPayloads } from '../Game/Type';
 import { socket } from '../../socket';
 import toast from "react-hot-toast"
+import { setSessionUser, setToken } from '../../redux/sessionSlice';
+import { login } from '../../api';
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -28,18 +27,16 @@ const SignupForm: React.FC = () => {
     };
 
     try{
-      await fetch('http://localhost:3001/users', requestOptions)
-      .then(response => {if (response.status !== 201) return toast.error("Signup failed")})
+      const response = await fetch('http://localhost:3001/users', requestOptions)
+      if (response.status !== 201) 
+        return toast.error("Username or email is already used by someone else")
       const user = await login(username,password)
       if (!user)
         return toast.error("Account created but signin failed")
       toast.success("Logged in")
       dispatch(setUser({...user}))
-      const payloads: ClientPayloads[ClientEvents.AuthState] = {
-        id: user.id,
-        token: user.access_token,
-      }
-      socket.emit(ClientEvents.AuthState, payloads);
+      socket.auth = {token: user.access_token};
+      socket.disconnect().connect();
     }catch(err) {
       console.log(err);
     }

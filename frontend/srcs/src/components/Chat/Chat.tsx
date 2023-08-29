@@ -1,36 +1,33 @@
-import React, { useEffect, useState } from "react";
-import io, { Socket } from "socket.io-client";
+import React from "react";
 import './Chat.scss'
 import Messages from "../Messages/Messages";
 import MessageInput from "../Messages/MessageInput";
-import { useAppSelector } from "../../redux/hooks";
-const Chat = (chat) => {
-  const user = useAppSelector((state)=>state.user)
-  const [socket, setSocket] = useState<Socket>()
-  const [messages, setMessages] = useState(chat.messages);
-  
-  useEffect(()=>{
-    const newSocket=io("http://localhost:3001/");
-    setSocket(newSocket)
-  },[setSocket])
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+
+interface ChatProps {
+  chatId: number;
+}
+
+const Chat: React.FC<ChatProps> = ({ chatId }) => {
+  const user = useAppSelector((state) => state.session.user);
+  const chat = useAppSelector((state) =>
+    state.session.JoinedChatChannels?.find(c => c.id === chatId)
+  );
+  const dispatch = useAppDispatch();
 
   const handleSendMessage = (value: string) => {
-    socket?.emit("message", [chat.id, user.id ,value])
+    if (chat && user) {
+      dispatch({
+        type: 'WEBSOCKET_SEND_MESSAGE',
+        payload: [chat.id, user.id, value]
+      });
+    }
   };
-
-  const messageListener = (message:string) =>{
-    setMessages([...messages, message])
-  }
-
-  useEffect(()=>{
-    socket?.on("message", messageListener)
-    return () => {socket?.off("message", messageListener)}
-  },[messageListener])
 
   return (
     <div className="chat-container">
-      <Messages messages={messages}/>
-      <MessageInput handleSendMessage={handleSendMessage}/>
+      <Messages messages={chat?.messages || []} />
+      <MessageInput handleSendMessage={handleSendMessage} />
     </div>
   );
 };

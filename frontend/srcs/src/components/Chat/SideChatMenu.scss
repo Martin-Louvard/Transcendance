@@ -1,0 +1,102 @@
+$chat-menu-width: 20vh;
+$chat-menu-min-width: 20vh;
+$chat-menu-bg-color: #312f2f;
+$chat-exit-button-height: 5%;
+$chat-exit-button-radius: 20px;
+$chat-menu-icon-right: 20vh;
+$chat-menu-animation-range: 11vw;
+$chat-menu-icon-open: 20vh;
+
+.chat-menu-wrapper {
+  width: $chat-menu-width;
+  min-width: $chat-menu-min-width;
+  background-color: $chat-menu-bg-color;
+  position: fixed;
+  right:0;
+  height: 100%;  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 111;
+}
+
+.inner-chat-menu-wrapper {
+	padding: 10px;
+	padding-top: 20px;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	justify-content: space-evenly;
+	width: 90%;
+	right: 0;
+}
+
+.chat-exit-button {
+  height: $chat-exit-button-height;
+  width: auto;
+  border-radius: $chat-exit-button-radius;
+  position: absolute;
+  cursor: pointer;
+  right: 10px;
+  z-index: 10;
+}
+
+.chat-menu-icon {
+  position: absolute;
+  cursor: pointer;
+  right: $chat-menu-icon-right;
+  z-index: 10;
+}
+
+.close-chat-menu {
+  right: -$chat-menu-animation-range;
+}
+
+.open-chat-menu {
+  right: 0;
+}
+
+.chat-menu-transition-close {
+  animation: 100ms slide_chat_menu_right ease-in-out;
+  transition: opacity 0.3s ease;
+  background-color: inherit;
+}
+
+.chat-menu-transition-open {
+  animation: 100ms slide_chat_menu_left ease-in-out;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes slide_chat_menu_right {
+  @for $i from 0 through 11 {
+    $percentage: $i * 10;
+    #{$percentage + '%'} {
+      right: ($i * -0.5)vw;
+    }
+  }
+}
+
+@keyframes slide_chat_menu_left {
+  @for $i from 0 through 11 {
+    $percentage: $i * 10;
+    #{$percentage + '%'} {
+      right: ($chat-menu-animation-range - $i * 0.5)vw;
+    }
+  }
+}
+
+.chat-item {
+  padding: 10px 0;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background-color 0.2s;
+}
+
+.chat-item:hover {
+  background-color: #e0e0e0;
+}
+
+.chat-item-active {
+  background-color: #c0c0c0;
+  font-weight: bold;
+}
