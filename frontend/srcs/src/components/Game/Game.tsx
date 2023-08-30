@@ -10,6 +10,7 @@ import verify from "../Authentication/verify";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../redux/hooks";
 import { emitInput } from "./emitInput";
+import * as CANNON from 'cannon-es'
 
 
 export const Ball: React.FC = (props) => {
@@ -17,11 +18,12 @@ export const Ball: React.FC = (props) => {
 
 	useFrame(() => {
 		ballRef.current.position.set(props.position[0], props.position[1], props.position[2]);
+		ballRef.current.quaternion.copy(props.quaternion);
 	  }, [])
 	return (
-		<mesh position={[0, 0, 0]} ref={ballRef}>
+		<mesh position={[0, 0, 0]} ref={ballRef} color={"#FF79CA"}>
 			<sphereGeometry args={props.args} />
-			<meshBasicMaterial />
+			<meshBasicMaterial color="#FF79CA" side={DoubleSide}/>
 	  </mesh>
 	)
 }
@@ -44,14 +46,16 @@ const Wall: React.FC<WallProps> = ({ size, position }) => {
 interface PaddleProps {
     size: [number, number, number]; // Largeur, hauteur, profondeur
     position: [number, number, number]; // x, y, z
+	quaternion: CANNON.Quaternion,
+	team: 'visitor' | 'home' | null,
 }
 
-const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion }) => {
+const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player, key }) => {
     const paddleRef = useRef<Mesh>(null)!;
 
     useFrame(() => {
 		//console.log(quaternion);
-		paddleRef.current?.quaternion.copy(quaternion)
+		paddleRef.current?.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
 		paddleRef.current?.position.set(position[0], position[1], position[2]);
 		// mise a jour en temps reel si necessaire.
 		// TODO: Peut etre prevoir les directions pour eviter les latences reseaux ???
@@ -63,8 +67,8 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion }) => {
 				ref={paddleRef}
 				args={size}
 				position={[0, 0, 0]}>
-				<meshPhongMaterial color="blue" />
-        </Box>
+							<meshPhongMaterial color={player.team ? (player.team == 'visitor' ? "#3AFFDE" : "#FF0000") : "#45FF40" } />
+        	</Box>
 		</mesh>
     ); // // TODO: Ajuste le material en fonction des données  recu. TODO: REcuperer le material en fonction des parametres de skin du player BCP plus tard. TODO... faudra les recuperer dans la db coté back.
 };
@@ -89,7 +93,7 @@ export const Game: React.FC = () => {
 	const [balls, setBalls] = useState(null);
 	const [players, setPlayers] = useState(null);
 	const [me, setMe] = useState(null);
-	const [KeyboardInput] = useKeyboardInput();
+	const [KeyboardInput, prevInput] = useKeyboardInput();
 	const player = usePlayerStore();
 	const navigate = useNavigate();
 	const user = useAppSelector((state) => state.session.user);
@@ -111,10 +115,10 @@ export const Game: React.FC = () => {
 			//console.log(data.gameData.players[0].position);
 			//console.log(data.gameData.players[1].position);
 			setBalls(data.gameData.balls.map((ball, index) =>
-			<Ball key={index} args={[ball.size, 32, 16]} position={ball.position}/>
+				<Ball key={index} args={[ball.size, 32, 16]} position={ball.position} quaternion={ball.quaternion}/>
 			))
 			setPlayers(data.gameData.players.map((player, index) =>
-			<Paddle key={index} size={player.size} position={player.position} quaternion={player.quaternion}/>
+				<Paddle key={index} size={player.size} position={player.position} quaternion={player.quaternion} player={player}/>
 			))
 			data.gameData.players.map((e) => {
 				if (user && e.id == user.id) {
@@ -126,7 +130,7 @@ export const Game: React.FC = () => {
 
 	useEffect(() => {
 		if (user)
-			emitInput(KeyboardInput, user.id);
+			emitInput(KeyboardInput, prevInput, user.id);
 		//player.setInput(KeyboardInput);
 	}, [KeyboardInput])
 
@@ -161,7 +165,7 @@ export const Game: React.FC = () => {
 					{/*<PerspectiveCamera position={[-me.position[0], -20, -me.position[2] - 30]} rotation-y={me.quaternion.y} >*/}
 					<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[data.gameData.mapHeight, data.gameData.mapWidth, 1]}>
 						<planeGeometry />
-						<meshBasicMaterial color="green" side={DoubleSide}/>
+						<meshBasicMaterial color="#2E2E2E" side={DoubleSide}/>
 					</mesh>
 					{balls}
 					{players}

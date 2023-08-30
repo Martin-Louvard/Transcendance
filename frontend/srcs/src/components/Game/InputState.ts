@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { usePlayerStore } from "./PlayerStore"
-import { Input } from '@shared/class';
+import { Input, ClientEvents, InputPacket } from '@shared/class';
+import { socket } from '../../socket';
+import { useAppSelector } from "../../redux/hooks";
 
 export const useKeyboardInput = () => {
 	const [input, setInput] = useState<Input>({
@@ -12,6 +14,7 @@ export const useKeyboardInput = () => {
 		rotRight: false,
 		rotLeft: false,
 	});
+	const prevInput = input;
   
 	const handleKeyDown = (event) => {
 		const key = event.keyCode == 32 ? 'space' : event.key.toLowerCase();
@@ -105,5 +108,5 @@ export const useKeyboardInput = () => {
 		};
 	}, []);
   
-	return [input];
+	return [input, prevInput];
   };

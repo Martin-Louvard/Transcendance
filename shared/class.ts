@@ -70,6 +70,7 @@ export interface PlayerBody {
 
 export interface Ball {
 	position: [number, number, number],
+	quaternion: CANNON.Quaternion
 	size: number,
 }
 
@@ -99,6 +100,7 @@ export interface InputPacketInterface {
 
 export class InputPacket implements InputPacketInterface {
 	code: number;
+	pressed: boolean;
 	timestamp: number;
 	id: number;
 } // A changer avec une methode de compression

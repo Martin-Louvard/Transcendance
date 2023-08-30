@@ -100,10 +100,12 @@ export class LobbyService {
 	@Cron(CronExpression.EVERY_5_MINUTES,
 		{name: 'lobby_cleaner'})
 	clearLobbies() {
-		//this.lobbies.forEach((lobby: Lobby) => {
-		//	lobby.clear();
-		//	this.lobbies.delete(lobby.id);
-		//})
+		this.lobbies.forEach((lobby: Lobby) => {
+			if (lobby.instance.hasFinished) {
+				lobby.clear();
+				this.lobbies.delete(lobby.id);
+			}
+		})
 		this.logger.log("Lobbies cleaned");
 	}
 }
