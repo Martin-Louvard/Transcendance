@@ -12,13 +12,14 @@ import { useAppSelector } from "../../redux/hooks";
 import { emitInput } from "./emitInput";
 
 
-export const Sphere: React.FC = (props) => {
-	const meshRef = useRef<Mesh>(null!)
+export const Ball: React.FC = (props) => {
+	const ballRef = useRef<Mesh>(null!)
 
-	useEffect(() => {
+	useFrame(() => {
+		ballRef.current.position.set(props.position[0], props.position[1], props.position[2]);
 	  }, [])
 	return (
-		<mesh position={props.position} ref={meshRef}>
+		<mesh position={[0, 0, 0]} ref={ballRef}>
 			<sphereGeometry args={props.args} />
 			<meshBasicMaterial />
 	  </mesh>
@@ -36,6 +37,7 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion }) => {
     useFrame(() => {
 		//console.log(quaternion);
 		paddleRef.current?.quaternion.copy(quaternion)
+		paddleRef.current?.position.set(position[0], position[1], position[2]);
 		// mise a jour en temps reel si necessaire.
 		// TODO: Peut etre prevoir les directions pour eviter les latences reseaux ???
     });
@@ -45,7 +47,7 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion }) => {
 			<Box
 				ref={paddleRef}
 				args={size}
-				position={position}>
+				position={[0, 0, 0]}>
 				<meshPhongMaterial color="blue" />
         </Box>
 		</mesh>
@@ -90,7 +92,7 @@ export const Game: React.FC = () => {
 			//console.log(data.gameData.players[0].position);
 			//console.log(data.gameData.players[1].position);
 			setBalls(data.gameData.balls.map((ball, index) =>
-			<Sphere key={index} args={[ball.size, 32, 16]} position={ball.position}/>
+			<Ball key={index} args={[ball.size, 32, 16]} position={ball.position}/>
 			))
 			setPlayers(data.gameData.players.map((player, index) =>
 			<Paddle key={index} size={player.size} position={player.position} quaternion={player.quaternion}/>

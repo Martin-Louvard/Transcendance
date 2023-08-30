@@ -7,6 +7,7 @@ import { Player } from "../player/player.class";
 interface Sphere {
 	radius: number;
 	body: CANNON.Body | null;
+	contactVelocity: CANNON.Vec3;
 }
 
 interface Paddle {
@@ -42,8 +43,7 @@ export class Instance {
 	scores: {home: number, visitor: number}= {home: 0, visitor: 0}; // A recuperer dans l'instance
 	private startTriggered: boolean = false; // Permet de savoir si le Start a deja été trigger pour annuler un start si
 	private moveDistance: number = 20; // this could be sended by the host of the game in the game parameter
-	private linearLocalVelocity = new CANNON.Vec3();
-	private lateralLocalVelocity = new CANNON.Vec3();
+	private ballContactVelocity: CANNON.Vec3;
 	accelerationRate = 50;
 	maxAcceleration = 5000;
 
@@ -79,11 +79,10 @@ export class Instance {
 				return undefined; //player dont exist error
 			switch (input.code) {
 				case 0: // move up
-					directionVector.set(0, 0, this.moveDistance);
+					directionVector.set(0, 0, -this.moveDistance);
 					paddle.body.quaternion.vmult(directionVector, worldVelocity);
 					paddle.body.velocity.x = worldVelocity.x;
 					paddle.body.velocity.z = worldVelocity.z;
-					console.log("caca");
 					break ;
 				case 1: // move right
 					directionVector.set( this.moveDistance, 0,0);
@@ -92,7 +91,7 @@ export class Instance {
 					paddle.body.velocity.z = worldVelocity.z;
 					break ;
 				case 2: // move down
-					directionVector.set(0, 0, -this.moveDistance);
+					directionVector.set(0, 0, this.moveDistance);
 					paddle.body.quaternion.vmult(directionVector, worldVelocity);
 					paddle.body.velocity.x = worldVelocity.x;
 					paddle.body.velocity.z = worldVelocity.z;
@@ -145,10 +144,42 @@ export class Instance {
 		this.hasFinished = true;
 	}
 
+	ballPhysics() {
+		this.world.balls.forEach((e) => {
+			e.body.velocity.y = 0;
+			e.body.position.y = 5;
+			e.body.velocity.vadd(e.contactVelocity, e.body.velocity);
+		})
+	}
+
 	collision(event) {
 		const contact = event.contact;
+		//const body = event.body;
+		const body: Paddle = null;
 
-		//console.log(contact);
+		//console.log(this.world.players);
+		this.world.players.forEach((pl) => {
+			if (pl.body.id == contact.bj.id) {
+				this.world.balls.forEach((bl) => {
+					if (bl.body.id == contact.bi.id) {
+						//console.log(`contact rh = ${contact.rj}`)
+						console.log(`contact bj with player ${pl.player.id} and ball ${bl.body.id} `);
+						const impactDirection: CANNON.Vec3 = contact.ri.clone();
+						const mulVec = new CANNON.Vec3(-0.1, 0, -0.1);
+						console.log(`impact direction = ${impactDirection.vmul(mulVec)} `);
+						bl.contactVelocity = impactDirection.vmul(mulVec, bl.contactVelocity);
+						bl.body.velocity.copy(bl.contactVelocity);
+						//const combinedDirection = contact.ni.clone().vadd(impactDirection).normalize();
+						//console.log(`new direction of ball : ${combinedDirection}`);
+					}
+				})
+			}
+		})
+		//if (contact.bj)
+		//if (body.id == 1) {
+		//	console.log(contact.bi.position + );
+		//	console.log('collision with ball')
+		//}
 	}
 
 	generate() {
@@ -170,8 +201,9 @@ export class Instance {
 				mass: 5,
 				shape: new CANNON.Sphere(radius),
 			}),
+			contactVelocity: new CANNON.Vec3(0, 0, 0),
 		};
-		sphere.body.position.set(0, 10, 0)
+		sphere.body.position.set(0, 5, 0)
 		this.world.world.addBody(sphere.body);
 		this.world.balls = new Array<Sphere>();
 		this.world.balls.push(sphere);
@@ -207,7 +239,7 @@ export class Instance {
 			this.world.world.addBody(paddle.body);
 			this.world.world.addContactMaterial(groundPlayerContactMaterial);
 			this.world.players.set(elem.id, paddle);
-			paddle.body.addEventListener('collide', this.collision);
+			paddle.body.addEventListener('collide', this.collision.bind(this));
 			this.data.players.push({position: [paddle.body.position.x, paddle.body.position.y, paddle.body.position.z], size: paddleSize, id: elem.id, quaternion: paddle.body.quaternion, team: elem.team});
 			elem.team = i % 2 ? 'home' : 'visitor';
 			console.log(elem.team);
@@ -252,6 +284,7 @@ export class Instance {
 			this.world.players.forEach((e) => {
 				e.body.velocity.y = 0;
 			})
+			this.ballPhysics();
 			this.dispatchGameState();
 		}, 1000/ 60);
 	  }
