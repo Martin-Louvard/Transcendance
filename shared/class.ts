@@ -78,6 +78,8 @@ export interface GameData {
 	players: PlayerBody[],
 	mapWidth: number,
 	mapHeight: number,
+	score: {home: number, visitor: number},
+	elapsedTime: number,
 } // A changer avec une methode de compression
 
 export interface Input {

@@ -26,6 +26,21 @@ export const Ball: React.FC = (props) => {
 	)
 }
 
+interface WallProps {
+    size: [number, number, number]; 
+    position: [number, number, number]; 
+}
+
+const Wall: React.FC<WallProps> = ({ size, position }) => {
+    return (
+        <mesh>
+            <Box args={size} position={position} >
+                <meshPhongMaterial color="black" />
+            </Box>
+        </mesh>
+    );
+};
+
 interface PaddleProps {
     size: [number, number, number]; // Largeur, hauteur, profondeur
     position: [number, number, number]; // x, y, z
@@ -60,8 +75,12 @@ const Camera: React.FC = (props) => {
 
 	if (player.team == 'visitor')
 		cameraOffset.z *= -1;
-	useThree(({camera}) => {
+
+	const { camera } = useThree();
+
+	useFrame(() => {
 		camera.position.set(player.position[0], player.position[1], player.position[2]).add(cameraOffset);
+		camera.lookAt(player.position[0], player.position[1], player.position[2]);
 	})
 }
 
@@ -99,7 +118,6 @@ export const Game: React.FC = () => {
 			))
 			data.gameData.players.map((e) => {
 				if (user && e.id == user.id) {
-					//console.log(`id : ${e.id} posiiton == ${e.position}`);
 					setMe(e);
 				}
 			})
@@ -115,14 +133,31 @@ export const Game: React.FC = () => {
 	//useThree(({ camera }) => {
 	//	camera.position.set(me[0], me[1], me[2]);
 	//})
-
+    function formatElapsedTime(elapsedTime: number) {
+        const minutes = Math.floor(Math.round(elapsedTime) / 60);
+        const seconds = Math.floor(Math.round(elapsedTime) % 60);
+        return `${minutes} : ${seconds < 10 ? '0' : ''}${seconds}`;
+    }
 	return (
 		data ?
+		<>
+		<div id='score'>
+			{data.gameData.score.home}
+			-
+			{data.gameData.score.visitor}
+		</div>
+		<div id='time'>
+			{formatElapsedTime(data.gameData.elapsedTime)}
+		</div>
 			<Canvas camera={{fov:75, position:[10, 10, 10]}}>
 				<TrackballControls noPan noZoom/>
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
 					<Camera player={me}/>
+					<Wall size={[data.gameData.mapHeight, 10, 2]} position={[0, 5, data.gameData.mapWidth / 2]} />
+					<Wall size={[data.gameData.mapHeight, 10, 2]} position={[0, 5, -data.gameData.mapWidth / 2]}/>
+					<Wall size={[2, 10, data.gameData.mapWidth]} position={[data.gameData.mapHeight / 2, 5, 0]} />
+					<Wall size={[2, 10, data.gameData.mapWidth]} position={[-data.gameData.mapHeight / 2, 5, 0]} />
 					{/*<PerspectiveCamera position={[-me.position[0], -20, -me.position[2] - 30]} rotation-y={me.quaternion.y} >*/}
 					<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[data.gameData.mapHeight, data.gameData.mapWidth, 1]}>
 						<planeGeometry />
@@ -130,8 +165,8 @@ export const Game: React.FC = () => {
 					</mesh>
 					{balls}
 					{players}
-				{/*</PerspectiveCamera>*/}
 			</Canvas>
+		</>
 		: 
 			<p>PAS DE JEU</p>
 	);
