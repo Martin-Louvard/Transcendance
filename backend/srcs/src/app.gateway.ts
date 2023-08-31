@@ -106,6 +106,18 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('message', message);
   }
 
+  @SubscribeMessage('read')
+  async handleUpdateMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const updatedMessage = await this.prisma.chatMessage.update({
+      where: { id: body[0] },
+      data: { readersId: { push: parseInt(body[3]) } },
+    });
+    this.server.emit('read', updatedMessage);
+  }
+
   @SubscribeMessage('create_chat')
   async handleCreateChat(
     @ConnectedSocket() client: Socket,
@@ -138,7 +150,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
         owner: true,
         admins: true,
         messages: true,
-        participants: true
+        participants: true,
       },
     });
     this.server.emit('create_chat', chatChannel);
@@ -198,21 +210,17 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       friendship = await this.friendService.findOne(update.id);
       const chat = await this.prisma.chatChannel.findUnique({
         where: { id: friendship.chat_id },
-        include: { friendship: true, messages: true, participants: true},
+        include: { friendship: true, messages: true, participants: true },
       });
       const friend_socket = this.connected_clients.get(friend_id);
       client.emit('friend_request', friendship);
-      if (body[2] === "ACCEPTED")
-      client.emit('create_chat', chat)
-      else
-      client.emit('update_chat', chat)
+      if (body[2] === 'ACCEPTED') client.emit('create_chat', chat);
+      else client.emit('update_chat', chat);
 
       if (friend_socket) {
         friend_socket.emit('friend_request', friendship);
-        if (body[2] === "ACCEPTED")
-        friend_socket.emit('create_chat', chat);
-        else
-        friend_socket.emit('update_chat', chat);
+        if (body[2] === 'ACCEPTED') friend_socket.emit('create_chat', chat);
+        else friend_socket.emit('update_chat', chat);
       }
     }
   }
