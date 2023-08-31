@@ -44,7 +44,7 @@ export class Instance {
 	lobby: Lobby;
 	private static nbInstances: number = 0;
 	public readonly id: number = 0;
-	private interval;
+	private interval = new Array();
 	private maxPlayer: number;
 	hasStarted: boolean = false; // A recuperer dans l'instance
 	hasFinished: boolean = false; // A recuperer dans l'instance
@@ -428,7 +428,9 @@ export class Instance {
 		delete this.world.players;
 		delete this.world.groundBody;
 		delete this.world;
-		clearInterval(this.interval);
+		this.interval.forEach((e) => {
+			clearInterval(e);
+		})
 	}
 
 	dispatchGameState() {
@@ -453,7 +455,7 @@ export class Instance {
 
 	animate() {
 		//requestAnimationFrame(this.animate)
-		this.interval = setInterval(() => {
+		this.interval.push(setInterval(() => {
 			this.world.world.step(1/120);
 			this.world.players.forEach((e) => {
 				e.body.position.y = e.size[1] / 2;
@@ -462,15 +464,15 @@ export class Instance {
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
 			if (this.data.elapsedTime > 180)
 			this.triggerFinish();
-	}, 1000/ 120);
+	}, 1000/ 120));
 }
 
 sendData() {
-	setInterval(() => {
+	this.interval.push(setInterval(() => {
 		this.processInput();
 		this.copyData();
 		this.dispatchGameState();
-		}, 1000 / 60)
+		}, 1000 / 60));
 	}
 
 	gameLogic() {

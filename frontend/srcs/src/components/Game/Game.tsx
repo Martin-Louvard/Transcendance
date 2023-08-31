@@ -1,17 +1,21 @@
 import { Box, PerspectiveCamera, TrackballControls } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, forwardRef, useState, useMemo } from "react";
 import { socket } from "../../socket";
 import { ServerEvents, ServerPayloads, ClientEvents, ClientPayloads, Input, InputPacket, Player} from '@shared/class';
+import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import { DoubleSide, Mesh, PlaneGeometry, SphereGeometry, Vector3 } from "three";
+import * as THREE from 'three'
 import { useKeyboardInput } from "./InputState";
 import { PlayerState, usePlayerStore } from "./PlayerStore";
 import verify from "../Authentication/verify";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../redux/hooks";
 import { emitInput } from "./emitInput";
-import * as CANNON from 'cannon-es'
-
+import * as CANNON from 'cannon-es';
+import { useControls } from 'leva'
+import {HorizontalBlurEffect} from './effects/HorizontalBlur'
+import {BadTVEffect} from './effects/BadTV'
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
@@ -37,7 +41,7 @@ const Wall: React.FC<WallProps> = ({ size, position }) => {
     return (
         <mesh>
             <Box args={size} position={position} >
-                <meshPhongMaterial color="black" />
+                <meshPhongMaterial color="#3f3f3f" />
             </Box>
         </mesh>
     );
@@ -86,6 +90,43 @@ const Camera: React.FC = (props) => {
 		camera.position.set(player.position[0], player.position[1], player.position[2]).add(cameraOffset);
 		camera.lookAt(player.position[0], player.position[1], player.position[2]);
 	})
+}
+
+function Effects() {
+	// const strength = useControls("Horizontal Blur", {
+	//   strength: { value: 0.1, min: 0, max: 1 }
+	// })
+  
+	const HorizontalBlur = forwardRef(({ strength = 0 }, ref) => {
+	  const effect = useMemo(() => new HorizontalBlurEffect({ strength }), [strength])
+	  return <primitive ref={ref} object={effect} dispose={null} />
+	})
+  
+	const { distortion, distortion2, speed, rollSpeed } = useControls('BadTV', {
+	  distortion: { value: 0.0, min: 0, max: 50.0 },
+	  distortion2: { value: 1.0, min: 0, max: 50.0 },
+	  speed: { value: 0.05, min: 0, max: 5.0 },
+	  rollSpeed: { value: 0, min: 0, max: 5.0 }
+	})
+  
+	const BadTV = forwardRef(({ distortion = 3.0, distortion2 = 5.0, speed = 0.2, rollSpeed = 0.1 }, ref) => {
+	  const effect = useMemo(() => new BadTVEffect({ distortion, distortion2, speed, rollSpeed }), [
+		distortion,
+		distortion2,
+		speed,
+		rollSpeed
+	  ])
+	  return <primitive ref={ref} object={effect} dispose={null} />
+	})
+  
+	return (
+	  <EffectComposer>
+		<Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
+		<Noise opacity={0.02} />
+		<BadTV distortion={distortion} distortion2={distortion2} speed={speed} rollSpeed={rollSpeed} />
+		{/* <HorizontalBlur strength={strength} /> */}
+	  </EffectComposer>
+	)
 }
 
 export const Game: React.FC = () => {
@@ -145,15 +186,8 @@ export const Game: React.FC = () => {
 	return (
 		data ?
 		<>
-		<div id='score'>
-			{data.gameData.score.home}
-			-
-			{data.gameData.score.visitor}
-		</div>
-		<div id='time'>
-			{formatElapsedTime(data.gameData.elapsedTime)}
-		</div>
-			<Canvas camera={{fov:75, position:[10, 10, 10]}}>
+
+			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#cfcfcf" }}>
 				<TrackballControls noPan noZoom/>
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
@@ -163,13 +197,24 @@ export const Game: React.FC = () => {
 					<Wall size={[2, 10, data.gameData.mapWidth]} position={[data.gameData.mapHeight / 2, 5, 0]} />
 					<Wall size={[2, 10, data.gameData.mapWidth]} position={[-data.gameData.mapHeight / 2, 5, 0]} />
 					{/*<PerspectiveCamera position={[-me.position[0], -20, -me.position[2] - 30]} rotation-y={me.quaternion.y} >*/}
-					<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[data.gameData.mapHeight, data.gameData.mapWidth, 1]}>
+					<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[data.gameData.mapHeight, data.gameData.mapWidth, 1]} castShadow>
 						<planeGeometry />
 						<meshBasicMaterial color="#2E2E2E" side={DoubleSide}/>
 					</mesh>
 					{balls}
 					{players}
+					<Effects/>
 			</Canvas>
+			<div id="info" style={{position:"absolute", top:"100px", left: "20px", color:"white"}}>
+				<div id='score'>
+					{data.gameData.score.home}
+					-
+					{data.gameData.score.visitor}
+				</div>
+				<div id='time'>
+					{formatElapsedTime(data.gameData.elapsedTime)}
+				</div>
+			</div>
 		</>
 		: 
 			<p>PAS DE JEU</p>
