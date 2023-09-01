@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { User, ChatChannels, Friendships, Friend, Message } from "../Types";
 import { fetchRelatedUserData } from "./sessionThunks";
+import { initNotifications } from './sessionFunctions';
 
 // Define a type for the slice state
 export interface sessionState {
@@ -321,9 +322,9 @@ export const sessionSlice = createSlice({
       state.error = undefined;
       state.friends = action.payload.friends;
       state.friendships = action.payload.friendships;
-      state.JoinedChatChannels = action.payload.JoinedChatChannels?.filter(
+      state.JoinedChatChannels = initNotifications(action.payload.JoinedChatChannels?.filter(
         (c) => !c.friendship || c.friendship.status === "ACCEPTED",
-      );
+      ), state.user?.id);
       state.OwnedChatChannels = action.payload.OwnedChatChannels;
       state.BannedFromChatChannels = action.payload.BannedFromChatChannels;
     });
