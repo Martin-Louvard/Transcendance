@@ -22,6 +22,9 @@ interface Paddle {
 		right: boolean,
 		down: boolean,
 		left: boolean,
+		boost: boolean,
+		rotRight: boolean,
+		rotLeft: boolean,
 	};	
 }
 
@@ -84,10 +87,6 @@ export class Instance {
 		if (this.isInstanceOfInputPacket(data)) {
 			const paddle = this.world.players.get(data.id);
 			const input: InputPacket = data;
-			let rotationQuaternion = new CANNON.Quaternion();
-			let axisY =  new CANNON.Vec3( 0, 1, 0 );
-			let rotateAngle;
-			let accelerationForce = new CANNON.Vec3();
 
 			if (!paddle)
 				return undefined; //player dont exist error
@@ -117,18 +116,22 @@ export class Instance {
 						paddle.activeDirections.left = false;
 					break ;
 				case 4: // boost
+					if (data.pressed)
+						paddle.activeDirections.boost = true;
+					else
+						paddle.activeDirections.boost = false;
 					break ;
 				case 5: // rotate right
-					rotateAngle = Math.PI / 2 * (1 / 12);
-					rotationQuaternion.setFromAxisAngle(axisY, -rotateAngle);
-					paddle.body.quaternion = rotationQuaternion.mult(paddle.body.quaternion);
-					console.log("right");
+					if (data.pressed)
+						paddle.activeDirections.rotRight = true;
+					else
+						paddle.activeDirections.rotRight = false;
 					break ;
 				case 6: // rotate left
-					rotateAngle = Math.PI / 2 * (1 / 12);
-					rotationQuaternion.setFromAxisAngle(axisY, rotateAngle);
-					paddle.body.quaternion = rotationQuaternion.mult(paddle.body.quaternion);
-					console.log("left");
+					if (data.pressed)
+						paddle.activeDirections.rotLeft = true;
+					else
+						paddle.activeDirections.rotLeft = false;
 					break ;
 				default:
 					break;
@@ -161,6 +164,9 @@ export class Instance {
 	processInput() {
 		let directionVector = new CANNON.Vec3();
 		let worldVelocity: CANNON.Vec3 = new CANNON.Vec3();
+		let rotationQuaternion = new CANNON.Quaternion();
+		let axisY =  new CANNON.Vec3( 0, 1, 0 );
+		let rotateAngle;
 		
 		this.world.players.forEach((e) => {
 			if (e.activeDirections.up) {
@@ -175,7 +181,20 @@ export class Instance {
 			else if (e.activeDirections.right) {
 				directionVector.x = this.moveDistance;
 			}
-				
+			if (e.activeDirections.rotLeft) {
+				rotateAngle = Math.PI / 2 * (1 / 12);
+				rotationQuaternion.setFromAxisAngle(axisY, rotateAngle);
+				e.body.quaternion = rotationQuaternion.mult(e.body.quaternion);
+				console.log("left");
+			} else if (e.activeDirections.rotRight) {
+				rotateAngle = Math.PI / 2 * (1 / 12);
+				rotationQuaternion.setFromAxisAngle(axisY, -rotateAngle);
+				e.body.quaternion = rotationQuaternion.mult(e.body.quaternion);
+				console.log("right");
+			}
+			if (e.activeDirections.boost) {
+				console.log("BOOOOSt");
+			}
 			e.body.quaternion.vmult(directionVector, worldVelocity);
 			e.body.velocity.x = worldVelocity.x;
 			e.body.velocity.z = worldVelocity.z;
@@ -201,29 +220,15 @@ export class Instance {
 						const impactDirection: CANNON.Vec3 = contact.ri.clone();
 						const angle = Math.atan2(impactDirection.z, impactDirection.x);
 
-						// Calcul de la vitesse de la balle et de la paddle
 						const ballSpeed = bl.body.velocity.length();
 						const paddleSpeed = pl.body.velocity.length();
 	
 						console.log(`ball speed : ${ballSpeed}, paddle speed : ${paddleSpeed}, angle : ${angle}`)
-						// Calcul de la force d'impulsion en fonction de l'angle, de la vitesse de la balle et de la vitesse de la paddle
 						const impulseForce = (angle * ballSpeed * paddleSpeed) / 1000;
 	
-						// Calcul du vecteur de force d'impulsion
 						const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
 						console.log(impulseVector)
-						// Application de la force d'impulsion à la balle
 						bl.body.applyImpulse(impulseVector, bl.body.position);
-	
-						// Calcul de la force de rotation en fonction de l'angle et de la vitesse de rotation de la paddle
-						//const rotationForce = angle * pl.body.angularVelocity.length();
-	
-						//// Calcul du vecteur de force de rotation
-						//const rotationVector = new CANNON.Vec3(0, rotationForce, 0);
-	
-						//// Application de la force de rotation à la balle
-						//bl.body.applyTorque(rotationVector);
-
 						//const mulVec = new CANNON.Vec3(-0, 0, -0);
 						//bl.body.applyImpulse(impactDirection.vmul(mulVec), bl.body.position);
 						//mulVec.set(-0.2, 0, -0.2);
@@ -287,6 +292,7 @@ export class Instance {
 			e.body.position.set(0, 5, 0);
 			e.contactVelocity.set(0, 0, 0);
 			e.body.force.set(0, 0, 0);
+			e.body.angularVelocity.set(0, 0, 0);
 		});
 	}
 
@@ -382,7 +388,7 @@ export class Instance {
 				acceleration: new CANNON.Vec3(),
 				previousVelocity: new CANNON.Vec3(),
 				lastMovement: null,
-				activeDirections: {left:false, right: false, up:false, down: false},
+				activeDirections: {left:false, right: false, up:false, down: false, boost: false, rotLeft: false, rotRight: false},
 			}
 			paddle.body.quaternion.setFromEuler(0, i % 2  ? Math.PI : 0, 0);
 			paddle.body.position.set(playerSpawnPos[i][0], playerSpawnPos[i][1], playerSpawnPos[i][2]); // Position du joueur 1

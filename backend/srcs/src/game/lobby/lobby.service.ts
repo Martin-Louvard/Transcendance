@@ -23,6 +23,10 @@ export class LobbyService {
 	}
 	sendToInstance<T extends InputPacket>(id:string, data: T, senderId: string) {
 		const lobby = this.lobbies.get(id);
+		if (!lobby.instance || !lobby) {
+			// TODO: throw an error
+			return ;
+		}
 		lobby.instance.processGameData<T>(data);
 	}
 	addLobby(lobby: Lobby) {

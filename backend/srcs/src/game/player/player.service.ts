@@ -52,8 +52,8 @@ export class PlayerService {
 		console.log(`player updated and in lobby : ${player.lobby ? player.lobby.id : "null"}`);
 		this.logger.log(`${player.id} is Online`);
 		const payload: ServerPayloads[ServerEvents.AuthState] = {
-			lobbyId: player.lobby == null ? null : player.lobby.id,
-			hasStarted: player.lobby == null ? false : player.lobby.instance.hasStarted,
+			lobbyId: player.lobby == null ||  !player.lobby.instance  ? null : player.lobby.id,
+			hasStarted: player.lobby == null || !player.lobby.instance ? false : player.lobby.instance.hasStarted,
 		};
 		player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 	}

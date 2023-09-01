@@ -14,8 +14,9 @@ export const useKeyboardInput = () => {
 		rotRight: false,
 		rotLeft: false,
 	});
-	const prevInput = input;
-  
+	const [prevInput, setPrevInput] = useState<Input>(input);
+
+	
 	const handleKeyDown = (event) => {
 		const key = event.keyCode == 32 ? 'space' : event.key.toLowerCase();
 		switch (key) {
@@ -106,7 +107,11 @@ export const useKeyboardInput = () => {
 			window.removeEventListener('keydown', handleKeyDown);
 			window.removeEventListener('keyup', handleKeyUp);
 		};
-	}, []);
+	}, [input]);
+
+	useEffect(() => {
+		setPrevInput(input);
+	  }, [input]);
   
 	return [input, prevInput];
   };

@@ -1,10 +1,12 @@
-import { Box, PerspectiveCamera, TrackballControls } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef, forwardRef, useState, useMemo } from "react";
+import { Box, PerspectiveCamera, TrackballControls, useTexture } from "@react-three/drei";
+import { Canvas, extend, useFrame, useThree} from "@react-three/fiber";
+import { useEffect, useRef, forwardRef, useState, useMemo} from "react";
 import { socket } from "../../socket";
 import { ServerEvents, ServerPayloads, ClientEvents, ClientPayloads, Input, InputPacket, Player} from '@shared/class';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import { DoubleSide, Mesh, PlaneGeometry, SphereGeometry, Vector3 } from "three";
+import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass'
+import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import * as THREE from 'three'
 import { useKeyboardInput } from "./InputState";
 import { PlayerState, usePlayerStore } from "./PlayerStore";
@@ -19,15 +21,16 @@ import {BadTVEffect} from './effects/BadTV'
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
+	const colorTexture = useTexture('/ballTest.png');
 
 	useFrame(() => {
 		ballRef.current.position.set(props.position[0], props.position[1], props.position[2]);
 		ballRef.current.quaternion.copy(props.quaternion);
 	  }, [])
 	return (
-		<mesh position={[0, 0, 0]} ref={ballRef} color={"#FF79CA"}>
+		<mesh position={[0, 0, 0]} ref={ballRef}>
 			<sphereGeometry args={props.args} />
-			<meshBasicMaterial color="#FF79CA" side={DoubleSide}/>
+			<meshBasicMaterial color="white" side={DoubleSide} map={colorTexture}/>
 	  </mesh>
 	)
 }
@@ -118,13 +121,17 @@ function Effects() {
 	  ])
 	  return <primitive ref={ref} object={effect} dispose={null} />
 	})
-  
+	const {scene, camera, size} = useThree();
+	const aspect = useMemo(() => new THREE.Vector2(size.width, size.height), [size])
+
 	return (
 	  <EffectComposer>
-		<Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
+		<Bloom intensity={2} luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
 		<Noise opacity={0.02} />
-		<BadTV distortion={distortion} distortion2={distortion2} speed={speed} rollSpeed={rollSpeed} />
-		{/* <HorizontalBlur strength={strength} /> */}
+		{/*<BadTV distortion={distortion} distortion2={distortion2} speed={speed} rollSpeed={rollSpeed} />*/}
+		{/*<HorizontalBlur strength={strength} />*/}
+		{/*<AfterimagePass  attachArray="passes"  uniforms-damp-value={0.991}/>*/}
+
 	  </EffectComposer>
 	)
 }
@@ -187,7 +194,7 @@ export const Game: React.FC = () => {
 		data ?
 		<>
 
-			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#cfcfcf" }}>
+			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#cfcfcf" }} >
 				<TrackballControls noPan noZoom/>
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
@@ -196,6 +203,10 @@ export const Game: React.FC = () => {
 					<Wall size={[data.gameData.mapHeight, 10, 2]} position={[0, 5, -data.gameData.mapWidth / 2]}/>
 					<Wall size={[2, 10, data.gameData.mapWidth]} position={[data.gameData.mapHeight / 2, 5, 0]} />
 					<Wall size={[2, 10, data.gameData.mapWidth]} position={[-data.gameData.mapHeight / 2, 5, 0]} />
+					<mesh>
+						<boxBufferGeometry args={[data.gameData.mapHeight, 1, 2]}/>
+						<meshBasicMaterial color={"#46B6FF"}/>
+					</mesh>
 					{/*<PerspectiveCamera position={[-me.position[0], -20, -me.position[2] - 30]} rotation-y={me.quaternion.y} >*/}
 					<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[data.gameData.mapHeight, data.gameData.mapWidth, 1]} castShadow>
 						<planeGeometry />
