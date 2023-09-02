@@ -1,5 +1,9 @@
-import { Friendships, User } from "./Types";
+import { Friendships, User, ChatChannels } from "./Types";
 import { sessionState } from "./redux/sessionSlice";
+/*
+export async function fetchChatChannels(userId: number): Promise<ChatChannels[]> {
+
+}; */
 
 export async function fetchAllRelatedInfoApi(userId: number): Promise<sessionState> {
   try {

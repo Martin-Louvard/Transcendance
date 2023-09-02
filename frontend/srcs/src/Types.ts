@@ -61,6 +61,7 @@ export interface Message {
   channelId: number;
   senderId: number;
   content: string;
+  readersId: number[] | undefined;
 }
 
 export interface ChatChannels {
@@ -73,4 +74,6 @@ export interface ChatChannels {
   channelType?: string;
   messages: Message[];
   participants: User[];
+  isOpen: boolean;
+  notifications: number ;
 }

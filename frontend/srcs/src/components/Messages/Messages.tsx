@@ -39,7 +39,6 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
   return (
     <div className="chat-messages" ref={chatMessagesRef}>
       {messages?.map((message, index) => (
-        blockedUsersIds?.some(id => id === message.id) ? null:
         <div
           key={index}
           className={`chat-message ${
