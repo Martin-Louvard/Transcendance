@@ -4,6 +4,7 @@ $secondary-color: #535bf2;
 $background-color: #242424;
 $light-color: #f9f9f9;
 $dark-color: #1a1a1a;
+$secondary-bg-color: #4d4848;
 
 // Mixins
 @mixin button-style {
@@ -88,6 +89,44 @@ button {
 ul{
   list-style-type: none;
   padding: 0;
+}
+
+.authors {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .row{
+    display: flex;
+    flex-direction: row;
+  }
+
+.friend-item {
+  background-color: $secondary-bg-color;
+  display: flex;
+  flex-direction: column;
+  justify-content:space-between;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 10px;
+  width: 20rem;
+
+  h3,
+  p {
+    margin: 5px 0;
+  }
+
+
+  .accept-deny{
+    button{
+      padding: 5px;
+      background: none;
+    }
+  }
+
+  }
 }
 
 // Media Queries

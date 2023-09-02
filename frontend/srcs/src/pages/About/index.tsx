@@ -3,12 +3,37 @@ const About = () => {
 
     return <>
     <h1>About page</h1> 
-    <h2>Project by </h2>
-    <ul>
-        <li>Martin Louvard</li>
-        <li>Youri Bougre</li>
-        <li>Clement Vidon</li>
-        <li>Darian Sereno</li>
+    <h2>Website by </h2>
+    <ul  className="authors">
+    <div className="row">
+    <li className="friend-item" >
+        <div className='friend-picture'>
+            <img src="/martin.jpg"/>
+        </div>
+        <p>Martin Louvard</p>
+    </li>
+    <li className="friend-item" >
+        <div className='friend-picture'>
+            <img src="/default.jpg"/>
+        </div>
+        <p>Youri Bougre</p>
+    </li>
+    </div>
+    <div className="row">
+    <li className="friend-item" >
+        <div className='friend-picture'>
+            <img src="/default.jpg"/>
+        </div>
+        <p>Clement Vidon</p>
+    </li>
+    <li className="friend-item" >
+        <div className='friend-picture'>
+            <img src="/default.jpg"/>
+        </div>
+        <p>Darian Sereno</p>
+        </li>
+        </div>
+
     </ul>
     <Footer/>
     </>
