@@ -10,10 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@react-three/drei": "9.70",
     "@react-three/fiber": "8.13",
+    "@react-three/postprocessing": "^2.15.1",
     "@reduxjs/toolkit": "^1.9.5",
+    "@rollup/plugin-inject": "^5.0.3",
     "@types/socket.io-client": "^3.0.0",
+    "cannon-es": "^0.20.0",
+    "glsl-noise": "^0.0.0",
+    "glsl-rotate": "^2.0.0",
+    "glslify": "^7.1.1",
+    "leva": "^0.9.35",
+    "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
@@ -36,6 +45,8 @@
     "eslint-plugin-react-refresh": "^0.3.4",
     "sass": "^1.65.1",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9"
+    "vite": "^4.3.9",
+    "vite-plugin-glsl": "^1.1.2",
+    "vite-plugin-glslify": "^2.0.2"
   }
 }

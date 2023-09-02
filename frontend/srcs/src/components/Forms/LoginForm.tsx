@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { socket } from '../../socket.ts';
-import { ClientPayloads, ClientEvents } from '../Game/Type.ts';
 import Form from './Form.js';
 import { login } from '../../api.ts';
 import { useAppDispatch } from '../../redux/hooks.js';
@@ -8,6 +7,7 @@ import { login2fa } from '../../api.ts';
 import './Forms.scss'
 import toast from "react-hot-toast"
 import { setSessionUser, setToken, fetchRelatedUserData} from '../../redux/sessionSlice.ts';
+import { ClientPayloads, ServerEvents, ServerPayloads, ClientEvents } from '@shared/class';
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -25,19 +25,18 @@ const LoginForm: React.FC = () => {
     event.preventDefault();
     username.length && password.length 
     const user = await login(username,password)
-    if(user.id)
+    if(user && user.id)
     { 
       if (!user.twoFAEnabled){
         dispatch(setSessionUser(user))
         dispatch(setToken(user.access_token))
-        if (user.id)
+        if (user)
           dispatch(fetchRelatedUserData(user.id))
         toast.success("Logged in")
-        const payloads: ClientPayloads[ClientEvents.AuthState] = {
-          id: user.id,
-          token: user.access_token,
-        }
-        socket.emit(ClientEvents.AuthState, payloads);
+        dispatch(setSessionUser(user))
+        dispatch(setToken(user.access_token))
+        socket.auth = {token: user.access_token};
+        socket.disconnect().connect();
         return
       }
       const code = window.prompt("Enter your code from google authenticator", "000000");
@@ -50,11 +49,8 @@ const LoginForm: React.FC = () => {
         toast.success("Logged in")
       } else if (user2fa.message)
           toast.error(user2fa.message)
-      const payloads: ClientPayloads[ClientEvents.AuthState] = {
-        id: user.id,
-        token: user.access_token,
-      }
-      socket.emit(ClientEvents.AuthState, payloads);
+      socket.auth = {token: user.access_token};
+      socket.disconnect().connect();
     }
     else
       toast.error("Invalid username or password")

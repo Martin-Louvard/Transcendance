@@ -5,12 +5,11 @@ import { UsersService } from 'src/users/users.service';
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from 'src/auth/constants';
-import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads } from '../Types';
+import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket } from '@shared/class';
 import { Player } from './player/player.class';
-import { OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { PlayerService } from './player/player.service';
 import { LobbyService } from './lobby/lobby.service';
-import { Lobby } from './lobby/lobby.class';
+import { Lobby } from './classes/lobby.class';
 
 @Injectable()
 export class GameService {
@@ -26,7 +25,7 @@ export class GameService {
 
   handleDisconnect(client: Socket) {
     try {
-		this.playerService.disconnectPlayer(client);
+		  this.playerService.disconnectPlayer(client);
     } catch (error) {
 		return (error);
     }

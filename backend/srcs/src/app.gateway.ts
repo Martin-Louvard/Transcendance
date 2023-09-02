@@ -1,24 +1,23 @@
-import {
-  ConnectedSocket,
-  MessageBody,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-} from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
-import { ClientEvents, ClientPayloads, LobbyMode } from './Types';
+import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket } from '@shared/class';
+import { JwtService } from '@nestjs/jwt';
+import { AppService } from './app.service';
+import { LobbyService } from './game/lobby/lobby.service';
+import { PlayerService } from './game/player/player.service';
 import { FriendsService } from './friends/friends.service';
 
 @WebSocketGateway({ cors: '*' })
-export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
   constructor(
     private prisma: PrismaService,
     private readonly gameService: GameService,
     private friendService: FriendsService,
+    private readonly appService: AppService,
+    private readonly lobbyService: LobbyService,
+    private readonly playerService: PlayerService
   ) {}
 
   connected_clients = new Map<number, Socket>();
@@ -26,49 +25,27 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
+  handleConnection(client: Socket) {
+    this.appService.auth(client);
+  }
+
   afterInit(server: Server) {
     return this.gameService.afterInit(server);
   }
 
-  async handleConnection(client: Socket) {
-    if (client.handshake.headers.user_id) {
-      const user_id_string = client.handshake.headers.user_id[0];
-      const user_id = parseInt(user_id_string);
-      this.connected_clients.set(user_id, client);
-      this.server.emit('update_friend_connection_state', {
-        user_id: user_id,
-        status: 'ONLINE',
-      });
-      await this.prisma.user.update({
-        where: { id: user_id },
-        data: { status: 'ONLINE' },
-      });
-    }
-  }
-
-  async handleDisconnect(client: Socket) {
-    if (client.handshake.headers.user_id) {
-      const user_id_string = client.handshake.headers.user_id[0];
-      const user_id = parseInt(user_id_string);
-      this.connected_clients.delete(user_id);
-      this.server.emit('update_friend_connection_state', {
-        user_id: user_id,
-        status: 'OFFLINE',
-      });
-      await this.prisma.user.update({
-        where: { id: user_id },
-        data: { status: 'OFFLINE' },
-      });
-    }
-
-    // Cela fait quitter le lobby du joeur, peut etre pas une bonne idée si
-    // le socket se reset et que le player est tej de son lobby. A voir selon le comportement.
+  handleDisconnect(client: Socket) {
     return this.gameService.handleDisconnect(client);
   }
 
   @SubscribeMessage('automatch')
   autoMatch(@ConnectedSocket() client: Socket, @MessageBody() data: LobbyMode) {
     this.gameService.automatch(client, data);
+  }
+
+  @SubscribeMessage(ClientEvents.InputState)
+  handleInputState(@ConnectedSocket() client: Socket, @MessageBody() data: InputPacket) {
+    const lobbyId = this.playerService.getLobby(client.id)
+    this.lobbyService.sendToInstance<InputPacket>(lobbyId, data, client.id);
   }
 
   @SubscribeMessage(ClientEvents.LobbyState)
@@ -84,15 +61,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('start')
   startMatch(@ConnectedSocket() client: Socket) {
     this.gameService.playerStart(client);
-  }
-
-  @SubscribeMessage(ClientEvents.AuthState)
-  auth(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: ClientPayloads[ClientEvents.AuthState],
-  ) {
-    if (data == undefined) return;
-    this.gameService.auth(client, data);
+    console.log("to");
   }
 
   @SubscribeMessage('message')

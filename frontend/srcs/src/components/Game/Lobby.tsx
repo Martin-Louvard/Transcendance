@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { socket } from '../../socket';
-import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads } from './Type';
 import { usePlayerStore } from './PlayerStore';
+import {ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads} from '@shared/class'
 
 const AutoMatch: React.FC = () => {
   const [gameState, setGameState] = useState({isDouble: false, isDuel: false})
-  const player = usePlayerStore();
-  const navigate = useNavigate();
 
+  console.log("yo");
   useEffect(() => {
     if (gameState.isDouble) {
       socket.emit("automatch", LobbyMode.double);
@@ -16,6 +15,10 @@ const AutoMatch: React.FC = () => {
       socket.emit("automatch", LobbyMode.duel);
     }
   }, [gameState])
+
+  useEffect(() => {
+    setGameState({isDouble: false, isDuel: false});
+  }, [])
 
     return (
       <>
