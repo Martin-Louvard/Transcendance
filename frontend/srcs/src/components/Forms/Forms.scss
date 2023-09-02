@@ -48,12 +48,13 @@ form {
   }
 
   button[type="submit"] {
-    width: 90%;
+    width: 60%;
     padding: 8px;
+    margin-top: 10px;
     background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
   }
 }
 
