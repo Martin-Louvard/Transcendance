@@ -1,10 +1,11 @@
-import { Box, PerspectiveCamera, TrackballControls, useTexture } from "@react-three/drei";
+import { Box, OrbitControls, PerspectiveCamera, TrackballControls, useTexture } from "@react-three/drei";
 import { Canvas, extend, useFrame, useThree} from "@react-three/fiber";
-import { useEffect, useRef, forwardRef, useState, useMemo} from "react";
+import React, { useEffect, useRef, forwardRef, useState, useMemo, useLayoutEffect} from "react";
 import { socket } from "../../socket";
 import { ServerEvents, ServerPayloads, ClientEvents, ClientPayloads, Input, InputPacket, Player} from '@shared/class';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import { DoubleSide, Mesh, PlaneGeometry, SphereGeometry, Vector3 } from "three";
+import { InstancedBufferGeometry, Float32BufferAttribute, BufferAttribute } from 'three';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass'
 import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import * as THREE from 'three'
@@ -18,6 +19,10 @@ import * as CANNON from 'cannon-es';
 import { useControls } from 'leva'
 import {HorizontalBlurEffect} from './effects/HorizontalBlur'
 import {BadTVEffect} from './effects/BadTV'
+
+import { grassVertex } from './shaders/grass.vert';
+import { grassFrag } from './shaders/grass.frag';
+import { GrassShaderMaterial } from './materialGrass';
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
@@ -44,7 +49,7 @@ const Wall: React.FC<WallProps> = ({ size, position }) => {
     return (
         <mesh>
             <Box args={size} position={position} >
-                <meshPhongMaterial color="#3f3f3f" />
+                <meshPhongMaterial color="#2E2E2E"  />
             </Box>
         </mesh>
     );
@@ -74,7 +79,7 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player, key
 				ref={paddleRef}
 				args={size}
 				position={[0, 0, 0]}>
-							<meshPhongMaterial color={player.team ? (player.team == 'visitor' ? "#3AFFDE" : "#FF0000") : "#45FF40" } />
+							<meshPhongMaterial color={player.team ? (player.team == 'visitor' ? "#0042ff" : "#FF0000") : "#45FF40" } />
         	</Box>
 		</mesh>
     ); // // TODO: Ajuste le material en fonction des données  recu. TODO: REcuperer le material en fonction des parametres de skin du player BCP plus tard. TODO... faudra les recuperer dans la db coté back.
@@ -126,7 +131,7 @@ function Effects() {
 
 	return (
 	  <EffectComposer>
-		<Bloom intensity={2} luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
+		<Bloom intensity={0.1} luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
 		<Noise opacity={0.02} />
 		{/*<BadTV distortion={distortion} distortion2={distortion2} speed={speed} rollSpeed={rollSpeed} />*/}
 		{/*<HorizontalBlur strength={strength} />*/}
@@ -136,10 +141,155 @@ function Effects() {
 	)
 }
 
+const Field: React.FC = (props) => {
+	const texture = useTexture('/field.jpg');
+	return (
+		<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[props.height, props.width, 1]} castShadow>
+			<planeGeometry />
+			<meshBasicMaterial side={DoubleSide} map={texture}/>
+		</mesh>
+	);
+}
+
+function GrassField(props) {
+	let instances = 10000;
+	let w = 10;
+	let d = 10;
+	let h = 0;
+
+	let group: THREE.Group;
+	let positions: number[] = [];
+	let indexs: number[] = [];
+	let uvs: number[] = [];
+	let terrPosis: number[] = [];
+	let angles: number[] = [];
+	let grassGeo: THREE.InstancedBufferGeometry;
+	let grassParticles: THREE.Mesh;
+	let grassPlaneGeo: THREE.PlaneGeometry;
+	let grassPlaneMat: THREE.MeshBasicMaterial;
+	let grassPlane: THREE.Mesh;
+
+	let grassShaderMaterial;
+	const {scene, clock} = useThree();
+
+	useLayoutEffect(() => {
+		group = new THREE.Group();
+		instances = 500;
+		w = 10;
+		d = 10;
+		h = 0;
+		const grassMaskTex = new THREE.TextureLoader().load( '/grass.jpg' );
+		const grassDiffTex = new THREE.TextureLoader().load( '/grass_diffuse.jpg' );
+		
+		
+		const uniforms = {
+			grassMaskTex: { value: grassMaskTex },
+			grassDiffTex: { value: grassDiffTex },
+			time: { type: 'float', value: 0 },
+		};
+		
+		grassShaderMaterial = new THREE.RawShaderMaterial( {
+
+			uniforms: uniforms,
+			vertexShader: grassVertex,
+			fragmentShader: grassFrag,
+			
+			side:THREE.DoubleSide,
+	
+		} );
+	
+		createParticles();
+	
+		grassPlaneGeo = new THREE.PlaneGeometry( w, d );
+		console.log(grassParticles);
+		grassPlaneMat = new THREE.MeshBasicMaterial( {color: 0x08731f, side: THREE.DoubleSide} );
+		grassPlane = new THREE.Mesh( grassPlaneGeo, grassPlaneMat );
+		group.add( grassPlane );
+		group.position.set(props.position[0], props.position[1], props.position[2])
+		grassPlane.rotation.x = Math.PI / 2;
+	}, [])
+
+    function createParticles() {
+
+        positions.push( 0.5, -0.5, 0 );
+        positions.push( -0.5, -0.5, 0 );
+        positions.push( -0.5, 0.5, 0 );
+        positions.push( 0.5, 0.5, 0 );
+
+        indexs.push(0);
+        indexs.push(1);
+        indexs.push(2);
+        indexs.push(2);
+        indexs.push(3);
+        indexs.push(0);
+
+        uvs.push(1.0, 0.0);
+        uvs.push(0.0, 0.0);
+        uvs.push(0.0, 1.0);
+        uvs.push(1.0, 1.0);
+
+        for( let i = 0 ; i < instances ; i++ ){
+
+            let posiX = Math.random() * w - w/2;
+            let posiY = h;
+            let posiZ = Math.random() * d - d/2;
+
+            //posiX = posiY = posiZ = 0;
+
+            terrPosis.push( posiX, posiY, posiZ );
+
+            let angle = Math.random()*360;
+            angles.push( angle );
+
+        }
+
+        grassGeo = new THREE.InstancedBufferGeometry();
+        grassGeo.instanceCount = instances;
+
+        grassGeo.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+        grassGeo.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+        grassGeo.setIndex(new THREE.BufferAttribute(new Uint16Array( indexs ), 1));
+
+        grassGeo.setAttribute( 'terrPosi', new THREE.InstancedBufferAttribute( new Float32Array( terrPosis ), 3 ) );
+        grassGeo.setAttribute( 'angle', new THREE.InstancedBufferAttribute(  new Float32Array( angles ), 1 ).setUsage( THREE.DynamicDrawUsage ) );
+
+		grassParticles = new THREE.Mesh( grassGeo, grassShaderMaterial );
+        grassParticles.frustumCulled = false;
+        group.add( grassParticles );
+		scene.add(group);
+
+		console.log(grassGeo);
+
+
+    }
+
+	
+
+    function update( dt ){
+
+        let t = dt;
+		if (grassParticles)
+			console.log(grassParticles);
+        //grassParticles.material.uniforms.time.value = t;
+
+    }
+
+	useFrame((state, delta) => {
+		//console.log(delta);
+		//update(delta);
+
+	})
+
+	return (<></>)
+		//<primitive object={scene} {...props} />)
+
+}
+
 export const Game: React.FC = () => {
 	const [data, setData] = useState<ServerPayloads[ServerEvents.GameState] | null>(null);
 	const [balls, setBalls] = useState(null);
 	const [players, setPlayers] = useState(null);
+	const [field, setField] = useState(null);
 	const [me, setMe] = useState(null);
 	const [KeyboardInput, prevInput] = useKeyboardInput();
 	const player = usePlayerStore();
@@ -168,6 +318,19 @@ export const Game: React.FC = () => {
 			setPlayers(data.gameData.players.map((player, index) =>
 				<Paddle key={index} size={player.size} position={player.position} quaternion={player.quaternion} player={player}/>
 			))
+			let grassFields = new Array();
+			let Offset = 100;
+			for (let z = 0; z < data.gameData.mapWidth; z += 10) {
+				for (let x = 0; x < data.gameData.mapHeight; x += 10) {
+				  grassFields.push(
+					<GrassField
+					  key={`grassfield-${x}-${z}`}
+					  position={[x -data.gameData.mapHeight / 2 + 5, 0, z - data.gameData.mapWidth / 2 + 5]} // Set the position based on grid coordinates
+					/>
+				  );
+				}
+			}
+			setField(grassFields);
 			data.gameData.players.map((e) => {
 				if (user && e.id == user.id) {
 					setMe(e);
@@ -190,28 +353,29 @@ export const Game: React.FC = () => {
         const seconds = Math.floor(Math.round(elapsedTime) % 60);
         return `${minutes} : ${seconds < 10 ? '0' : ''}${seconds}`;
     }
+
 	return (
 		data ?
 		<>
 
 			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#cfcfcf" }} >
 				<TrackballControls noPan noZoom/>
+				<OrbitControls/>
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
+					{/*<GrassField position={[0, 0, 0]}/>*/}
+					{field}
 					<Camera player={me}/>
+					{/*<GrassField/>*/}
 					<Wall size={[data.gameData.mapHeight, 10, 2]} position={[0, 5, data.gameData.mapWidth / 2]} />
 					<Wall size={[data.gameData.mapHeight, 10, 2]} position={[0, 5, -data.gameData.mapWidth / 2]}/>
 					<Wall size={[2, 10, data.gameData.mapWidth]} position={[data.gameData.mapHeight / 2, 5, 0]} />
 					<Wall size={[2, 10, data.gameData.mapWidth]} position={[-data.gameData.mapHeight / 2, 5, 0]} />
 					<mesh>
 						<boxBufferGeometry args={[data.gameData.mapHeight, 1, 2]}/>
-						<meshBasicMaterial color={"#46B6FF"}/>
+						<meshBasicMaterial color={"#30ff4f"}/>
 					</mesh>
-					{/*<PerspectiveCamera position={[-me.position[0], -20, -me.position[2] - 30]} rotation-y={me.quaternion.y} >*/}
-					<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[data.gameData.mapHeight, data.gameData.mapWidth, 1]} castShadow>
-						<planeGeometry />
-						<meshBasicMaterial color="#2E2E2E" side={DoubleSide}/>
-					</mesh>
+					<Field height={data.gameData.mapHeight} width={data.gameData.mapWidth}/>
 					{balls}
 					{players}
 					<Effects/>

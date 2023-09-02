@@ -16,6 +16,8 @@ const requestOptions = {
 	  return data;
 	}
   }catch(err) {
+	console.log("err =>")
+	console.log(err);
   }
 }
 

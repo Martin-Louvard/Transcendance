@@ -40,8 +40,10 @@ export class Lobby {
 		return true;
 	}
 	removePlayer(player: Player):boolean {
-		if (player.lobby == null || !player)
+		if (player.lobby == null || !player) {
+			console.log("remove player error");
 			return false;
+		}
 		player.socket.leave(this.id);
 		let isDeleted = this.players.delete(player.socket);
 		if (isDeleted) {
@@ -57,6 +59,7 @@ export class Lobby {
 			player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 			return false;
 		}
+		console.log(`player not deleted ${player.socket.id} id : ${player.id}`)
 		return true;
 	}
 	setPlayerOffline(player: Player):boolean {

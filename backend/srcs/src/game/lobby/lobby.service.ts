@@ -23,7 +23,7 @@ export class LobbyService {
 	}
 	sendToInstance<T extends InputPacket>(id:string, data: T, senderId: string) {
 		const lobby = this.lobbies.get(id);
-		if (!lobby.instance || !lobby) {
+		if (!lobby || !lobby.instance) {
 			// TODO: throw an error
 			return ;
 		}
@@ -104,12 +104,12 @@ export class LobbyService {
 	@Cron(CronExpression.EVERY_5_MINUTES,
 		{name: 'lobby_cleaner'})
 	clearLobbies() {
-		this.lobbies.forEach((lobby: Lobby) => {
-			if (lobby.instance.hasFinished) {
-				lobby.clear();
-				this.lobbies.delete(lobby.id);
-			}
-		})
-		this.logger.log("Lobbies cleaned");
+		//this.lobbies.forEach((lobby: Lobby) => {
+		//	if (lobby.instance.hasFinished) {
+		//		lobby.clear();
+		//		this.lobbies.delete(lobby.id);
+		//	}
+		//})
+		//this.logger.log("Lobbies cleaned");
 	}
 }

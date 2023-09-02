@@ -11,6 +11,7 @@ function Home() {
 
     useEffect(() => {
         async function verifyToken() {
+            console.log(user?.access_token);
             console.log(await verify(user.access_token));
             if (!await verify(user.access_token))
                 navigate('/login');
