@@ -85,6 +85,20 @@ $chat-menu-icon-open: 20vh;
   }
 }
 
+.notification-none {
+	display:flex;
+	background-color: inherit;
+	border-radius: $chat-exit-button-radius;
+}
+
+.notification-some {
+	display:flex;
+	background-color: rgb(211, 18, 69);
+	border-radius: $chat-exit-button-radius;
+	width: 15%;
+	height: 90%;
+}
+
 .chat-item {
   padding: 10px 0;
   cursor: pointer;

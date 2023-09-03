@@ -19,6 +19,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
+        socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
         break;
 
       case 'WEBSOCKET_SEND_MESSAGE':
@@ -44,7 +45,11 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           socket.emit('update_chat', action.payload);
         }
         break;
-
+      case 'MSG_READ':
+        if (socket && socket.connected) {
+          socket.emit('read', action.payload);
+        }
+        break;
       default:
         return next(action);
     }

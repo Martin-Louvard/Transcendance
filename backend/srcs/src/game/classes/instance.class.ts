@@ -185,12 +185,10 @@ export class Instance {
 				rotateAngle = Math.PI / 2 * (1 / 12);
 				rotationQuaternion.setFromAxisAngle(axisY, rotateAngle);
 				e.body.quaternion = rotationQuaternion.mult(e.body.quaternion);
-				console.log("left");
 			} else if (e.activeDirections.rotRight) {
 				rotateAngle = Math.PI / 2 * (1 / 12);
 				rotationQuaternion.setFromAxisAngle(axisY, -rotateAngle);
 				e.body.quaternion = rotationQuaternion.mult(e.body.quaternion);
-				console.log("right");
 			}
 			if (e.activeDirections.boost) {
 				console.log("BOOOOSt");
@@ -205,6 +203,10 @@ export class Instance {
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
+			const coef = new CANNON.Vec3(0.005, 0.005, 0.005);
+			const velo = e.body.velocity.vmul(coef);
+			e.body.velocity.vadd(velo);
+			e.body.angularVelocity.scale(0.5)
 			//e.body.velocity.vadd(e.contactVelocity, e.body.velocity);
 		})
 	}
@@ -356,6 +358,7 @@ export class Instance {
 				mass: 5,
 				shape: new CANNON.Sphere(radius),
 				material: ballMaterial,
+				angularFactor: new CANNON.Vec3(0.4, 0.4, 0.4),
 			}),
 			contactVelocity: new CANNON.Vec3(0, 0, 0),
 		};
@@ -458,14 +461,19 @@ export class Instance {
 		})
 	}
 
+	playerLogic() {
+		this.world.players.forEach((e) => {
+			e.body.position.y = e.size[1] / 2;
+			if (e.player.team == 'home')
+				console.log(`home pos = ${e.body.position}`);
+		})	
+	}
 
 	animate() {
 		//requestAnimationFrame(this.animate)
 		this.interval.push(setInterval(() => {
 			this.world.world.step(1/120);
-			this.world.players.forEach((e) => {
-				e.body.position.y = e.size[1] / 2;
-			})
+			this.playerLogic();
 			this.ballPhysics();
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
 			if (this.data.elapsedTime > 180)

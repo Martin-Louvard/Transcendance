@@ -1,26 +1,27 @@
-import { createSlice } from '@reduxjs/toolkit'
-import {User, ChatChannels, Friendships, Friend} from '../Types'
-import { fetchRelatedUserData } from './sessionThunks'
+import { createSlice } from "@reduxjs/toolkit";
+import { User, ChatChannels, Friendships, Friend, Message } from "../Types";
+import { fetchRelatedUserData } from "./sessionThunks";
+import { initNotifications } from './sessionFunctions';
 
 // Define a type for the slice state
 export interface sessionState {
-    user: User | undefined,
-    access_token: string | undefined
-    friends: Friend[] | undefined,
-    friendships: Friendships[] | undefined,
-    friendRequests: Friendships[] | undefined,
-    JoinedChatChannels: ChatChannels[] | undefined,
-    OwnedChatChannels: ChatChannels[] | undefined,
-    BannedFromChatChannels: ChatChannels[] | undefined,
-    OpenedChatChannels: ChatChannels[],
-    loading: boolean,
-    error: string | undefined,
+  user: User | undefined;
+  access_token: string | undefined;
+  friends: Friend[] | undefined;
+  friendships: Friendships[] | undefined;
+  friendRequests: Friendships[] | undefined;
+  JoinedChatChannels: ChatChannels[] | undefined;
+  OwnedChatChannels: ChatChannels[] | undefined;
+  BannedFromChatChannels: ChatChannels[] | undefined;
+  OpenedChatChannels: ChatChannels[];
+  loading: boolean;
+  error: string | undefined;
 }
 
 // Define the initial state using that type
 const initialState: sessionState = {
   user: undefined,
-  access_token : undefined,
+  access_token: undefined,
   friends: undefined,
   friendships: undefined,
   friendRequests: undefined,
@@ -30,26 +31,121 @@ const initialState: sessionState = {
   OpenedChatChannels: [],
   loading: false,
   error: undefined,
-}
+};
 
 // Utiliser createSlice permet d'ecrire les reducers comme si on mutait le state car il marche avec Immer qui sous le capot s'occupe de transformer le state de maniere immutable
 export const sessionSlice = createSlice({
-  name: 'session',
+  name: "session",
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
     addOpenedChatChannel: (state, action) => {
       const chatChannel = action.payload;
-      if (!state.OpenedChatChannels?.some(channel => channel.id === chatChannel.id)) {
-          if (state.OpenedChatChannels?.length >= 3) {
-            state.OpenedChatChannels?.shift();
-          }
+      if (
+        !state.OpenedChatChannels?.some(
+          (channel) => channel.id === chatChannel.id,
+        )
+      ) {
+        if (state.OpenedChatChannels?.length >= 3) {
+          state.OpenedChatChannels?.shift();
+        }
         state.OpenedChatChannels.push(chatChannel);
       }
     },
     removeOpenedChatChannel: (state, action) => {
       const chatChannelId = action.payload;
-      state.OpenedChatChannels = state.OpenedChatChannels.filter(channel => channel.id !== chatChannelId);
+      state.OpenedChatChannels = state.OpenedChatChannels.filter(
+        (channel) => channel.id !== chatChannelId,
+      );
+    },
+    setChatOpen: (state, action) => {
+      const updatedChat = action.payload;
+      state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) =>
+        chat.id === updatedChat.id ? { ...chat, isOpen: true } : chat
+      );
+      state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) =>
+        chat.id === updatedChat.id ? { ...chat, isOpen: true } : chat
+      );
+    },
+    setChatClose: (state, action) => {
+      const updatedChat = action.payload;
+      state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) =>
+        chat.id === updatedChat.id ? { ...chat, isOpen: false } : chat
+      );
+      state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) =>
+        chat.id === updatedChat.id ? { ...chat, isOpen: false } : chat
+      );
+    },
+    resetNotification: (state, action) => {
+      const updatedChat: ChatChannels = action.payload;
+      const userId = state.user?.id;
+
+      if (state.JoinedChatChannels !== undefined) {
+        const updatedJoinedChannels: ChatChannels[] = state.JoinedChatChannels.map((chat) =>{
+          if (chat.id === updatedChat.id && userId){
+            const updatedMessages = chat.messages.map((message) => {
+              if (
+                message === chat.messages[chat.messages.length - 1] &&
+                message.senderId !== userId &&
+                !message.readersId?.includes(userId)
+              ) {
+                return {
+                  ...message,
+                  readersId: [...(message.readersId || []), userId],
+                };
+              }
+              return message;
+            });
+            return {...chat, notifications: 0, messages: updatedMessages};
+          }
+          return chat;
+        });
+        state.JoinedChatChannels = updatedJoinedChannels;
+      }
+      if (state.OpenedChatChannels !== undefined) {
+        const updatedJoinedChannels: ChatChannels[] = state.OpenedChatChannels.map((chat) =>{
+          if (chat.id === updatedChat.id && userId){
+            const updatedMessages = chat.messages.map((message) => {
+              if (
+                message === chat.messages[chat.messages.length - 1] &&
+                message.senderId !== userId &&
+                !message.readersId?.includes(userId)
+              ) {
+                return {
+                  ...message,
+                  readersId: [...(message.readersId || []), userId],
+                };
+              }
+              return message;
+            });
+            return {...chat, notifications: 0, messages: updatedMessages};
+          }
+          return chat;
+        });
+        state.OpenedChatChannels = updatedJoinedChannels;
+      }
+    },
+    updateChatNotification: (state, action) => {
+      const updatedChat: ChatChannels[] = action.payload;
+
+      updatedChat.forEach((updatedChatChannel) => {
+        const openedChatIndex = state.OpenedChatChannels.findIndex(
+          (chat) => chat.id === updatedChatChannel.id
+        );
+        const joinedChatIndex = state.JoinedChatChannels?.findIndex(
+          (chat) => chat.id === updatedChatChannel.id
+        );
+        if (state.JoinedChatChannels !== undefined){
+          if (joinedChatIndex !== -1) {
+            state.JoinedChatChannels[openedChatIndex].notifications =
+              updatedChatChannel.notifications;
+          }
+        }
+        if (openedChatIndex !== -1) {
+          state.OpenedChatChannels[openedChatIndex].notifications =
+            updatedChatChannel.notifications;
+        }
+      });
     },
     setSessionUser: (state, action) => {
       state.user = action.payload;
@@ -58,13 +154,14 @@ export const sessionSlice = createSlice({
       state.access_token = action.payload;
     },
     setFriends: (state, action) => {
-      state.friends = action.payload;
+    state.friends = action.payload;
     },
     setFriendships: (state, action) => {
       state.friendships = action.payload;
     },
     setJoinedChatChannels: (state, action) => {
-      state.JoinedChatChannels = action.payload
+      state.JoinedChatChannels = action.payload;
+      setNotifications(state.JoinedChatChannels);
     },
     setOwnedChatChannels: (state, action) => {
       state.OwnedChatChannels = action.payload;
@@ -72,119 +169,193 @@ export const sessionSlice = createSlice({
     setBannedFromChatChannels: (state, action) => {
       state.BannedFromChatChannels = action.payload;
     },
-    receiveMessage: (state, action) => {
-      state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages.push(action.payload);
+    setNotifications: (state, action) => {
+      const updatedChannels: ChatChannels[] = action.payload;
+      const userId = state.user?.id;
+      
+      if (updatedChannels !== undefined) {
+        state.JoinedChatChannels = updatedChannels.map((chat) => {
+          const lastMessage: Message = chat.messages[chat.messages?.length - 1];
+          if (lastMessage && userId) {
+            let notifs = 0;
+            for (let i = chat.messages.length - 1; i >= 0; i--) {
+              if (
+                !chat.messages[i]?.readersId?.includes(userId) &&
+                chat.messages[i]?.senderId !== userId
+              ) {
+                notifs++;
+              } else {
+                break;
+              }
+            }
+            return {...chat, notifications: notifs };
+          }
+          return chat;
+        })
+      }
     },
-    updateFriendRequest: (state, action)=>{
+    receiveMessage: (state, action) => {
+      const channelId = action.payload.channelId;
+      const chat: ChatChannels | undefined = state.JoinedChatChannels?.find((c) => c.id === channelId);
+      if (chat && chat.isOpen){
+        action.payload.readersId.push(state.user?.id); 
+      }
+      state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages.push(action.payload);
+
+      if (chat && !chat.isOpen) {
+        const lastMessage: Message = chat.messages[chat.messages?.length - 1];
+        const userId = state.user?.id;
+        
+        if (lastMessage && userId) {
+          let notifs = 0;
+          for (let i = chat.messages.length - 1; i >= 0; i--) {
+            if (
+              !chat.messages[i]?.readersId?.includes(userId) &&
+              chat.messages[i]?.senderId !== userId
+            ) {
+              notifs++;
+            } else {
+              break;
+            }
+          }
+          chat.notifications = notifs;
+        }
+        const updatedJoinedChannels = state.JoinedChatChannels?.map((c) =>
+          c.id === channelId ? { ...chat } : c
+        );
+        updateChatNotification(updatedJoinedChannels);
+      }
+    },
+    updateFriendRequest: (state, action) => {
       if (state.friendships === undefined || state.friendships.length === 0)
-        state.friendships = [action.payload]
-      else if (state.friendships.find(f=>f.id == action.payload.id))
-        state.friendships =  state.friendships.map((f) => {
-          if (f.id == action.payload.id)
-            return action.payload
-          return f
+        state.friendships = [action.payload];
+      else if (state.friendships.find((f) => f.id == action.payload.id))
+        state.friendships = state.friendships.map((f) => {
+          if (f.id == action.payload.id) return action.payload;
+          return f;
         });
-      else
-        state.friendships.push(action.payload)
+      else state.friendships.push(action.payload);
 
       //Add to friends if friendship accepted, else filter friends and remove friends that are no longer accepted if they are in the state
-      if (state.user && action.payload.status === "ACCEPTED")
-      {
+      if (state.user && action.payload.status === "ACCEPTED") {
         if (state.friends === undefined || state.friends.length === 0)
-          state.friends = [action.payload.user.id !== state.user.id ? action.payload.user :action.payload.friend]
+          state.friends = [
+            action.payload.user.id !== state.user.id
+              ? action.payload.user
+              : action.payload.friend,
+          ];
         else
-          state.friends.push(action.payload.user.id !== state.user.id ? action.payload.user :action.payload.friend)
-      }
-      else if (state.friends && state.user && (action.payload.status === "CANCELED" || action.payload.status === "DECLINED" || action.payload.status === "BLOCKED"))
-      {
-        state.friends = state.friends?.filter(f => f.id !== (action.payload.user.id !== state.user?.id ? action.payload.user.id :action.payload.friend.id))
+          state.friends.push(
+            action.payload.user.id !== state.user.id
+              ? action.payload.user
+              : action.payload.friend,
+          );
+      } else if (
+        state.friends &&
+        state.user &&
+        (action.payload.status === "CANCELED" ||
+          action.payload.status === "DECLINED" ||
+          action.payload.status === "BLOCKED")
+      ) {
+        state.friends = state.friends?.filter(
+          (f) =>
+            f.id !==
+            (action.payload.user.id !== state.user?.id
+              ? action.payload.user.id
+              : action.payload.friend.id),
+        );
       }
     },
-    updateFriendStatus: (state, action)=>{
+    updateFriendStatus: (state, action) => {
       if (state.friendships)
-        state.friendships =  state.friendships.map((f) => {
+        state.friendships = state.friendships.map((f) => {
           if (f.friend.id === action.payload.user_id)
-            f.friend.status = action.payload.status
+            f.friend.status = action.payload.status;
           else if (f.user.id === action.payload.user_id)
-            f.user.status = action.payload.status
-          return f
+            f.user.status = action.payload.status;
+          return f;
         });
 
       if (state.friends?.length)
-      state.friends =  state.friends.map((f) => {
-        if (f.id === action.payload.user_id)
-          f.status = action.payload.status
-        return f
-      });
+        state.friends = state.friends.map((f) => {
+          if (f.id === action.payload.user_id) f.status = action.payload.status;
+          return f;
+        });
     },
     createChat: (state, action) => {
       if (state.JoinedChatChannels)
-        state.JoinedChatChannels.push(action.payload)
-      else
-        state.JoinedChatChannels = action.payload
+        state.JoinedChatChannels.push(action.payload);
+      else state.JoinedChatChannels = action.payload;
     },
-    updateChat: (state, action) =>{
-      if (state.JoinedChatChannels === undefined || state.JoinedChatChannels.length === 0)
-      {
-        if (action.payload.friendship === undefined || action.payload.friendship.status === "ACCEPTED")
-          state.JoinedChatChannels = [action.payload]
-      }
-      else{
-        const updatedChannels =  state.JoinedChatChannels.map((c) => {
-          if (c.id === action.payload.id)
-            c = action.payload
-        return c
-        })
-        state.JoinedChatChannels = updatedChannels.filter(c => c.friendship === undefined || c.friendship.status === "ACCEPTED")
+    updateChat: (state, action) => {
+      if ( state.JoinedChatChannels === undefined || state.JoinedChatChannels.length === 0 ) {
+        if ( action.payload.friendship === undefined || action.payload.friendship.status === "ACCEPTED")
+          state.JoinedChatChannels = [action.payload];
+      } else {
+        const updatedChannels = state.JoinedChatChannels.map((c) => {
+          if (c.id === action.payload.id) c = action.payload;
+          return c;
+        });
+        state.JoinedChatChannels = updatedChannels.filter(
+          (c) =>
+            c.friendship === undefined || c.friendship.status === "ACCEPTED",
+        );
       }
     },
-    cleanSession: (state) =>{
-      state.user= undefined,
-      state.access_token = undefined,
-      state.friends = undefined,
-      state.friendships = undefined,
-      state.JoinedChatChannels = undefined,
-      state.OwnedChatChannels = undefined,
-      state.BannedFromChatChannels = undefined
-    }
+    cleanSession: (state) => {
+      (state.user = undefined),
+        (state.access_token = undefined),
+        (state.friends = undefined),
+        (state.friendships = undefined),
+        (state.JoinedChatChannels = undefined),
+        (state.OwnedChatChannels = undefined),
+        (state.BannedFromChatChannels = undefined),
+        (state.OpenedChatChannels = []);
+    },
   },
   extraReducers: (builder) => {
-      builder.addCase(fetchRelatedUserData.pending, (state) => {
-        state.loading = true;
-        state.error = undefined;
-      });
-      builder.addCase(fetchRelatedUserData.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = undefined;
-        state.friends = action.payload.friends,
-        state.friendships = action.payload.friendships,
-        state.JoinedChatChannels = action.payload.JoinedChatChannels?.filter(c => !c.friendship || c.friendship.status === "ACCEPTED");
-        state.OwnedChatChannels = action.payload.OwnedChatChannels,
-        state.BannedFromChatChannels = action.payload.BannedFromChatChannels
-      });
-      builder.addCase(fetchRelatedUserData.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'An error occurred';
-      });
+    builder.addCase(fetchRelatedUserData.pending, (state) => {
+      state.loading = true;
+      state.error = undefined; });
+    builder.addCase(fetchRelatedUserData.fulfilled, (state, action) => {
+      state.loading = false;
+      state.error = undefined;
+      state.friends = action.payload.friends;
+      state.friendships = action.payload.friendships;
+      state.JoinedChatChannels = initNotifications(action.payload.JoinedChatChannels?.filter(
+        (c) => !c.friendship || c.friendship.status === "ACCEPTED",
+      ), state.user?.id);
+      state.OwnedChatChannels = action.payload.OwnedChatChannels;
+      state.BannedFromChatChannels = action.payload.BannedFromChatChannels;
+    });
+    builder.addCase(fetchRelatedUserData.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message || "An error occurred";
+    });
   },
-})
+});
 
-export const { 
-  setSessionUser, 
-  setToken, 
-  setFriends, 
-  setFriendships, 
-  setJoinedChatChannels, 
-  setOwnedChatChannels, 
-  setBannedFromChatChannels, 
-  cleanSession, 
-  receiveMessage, 
-  updateFriendRequest, 
+export const {
+  setSessionUser,
+  setToken,
+  setFriends,
+  setFriendships,
+  setJoinedChatChannels,
+  setOwnedChatChannels,
+  setBannedFromChatChannels,
+  cleanSession,
+  receiveMessage,
+  updateFriendRequest,
   updateFriendStatus,
   createChat,
   updateChat,
   addOpenedChatChannel,
   removeOpenedChatChannel,
-} = sessionSlice.actions
+  setChatClose,
+  setChatOpen,
+  resetNotification,
+  updateChatNotification,
+  setNotifications
+} = sessionSlice.actions;
 export { fetchRelatedUserData };
-export default sessionSlice.reducer
+export default sessionSlice.reducer;
