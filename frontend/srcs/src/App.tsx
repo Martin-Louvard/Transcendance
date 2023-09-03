@@ -11,6 +11,7 @@ import { useAppSelector } from './redux/hooks.ts';
 import { Toaster } from 'react-hot-toast';
 import Dashboard from './components/Dashboard/Dashboard.tsx';
 import Authentication from './components/Authentication/Authentication.tsx';
+import { socket } from './socket.ts';
 
 function App() {
   const player = usePlayerStore();

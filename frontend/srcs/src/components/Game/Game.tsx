@@ -93,11 +93,14 @@ const Camera: React.FC = (props) => {
 		cameraOffset.z *= -1;
 
 	const { camera } = useThree();
+	let camRotationStart: Vector3 = useMemo(() => {
+		return (camera.rotation);
+	}, [])
 
 	useFrame(() => {
 		camera.position.set(player.position[0], player.position[1], player.position[2]).add(cameraOffset);
 		camera.lookAt(player.position[0], player.position[1], player.position[2]);
-		camera.rotation.y = 0;
+		camera.rotation.set(camRotationStart.x, camRotationStart.y, camRotationStart.z);
 	})
 }
 
@@ -211,7 +214,39 @@ function GrassField(props, {count= 1000, temp = new THREE.Object3D()}) {
 	}, [])
 
 
-	useEffect(() => {
+	//useEffect(() => {
+    //    positions.push( 0.2, -0.5, 0 );
+    //    positions.push( -0.5, -0.5, 0 );
+    //    positions.push( -0.5, 0.2, 0 );
+    //    positions.push( 0.2, 0.2, 0 );
+
+    //    indexs.push(0);
+    //    indexs.push(1);
+    //    indexs.push(2);
+    //    indexs.push(2);
+    //    indexs.push(3);
+    //    indexs.push(0);
+
+    //    uvs.push(1.0, 0.0);
+    //    uvs.push(0.0, 0.0);
+    //    uvs.push(0.0, 1.0);
+    //    uvs.push(1.0, 1.0);
+
+    //    for( let i = 0 ; i < instances ; i++ ){
+
+    //    	temp.position.x = Math.random() * w - w/2;
+    //        temp.position.y = h;
+	//		temp.position.z = Math.random() * d - d/2;
+	//		temp.ang
+    //        let angle = Math.random()*360;
+    //        angles.push( angle );
+
+    //    }
+
+	//}, [])
+
+    function createParticles() {
+
         positions.push( 0.2, -0.5, 0 );
         positions.push( -0.5, -0.5, 0 );
         positions.push( -0.5, 0.2, 0 );
@@ -243,41 +278,6 @@ function GrassField(props, {count= 1000, temp = new THREE.Object3D()}) {
             angles.push( angle );
 
         }
-	}, [])
-
-    function createParticles() {
-
-        //positions.push( 0.2, -0.5, 0 );
-        //positions.push( -0.5, -0.5, 0 );
-        //positions.push( -0.5, 0.2, 0 );
-        //positions.push( 0.2, 0.2, 0 );
-
-        //indexs.push(0);
-        //indexs.push(1);
-        //indexs.push(2);
-        //indexs.push(2);
-        //indexs.push(3);
-        //indexs.push(0);
-
-        //uvs.push(1.0, 0.0);
-        //uvs.push(0.0, 0.0);
-        //uvs.push(0.0, 1.0);
-        //uvs.push(1.0, 1.0);
-
-        //for( let i = 0 ; i < instances ; i++ ){
-
-        //    let posiX = Math.random() * w - w/2;
-        //    let posiY = h;
-        //    let posiZ = Math.random() * d - d/2;
-
-        //    //posiX = posiY = posiZ = 0;
-
-        //    terrPosis.push( posiX, posiY, posiZ );
-
-        //    let angle = Math.random()*360;
-        //    angles.push( angle );
-
-        //}
 
         grassGeo = new THREE.InstancedBufferGeometry();
         grassGeo.instanceCount = instances;
@@ -316,10 +316,10 @@ function GrassField(props, {count= 1000, temp = new THREE.Object3D()}) {
 
 	})
 
-	//const ref = 
+	const ref = useRef();
 
 	return (
-		<instancedMesh ref={instancedMeshRef} args={[null, null, count]}>
+		<instancedMesh ref={ref} args={[null, null, count]}>
 			<bufferGeometry />
 			<shaderMaterial />
 		</instancedMesh>

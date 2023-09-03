@@ -59,6 +59,7 @@ export class Instance {
 	public startTime: number;
 	accelerationRate = 50;
 	maxAcceleration = 5000;
+	private playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
 
 	// un player quitte pendant le temps d'attente du demarage
 	private data: GameData = {
@@ -83,10 +84,12 @@ export class Instance {
 	isInstanceOfInputPacket(object: any): boolean {
 		return ('code' in object && 'timestamp' in object);
 	}
+
 	processGameData<T extends InputPacket>(data: T) {
 		if (this.isInstanceOfInputPacket(data)) {
 			const paddle = this.world.players.get(data.id);
 			const input: InputPacket = data;
+			console.log(data);
 
 			if (!paddle)
 				return undefined; //player dont exist error
@@ -170,15 +173,19 @@ export class Instance {
 		
 		this.world.players.forEach((e) => {
 			if (e.activeDirections.up) {
+				console.log(e.player.id);
 				directionVector.z = -this.moveDistance;
 			}
 			else if (e.activeDirections.down) {
+				console.log(e.player.id);
 				directionVector.z = this.moveDistance;
 			}
 			if (e.activeDirections.left) {
+				console.log(e.player.id);
 				directionVector.x = -this.moveDistance;
 			}
 			else if (e.activeDirections.right) {
+				console.log(e.player.id);
 				directionVector.x = this.moveDistance;
 			}
 			if (e.activeDirections.rotLeft) {
@@ -196,6 +203,7 @@ export class Instance {
 			e.body.quaternion.vmult(directionVector, worldVelocity);
 			e.body.velocity.x = worldVelocity.x;
 			e.body.velocity.z = worldVelocity.z;
+			directionVector.set(0, 0, 0);
 		})
 	}
 
@@ -203,10 +211,10 @@ export class Instance {
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
-			const coef = new CANNON.Vec3(0.005, 0.005, 0.005);
-			const velo = e.body.velocity.vmul(coef);
-			e.body.velocity.vadd(velo);
-			e.body.angularVelocity.scale(0.5)
+			//const coef = new CANNON.Vec3(0.005, 0.005, 0.005);
+			//const velo = e.body.velocity.vmul(coef);
+			//e.body.velocity.vadd(velo);
+			//e.body.angularVelocity.scale(0.5)
 			//e.body.velocity.vadd(e.contactVelocity, e.body.velocity);
 		})
 	}
@@ -288,14 +296,33 @@ export class Instance {
 		}
 	}
 
-	restartRound() {
+	async timeoutAction(ms, callback) {
+		await new Promise(resolve => setTimeout(resolve, ms));
+		callback();
+	}
+
+	ballStart(ball: Sphere) {
+		const direction = new CANNON.Vec3(Math.random(), 0, Math.random());
+		const angle = Math.atan2(direction.z, direction.x);
+		direction.set(Math.cos(angle), 0, Math.sin(angle))
+		const impulseStrength = 500; 
+		ball.body.applyImpulse(direction.scale(impulseStrength), ball.body.position);
+	}
+
+	async restartRound() {
 		this.world.balls.forEach((e: Sphere) => {
 			e.body.velocity.set(0, 0, 0);
 			e.body.position.set(0, 5, 0);
 			e.contactVelocity.set(0, 0, 0);
 			e.body.force.set(0, 0, 0);
 			e.body.angularVelocity.set(0, 0, 0);
+			//this.timeoutAction(3000, () => this.ballStart(e));
 		});
+		let i = 0;
+		this.world.players.forEach((e) => {
+			e.body.position.set(this.playerSpawnPos[i][0], this.playerSpawnPos[i][1], this.playerSpawnPos[i][2]);
+			i++;
+		})
 	}
 
 	createWalls(ballMaterial: CANNON.Material) {
@@ -362,7 +389,7 @@ export class Instance {
 			}),
 			contactVelocity: new CANNON.Vec3(0, 0, 0),
 		};
-		sphere.body.position.set(0, 5, 0)
+		sphere.body.position.set(0, 5, 30)
 		this.world.world.addBody(sphere.body);
 		this.world.balls = new Array<Sphere>();
 		this.world.balls.push(sphere);
@@ -373,7 +400,6 @@ export class Instance {
 	createPlayers(groundMaterial: CANNON.Material, ballMaterial: CANNON.Material) {
 		this.world.players = new Map<number, Paddle>();
 		this.data.players = new Array<PlayerBody>();
-		const playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
 		let i: number = 0;
 		const paddleSize:[number, number, number] = [12, 3, 2];
 		const playerMaterial: CANNON.Material = new CANNON.Material('slippery');
@@ -394,7 +420,7 @@ export class Instance {
 				activeDirections: {left:false, right: false, up:false, down: false, boost: false, rotLeft: false, rotRight: false},
 			}
 			paddle.body.quaternion.setFromEuler(0, i % 2  ? Math.PI : 0, 0);
-			paddle.body.position.set(playerSpawnPos[i][0], playerSpawnPos[i][1], playerSpawnPos[i][2]); // Position du joueur 1
+			paddle.body.position.set(this.playerSpawnPos[i][0], this.playerSpawnPos[i][1], this.playerSpawnPos[i][2]);
 			const groundPlayerContactMaterial = new CANNON.ContactMaterial(groundMaterial, playerMaterial, {
 				friction: 0.1,
 			});
@@ -430,6 +456,9 @@ export class Instance {
 		this.createBalls(ballMaterial);
 		this.createPlayers(groundMaterial, ballMaterial);
 		this.createWalls(ballMaterial);
+		this.world.balls.forEach((e) => {
+			//this.timeoutAction(3000, () => this.ballStart(e));
+		})
 	}
 
 	clear() {
@@ -464,8 +493,17 @@ export class Instance {
 	playerLogic() {
 		this.world.players.forEach((e) => {
 			e.body.position.y = e.size[1] / 2;
-			if (e.player.team == 'home')
-				console.log(`home pos = ${e.body.position}`);
+			if ( (e.player.team == 'home' ? e.body.position.z >= -20 : e.body.position.z <= 20)) {
+				e.body.position.z =  (e.player.team == 'home' ? -20 : 20);
+			}
+			if (e.body.position.z <= -this.world.mapWidth / 2)
+				e.body.position.z = -(this.world.mapWidth / 2);
+			if (e.body.position.z >= this.world.mapWidth / 2)
+				e.body.position.z = this.world.mapWidth / 2;
+			if (e.body.position.x <= -this.world.mapHeight / 2)
+				e.body.position.x = -(this.world.mapHeight / 2);
+			if (e.body.position.x >= this.world.mapHeight / 2)
+				e.body.position.x = this.world.mapHeight / 2;  
 		})	
 	}
 
