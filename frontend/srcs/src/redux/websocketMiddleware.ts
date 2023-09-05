@@ -1,8 +1,10 @@
 import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
-import { websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
+import { setAuthState, setGameState, setLobbyState, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
 import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat } from './sessionSlice';
+import { ClientEvents, ServerEvents, Input, InputPacket} from '@shared/class';
+import { useAppSelector } from './hooks';
 
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
   let socket: Socket | null = null;
@@ -10,7 +12,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
   return (next: Dispatch<AnyAction>) => (action: AnyAction) => {
     switch (action.type) {
       case 'WEBSOCKET_CONNECT':
-        socket = io("http://localhost:3001/", {extraHeaders: {user_id: action.payload}}); 
+        socket = io("http://localhost:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
 
         socket.on('connect', () => store.dispatch(websocketConnected()));
         socket.on('disconnect', () => store.dispatch(websocketDisconnected()));
@@ -20,11 +22,32 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
         socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
+        socket.on(ServerEvents.AuthState, (data: any) => {store.dispatch(setAuthState(data))})
+        socket.on(ServerEvents.LobbyState, (data: any) => {store.dispatch(setLobbyState(data))})
+        socket.on(ServerEvents.GameState, (data: any) => {store.dispatch(setGameState(data))})
         break;
 
       case 'WEBSOCKET_SEND_MESSAGE':
         if (socket && socket.connected) {
           socket.emit('message', action.payload);
+        }
+        break;
+      
+      case 'WEBSOCKET_SEND_AUTOMATCH':
+        if (socket && socket.connected) {
+          socket.emit('automatch', action.payload);
+        }
+        break;
+      
+      case 'WEBSOCKET_SEND_LOBBYSTATE':
+          if (socket && socket.connected) {
+            socket.emit(ClientEvents.LobbyState, action.payload);
+          }
+          break;
+
+      case 'WEBSOCKET_SEND_INPUT':
+        if (socket && socket.connected) {
+          socket.emit(ClientEvents.InputState, action.payload);
         }
         break;
 

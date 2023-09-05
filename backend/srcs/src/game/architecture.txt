@@ -1,0 +1,129 @@
+Steps:
+	1. Connecter le serveur au server par les sockets.
+	2. Quand le player clique sur play, le mettre dans la pool de recherche de lobby
+	3. Une fois le lobby trouvé check si le lobby est plein, si oui envoyé lancer la game pour
+		tout le monde, sinon attendre une prochaine connexion.
+	4. Echange de datas durant la game
+	5. Clear le lobby, envoyer les datas de la game a la db.
+	<-| (et on boucle sur ces étapes)
+
+
+- Taille de La MAP: width / height /-> Envoyer q'au start.
+- score /-> peut etre envoyé que lors d'un but
+- liste d'objet
+
+Objet : 
+	- Width - height
+	- Shape ID
+	- position : x, y, z
+	- velocity : x, y, z
+	- angular velocity: x, y, z
+	- rotation : x, y, z
+	- mass: x
+
+
+
+
+
+
+Datas Management:
+	Classe:
+		--	Global Data --
+		[Player]: Stock le socket du player et ses infos perso (fetch les infos a chaque game certainement pour update, ou alors si possible
+			s'abonner a des données de la db [peut etre avec des sockets] pour que a chaque changement les datas s'actualise).
+			L'id du player est lié a son compte, donc si le joueur quitte et reviens sur la page, le socket dans son Player sera
+			actualisé et pourra revenir dans la partie avec le nouveau socket.
+		[PlayersManager]: Stock tout les players connecté en temps réel.
+		[Lobby]: Stock les données du lobby dont des *pointeurs* (a voir si c'est possible en js) vers le player.
+		[LobbyManager]: Stock tout les lobbys en cours.
+		[Instance]: L'instance du jeu ou s'effectuera tout l'échange de data
+		-- Game Data -- 
+		[Object]: Un objet dans le jeu. slots: [Physic]: physique de l'objet.
+		(Object) [Ball]: Une balle.
+		(Object) [Paddle]: Un paddle de joueur.
+		[Physic]: Une classe qui sert a gérer la physique de basse d'un objet.
+		(Physic) [BallPhysic] : Ajoute a Physic tout les élements nécessaire a faire la physique d'une balle.
+		(Physic) [PlayerPhysic]: Ajoute à Physic tout les élements nécaissaire a faire la phyisique d'un joueur.
+		[GameData]: Les datas du jeu uniquemet pour l'échange de données entre Serveur / Client.
+
+		[GameEngine]: Le moteur du jeu, effectue tout les calculs nécessaire. slots: [Lobby]: Le lobby
+			de la partie (Le lobby possède l'instance du jeu et donc toutes les données nécessaire au jeu).
+
+BasicPhysic []
+	BallPhysic []
+PlayerCollider[] }
+BallCollider[] }    = > Permet d'ajouter les élements au BHV. Les collision sont detecté a part.
+GroundCollider[] }
+
+Object : {
+	Player : {
+		BasicPhysic : []
+		InputMananger : []
+		PlayerCollider : []
+	},
+	Ball : {
+		BallPhysic : []
+		BallCollider : []
+	},
+	Ground : {
+		GroundCollider: []
+	}
+}
+
+
+Game Architecture:
+	* Le Player peut choisir de rejoindre une partie automatiquement, de créer une partie ou de choisir une partie (à définir).
+	
+	HANDSHAKE de START:
+		1. Le serveur envoie le lobbyState, le joueur constate que la parti est pleine. Il emit "start" au lobby.
+		2a. Le lobby une fois que tout les clients on envoyé "start", il renvoie "start".
+		2b. Le lobby ne reçois pas le start d'un player au bout de 15sec, la partie est annulé.
+		3a. Le client lance la partie une fois le "start" receptioné
+
+	A. Rejoindre automatiquement (ranked):
+		1. Quand le player clique sur play, le mettre dans la pool de recherche de lobby
+		2. Une fois le lobby trouvé check si le lobby est plein -> si oui: trigger le depart pour tout le monde
+																-> si non: attendre une prochaine connexion.
+	B. Créer une partie (occasionel):
+		1. Le joueur à le choix de parametrer la partie (à définir).
+		2. Une interface apparait, et sur l'interface on peut voir 2 ou 4 emplacement pour joueur, 
+			avec le joueur actuel dans le 1er. Sur chaque emplacement vide le joueur à plusieurs possibilité : 	- Mettre un bot (si je me chauffe a le coder): Bloquera le slot pour un bot
+																												- Ouvrir en ligne -> Sera visible dans l'onglet parties
+																												- Inviter un ami -> bloquera le slot pour l'ami invité
+
+		Paramètre de partie:
+			L'hôte a la possibilité de personnaliser une partie en ligne. Il peut modifier le 'nom', le nombre de joueur, les bonus et malus si ya,
+			la vitesse de la balle, des rebonds, la force de rebondissements, ...
+
+		3. Une fois les 4 slots rempli, la partie se lancera automatiquement au bout de 5 secondes.
+	B. Rejoindre une partie en ligne (occasionel):
+		1. Le joueur choisi la partie et la rejoins. -> Si la partie est pleine elle est lancé.
+													'-> Sinon attendre que la partie soit pleine.
+
+	ALGORITHME de COLLISION :
+		Hierarchical Bounding Volumes. Peut etre trop overkill pour le projet, à determiner.
+	PHYSIQUE du JEU:
+		Continuous Collision Detection. Peut etre aussi overkill ? a voir.
+		'->Pour prévoir les trajectoires et anticiper les collisions.
+
+
+
+PARAMETRAGE D'UN GAME :
+	0. PONG BASIC OU PONG ULTIMATE
+	1. DUEL / DOUBLE
+		1.1 SLOT D'AMI OU ONLINE OU BOT (si le temps)
+	2 PARAMETRE DE MAP :
+		2.1 TAILLE DE LA MAP
+		2.2 TAILLE DES CAGES
+		2.3 OFFSET DE LA LIGNE MEDIANE (la ou les joueurs ne peuvent plus avancer avant la ligne mediane)
+	3. PARAMETRE DE BALLE :
+		3.1 VITESSE DE LA BALLE CONTINU
+		3.2 FORCE DU REBOND
+		3.3 ACCELERATION DE LA BALLE AU FIL DU TEMPS
+		3.4 VITESSE DE ROTATION DE LA BALLE
+	4. PARAMETRE DES JOUEURS
+		4.1 VITESSE DES JOUEURS
+		4.2 VITESSE DE ROTATIONS
+		4.3 VITESSE DU BOOST
+	5. PARAMETRE GLOBAL
+		5.1 TEMPS DE LA GAME

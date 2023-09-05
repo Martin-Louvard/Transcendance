@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import  { ChatChannels, Message }  from '../../Types.ts';
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { addOpenedChatChannel, setChatOpen, resetNotification, setNotifications } from '../../redux/sessionSlice';  
@@ -44,7 +44,7 @@ const SideChatMenu = () => {
         alt="Chat Menu"
         onClick={toggleMenu} />
       <ul className="inner-chat-menu-wrapper">CHATS
-        <hr></hr>{storedJoinedChannels?.map((chat: ChatChannels) => (
+        {/*<hr></hr>{storedJoinedChannels?.map((chat: ChatChannels) => (
           <li className={`chat-item${chatBox === chat ? "-active" : ""}`}
             key={chat.id}
             onClick={() => handleChatBoxClick(chat)}>
@@ -53,7 +53,7 @@ const SideChatMenu = () => {
             </div>
           <div>{getName(chat, userName)}</div>
           </li>
-      ))}
+      ))}*/}
       </ul>
     </div>
   )

@@ -13,16 +13,14 @@ import { useKeyboardInput } from "./InputState";
 import { PlayerState, usePlayerStore } from "./PlayerStore";
 import verify from "../Authentication/verify";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { emitInput } from "./emitInput";
 import * as CANNON from 'cannon-es';
 import { useControls } from 'leva'
 import {HorizontalBlurEffect} from './effects/HorizontalBlur'
 import {BadTVEffect} from './effects/BadTV'
 
-import { grassVertex } from './shaders/grass.vert';
-import { grassFrag } from './shaders/grass.frag';
-import { GrassShaderMaterial } from './materialGrass';
+import { GrassField } from "./GrassField";
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
@@ -87,21 +85,24 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player, key
 
 const Camera: React.FC = (props) => {
 	let player = props.player;
-	let cameraOffset: Vector3 = new Vector3(0, 5, -15);
+	let cameraOffset: Vector3 = new Vector3(0, 3, -10);
 
-	if (player.team == 'visitor')
+	if (player && player.team == 'visitor')
 		cameraOffset.z *= -1;
 
 	const { camera } = useThree();
-	let camRotationStart: Vector3 = useMemo(() => {
-		return (camera.rotation);
+	let camRotationStart: THREE.Euler | null = null;
+
+	useEffect(() => {
+		camRotationStart = camera.rotation.clone();
 	}, [])
 
 	useFrame(() => {
 		camera.position.set(player.position[0], player.position[1], player.position[2]).add(cameraOffset);
 		camera.lookAt(player.position[0], player.position[1], player.position[2]);
-		camera.rotation.set(camRotationStart.x, camRotationStart.y, camRotationStart.z);
-	})
+		if (camRotationStart)
+			camera.rotation.set(camRotationStart.x, camRotationStart.y, camRotationStart.z);
+	}, [])
 }
 
 function Effects() {
@@ -145,235 +146,276 @@ function Effects() {
 	)
 }
 
-const Field: React.FC = (props) => {
-	const texture = useTexture('/field.jpg');
-	return (
-		<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[props.height, props.width, 1]} castShadow>
-			<planeGeometry />
-			<meshBasicMaterial side={DoubleSide} map={texture}/>
-		</mesh>
-	);
-}
-
-function GrassField(props, {count= 1000, temp = new THREE.Object3D()}) {
-	let instances;
-	let w ;
-	let d ;
-	let h ;
-
-	let group: THREE.Group;
-	let positions: number[] = [];
-	let indexs: number[] = [];
-	let uvs: number[] = [];
-	let terrPosis: number[] = [];
-	let angles: number[] = [];
-	let grassGeo: THREE.InstancedBufferGeometry;
-	let grassParticles: THREE.Mesh;
-	let grassPlaneGeo: THREE.PlaneGeometry;
-	let grassPlaneMat: THREE.MeshBasicMaterial;
-	let grassPlane: THREE.Mesh;
-
-	let grassShaderMaterial;
-	const {scene, clock} = useThree();
-
-	useLayoutEffect(() => {
-		group = new THREE.Group();
-		instances = 100000;
-		w = props.height;
-		d = props.width;
-		h = 0;
-		const grassMaskTex = new THREE.TextureLoader().load( '/grass.jpg' );
-		const grassDiffTex = new THREE.TextureLoader().load( '/grass_diffuse.png' );
-		
-		
-		const uniforms = {
-			grassMaskTex: { value: grassMaskTex },
-			grassDiffTex: { value: grassDiffTex },
-			time: { type: 'float', value: 0 },
-		};
-		
-		grassShaderMaterial = new THREE.RawShaderMaterial( {
-
-			uniforms: uniforms,
-			vertexShader: grassVertex,
-			fragmentShader: grassFrag,
-			
-			side:THREE.DoubleSide,
-	
-		} );
-	
-		createParticles();
-	
-		grassPlaneGeo = new THREE.PlaneGeometry( w, d );
-		console.log(grassParticles);
-		grassPlaneMat = new THREE.MeshBasicMaterial( {color: 0x08731f, side: THREE.DoubleSide} );
-		grassPlane = new THREE.Mesh( grassPlaneGeo, grassPlaneMat );
-		group.add( grassPlane );
-		group.position.set(props.position[0], props.position[1], props.position[2])
-		grassPlane.rotation.x = Math.PI / 2;
-	}, [])
-
-
-	//useEffect(() => {
-    //    positions.push( 0.2, -0.5, 0 );
-    //    positions.push( -0.5, -0.5, 0 );
-    //    positions.push( -0.5, 0.2, 0 );
-    //    positions.push( 0.2, 0.2, 0 );
-
-    //    indexs.push(0);
-    //    indexs.push(1);
-    //    indexs.push(2);
-    //    indexs.push(2);
-    //    indexs.push(3);
-    //    indexs.push(0);
-
-    //    uvs.push(1.0, 0.0);
-    //    uvs.push(0.0, 0.0);
-    //    uvs.push(0.0, 1.0);
-    //    uvs.push(1.0, 1.0);
-
-    //    for( let i = 0 ; i < instances ; i++ ){
-
-    //    	temp.position.x = Math.random() * w - w/2;
-    //        temp.position.y = h;
-	//		temp.position.z = Math.random() * d - d/2;
-	//		temp.ang
-    //        let angle = Math.random()*360;
-    //        angles.push( angle );
-
-    //    }
-
-	//}, [])
-
-    function createParticles() {
-
-        positions.push( 0.2, -0.5, 0 );
-        positions.push( -0.5, -0.5, 0 );
-        positions.push( -0.5, 0.2, 0 );
-        positions.push( 0.2, 0.2, 0 );
-
-        indexs.push(0);
-        indexs.push(1);
-        indexs.push(2);
-        indexs.push(2);
-        indexs.push(3);
-        indexs.push(0);
-
-        uvs.push(1.0, 0.0);
-        uvs.push(0.0, 0.0);
-        uvs.push(0.0, 1.0);
-        uvs.push(1.0, 1.0);
-
-        for( let i = 0 ; i < instances ; i++ ){
-
-            let posiX = Math.random() * w - w/2;
-            let posiY = h;
-            let posiZ = Math.random() * d - d/2;
-
-            //posiX = posiY = posiZ = 0;
-
-            terrPosis.push( posiX, posiY, posiZ );
-
-            let angle = Math.random()*360;
-            angles.push( angle );
-
-        }
-
-        grassGeo = new THREE.InstancedBufferGeometry();
-        grassGeo.instanceCount = instances;
-
-        grassGeo.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-        grassGeo.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-        grassGeo.setIndex(new THREE.BufferAttribute(new Uint16Array( indexs ), 1));
-
-        grassGeo.setAttribute( 'terrPosi', new THREE.InstancedBufferAttribute( new Float32Array( terrPosis ), 3 ) );
-        grassGeo.setAttribute( 'angle', new THREE.InstancedBufferAttribute(  new Float32Array( angles ), 1 ).setUsage( THREE.DynamicDrawUsage ) );
-
-		grassParticles = new THREE.Mesh( grassGeo, grassShaderMaterial );
-        grassParticles.frustumCulled = false;
-        group.add( grassParticles );
-		scene.add(group);
-
-		console.log(grassGeo);
-
-
-    }
-
-	
-
-    function update( dt ){
-
-        let t = dt;
-		if (grassParticles)
-			console.log(grassParticles);
-        //grassParticles.material.uniforms.time.value = t;
-
-    }
-
-	useFrame((state, delta) => {
-		//console.log(delta);
-		//update(delta);
-
-	})
-
-	const ref = useRef();
-
-	return (
-		<instancedMesh ref={ref} args={[null, null, count]}>
-			<bufferGeometry />
-			<shaderMaterial />
-		</instancedMesh>
-		//<instancedMesh>
-		//<instancedBufferGeometry index={new THREE.BufferAttribute(new Uint16Array( indexs ), 1)}>
-		//	<instancedBufferAttribute attach={"position"} args={ new THREE.Float32BufferAttribute( positions, 3 )}/>
-		//	<instancedBufferAttribute args={THREE.TypedArray(4, 4, 4)}
-		//	<instancedBufferAttribute attach={'uv'} args={ new THREE.Float32BufferAttribute( uvs, 2 ) }/>
-		//</instancedBufferGeometry>
-		//{/*</instancedMesh>*/}
-	)
-		//<primitive object={scene} {...props} />)
-
-}
-
 export const Game: React.FC = () => {
-	const [data, setData] = useState<ServerPayloads[ServerEvents.GameState] | null>(null);
+	const game = useAppSelector((state) => state.websocket);
+	const navigate = useNavigate();
+
+    function formatElapsedTime(elapsedTime: number) {
+        const minutes = Math.floor(Math.round(elapsedTime) / 60);
+        const seconds = Math.floor(Math.round(elapsedTime) % 60);
+        return `${minutes} : ${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+	useEffect(() => {
+		console.log(game.isPlaying);
+		if (!game.isConnected || !game.isPlaying)
+			navigate('/');
+
+	}, [game])
+
+	return (
+		game.score ?
+		<>
+			<div id="info" style={{position:"absolute", top:"100px", left: "20px", color:"white"}}>
+				<div id='score'>
+					{game.score.home}
+					-
+					{game.score.visitor}
+				</div>
+				<div id='time'>
+					{formatElapsedTime(game.elapsedTime)}
+				</div>
+			</div>
+			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#cfcfcf" }} >
+				<Render game={game}/>
+			</Canvas>
+		</>
+		: 
+		<></>
+	)
+}
+
+export const Render: React.FC = (props) => {
 	const [balls, setBalls] = useState(null);
 	const [players, setPlayers] = useState(null);
 	const [me, setMe] = useState(null);
 	const [KeyboardInput, prevInput] = useKeyboardInput();
-	const player = usePlayerStore();
-	const navigate = useNavigate();
 	const user = useAppSelector((state) => state.session.user);
+	const game = props.game;
+	const dispatch = useAppDispatch();
+
 
 	useEffect(() => {
-        async function verifyToken() {
-            console.log(await verify(user.access_token));
-            if (!await verify(user.access_token))
-                navigate('/login');
-        }
-        if (user && user.access_token)
-            verifyToken();
-        else
-            navigate('/login');
-		if (player && player.lobbyId == null)
-			navigate('/login');
-		socket.on(ServerEvents.GameState, (data: ServerPayloads[ServerEvents.GameState]) => {
-			setData(data);
-			//console.log(data.gameData.players[0].position);
-			//console.log(data.gameData.players[1].position);
-			setBalls(data.gameData.balls.map((ball, index) =>
-				<Ball key={index} args={[ball.size, 32, 16]} position={ball.position} quaternion={ball.quaternion}/>
-			))
-			setPlayers(data.gameData.players.map((player, index) =>
-				<Paddle key={index} size={player.size} position={player.position} quaternion={player.quaternion} player={player}/>
-			))
-			data.gameData.players.map((e) => {
-				if (user && e.id == user.id) {
-					setMe(e);
-				}
-			})
+		setBalls(game.balls.map((ball, index) =>
+			<Ball key={index} args={[ball.size, 32, 16]} position={ball.position} quaternion={ball.quaternion}/>
+		))
+		setPlayers(game.players.map((player, index) =>
+			<Paddle key={index} size={player.size} position={player.position} quaternion={player.quaternion} player={player}/>
+		))
+		game.players.map((e) => {
+			if (user && e.id == user.id) {
+				setMe(e);
+			}
 		})
-	}, [])
+	}, [game])
+
+
+
+	function emitInput(KeyboardInput: Input, prevInput: Input, id: number) {
+	
+	// PRESSED
+	if (KeyboardInput.up) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 0;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: true,
+			id: id,
+		}
+		console.log('up');
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+		//socket.emit<InputPacket>(ClientEvents.InputState, payload);
+	}
+	if (KeyboardInput.right) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 1;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: true,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+	if (KeyboardInput.down) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 2;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: true,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+	if (KeyboardInput.left) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 3;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: true,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+	if (KeyboardInput.boost) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 4;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: true,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+	if (KeyboardInput.rotRight) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 5;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: true,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});	
+	}
+	if (KeyboardInput.rotLeft) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 6;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: true,
+			id: id,
+		}	
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+
+	// RELEASED
+	if (!KeyboardInput.up && prevInput.up) {
+		console.log("stop up");
+		console.log(prevInput);
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 0;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: false,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+	if (!KeyboardInput.right && prevInput.right) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 1;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: false,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+	if (!KeyboardInput.down && prevInput.down) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 2;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: false,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+	if (!KeyboardInput.left && prevInput.left) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 3;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: false,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+	if (!KeyboardInput.boost  && prevInput.boost) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 4;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: false,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+	}
+	if (!KeyboardInput.rotRight  && prevInput.rotRight) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 5;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: false,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});	
+	}
+	if (!KeyboardInput.rotLeft  && prevInput.rotLeft) {
+		const timestamp: number = Math.floor(Date.now() / 1000);
+		const code = 6;
+		const payload: InputPacket = {
+			code: code,
+			timestamp: timestamp,
+			pressed: false,
+			id: id,
+		}
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});	
+	}
+} 
 
 	useEffect(() => {
 		if (user)
@@ -381,51 +423,35 @@ export const Game: React.FC = () => {
 		//player.setInput(KeyboardInput);
 	}, [KeyboardInput])
 
+
 	//useThree(({ camera }) => {
 	//	camera.position.set(me[0], me[1], me[2]);
 	//})
-    function formatElapsedTime(elapsedTime: number) {
-        const minutes = Math.floor(Math.round(elapsedTime) / 60);
-        const seconds = Math.floor(Math.round(elapsedTime) % 60);
-        return `${minutes} : ${seconds < 10 ? '0' : ''}${seconds}`;
-    }
 
 	return (
-		data ?
+		game.balls && game.players ?
 		<>
 
-			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#cfcfcf" }} >
 				<TrackballControls noPan noZoom/>
 				<OrbitControls/>
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
-					<GrassField position={[0, 0, 0]} width={data.gameData.mapWidth} height={data.gameData.mapHeight}/>
+					<GrassField position={[0, 0, 0]} width={game.mapHeight} height={game.mapWidth}/>
 					<Camera player={me}/>
-					{/*<GrassField/>*/}
-					<Wall size={[data.gameData.mapHeight, 10, 2]} position={[0, 5, data.gameData.mapWidth / 2]} />
-					<Wall size={[data.gameData.mapHeight, 10, 2]} position={[0, 5, -data.gameData.mapWidth / 2]}/>
-					<Wall size={[2, 10, data.gameData.mapWidth]} position={[data.gameData.mapHeight / 2, 5, 0]} />
-					<Wall size={[2, 10, data.gameData.mapWidth]} position={[-data.gameData.mapHeight / 2, 5, 0]} />
+					<Wall size={[game.mapWidth, 10, 2]} position={[0, 5, game.mapHeight / 2]} />
+					<Wall size={[game.mapWidth, 10, 2]} position={[0, 5, -game.mapHeight / 2]}/>
+					<Wall size={[2, 10, game.mapHeight]} position={[game.mapWidth / 2, 5, 0]} />
+					<Wall size={[2, 10, game.mapHeight]} position={[-game.mapWidth / 2, 5, 0]} />
 					<mesh>
-						<boxBufferGeometry args={[data.gameData.mapHeight, 1.5, 2]}/>
+						<boxBufferGeometry args={[game.mapWidth, 1.5, 2]}/>
 						<meshBasicMaterial color={"white"}/>
 					</mesh>
 					{balls}
 					{players}
-					<Effects/>
-			</Canvas>
-			<div id="info" style={{position:"absolute", top:"100px", left: "20px", color:"white"}}>
-				<div id='score'>
-					{data.gameData.score.home}
-					-
-					{data.gameData.score.visitor}
-				</div>
-				<div id='time'>
-					{formatElapsedTime(data.gameData.elapsedTime)}
-				</div>
-			</div>
+					{/*<Effects/>*/}
 		</>
 		: 
-			<p>PAS DE JEU</p>
+		<></>
+			//<p>PAS DE JEU</p>
 	);
 }

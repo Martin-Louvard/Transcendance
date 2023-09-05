@@ -25,6 +25,7 @@ const LeftMenu: React.FC = () => {
     if (friendships){
       setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
     }
+    console.log(friendRequests);
   }, [friendships])
 
   const toggleMenu = () => {

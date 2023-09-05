@@ -1,10 +1,11 @@
 import { ClientEvents, Input, InputPacket} from '@shared/class';
 import { socket } from '../../socket';
 import { usePlayerStore } from './PlayerStore';
+import { useAppDispatch } from '../../redux/hooks';
 
 
 export function emitInput(KeyboardInput: Input, prevInput: Input, id: number) {
-
+	const dispatch = useAppDispatch();
 	// PRESSED
 	if (KeyboardInput.up) {
 		const timestamp: number = Math.floor(Date.now() / 1000);
@@ -16,7 +17,11 @@ export function emitInput(KeyboardInput: Input, prevInput: Input, id: number) {
 			id: id,
 		}
 		console.log('up');
-		socket.emit<InputPacket>(ClientEvents.InputState, payload);
+		dispatch({
+			type: 'WEBSOCKET_SEND_INPUT',
+			payload: payload,
+		});
+		//socket.emit<InputPacket>(ClientEvents.InputState, payload);
 	}
 	if (KeyboardInput.right) {
 		const timestamp: number = Math.floor(Date.now() / 1000);

@@ -15,7 +15,7 @@ const Dashboard: React.FC = () => {
     if (isInitialLoadRef.current) {
       isInitialLoadRef.current = false;
       if (user && user.id) {
-        dispatch({ type: 'WEBSOCKET_CONNECT', payload: user.id });
+        dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, user.access_token] });
       }
     }
   }, [dispatch, user]);

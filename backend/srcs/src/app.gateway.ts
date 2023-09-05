@@ -146,8 +146,8 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     @ConnectedSocket() client: Socket,
     @MessageBody() body: Array<any>,
   ): Promise<void> {
-    if (client.handshake.headers.user_id) {
-      const user_id_string = client.handshake.headers.user_id[0];
+    if (client.handshake.auth) {
+      const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
       const friend = await this.prisma.user.findUnique({
         where: { username: body[1] },

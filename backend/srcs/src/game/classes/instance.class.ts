@@ -63,16 +63,16 @@ export class Instance {
 
 	// un player quitte pendant le temps d'attente du demarage
 	private data: GameData = {
-		mapHeight:  100,
-		mapWidth: 200,
+		mapHeight:  200,
+		mapWidth: 100,
 		balls: null,
 		players: null,
 		score: {home: 0, visitor: 0},
 		elapsedTime: 0,
 	};
 	private world: World = {
-		mapHeight:  100,
-		mapWidth: 200,
+		mapHeight:  200,
+		mapWidth: 100,
 		world: null,
 		groundBody: null,
 		players: null,
@@ -226,25 +226,39 @@ export class Instance {
 			if (bl.body.id == contact.bi.id) {
 				this.world.players.forEach((pl) => {
 					if (pl.body.id == contact.bj.id) {
-						console.log("collision")
-						const impactDirection: CANNON.Vec3 = contact.ri.clone();
-						const angle = Math.atan2(impactDirection.z, impactDirection.x);
+						console.log("Collision");
 
-						const ballSpeed = bl.body.velocity.length();
-						const paddleSpeed = pl.body.velocity.length();
-	
-						console.log(`ball speed : ${ballSpeed}, paddle speed : ${paddleSpeed}, angle : ${angle}`)
-						const impulseForce = (angle * ballSpeed * paddleSpeed) / 1000;
-	
-						const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
-						console.log(impulseVector)
-						bl.body.applyImpulse(impulseVector, bl.body.position);
-						//const mulVec = new CANNON.Vec3(-0, 0, -0);
-						//bl.body.applyImpulse(impactDirection.vmul(mulVec), bl.body.position);
-						//mulVec.set(-0.2, 0, -0.2);
-						//bl.contactVelocity.copy(impulseVector);
-						//impactDirection.vmul(mulVec, bl.contactVelocity);
-						//bl.body.velocity.copy(bl.contactVelocity);
+						// Calculate the collision normal
+						const collisionNormal = contact.ni;
+			  
+						// Calculate the ball's velocity along the collision normal
+						const ballVelocityAlongNormal = collisionNormal.dot(bl.body.velocity);
+			  
+						// Calculate the new velocity by reversing the component along the normal
+						const newVelocity = bl.body.velocity.vsub(
+						  collisionNormal.scale(2 * ballVelocityAlongNormal)
+						);
+			  
+						// Update the ball's velocity with the new velocity
+						bl.body.velocity.copy(newVelocity);
+			  
+						console.log("New Velocity:", newVelocity);
+			  
+						// Invert the angular rotation (optional)
+						bl.body.angularVelocity.scale(-0.1);
+			  
+						// Apply an impulse force to the ball's new direction (optional)
+						const impulseStrength = 100;
+						const impulseDirection = new CANNON.Vec3(
+						  Math.floor(Math.random() * 2) - 1,
+						  0,
+						  Math.random()
+						);
+						impulseDirection.normalize();
+						const impulseForce = impulseDirection.scale(impulseStrength);
+						bl.body.applyImpulse(impulseForce, bl.body.position);
+			  
+						console.log("Angular Velocity:", bl.body.angularVelocity);
 
 					}
 				})
@@ -259,7 +273,8 @@ export class Instance {
 			const bi = contact.bi;
 			const bj = contact.bj;
 
-
+			if ((this.world.balls.find(ball => ball.body === bi) && this.world.walls.includes(bj)) )
+				console.log('contact');
 			if ((this.world.balls.find(ball => ball.body === bi) && this.world.walls.includes(bj)) ||
 				(this.world.balls.find(ball => ball.body === bj) && this.world.walls.includes(bi))) {
 					const ball = this.world.balls.find(ball => ball.body === bi || ball.body === bj);
@@ -302,7 +317,8 @@ export class Instance {
 	}
 
 	ballStart(ball: Sphere) {
-		const direction = new CANNON.Vec3(Math.random(), 0, Math.random());
+		console.log("ball Start");
+		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
 		const angle = Math.atan2(direction.z, direction.x);
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
 		const impulseStrength = 500; 
@@ -316,7 +332,7 @@ export class Instance {
 			e.contactVelocity.set(0, 0, 0);
 			e.body.force.set(0, 0, 0);
 			e.body.angularVelocity.set(0, 0, 0);
-			//this.timeoutAction(3000, () => this.ballStart(e));
+			this.timeoutAction(3000, () => this.ballStart(e));
 		});
 		let i = 0;
 		this.world.players.forEach((e) => {
@@ -330,8 +346,8 @@ export class Instance {
 		const wallHeight = 10; // Adjust this value as needed
 		this.world.walls = new Array<CANNON.Body>(4);
 	
-		const wallShapeX = new CANNON.Box(new CANNON.Vec3(this.world.mapHeight / 2, wallHeight / 2, wallSize / 2));
-		const wallShapeZ = new CANNON.Box(new CANNON.Vec3(wallSize / 2, wallHeight / 2, this.world.mapWidth / 2));
+		const wallShapeX = new CANNON.Box(new CANNON.Vec3(this.world.mapWidth / 2, wallHeight / 2, wallSize / 2));
+		const wallShapeZ = new CANNON.Box(new CANNON.Vec3(wallSize / 2, wallHeight / 2, this.world.mapHeight / 2));
 	
 		const wallMaterial = new CANNON.Material();
 		const wallLeft = new CANNON.Body({
@@ -339,7 +355,7 @@ export class Instance {
 			shape: wallShapeZ,
 			material: wallMaterial
 		});
-		wallLeft.position.set(-this.world.mapHeight / 2 - wallSize / 2, wallHeight / 2, 0);
+		wallLeft.position.set(-this.world.mapWidth / 2 - wallSize / 2, wallHeight / 2, 0);
 		this.world.world.addBody(wallLeft);
 		this.world.walls.push(wallLeft);
 	
@@ -348,7 +364,7 @@ export class Instance {
 			shape: wallShapeZ,
 			material: wallMaterial
 		});
-		wallRight.position.set(this.world.mapHeight / 2 + wallSize / 2, wallHeight / 2, 0);
+		wallRight.position.set(this.world.mapWidth / 2 + wallSize / 2, wallHeight / 2, 0);
 		this.world.world.addBody(wallRight);
 		this.world.walls.push(wallRight);
 	
@@ -358,7 +374,7 @@ export class Instance {
 			material: wallMaterial,
 		});
 		wallTop.id = 100;
-		wallTop.position.set(0, wallHeight / 2, -this.world.mapWidth / 2 - wallSize / 2);
+		wallTop.position.set(0, wallHeight / 2, -this.world.mapHeight / 2 - wallSize / 2);
 		this.world.world.addBody(wallTop);
 		this.world.walls.push(wallTop);
 	
@@ -368,7 +384,7 @@ export class Instance {
 			material: wallMaterial
 		});
 		wallBottom.id = 99;
-		wallBottom.position.set(0, wallHeight / 2, this.world.mapWidth / 2 + wallSize / 2);
+		wallBottom.position.set(0, wallHeight / 2, this.world.mapHeight / 2 + wallSize / 2);
 		this.world.walls.push(wallBottom);
 		this.world.world.addBody(wallBottom);
 		const ballContactMaterial: CANNON.ContactMaterial = new CANNON.ContactMaterial(ballMaterial, wallMaterial, {restitution: 1 });
@@ -389,7 +405,7 @@ export class Instance {
 			}),
 			contactVelocity: new CANNON.Vec3(0, 0, 0),
 		};
-		sphere.body.position.set(0, 5, 30)
+		sphere.body.position.set(0, radius, 0)
 		this.world.world.addBody(sphere.body);
 		this.world.balls = new Array<Sphere>();
 		this.world.balls.push(sphere);
@@ -449,6 +465,7 @@ export class Instance {
 			mass: 0,
 			material: groundPhysicMaterial,
 			shape: new CANNON.Plane(),
+			collisionResponse: false,
 		})
 		groundBody.quaternion.setFromAxisAngle( new CANNON.Vec3( 1, 0, 0 ), -Math.PI / 2 )
 		this.world.world.addBody(groundBody);
@@ -457,7 +474,7 @@ export class Instance {
 		this.createPlayers(groundMaterial, ballMaterial);
 		this.createWalls(ballMaterial);
 		this.world.balls.forEach((e) => {
-			//this.timeoutAction(3000, () => this.ballStart(e));
+			this.timeoutAction(3000, () => this.ballStart(e));
 		})
 	}
 
@@ -473,7 +490,6 @@ export class Instance {
 
 	dispatchGameState() {
 		const payload: ServerPayloads[ServerEvents.GameState] = {
-			scores: this.scores,
 			gameData: this.data,
 		}
 		this.lobby.emit<ServerPayloads[ServerEvents.GameState]>(ServerEvents.GameState, payload);
@@ -496,14 +512,14 @@ export class Instance {
 			if ( (e.player.team == 'home' ? e.body.position.z >= -20 : e.body.position.z <= 20)) {
 				e.body.position.z =  (e.player.team == 'home' ? -20 : 20);
 			}
-			if (e.body.position.z <= -this.world.mapWidth / 2)
-				e.body.position.z = -(this.world.mapWidth / 2);
-			if (e.body.position.z >= this.world.mapWidth / 2)
-				e.body.position.z = this.world.mapWidth / 2;
-			if (e.body.position.x <= -this.world.mapHeight / 2)
-				e.body.position.x = -(this.world.mapHeight / 2);
-			if (e.body.position.x >= this.world.mapHeight / 2)
-				e.body.position.x = this.world.mapHeight / 2;  
+			if (e.body.position.z <= -this.world.mapHeight / 2)
+				e.body.position.z = -(this.world.mapHeight / 2);
+			if (e.body.position.z >= this.world.mapHeight / 2)
+				e.body.position.z = this.world.mapHeight / 2;
+			if (e.body.position.x <= -this.world.mapWidth / 2)
+				e.body.position.x = -(this.world.mapWidth / 2);
+			if (e.body.position.x >= this.world.mapWidth / 2)
+				e.body.position.x = this.world.mapWidth / 2;  
 		})	
 	}
 
@@ -515,7 +531,7 @@ export class Instance {
 			this.ballPhysics();
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
 			if (this.data.elapsedTime > 180)
-			this.triggerFinish();
+				this.triggerFinish();
 	}, 1000/ 120));
 }
 

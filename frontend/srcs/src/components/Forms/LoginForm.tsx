@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { socket } from '../../socket.ts';
 import Form from './Form.js';
 import { login } from '../../api.ts';
 import { useAppDispatch } from '../../redux/hooks.js';
@@ -35,8 +34,6 @@ const LoginForm: React.FC = () => {
         toast.success("Logged in")
         dispatch(setSessionUser(user))
         dispatch(setToken(user.access_token))
-        socket.auth = {token: user.access_token};
-        socket.disconnect().connect();
         return
       }
       const code = window.prompt("Enter your code from google authenticator", "000000");
@@ -49,8 +46,6 @@ const LoginForm: React.FC = () => {
         toast.success("Logged in")
       } else if (user2fa.message)
           toast.error(user2fa.message)
-      socket.auth = {token: user.access_token};
-      socket.disconnect().connect();
     }
     else
       toast.error("Invalid username or password")
