@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {PlayerBody, Ball } from '@shared/class'
 
 interface WebSocketState {
   isConnected: boolean;
@@ -29,9 +30,11 @@ const websocketSlice = createSlice({
   initialState,
   reducers: {
     websocketConnected: (state) => {
+      console.log("connected")
       state.isConnected = true;
     },
     websocketDisconnected: (state) => {
+      console.log("disconnected")
       state.isConnected = false;
       state.lobbyId = null;
       state.isPlaying =false;

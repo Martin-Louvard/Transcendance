@@ -146,7 +146,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     @ConnectedSocket() client: Socket,
     @MessageBody() body: Array<any>,
   ): Promise<void> {
-    if (client.handshake.auth) {
+    if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
       const friend = await this.prisma.user.findUnique({
@@ -181,7 +181,9 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
         where: { id: friendship.chat_id },
         include: { friendship: true, messages: true, participants: true },
       });
-      const friend_socket = this.connected_clients.get(friend_id);
+      const friendplayer = this.playerService.getPlayerById(friend_id);
+      const friend_socket = friendplayer ? friendplayer.socket : undefined;
+      console.log(friend_socket, " ", friendship);
       client.emit('friend_request', friendship);
       if (body[2] === 'ACCEPTED') client.emit('create_chat', chat);
       else client.emit('update_chat', chat);

@@ -227,13 +227,16 @@ export const sessionSlice = createSlice({
       }
     },
     updateFriendRequest: (state, action) => {
-      if (state.friendships === undefined || state.friendships.length === 0)
+      console.log("hey");
+      if (state.friendships === undefined || state.friendships.length === 0) {
         state.friendships = [action.payload];
-      else if (state.friendships.find((f) => f.id == action.payload.id))
+      }
+      else if (state.friendships.find((f) => f.id == action.payload.id)) {
         state.friendships = state.friendships.map((f) => {
-          if (f.id == action.payload.id) return action.payload;
-          return f;
-        });
+            if (f.id == action.payload.id) return action.payload;
+            return f;
+          });
+      }
       else state.friendships.push(action.payload);
 
       //Add to friends if friendship accepted, else filter friends and remove friends that are no longer accepted if they are in the state
@@ -314,6 +317,7 @@ export const sessionSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    fetchRelatedUserData(5);
     builder.addCase(fetchRelatedUserData.pending, (state) => {
       state.loading = true;
       state.error = undefined; });

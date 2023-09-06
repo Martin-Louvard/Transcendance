@@ -18,12 +18,24 @@ const LeftMenu: React.FC = () => {
   const [contentToShow, setContentToShow] = useState<"menu" | "profile" | "friends" | "games" | "friendUser"| "chat">("menu");
   const friendships = useAppSelector((state)=> state.session.friendships)
   const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships)
+  console.log("test => ", friendships);
   const [selectedFriendship, setSelectedFriendship] = useState(Object)
   const dispatch = useAppDispatch();
 
   useEffect(()=>{
     if (friendships){
-      setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
+      let friendshipstmp: Friendships[] = [];
+      //console.log(friendships)
+      //setFriendRequest(friendships.filter(f => (
+      //  f.status === Status.PENDING && f.sender_id != user?.id,
+      //  console.log(`sender_id : ${f.sender_id}, status : ${f.status}, user_id : ${user?.id}`)
+      //  )))
+      friendships.forEach((e) => {
+        console.log(e);
+        if (e.status === Status.PENDING && e.sender_id != user?.id)
+          friendshipstmp.push(e);
+      })
+      setFriendRequest(friendshipstmp);
     }
     console.log(friendRequests);
   }, [friendships])
@@ -75,6 +87,8 @@ const LeftMenu: React.FC = () => {
   );
 
   const renderNotifications = () => (   
+    console.log("avant de render => ", friendships),
+    console.log(", ", friendRequests),
   <div className="friends-card-wrapper">
     <h2>Friend Requests</h2>
         <ul className="friend-list">

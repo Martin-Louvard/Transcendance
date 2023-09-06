@@ -16,7 +16,8 @@ export class AppService {
   async auth(client: Socket): Promise<void> {
     try {
       console.log("auth socket token : " + client.handshake.auth.token);
-      if (!client.handshake.auth.token || client.handshake.auth.token == "abc") {
+      console.log(client.handshake);
+      if (!client.handshake.auth.token) {
         throw "no jwt token"
       }
       const payload = this.jwtService.verify(
