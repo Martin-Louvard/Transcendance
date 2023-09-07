@@ -41,7 +41,7 @@ const FriendsListCard: React.FC = () =>{
 
     const friendList = () =>{
       return (
-      <div className="friends-card-wrapper">
+      <div className="card-wrapper">
         <Form onSubmit={sendFriendRequest} title="Add a new friend" buttonText="Add">
           <div>
             <input 
@@ -54,10 +54,10 @@ const FriendsListCard: React.FC = () =>{
           </div>
         </Form>
         <h2>My Friends</h2>
-        <ul className="friend-list">
+        <ul className="list">
           {friendshipsAccepted
             ? friendshipsAccepted.map((friendship, index) => (
-              <li className="friend-item" onClick={() => displayFriendProfile(friendship)} key={index}>
+              <li className="item" onClick={() => displayFriendProfile(friendship)} key={index}>
                 <div className="picture-indicator">
                   <div className='friend-picture'>
                     <img 

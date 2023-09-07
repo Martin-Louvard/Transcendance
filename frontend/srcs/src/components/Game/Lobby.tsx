@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { socket } from '../../socket';
 import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads } from './Type';
 import { usePlayerStore } from './PlayerStore';
+import './Lobby.scss'
 
 const AutoMatch: React.FC = () => {
   const [gameState, setGameState] = useState({isDouble: false, isDuel: false})
@@ -83,11 +84,14 @@ export const Lobby: React.FC = () => {
       <JoinMatch/>
     :
     !player.lobbyId && !player.isPlaying?
+    <>
+    <img src="/marvin2.png" className="logo" alt="PONGƎD logo" />
     <div className='play-buttons'>
-      <button className="auto-button" onClick={() => {setLobbyState({isAuto: true, isCreate: false, isJoin: false})}}>Auto Match</button>
-      <button className="create-button" onClick={() => {setLobbyState({isAuto: false, isCreate: true, isJoin: false})}}>Create game</button>
-      <button className="join-button" onClick={() => {setLobbyState({isAuto: false, isCreate: false, isJoin: true})}}>Join Game</button>
+      <button className="auto-button" onClick={() => {setLobbyState({isAuto: true, isCreate: false, isJoin: false})}}>AUTOMATCH</button>
+      <button className="create-button" onClick={() => {setLobbyState({isAuto: false, isCreate: true, isJoin: false})}}>CREATE GAME</button>
+      <button className="join-button" onClick={() => {setLobbyState({isAuto: false, isCreate: false, isJoin: true})}}>JOIN GAME</button>
     </div>
+    </>
     :
     player.isPlaying && player.lobbyId? 
     <div className='current-game-block'>

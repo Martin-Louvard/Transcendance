@@ -137,17 +137,19 @@ const ProfileCard: React.FC = () => {
           <h6> Victories:{user?.victoriesCount} </h6>
           <h6> Defeats:{user?.defeatCount} </h6>
       </div>
+      <div className='list'>
       <button  onClick={() =>{setShowGames(true)}}>Game History</button> 
       {
         !user?.twoFAEnabled ? <button  onClick={() =>{activate2fa()}}>Activate 2fa</button> : <button  onClick={() =>{disable2fa()}}>Disable 2fa</button>
       }
       <button  onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
       {twoFaQrcode.length ? QrCode() : null}
+      </div>
     </>)
     }
     
     return <>
-        <div className="profile-card-wrapper">
+        <div className="card-wrapper">
         {
           changeInfoOpen ? <ChangeInfo setChangeInfoOpen={setChangeInfoOpen}/>:
           showGames ? <HistoryCard/> :

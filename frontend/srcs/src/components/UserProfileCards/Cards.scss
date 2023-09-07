@@ -1,22 +1,32 @@
 $card-padding: 10px;
-$main-bg-color: #312f2f;
+$main-bg-color: #131313;
 $secondary-bg-color: #4d4848;
 $overlay-bg-color: rgba(0, 0, 0, 0.7);
 $font-color: wheat;
 $picture-size: 150px;
 $friend-picture-size: 50px;
 
-.profile-card-wrapper {
-  background-color: $main-bg-color;
+.card-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   width: 100%;
-  height: 110%;
   z-index: 1;
   overflow: hidden;
+  border-radius: 25%;
+  padding: 15px;
+  h2 {
+    margin-bottom: 10px;
+  }
 
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    height: 100%;
+  }
   
   button {
     width: 90%;
@@ -73,25 +83,6 @@ $friend-picture-size: 50px;
   }
 }
 
-.friends-card-wrapper,
-.history-card-wrapper {
-  background-color: $main-bg-color;
-  width: 100%;
-  overflow: hidden;
-
-  h2 {
-    margin-bottom: 10px;
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    overflow-y: auto;
-    height: 100%;
-  }
-}
-
 .friend-picture {
   width: $friend-picture-size;
   height: $friend-picture-size;
@@ -107,11 +98,14 @@ $friend-picture-size: 50px;
   }
 }
 
-.friend-list {
+.list {
   display: flex;
   flex-direction: column;
+  width: 90%;
+  max-width: 500px;
+  align-items: center;
 
-.friend-item {
+.item {
   background-color: $secondary-bg-color;
   display: flex;
   flex-direction: row;
@@ -121,6 +115,7 @@ $friend-picture-size: 50px;
   border-radius: 10px;
   margin-bottom: 10px;
   padding: 10px;
+  min-width: 200px;
 
   h3,
   p {

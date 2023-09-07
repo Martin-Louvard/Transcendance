@@ -12,8 +12,10 @@ $react-color: #61dafbaa;
   top: 0;
   left: 0;
   right: 0;
-  background-color: $primary-color;
+  background-color: transparent;
   padding: 0 20px;
+  position: fixed;
+  z-index: 5;
 }
 
 // Elem Wrapper

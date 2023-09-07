@@ -64,8 +64,10 @@ const Authentication: React.FC = () => {
           <button onClick={handleSignupClick}>Signup</button>
         </div>
         <div className="auth-card">
+                     
+
           <a href={`https://api.intra.42.fr/oauth/authorize?client_id=${Api42uid}&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&response_type=code`}>
-            Login with 42
+            Login with <img src={"/42_Logo.svg"}></img>
           </a>
         </div>
       </div>

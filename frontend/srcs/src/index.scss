@@ -47,18 +47,20 @@ body {
   width: 100vw;
   height: 100vh;
   text-align: center;
+  align-items: center;
   display: flex;
   flex-direction: column;
   top: 0;
   bottom: 0;
   flex: 1;
   padding: 0;
+  background-color: #000000;
 }
 
 // Links
 a {
   font-weight: 500;
-  color: $primary-color;
+  color: white;
   text-decoration: inherit;
 
   &:hover {
@@ -101,7 +103,7 @@ ul{
     flex-direction: row;
   }
 
-.friend-item {
+.item {
   background-color: $secondary-bg-color;
   display: flex;
   flex-direction: column;
