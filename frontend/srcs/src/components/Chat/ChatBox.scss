@@ -1,14 +1,18 @@
 .chat-boxes-wrapper {
 	display: flex;
-	flex-direction: column-reverse;
+	flex-direction: row-reverse;
+	justify-content: space-between;
 	position: fixed;
-	max-width: 20vh;
-	max-height: 10px;
 	bottom: 20px;
-	padding-right: 50px;
-	padding-top: 90vh;
-	right: 30vh;
+	right: 12%;
 	gap: 10px;
+}
+
+.inner-chat-boxes-wrapper {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+
 }
 
 .chat-box {
@@ -18,9 +22,10 @@
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
 	width: 250px;
 	transition: width 0.3s ease-in-out;
+	height: 250px;
 
 	&.minimized {
-		min-height: 45px;
+		height: 45px;
 		min-width: 50px;
 		overflow: hidden;
 	}
@@ -35,12 +40,19 @@
 		padding: 5px;
 		font-weight: bold;
 		padding-right: 10px;
+		justify-content: "space-between";
+	}
+
+	.chat-name-wrapper-right {
+		display: flex;
+		align-items: center;
 	}
 
 	.chat-name {
 		display:flex;
 		margin-left: 10px;
 		margin-top:4px;
+		width: 70%;
 	}
 
 	.minimized-box-button {

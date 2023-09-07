@@ -8,24 +8,32 @@ export class ChatChannelsService {
   constructor(private prisma: PrismaService) {}
 
   create(createChatChannelDto: CreateChatChannelDto) {
-    return this.prisma.chatChannel.create({data: createChatChannelDto});
+    return this.prisma.chatChannel.create({ data: createChatChannelDto });
   }
 
   findAll() {
-    return this.prisma.chatChannel.findMany({include: {
-      participants: true,
-      bannedUsers: true,
-      admins: true,
-      messages: true 
-    }});
+    return this.prisma.chatChannel.findMany({
+      include: {
+        participants: true,
+        bannedUsers: true,
+        admins: true,
+        messages: true,
+      },
+    });
   }
 
   findOne(id: number) {
-    return this.prisma.chatChannel.findUnique({where: {id}, include: {messages: true}});
+    return this.prisma.chatChannel.findUnique({
+      where: { id },
+      include: { messages: true },
+    });
   }
 
   update(id: number, updateChatChannelDto: UpdateChatChannelDto) {
-    return this.prisma.chatChannel.update({where: {id}, data: updateChatChannelDto});
+    return this.prisma.chatChannel.update({
+      where: { id },
+      data: updateChatChannelDto,
+    });
   }
 
   remove(id: number) {
