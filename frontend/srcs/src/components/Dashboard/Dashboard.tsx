@@ -9,12 +9,13 @@ import { useState } from 'react';
 import ProfileCard from '../UserProfileCards/ProfileCard';
 import FriendsListCard from '../UserProfileCards/FriendsListCard';
 import HistoryCard from '../UserProfileCards/HistoryCard';
+import ChatCreator from '../Chat/ChatCreator';
 
 const Dashboard: React.FC = () => {
   const user = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
   const isInitialLoadRef = useRef(true);
-  const [contentToShow, setContentToShow] = useState< "profile" | "friends" | "games" | "friendUser"| "lobby">("lobby");
+  const [contentToShow, setContentToShow] = useState< "profile" | "friends" | "games" | "friendUser"| "lobby" | "chat" >("lobby");
 
   useEffect(() => {
     if (isInitialLoadRef.current) {
@@ -32,6 +33,7 @@ const Dashboard: React.FC = () => {
     else if (targetId === "friends") setContentToShow("friends");
     else if (targetId === "history") setContentToShow("games");
     else if (targetId === "play") setContentToShow("lobby");
+    else if (targetId === "chat") setContentToShow("chat");
   };
 
   const renderContent = () => {
@@ -40,6 +42,8 @@ const Dashboard: React.FC = () => {
     if (contentToShow === "friends") return <FriendsListCard />;
     if (contentToShow === "games") return <HistoryCard />;
     if (contentToShow === "lobby") return <Lobby />;
+    if (contentToShow === "chat") return <ChatCreator />;
+
   };
 
   const renderMenuButtons = () => (
@@ -53,6 +57,9 @@ const Dashboard: React.FC = () => {
       <button id="profile" onClick={handleClick}>
         My Profile
       </button>
+      <button id="chat" onClick={handleClick}>
+        Channel Creator
+      </button>
       <button id="play" onClick={handleClick}>
         PLAY
       </button>
@@ -64,7 +71,6 @@ const Dashboard: React.FC = () => {
   return (
     <div className="dashboard-wrapper">
       {renderMenuButtons()}
-      <LeftMenu />
       <ChatBoxes />
       <SideChatMenu />
       <div className="canvas-wrapper">

@@ -14,13 +14,17 @@ const FriendsListCard: React.FC = () =>{
     const [selectedFriendship, setSelectedFriendship] = useState(Object)
     const [newFriendUsername, setNewFriendUsername] = useState('');
     const dispatch = useAppDispatch();
-
+    const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships)
 
     useEffect(()=>{
+      if (friendships){
+        setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
+      }
       const accepted = friendships?.filter(f => f.status === Status.ACCEPTED)
       if (accepted)
         setFriendshipsAccepted(accepted)
     },[friendships])
+
 
     const sendFriendRequest = async (event: React.FormEvent<HTMLFormElement>) =>{
       event.preventDefault()
@@ -39,6 +43,28 @@ const FriendsListCard: React.FC = () =>{
       setSelectedFriendship(friendship);
     };
 
+    const renderNotifications = () => (   
+      <div className="friends-card-wrapper">
+        <h2>Friend Requests</h2>
+            <ul className="list">
+              {friendRequests ? friendRequests.map((friendship, index) => (
+                <li className="item" key={index}>
+                <div className='friend-picture' onClick={()=>{setSelectedFriendship(friendship); setContentToShow("friendUser") }}>
+                  <img src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
+                </div>
+                <div>
+                  <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
+                  <div className='accept-deny'>
+                    <button onClick={()=>{ dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username, Status.ACCEPTED] }) }}>Add Friend ✅</button>
+                    <button onClick={()=>{ dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id,friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username, Status.DECLINED] }) }}>Decline ❌</button>
+                  </div>
+                </div>
+                </li>
+              )) : <></>}
+            </ul>
+        </div>
+      )
+
     const friendList = () =>{
       return (
       <div className="card-wrapper">
@@ -53,6 +79,7 @@ const FriendsListCard: React.FC = () =>{
             />
           </div>
         </Form>
+        {friendRequests?.length ? renderNotifications() : ""}
         <h2>My Friends</h2>
         <ul className="list">
           {friendshipsAccepted

@@ -1,19 +1,18 @@
-$chat-menu-width: 20vh;
-$chat-menu-min-width: 20vh;
-$chat-menu-bg-color: #312f2f;
+$chat-menu-width: 15vw;
+$chat-menu-bg-color: #131313;
 $chat-exit-button-height: 5%;
 $chat-exit-button-radius: 20px;
-$chat-menu-icon-right: 20vh;
-$chat-menu-animation-range: 11vw;
-$chat-menu-icon-open: 20vh;
+$chat-menu-icon-right: 15vw;
+$chat-menu-animation-range: 15vw;
+$chat-menu-icon-open: 15vw;
 
 .chat-menu-wrapper {
   width: $chat-menu-width;
-  min-width: $chat-menu-min-width;
   background-color: $chat-menu-bg-color;
   position: fixed;
   right:0;
-  height: 100%;  
+  bottom: 0;
+  height: 90%;  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,13 +20,12 @@ $chat-menu-icon-open: 20vh;
 }
 
 .inner-chat-menu-wrapper {
-	padding: 10px;
 	padding-top: 20px;
 	display: flex;
 	flex-direction: column;
 	text-align: center;
 	justify-content: space-evenly;
-	width: 90%;
+	width: auto;
 	right: 0;
 }
 
@@ -45,6 +43,7 @@ $chat-menu-icon-open: 20vh;
   position: absolute;
   cursor: pointer;
   right: $chat-menu-icon-right;
+  bottom: 0;
   z-index: 10;
 }
 
