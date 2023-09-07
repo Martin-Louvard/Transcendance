@@ -1,10 +1,8 @@
 import React, { useRef, useEffect } from 'react';
-import LeftMenu from '../Menu/LeftMenu';
 import './Dashboard.scss';
 import { Lobby } from '../Game/Lobby';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import SideChatMenu from '../Chat/SideChatMenu';
-import ChatBoxes from '../Chat/ChatBox';
 import { useState } from 'react';
 import ProfileCard from '../UserProfileCards/ProfileCard';
 import FriendsListCard from '../UserProfileCards/FriendsListCard';
@@ -71,7 +69,6 @@ const Dashboard: React.FC = () => {
   return (
     <div className="dashboard-wrapper">
       {renderMenuButtons()}
-      <ChatBoxes />
       <SideChatMenu />
       <div className="canvas-wrapper">
         {renderContent()}

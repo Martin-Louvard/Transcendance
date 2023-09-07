@@ -9,6 +9,8 @@ import {
 import { VscFoldDown, VscFoldUp } from "react-icons/vsc";
 import "./SideChatMenu.scss";
 import { getName } from "./functions.ts";
+import ChatBoxes from "./ChatBox.tsx";
+import "./ChatBox.scss"
 
 const SideChatMenu = () => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -128,9 +130,10 @@ const SideChatMenu = () => {
 
   return (
     <div className={`chat-menu-wrapper ${menuCss}`}>
+      <ChatBoxes />
       <img
         className={`logo-nav chat-menu-icon`}
-        src={"/menu.svg"}
+        src={"/chat.svg"}
         alt="Chat Menu"
         onClick={toggleMenu}
       />
