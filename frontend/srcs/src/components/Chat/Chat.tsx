@@ -25,10 +25,10 @@ const Chat: React.FC<ChatProps> = ({ chatId }) => {
   };
 
   return (
-    <div className="chat-container">
+    <>
       <Messages messages={chat?.messages || []} />
       <MessageInput handleSendMessage={handleSendMessage} />
-    </div>
+    </>
   );
 };
 

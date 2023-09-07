@@ -31,6 +31,11 @@ $chat-menu-icon-open: 20vh;
 	right: 0;
 }
 
+.channel-type-wrapper {
+	display: flex;
+	justify-content: space-between;
+}
+
 .chat-exit-button {
   height: $chat-exit-button-height;
   width: auto;
@@ -97,13 +102,21 @@ $chat-menu-icon-open: 20vh;
 	border-radius: $chat-exit-button-radius;
 	width: 15%;
 	height: 90%;
+	justify-content: center;
 }
 
 .chat-item {
-  padding: 10px 0;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: background-color 0.2s;
+	display:flex;
+	padding: 10px 0;
+	justify-content: space-between;
+	cursor: pointer;
+	border-radius: 10px;
+	transition: background-color 0.2s;
+	flex-direction: left;
+}
+.chat-name-in-menu {
+	display:flex;
+	width: 70%;
 }
 
 .chat-item:hover {

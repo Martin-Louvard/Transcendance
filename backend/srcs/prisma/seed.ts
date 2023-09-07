@@ -6,36 +6,32 @@ const prisma = new PrismaClient();
 
 const roundsOfHashing = 10;
 
-
 async function main() {
-
   const commonpassword = await bcrypt.hash('123', roundsOfHashing);
   const adminpassword = await bcrypt.hash('admin', roundsOfHashing);
-  
+
   // create one admin user
   const admin = await prisma.user.upsert({
     where: { username: 'admin' },
     update: { password: adminpassword },
     create: {
-        username: 'admin',
-        email: 'admin@gmail.com',
-        password: adminpassword,
-
-      },
+      username: 'admin',
+      email: 'admin@gmail.com',
+      password: adminpassword,
+    },
   });
-
 
   // create two common users
   const user1 = await prisma.user.upsert({
     where: { username: 'User1' },
     update: { password: commonpassword },
     create: {
-        username: 'User1',
-        email: 'fakeEmail@gmail.com',
-        password: commonpassword ,
-        //friends: {
-         // create:[{friend_id: admin.id}]
-        //}
+      username: 'User1',
+      email: 'fakeEmail@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
     },
   });
 
@@ -43,31 +39,42 @@ async function main() {
     where: { username: 'User2' },
     update: { password: commonpassword },
     create: {
-        username: 'User2',
-        email: 'fakeEmail2@gmail.com',
-        password: commonpassword,
-        //friends: {
-         // create:[{friend_id: admin.id}]
-        //}
-      },
+      username: 'User2',
+      email: 'fakeEmail2@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
   });
 
   const user42 = await prisma.user.upsert({
     where: { username: 'User42' },
     update: { password: commonpassword },
     create: {
-        username: 'User42',
-        email: 'fakeEmail42@gmail.com',
-        email42: '42email@stud42.fr',
-        password: commonpassword ,
-        //friends: {
-        //  create:[{friend_id: admin.id}]
-        //}
+      username: 'User42',
+      email: 'fakeEmail42@gmail.com',
+      email42: '42email@stud42.fr',
+      password: commonpassword,
+      //friends: {
+      //  create:[{friend_id: admin.id}]
+      //}
     },
   });
 
+  const chatGeneral = await prisma.chatChannel.create({
+    data: {
+      owner: { connect: { id: admin.id } },
+      admins: { connect: { id: admin.id } },
+      channelType: 'general',
+      name: 'WorldChannel',
+      participants: {
+        connect: [{ id: admin.id }, { id: user1.id }, { id: user2.id }],
+      },
+    },
+  });
 
-  console.log({ user1, user2, user42, admin });
+  console.log({ user1, user2, user42, admin, chatGeneral });
 }
 
 // execute the main function
