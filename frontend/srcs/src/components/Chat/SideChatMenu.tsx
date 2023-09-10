@@ -11,6 +11,7 @@ import "./SideChatMenu.scss";
 import { getName } from "./functions.ts";
 import ChatBoxes from "./ChatBox.tsx";
 import "./ChatBox.scss"
+import ChatCreator from "./ChatCreator.tsx";
 
 const SideChatMenu = () => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -22,6 +23,7 @@ const SideChatMenu = () => {
     (state) => state.session.OpenedChatChannels,
   );
   const [chatBox, setChatBox] = useState<ChatChannels | null>(null);
+  const [showChatCreator, setShowChatCreator] = useState(false)
   const [menuCss, setMenuCss] = useState("open-chat-menu");
   const [minimizedList, setMinimizedList] = useState<string[] | undefined>([]);
   // ================================================================== //
@@ -66,10 +68,12 @@ const SideChatMenu = () => {
     }
   };
 
+
+
+
   const channelsList = (channels: ChatChannels[]) => {
     return (
       <div>
-        {" "}
         {channels.map((chat: ChatChannels) => (
           <li
             className={`chat-item${chatBox === chat ? "-active" : ""}`}
@@ -133,10 +137,14 @@ const SideChatMenu = () => {
       <ChatBoxes />
       <img
         className={`logo-nav chat-menu-icon`}
-        src={"/chat.svg"}
+        src={"/comments.svg"}
         alt="Chat Menu"
         onClick={toggleMenu}
       />
+      <button id="chat" onClick={()=> setShowChatCreator(!showChatCreator)}>
+        Channel Creator
+      </button>
+        {  showChatCreator ?  <ChatCreator /> : ""}
       <div className="inner-chat-menu-wrapper">{displayList()}</div>
     </div>
   );

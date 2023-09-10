@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import LeftMenu from '../Menu/LeftMenu';
 import './Dashboard.scss';
 import { Lobby } from '../Game/Lobby';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
@@ -13,7 +14,7 @@ const Dashboard: React.FC = () => {
   const user = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
   const isInitialLoadRef = useRef(true);
-  const [contentToShow, setContentToShow] = useState< "profile" | "friends" | "games" | "friendUser"| "lobby" | "chat" >("lobby");
+  const [contentToShow, setContentToShow] = useState< "profile" | "friends" | "games" | "friendUser"| "lobby"  >("lobby");
 
   useEffect(() => {
     if (isInitialLoadRef.current) {
@@ -31,7 +32,6 @@ const Dashboard: React.FC = () => {
     else if (targetId === "friends") setContentToShow("friends");
     else if (targetId === "history") setContentToShow("games");
     else if (targetId === "play") setContentToShow("lobby");
-    else if (targetId === "chat") setContentToShow("chat");
   };
 
   const renderContent = () => {
@@ -40,7 +40,6 @@ const Dashboard: React.FC = () => {
     if (contentToShow === "friends") return <FriendsListCard />;
     if (contentToShow === "games") return <HistoryCard />;
     if (contentToShow === "lobby") return <Lobby />;
-    if (contentToShow === "chat") return <ChatCreator />;
 
   };
 
@@ -54,9 +53,6 @@ const Dashboard: React.FC = () => {
       </button>
       <button id="profile" onClick={handleClick}>
         My Profile
-      </button>
-      <button id="chat" onClick={handleClick}>
-        Channel Creator
       </button>
       <button id="play" onClick={handleClick}>
         PLAY

@@ -20,7 +20,8 @@ const AutoMatch: React.FC = () => {
 
     return (
       <>
-        <div>
+        <img src="/marvin2.png" className="logo" alt="PONGƎD logo" />
+        <div className='play-buttons'>
           <button onClick={() => {setGameState({isDuel: true, isDouble: false});}}>Duel</button>
           <button onClick={() => {setGameState({isDuel: false, isDouble: true });}}>Double</button>
         </div>
