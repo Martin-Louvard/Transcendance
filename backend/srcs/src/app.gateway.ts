@@ -113,9 +113,24 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): Promise<void> {
     const updatedMessage = await this.prisma.chatMessage.update({
       where: { id: body[0] },
-      data: { readersId: { push: parseInt(body[3]) } },
+      data: { readersId: { push: parseInt(body[1]) } },
     });
     this.server.emit('read', updatedMessage);
+  }
+
+  @SubscribeMessage('join_chat')
+  async handleJoinChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const newUser = await this.prisma.user.findUnique({
+      where: { id: body[0] },
+    });
+    const updatedChats = await this.prisma.chatChannel.update({
+      where: { id: body[1] },
+      data: { participants: { connect: { id: newUser.id } } },
+    });
+    this.server.emit('join_chat', updatedChats);
   }
 
   @SubscribeMessage('create_chat')

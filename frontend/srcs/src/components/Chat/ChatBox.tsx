@@ -29,10 +29,12 @@ const ChatBoxes = () => {
       setMinimizedChat(minimizedChat.filter((id) => id !== chat.id));
       dispatch(setChatOpen(chat));
       dispatch(resetNotification(chat));
-      dispatch({
-        type: "MSG_READ",
-        payload: chat.messages[chat.messages.length - 1],
-      });
+      if (chat.messages?.length > 0){
+        dispatch({
+          type: "MSG_READ",
+          payload: [chat.messages[chat.messages.length - 1].id, currentUser?.id]
+        });
+      }
     } else {
       setMinimizedChat([...minimizedChat, chat.id]);
       dispatch(setChatClose(chat));

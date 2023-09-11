@@ -33,7 +33,7 @@ export class UsersService {
     const newUser = await this.prisma.user.create({ data: createUserDto });
 
     const chatGeneral = await this.prisma.chatChannel.findFirst({
-      where: { channelType: 'general' },
+      where: { name: 'WorldChannel' },
     });
     const chatGeneralId = chatGeneral.id;
 
@@ -43,6 +43,13 @@ export class UsersService {
         participants: {
           connect: [{ id: newUser.id }],
         },
+      },
+    });
+
+    await this.prisma.user.update({
+      where: { id: newUser.id },
+      data: {
+        JoinedChatChannels: { connect: [{ id: chatGeneralId }] },
       },
     });
 

@@ -6,6 +6,7 @@ import { ClientEvents, ClientPayloads } from '../Game/Type';
 import { socket } from '../../socket';
 import toast from "react-hot-toast"
 import { setSessionUser, setToken } from '../../redux/sessionSlice';
+import { fetchRelatedUserData } from '../../redux/sessionThunks';
 import { login } from '../../api';
 
 const SignupForm: React.FC = () => {
@@ -37,6 +38,7 @@ const SignupForm: React.FC = () => {
       toast.success("Logged in")
       dispatch(setSessionUser(user))
       dispatch(setToken(user.access_token))
+      dispatch(fetchRelatedUserData(user.id))
 
       const payloads: ClientPayloads[ClientEvents.AuthState] = {
         id: user.id,

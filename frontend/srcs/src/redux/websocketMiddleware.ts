@@ -2,7 +2,7 @@ import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
 import { websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
-import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat } from './sessionSlice';
+import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat, addNewChatChannel} from './sessionSlice';
 
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
   let socket: Socket | null = null;
@@ -19,7 +19,8 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
-        socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
+        socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
+        //        socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
         break;
 
       case 'WEBSOCKET_SEND_MESSAGE':
@@ -37,6 +38,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       case 'CREATE_CHAT':
         if (socket && socket.connected) {
           socket.emit('create_chat', action.payload);
+        }
+        break;
+
+      case 'JOIN_CHAT':
+        if (socket && socket.connected) {
+          socket.emit('join_chat', action.payload);
         }
         break;
 

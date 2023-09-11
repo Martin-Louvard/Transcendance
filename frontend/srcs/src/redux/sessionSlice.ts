@@ -42,15 +42,16 @@ export const sessionSlice = createSlice({
     addOpenedChatChannel: (state, action) => {
       const chatChannel = action.payload;
       if (
-        !state.OpenedChatChannels?.some(
-          (channel) => channel.id === chatChannel.id,
-        )
+        !state.OpenedChatChannels?.includes(chatChannel)
       ) {
         if (state.OpenedChatChannels?.length >= 3) {
           state.OpenedChatChannels?.shift();
         }
         state.OpenedChatChannels.push(chatChannel);
       }
+    },
+    addNewChatChannel: (state, action) => {
+      state.JoinedChatChannels?.push(action.payload);
     },
     removeOpenedChatChannel: (state, action) => {
       const chatChannelId = action.payload;
@@ -200,7 +201,7 @@ export const sessionSlice = createSlice({
       if (chat && chat.isOpen){
         action.payload.readersId.push(state.user?.id); 
       }
-      state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages.push(action.payload);
+      state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages?.push(action.payload);
 
       if (chat && !chat.isOpen) {
         const lastMessage: Message = chat.messages[chat.messages?.length - 1];
@@ -283,9 +284,11 @@ export const sessionSlice = createSlice({
         });
     },
     createChat: (state, action) => {
-      if (state.JoinedChatChannels)
+      const newChat: ChatChannels = action.payload;
+      if (state.JoinedChatChannels && newChat.participants.filter((users) => users.id === state.user!.id).length > 0)
         state.JoinedChatChannels.push(action.payload);
-      else state.JoinedChatChannels = action.payload;
+      else if (!state.JoinedChatChannels && newChat.participants.filter((users) => users.id === state.user!.id).length > 0)
+        state.JoinedChatChannels = action.payload;
     },
     updateChat: (state, action) => {
       if ( state.JoinedChatChannels === undefined || state.JoinedChatChannels.length === 0 ) {
@@ -298,7 +301,7 @@ export const sessionSlice = createSlice({
         });
         state.JoinedChatChannels = updatedChannels.filter(
           (c) =>
-            c.friendship === undefined || c.friendship.status === "ACCEPTED",
+            c.friendship === undefined || c.friendship?.status === "ACCEPTED",
         );
       }
     },
@@ -355,7 +358,8 @@ export const {
   setChatOpen,
   resetNotification,
   updateChatNotification,
-  setNotifications
+  setNotifications,
+  addNewChatChannel
 } = sessionSlice.actions;
 export { fetchRelatedUserData };
 export default sessionSlice.reducer;

@@ -7,8 +7,14 @@ import {
   resetNotification,
 } from "../../redux/sessionSlice";
 import { VscFoldDown, VscFoldUp } from "react-icons/vsc";
+import { IoIosChatboxes } from "react-icons/io";
 import "./SideChatMenu.scss";
 import { getName } from "./functions.ts";
+import { TbMessagePlus } from "react-icons/tb";
+import ChatCreator from "./ChatCreator.tsx";
+import SearchBarChat from "./SearchChat.tsx";
+import { BsFillPersonFill, BsSearch } from "react-icons/bs";
+import { fetchChatChannelsApi } from "../../api.ts"
 
 const SideChatMenu = () => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -22,6 +28,8 @@ const SideChatMenu = () => {
   const [chatBox, setChatBox] = useState<ChatChannels | null>(null);
   const [menuCss, setMenuCss] = useState("open-chat-menu");
   const [minimizedList, setMinimizedList] = useState<string[] | undefined>([]);
+  const [isChatList, setIsChatList] = useState<boolean>(true);
+  const [searchList, setSearchList] = useState<ChatChannels[] | undefined>([]);
   // ================================================================== //
   const userName = currentUser?.username;
   // La variable au dessus est dangereuse
@@ -39,6 +47,9 @@ const SideChatMenu = () => {
     storedJoinedChannels?.filter((chat) => chat.channelType === "private");
   const joinedGroupChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => chat.channelType === "created");
+  const publicChannels: ChatChannels[] | undefined =
+    storedJoinedChannels?.filter((chat) => chat.channelType === "public");
+  const [chatMenuChoice, setChatMenuChoice] = useState<string>("chatList");
 
   const handleChatTypeListClick = (_type: string) => {
     if (minimizedList?.includes(_type)) {
@@ -57,10 +68,12 @@ const SideChatMenu = () => {
       dispatch(addOpenedChatChannel(chat));
       dispatch(setChatOpen(chat));
       dispatch(resetNotification(chat));
-      dispatch({
-        type: "MSG_READ",
-        payload: chat.messages[chat.messages.length - 1],
-      });
+      if (chat.messages?.length > 0){
+        dispatch({
+          type: "MSG_READ",
+          payload: [chat.messages[chat.messages.length - 1].id, currentUser?.id]
+        });
+      }
     }
   };
 
@@ -81,14 +94,23 @@ const SideChatMenu = () => {
             >
               {chat.notifications ? `${chat.notifications}` : ""}
             </div>
-            <div className="chat-name-in-menu">{getName(chat, userName)}</div>
+            <div className="chat-name-in-menu">
+              <div>{getName(chat, userName)}</div>
+              <div>{`${chat?.participants?.length}`}</div>
+              <div>
+                <BsFillPersonFill />
+              </div>
+            </div>
           </li>
         ))}{" "}
       </div>
     );
   };
 
-  const channelsTypeList = ( list: ChatChannels[] | undefined, _type: string) => {
+  const channelsTypeList = (
+    list: ChatChannels[] | undefined,
+    _type: string,
+  ) => {
     if (list !== undefined && list.length > 0) {
       return (
         <ul className="inner-chat-list-wrapper">
@@ -98,33 +120,64 @@ const SideChatMenu = () => {
           >
             <div className="channel-type-name"> {`${_type}`} </div>
             <div>
-              {minimizedList?.includes(_type) ? (
-                <VscFoldUp />
-              ) : (
-                <VscFoldDown />
-              )}
+              {minimizedList?.includes(_type) ? <VscFoldUp /> : <VscFoldDown />}
             </div>
           </div>
-          <div>
-            {minimizedList?.includes(_type)
-              ? ""
-              : channelsList(list)}
-          </div>
+          <div>{minimizedList?.includes(_type) ? "" : channelsList(list)}</div>
         </ul>
       );
     }
   };
-  
+
   const displayList = () => {
     return (
       <div>
         {channelsTypeList(privateChannels, "private")}
         {channelsTypeList(generalChannels, "general")}
-        {channelsTypeList(joinedGroupChannels, "general")}
+        {channelsTypeList(joinedGroupChannels, "created")}
+        {channelsTypeList(publicChannels, "public")}
       </div>
     );
   };
 
+  const handleChatListButton = () => {
+    if (chatMenuChoice !== "chatList") {
+      setChatMenuChoice("chatList");
+    }
+  };
+
+  const handleCreateChatButton = () => {
+    if (chatMenuChoice !== "createChat") {
+      setChatMenuChoice("createChat");
+    }
+  };
+
+  const handleChatSearchButton = async () => {
+    if (chatMenuChoice !== "searchChat") {
+      setChatMenuChoice("searchChat");
+      try {
+      const fetchedChannels: ChatChannels[] | undefined = await fetchChatChannelsApi();
+        if (fetchedChannels){
+          setChatMenuChoice("searchChatWithList");
+          setSearchList(fetchedChannels);
+        }
+      }
+      catch (error){
+        console.log(error);
+      }
+    }
+  };
+
+  const displayChoice = () => {
+    if (chatMenuChoice === "chatList")
+      return displayList();
+    else if (chatMenuChoice === "createChat")
+      return (<ChatCreator />); 
+    else if (chatMenuChoice === "searchChatWithList")
+      return (<SearchBarChat fetchedChannels={searchList}/>); 
+    else
+      return ;
+  };
 
   return (
     <div className={`chat-menu-wrapper ${menuCss}`}>
@@ -134,7 +187,23 @@ const SideChatMenu = () => {
         alt="Chat Menu"
         onClick={toggleMenu}
       />
-      <div className="inner-chat-menu-wrapper">{displayList()}</div>
+      <div className="inner-chat-menu-wrapper">
+        <div className="chat-menu-header">
+          <div onClick={handleChatListButton} className="chat-list-button">
+            <IoIosChatboxes />
+          </div>
+          <div
+            onClick={handleCreateChatButton}
+            className="create-new-chat-button"
+          >
+            <TbMessagePlus />
+          </div>
+          <div className="search-button" onClick={handleChatSearchButton}>
+            <BsSearch />
+          </div>
+        </div>
+        <div>{displayChoice()}</div>
+      </div>
     </div>
   );
 };

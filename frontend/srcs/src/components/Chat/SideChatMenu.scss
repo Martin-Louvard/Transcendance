@@ -20,6 +20,11 @@ $chat-menu-icon-open: 20vh;
   z-index: 111;
 }
 
+.search-chat-input {
+	display: flex;
+	justify-content: space-evenly;
+}
+
 .inner-chat-menu-wrapper {
 	padding: 10px;
 	padding-top: 20px;
@@ -34,6 +39,11 @@ $chat-menu-icon-open: 20vh;
 .channel-type-wrapper {
 	display: flex;
 	justify-content: space-between;
+}
+
+.chat-menu-header {
+	display: flex;
+	justify-content: space-evenly;
 }
 
 .chat-exit-button {
@@ -116,7 +126,10 @@ $chat-menu-icon-open: 20vh;
 }
 .chat-name-in-menu {
 	display:flex;
-	width: 70%;
+	width: 80%;
+	justify-content: space-evenly;
+	flex-direction: row;
+	font-size: 12px;
 }
 
 .chat-item:hover {
