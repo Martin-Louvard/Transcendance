@@ -42,7 +42,9 @@ export const sessionSlice = createSlice({
     addOpenedChatChannel: (state, action) => {
       const chatChannel = action.payload;
       if (
-        !state.OpenedChatChannels?.includes(chatChannel)
+        !state.OpenedChatChannels?.some(
+          (channel) => channel.id === chatChannel.id,
+        )
       ) {
         if (state.OpenedChatChannels?.length >= 3) {
           state.OpenedChatChannels?.shift();
@@ -51,7 +53,13 @@ export const sessionSlice = createSlice({
       }
     },
     addNewChatChannel: (state, action) => {
-      state.JoinedChatChannels?.push(action.payload);
+      const newChat = action.payload;
+      if (
+        !state.JoinedChatChannels?.some(
+          (channel) => channel.id === newChat.id,
+        )){
+        state.JoinedChatChannels?.push(action.payload);
+      }
     },
     removeOpenedChatChannel: (state, action) => {
       const chatChannelId = action.payload;
@@ -83,7 +91,7 @@ export const sessionSlice = createSlice({
 
       if (state.JoinedChatChannels !== undefined) {
         const updatedJoinedChannels: ChatChannels[] = state.JoinedChatChannels.map((chat) =>{
-          if (chat.id === updatedChat.id && userId){
+          if (chat.id === updatedChat.id && userId && chat.messages?.length > 0){
             const updatedMessages = chat.messages.map((message) => {
               if (
                 message === chat.messages[chat.messages.length - 1] &&
@@ -203,7 +211,7 @@ export const sessionSlice = createSlice({
       }
       state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages?.push(action.payload);
 
-      if (chat && !chat.isOpen) {
+      if (chat && !chat.isOpen && chat.messages?.length > 0) {
         const lastMessage: Message = chat.messages[chat.messages?.length - 1];
         const userId = state.user?.id;
         

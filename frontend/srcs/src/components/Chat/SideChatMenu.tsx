@@ -130,6 +130,12 @@ const SideChatMenu = () => {
   };
 
   const displayList = () => {
+    console.log("=============================");
+    console.log("SEARCHLIST");
+    console.log(searchList);
+    console.log("=============================");
+    console.log("STORED");
+    console.log(storedJoinedChannels);
     return (
       <div>
         {channelsTypeList(privateChannels, "private")}

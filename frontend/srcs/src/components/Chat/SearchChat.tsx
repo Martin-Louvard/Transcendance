@@ -8,7 +8,7 @@ import {
   addOpenedChatChannel,
   setChatOpen,
   resetNotification,
-  updateChat,
+  addNewChatChannel,
 } from "../../redux/sessionSlice";
 
 interface searchBarChatProps {
@@ -54,6 +54,7 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
       }
       else {
         if (!chat.password){
+          dispatch(addNewChatChannel(chat));
           dispatch({
             type: "JOIN_CHAT",
             payload: [currentUser.id, chat.id],
