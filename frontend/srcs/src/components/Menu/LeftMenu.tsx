@@ -10,6 +10,8 @@ import { Status } from '../../Types';
 import { useAppDispatch } from '../../redux/hooks';
 import { Friendships } from '../../Types';
 import FriendCard from '../UserProfileCards/FriendCard';
+import { deleteInvitedGame, setLobbyType } from '../../redux/websocketSlice';
+import { GameInvitation, LobbyMode, LobbyType } from '@shared/class';
 
 const LeftMenu: React.FC = () => {
   const user = useAppSelector((state) => state.session.user)
@@ -18,26 +20,19 @@ const LeftMenu: React.FC = () => {
   const [contentToShow, setContentToShow] = useState<"menu" | "profile" | "friends" | "games" | "friendUser"| "chat">("menu");
   const friendships = useAppSelector((state)=> state.session.friendships)
   const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships)
-  console.log("test => ", friendships);
   const [selectedFriendship, setSelectedFriendship] = useState(Object)
+  const gameRequest = useAppSelector((state) => state.websocket.invitedGames);
   const dispatch = useAppDispatch();
 
   useEffect(()=>{
     if (friendships){
       let friendshipstmp: Friendships[] = [];
-      //console.log(friendships)
-      //setFriendRequest(friendships.filter(f => (
-      //  f.status === Status.PENDING && f.sender_id != user?.id,
-      //  console.log(`sender_id : ${f.sender_id}, status : ${f.status}, user_id : ${user?.id}`)
-      //  )))
       friendships.forEach((e) => {
-        console.log(e);
         if (e.status === Status.PENDING && e.sender_id != user?.id)
           friendshipstmp.push(e);
       })
       setFriendRequest(friendshipstmp);
     }
-    console.log(friendRequests);
   }, [friendships])
 
   const toggleMenu = () => {
@@ -82,13 +77,12 @@ const LeftMenu: React.FC = () => {
       <button id="profile" onClick={handleClick}>
         My Profile
       </button>
-      {friendRequests ? renderNotifications() : ""}
+      {friendRequests && friendRequests.length > 0 ? renderNotifications() : ""}
+      {renderGameNotifcation()}
     </>
   );
 
   const renderNotifications = () => (   
-    console.log("avant de render => ", friendships),
-    console.log(", ", friendRequests),
   <div className="friends-card-wrapper">
     <h2>Friend Requests</h2>
         <ul className="friend-list">
@@ -109,6 +103,44 @@ const LeftMenu: React.FC = () => {
         </ul>
     </div>
   )
+  function joinLobby(request: GameInvitation) {
+    dispatch(setLobbyType(LobbyType.create));
+    dispatch({
+      type: "WEBSOCKET_SEND_JOIN_LOBBY",
+      payload: {lobbyId: request.lobby.id, info: {username: user?.username, avatar: user?.avatar, id: user?.id}},
+    })
+    dispatch({
+      type: "WEBSOCKET_SEND_DELETE_GAME_INVITATION",
+      payload: request,
+    })
+
+  }
+
+  const renderGameNotifcation = () => (
+    
+    <div className="friends-card-wrapper">
+      <h2>Game Requests</h2>
+          <ul className="friend-list">
+            {gameRequest ? gameRequest.map((request, index, requests) => (
+              <li className="friend-item" key={index}>
+              <div className='friend-picture'>
+                <img src={request.sender.avatar}/>
+              </div>
+              <div>
+                <p>{request.sender.username}</p>
+                <div className='accept-deny'>
+                  <button onClick={() => {joinLobby(request);dispatch(deleteInvitedGame(request))}} >Join Game ✅</button>
+                  <button onClick={() => {dispatch(deleteInvitedGame(request));     dispatch({
+                    type: "WEBSOCKET_SEND_DELETE_GAME_INVITATION",
+                    payload: request,
+                  })}}>Decline ❌</button>
+                </div>
+              </div>
+              </li>
+            )) : <></>}
+          </ul>
+      </div>
+    )
 
   return (
     <>

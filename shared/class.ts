@@ -5,6 +5,13 @@ export enum LobbyMode {
 	double = 4,
 }
 
+export enum LobbyType {
+	none = 0,
+	auto = 1,
+	create = 2,
+	find = 3,
+}
+
 export enum ServerEvents
 {
   // General
@@ -15,6 +22,20 @@ export enum ServerEvents
   GameState = 'server.game.state',
 
   AuthState = 'server.auth.state',
+
+  LobbySlotsState = 'server.lobby.slots.state',
+
+  GameInvitation = 'server.game.invitation',
+
+  SuccessfulInvited = 'server.successfull.invite',
+
+  DeleteGameRequest = 'server.delete.game.request',
+
+  DeleteSentGameRequest = 'server.delete.sent.game.request',
+
+  LobbyFull = 'server.lobby.full',
+
+  GetLobbies = 'server.get.lobbies',
 }
 
 export enum ClientEvents
@@ -27,17 +48,67 @@ export enum ClientEvents
 
   InputState = 'client.input.state',
 
-  parameterState = 'client.parameter.state',
+  ParameterState = 'client.parameter.state',
+
+  LobbySlotsState = 'client.lobby.slots.state',
+
+  GameSendRequest = 'client.game.send.request',
+
+  JoinLobby = 'client.join.lobby',
+
+  DeleteGameRequest = 'client.delete.game.request',
+
+  StartGame = 'client.start.game',
+
+  GetLobbies = 'client.get.lobbies',
 }
+
+export interface LobbyCli {
+	id: string,
+	slots: LobbySlotCli[],
+	creator: PlayerInfo,
+}
+
+export interface PlayerInfo {
+	username: string;
+	avatar: string;
+	id: number;
+}
+
+export enum LobbySlotType {
+	friend = 0,
+	online = 1,
+	bot = 2,
+	invited = 3,
+}
+
+export interface LobbySlotCli  {
+	full: boolean;
+	type: LobbySlotType;
+	player: PlayerInfo | null;
+}
+
+export interface GameInvitation {
+	sender: PlayerInfo,
+	receiver: PlayerInfo,
+	lobby: {
+		id: string,
+		mode: LobbyMode,
+	}
+	id: string,
+	timestamp: number,
+}
+
 
 export type ServerPayloads = {
 	[ServerEvents.LobbyState]: {
-		lobbyId: string;
-	  	mode: LobbyMode;
-	  	hasStarted: boolean;
-	  	hasFinished: boolean;
-	  	playersCount: number;
-	  	isSuspended: boolean;
+		lobbyId: string,
+	  	mode: LobbyMode,
+	  	hasStarted: boolean,
+	  	hasFinished: boolean,
+	  	playersCount: number,
+	  	isSuspended: boolean,
+		playersInfo: PlayerInfo[],
 	},
 	[ServerEvents.GameState]: {
 		gameData: GameData;
@@ -45,7 +116,10 @@ export type ServerPayloads = {
 	[ServerEvents.AuthState]: {
 		lobbyId: string | null,
 		hasStarted: boolean,
-	}
+		owner: string,
+	},
+	[ServerEvents.LobbySlotsState]: LobbySlotCli[],
+	[ServerEvents.GameInvitation]: GameInvitation;
 };
 
 export type ClientPayloads = {
@@ -53,13 +127,21 @@ export type ClientPayloads = {
 		leaveLobby: boolean | null,
 		automatch: boolean | null,
 		mode: LobbyMode | null,
+		infos: PlayerInfo,
 	},
 	[ClientEvents.AuthState]: {
 		id: number,
 		token: string,
+		owner: boolean,
 	},
 	[ClientEvents.InputState]: InputPacket,
-	[ClientEvents.parameterState]: GameParameters,
+	[ClientEvents.ParameterState]: GameParameters,
+	[ClientEvents.LobbySlotsState]: LobbySlotCli[],
+	[ClientEvents.GameSendRequest]: {
+		senderId: number,
+		receiverId: number,
+		lobbyId: number,
+	}
 };
 
 export interface PlayerBody {
@@ -108,7 +190,7 @@ export class InputPacket implements InputPacketInterface {
 } // A changer avec une methode de compression
 
 //PARAMETRAGE D'UN GAME :
-//	0. PONG BASIC OU PONG ULTIMATE
+
 //	1. DUEL / DOUBLE
 //		1.1 SLOT D'AMI OU ONLINE OU BOT (si le temps)
 //	2 PARAMETRE DE MAP :

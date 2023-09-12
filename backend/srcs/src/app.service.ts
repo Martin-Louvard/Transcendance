@@ -15,8 +15,6 @@ export class AppService {
 
   async auth(client: Socket): Promise<void> {
     try {
-      console.log("auth socket token : " + client.handshake.auth.token);
-      console.log(client.handshake);
       if (!client.handshake.auth.token) {
         throw "no jwt token"
       }
@@ -27,7 +25,6 @@ export class AppService {
         if (!user) 
           throw "user not registered";
         this.playerService.connectPlayer({id: payload.sub, socket: client});
-
     } catch (error) {
       console.log(error);
       client.disconnect();

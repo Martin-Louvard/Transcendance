@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import createWebSocketMiddleware from './websocketMiddleware.ts';
+import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2';
 
 // Combine all reducers including persisted user reducer
 const rootReducer = combineReducers({
@@ -30,7 +31,7 @@ export const store = configureStore({
 // Configure listeners using the provided defaults
 setupListeners(store.dispatch);
 export const persistor = persistStore(store);
-
+//persistor.purge();
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;

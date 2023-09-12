@@ -1,26 +1,23 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
-import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket } from '@shared/class';
+import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket, GameParameters, PlayerInfo, GameInvitation } from '@shared/class';
 import { JwtService } from '@nestjs/jwt';
 import { AppService } from './app.service';
 import { LobbyService } from './game/lobby/lobby.service';
 import { PlayerService } from './game/player/player.service';
 import { FriendsService } from './friends/friends.service';
+import { Player } from './game/player/player.class';
 
 @WebSocketGateway({ cors: '*' })
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
   constructor(
     private prisma: PrismaService,
-    private readonly gameService: GameService,
     private friendService: FriendsService,
     private readonly appService: AppService,
     private readonly lobbyService: LobbyService,
     private readonly playerService: PlayerService
   ) {}
-
-  connected_clients = new Map<number, Socket>();
 
   @WebSocketServer()
   server: Server;
@@ -29,39 +26,120 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     this.appService.auth(client);
   }
 
+
   afterInit(server: Server) {
-    return this.gameService.afterInit(server);
+    return this.lobbyService.setServer(server);
   }
 
   handleDisconnect(client: Socket) {
-    return this.gameService.handleDisconnect(client);
+		const player  = this.playerService.getPlayer(client.id);
+    return this.playerService.disconnectPlayer(player);
   }
 
   @SubscribeMessage('automatch')
-  autoMatch(@ConnectedSocket() client: Socket, @MessageBody() data: LobbyMode) {
-    this.gameService.automatch(client, data);
+  autoMatch(@ConnectedSocket() client: Socket, @MessageBody() data: {mode: LobbyMode, info: PlayerInfo}) {
+    const player: Player = this.playerService.getPlayer(client.id);
+    if (!player || player.socket.id != client.id)
+      return ;
+    this.lobbyService.automatch(player, data, this.server);
+  }
+
+  @SubscribeMessage(ClientEvents.DeleteGameRequest)
+  deleteGameRequest(@ConnectedSocket() client: Socket, @MessageBody() data: GameInvitation) {
+    try {
+      if (!data || !data.sender || !data.sender.id || !data.receiver || !data.receiver.id) {
+        return false;
+      }
+    const receiver = this.playerService.getPlayerById(data.receiver.id);
+    const sender = this.playerService.getPlayerById(data.sender.id);
+    const current = this.playerService.getPlayer(client.id)
+    if (!receiver || !sender || !current) {
+      return false;
+    }
+    if (sender.id == current.id)
+      receiver.emit<GameInvitation>(ServerEvents.DeleteGameRequest, data);
+    else if (receiver.id == current.id)
+      sender.emit<GameInvitation>(ServerEvents.DeleteSentGameRequest, data);
+    } catch(err) {
+      console.log(err);
+  }
+  }
+
+  @SubscribeMessage(ClientEvents.GetLobbies)
+  getLobbies(@ConnectedSocket() client: Socket) {
+    client.emit(ServerEvents.GetLobbies ,this.lobbyService.getJoinableLobbies());
+
+  }
+
+  @SubscribeMessage(ClientEvents.StartGame)
+  handleStart(@ConnectedSocket() client: Socket) {
+    const player = this.playerService.getPlayer(client.id);
+    if (!player)
+      return 'player not found';
+    const lobby = player.lobby;
+    if (!lobby)
+      return 'lobby not found';
+    if (!lobby.full)
+      return 'lobby not full';
+    if (!lobby.instance)
+      return 'no lobby instance';
+    if (lobby.instance.hasStarted || lobby.instance.hasFinished)
+      return 'game cannot be restarted'
+    lobby.instance.triggerStart();
   }
 
   @SubscribeMessage(ClientEvents.InputState)
   handleInputState(@ConnectedSocket() client: Socket, @MessageBody() data: InputPacket) {
-    const lobbyId = this.playerService.getLobby(client.id)
-    this.lobbyService.sendToInstance<InputPacket>(lobbyId, data, client.id);
+    const lobby = this.playerService.getLobby(client.id);
+    if (lobby)
+      this.lobbyService.sendToInstance<InputPacket>(lobby.id, data, client.id);
   }
 
   @SubscribeMessage(ClientEvents.LobbyState)
-  lobbyStateHandling(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: ClientPayloads[ClientEvents.LobbyState],
-  ) {
+  lobbyStateHandling(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.LobbyState]) {
+		const player: Player = this.playerService.getPlayer(client.id);
+		if (!player || player.socket.id != client.id || !player.lobby )
+			return ;
     if (data.leaveLobby) {
-      this.gameService.leaveLobby(client);
+      this.lobbyService.leaveLobby(player);
+    }
+  }
+  @SubscribeMessage(ClientEvents.LobbySlotsState)
+  lobbySlotsHandling(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.LobbySlotsState]) {
+    const lobby = this.playerService.getLobby(client.id);
+    if (lobby) {
+      lobby.setSlots(data);
+      lobby.players.forEach((e) => {
+        if (e.socket.id != client.id)
+          e.emit<ServerPayloads[ServerEvents.LobbySlotsState]>(ServerEvents.LobbySlotsState, lobby.slots);
+      })
     }
   }
 
-  @SubscribeMessage('start')
-  startMatch(@ConnectedSocket() client: Socket) {
-    this.gameService.playerStart(client);
-    console.log("to");
+  @SubscribeMessage(ClientEvents.GameSendRequest)
+  HandleGameInvitation(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.GameSendRequest]) {
+		const player = this.playerService.getPlayerById(data.receiverId);
+		if (!player || !player.isOnline)
+		  return false
+    this.lobbyService.invitePlayer(player, data);
+  }
+
+  @SubscribeMessage(ClientEvents.JoinLobby)
+  JoinLobby(@ConnectedSocket() client: Socket, @MessageBody() data: {lobbyId: string, info: PlayerInfo}) {
+    const player = this.playerService.getPlayer(client.id);
+    if (!player)
+      return 'player not found';
+    if (!this.lobbyService.joinLobby(player, data))
+      return 'cant join lobby';
+  }
+
+  @SubscribeMessage(ClientEvents.ParameterState)
+  createMatch(@ConnectedSocket() client: Socket, @MessageBody() data: {params: GameParameters, info: PlayerInfo}) {
+    const player = this.playerService.getPlayerBySocketId(client.id);
+    if (!player || player.lobby) // si il est deja dans un lobby on l'autorise pas
+    return ;
+    player.infos = data.info;
+    this.lobbyService.createLobbyByParameters(data.params, this.server, player);
   }
 
   @SubscribeMessage('message')
@@ -183,7 +261,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
       });
       const friendplayer = this.playerService.getPlayerById(friend_id);
       const friend_socket = friendplayer ? friendplayer.socket : undefined;
-      console.log(friend_socket, " ", friendship);
       client.emit('friend_request', friendship);
       if (body[2] === 'ACCEPTED') client.emit('create_chat', chat);
       else client.emit('update_chat', chat);

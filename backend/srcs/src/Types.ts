@@ -1,14 +1,9 @@
 import { Client } from "socket.io/dist/client";
 import { Player } from "./game/player/player.class";
-
-export enum LobbySlotType {
-	friend = 0,
-	online = 1,
-	bot = 2,
-}
+import { LobbySlotType } from "@shared/class";
 
 export type LobbySlot  = () => {
 	full: boolean;
-	type: LobbySlot;
+	type: LobbySlotType;
 	player: Player | null;
 }

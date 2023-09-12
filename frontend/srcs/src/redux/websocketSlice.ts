@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
-import {PlayerBody, Ball } from '@shared/class'
+import { createSlice, current } from '@reduxjs/toolkit';
+import {PlayerBody, Ball, LobbyMode, LobbyType, PlayerInfo, GameParameters, LobbySlotCli, ServerPayloads, ServerEvents, LobbyCli } from '@shared/class'
 
-interface WebSocketState {
+export interface WebSocketState {
   isConnected: boolean;
   score: {home: number, visitor: number};
   balls: Ball[];
@@ -11,6 +11,15 @@ interface WebSocketState {
   elapsedTime: number;
   lobbyId: number | null;
   isPlaying: boolean;
+  LobbyType: LobbyType;
+  playersInfo: PlayerInfo[];
+  params: GameParameters;
+  owner: string | null;
+  lobbySlots: LobbySlotCli[];
+  invitedGames: ServerPayloads[ServerEvents.GameInvitation][];
+  sentInvites: ServerPayloads[ServerEvents.GameInvitation][];
+  full: boolean;
+  lobbies: LobbyCli[];
 }
 
 const initialState: WebSocketState = {
@@ -23,6 +32,38 @@ const initialState: WebSocketState = {
   elapsedTime: 0,
   lobbyId: 0,
   isPlaying: false,
+  LobbyType: LobbyType.none,
+  playersInfo: new Array<PlayerInfo>(),
+  owner: null,
+  lobbySlots: [],
+  params: {
+   classic: true,
+   duel: false,
+    
+   map: {
+    size: [200, 100],
+    goalSize: 20,
+    medianOffset: 20,
+   },
+   ball: {
+    globalSpeed: 10, // speed
+    reboundForce: 10, // force du rebond
+    ballAcceleration: 0.5, // m / sec
+    rotationForce: 1, // force de rotation
+   },
+   players: {
+    speed: 60, // vitesse X et Z
+    rotationSpeed: 10, // vitesse de rotation
+    boostForce: 10, // force du boost
+   },
+   general: {
+    time: 180,
+   }
+  },
+  invitedGames: [],
+  sentInvites: [],
+  full: false,
+  lobbies: [],
 };
 
 const websocketSlice = createSlice({
@@ -39,6 +80,100 @@ const websocketSlice = createSlice({
       state.lobbyId = null;
       state.isPlaying =false;
     },
+    setLobbyType: (state, action) => {
+      state.LobbyType = action.payload;
+    },
+    setParams: (state, action) => {
+      state.params = JSON.parse(JSON.stringify(action.payload)); 
+    },
+    setLobbySlots: (state, action) => {
+      state.lobbySlots = JSON.parse(JSON.stringify(action.payload)); 
+    },
+    addInvitedGame: (state, action) => {
+      if (!state.invitedGames)
+        state.invitedGames = [action.payload];
+      else
+        state.invitedGames = [...state.invitedGames, action.payload];
+    },
+    deleteInvitedGame: (state, action) => {
+      if (!state.invitedGames)
+        return ;
+      let newState = [...state.invitedGames];
+      let index = newState.findIndex((e) => e.lobby.id == action.payload.lobby.id && e.sender.id == action.payload.sender.id);
+      newState.splice(index, index + 1);
+      state.invitedGames = [...newState];
+    },
+    deleteInvitedGameById: (state, action) => {
+      if (!state.invitedGames)
+        return ;
+      let newState = [...state.invitedGames];
+      let index = newState.findIndex((e) => e.id == action.payload);
+      newState.splice(index, index + 1);
+      state.invitedGames = [...newState];
+    },
+    addSentInvte: (state, action) => {
+      if (!state.sentInvites)
+        state.sentInvites = [action.payload];
+      else
+        state.sentInvites = [...state.sentInvites, action.payload];
+    },
+    deleteSentInvite: (state, action) => {
+      if (!state.sentInvites)
+        return ;
+      let newState = [...state.sentInvites];
+      let index = newState.findIndex((e) => e.lobby.id == action.payload.lobby.id && e.receiver.id == action.payload.receiver.id);
+      newState.splice(index, index + 1);
+      state.sentInvites = [...newState]
+    },
+    setLobbyFull: (state, action) => {
+      state.full = action.payload;
+    },
+    deleteSentInviteById: (state, action) => {
+      if (!state.sentInvites)
+        return ;
+      let newState = [...state.sentInvites];
+      let index = newState.findIndex((e) => e.id == action.payload);
+      newState.splice(index, index + 1);
+      state.sentInvites = [...newState]
+    },
+    resetGameDatas: (state) => {
+      resetParams();
+      state.LobbyType = LobbyType.none;
+      state.lobbySlots = [];
+      state.balls = [];
+      state.players = [];
+      state.owner = null;
+      state.playersInfo = [];
+      // reset game datas
+    },
+    resetParams: (state) => {
+      state.params = {
+        classic: true,
+        duel: false,
+        map: {
+         size: [200, 100],
+         goalSize: 20,
+         medianOffset: 20,
+        },
+        ball: {
+         globalSpeed: 10, // speed
+         reboundForce: 10, // force du rebond
+         ballAcceleration: 0.5, // m / sec
+         rotationForce: 1, // force de rotation
+        },
+        players: {
+         speed: 60, // vitesse X et Z
+         rotationSpeed: 10, // vitesse de rotation
+         boostForce: 10, // force du boost
+        },
+        general: {
+         time: 180,
+        }
+       }
+    },
+    setDuel: (state, action) => {
+      state.params.duel = action.payload;
+    },
     setGameState: (state, action) => {
       state.score = action.payload.gameData.score;
       state.balls = action.payload.gameData.balls;
@@ -48,10 +183,40 @@ const websocketSlice = createSlice({
       state.elapsedTime = action.payload.gameData.elapsedTime;
     },
     setAuthState: (state, action) => {
-      //console.log('game reducer: Auth State')
-      console.log(action.payload);
+      if (!action.payload.lobbyId || action.payload.lobbyId == 0) {        
+        state.LobbyType = LobbyType.none;
+        state.lobbySlots = [];
+        state.balls = [];
+        state.players = [];
+        state.owner = null;
+        state.playersInfo = [];
+        state.params = {
+          classic: true,
+          duel: false,
+          map: {
+           size: [200, 100],
+           goalSize: 20,
+           medianOffset: 20,
+          },
+          ball: {
+           globalSpeed: 10, // speed
+           reboundForce: 10, // force du rebond
+           ballAcceleration: 0.5, // m / sec
+           rotationForce: 1, // force de rotation
+          },
+          players: {
+           speed: 60, // vitesse X et Z
+           rotationSpeed: 10, // vitesse de rotation
+           boostForce: 10, // force du boost
+          },
+          general: {
+           time: 180,
+          }
+         }
+      }
       state.lobbyId = action.payload.lobbyId;
       state.isPlaying = action.payload.hasStarted
+      state.owner = action.payload.owner;
     },
     setLobbyState: (state, action) => {
       //console.log('game reducer: lobby State')
@@ -62,10 +227,18 @@ const websocketSlice = createSlice({
       if (action.payload.hasStarted) {
         state.isPlaying = true;
       }
+      if (action.payload.playersInfo) {
+        state.playersInfo = action.payload.playersInfo;
+      }
+    },
+    setLobbies: (state, action) => {
+      if (!action.payload)
+        state.lobbies = [];
+      state.lobbies = [...action.payload];
     }
   },
 });
 
-export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState } = websocketSlice.actions;
+export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, resetGameDatas, addInvitedGame, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies} = websocketSlice.actions;
 
 export default websocketSlice.reducer;

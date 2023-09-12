@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { usePlayerStore } from "./PlayerStore"
 import { Input, ClientEvents, InputPacket } from '@shared/class';
-import { socket } from '../../socket';
 import { useAppSelector } from "../../redux/hooks";
 
 export const useKeyboardInput = () => {

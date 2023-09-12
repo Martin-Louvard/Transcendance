@@ -30,8 +30,6 @@ const Authentication: React.FC = () => {
       if (await verify(user.access_token))
           navigate('/');
     }
-    console.log("salut");
-    console.log(user);
     if (user && user.access_token)
       verifyToken();
   }, [user])

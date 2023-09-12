@@ -119,7 +119,7 @@ PARAMETRAGE D'UN GAME :
 	3. PARAMETRE DE BALLE :
 		3.1 VITESSE DE LA BALLE CONTINU
 		3.2 FORCE DU REBOND
-		3.3 ACCELERATION DE LA BALLE AU FIL DU TEMPS
+		3.3 ACCELERATION DE LA BALLE AU FIL DU ROUND
 		3.4 VITESSE DE ROTATION DE LA BALLE
 	4. PARAMETRE DES JOUEURS
 		4.1 VITESSE DES JOUEURS
@@ -127,3 +127,12 @@ PARAMETRAGE D'UN GAME :
 		4.3 VITESSE DU BOOST
 	5. PARAMETRE GLOBAL
 		5.1 TEMPS DE LA GAME
+
+
+Invitation envoyé :
+	timeout de 1 minute sur l'invitation :> sinon supprimé ///// FAIT
+	invitation accepté :> supprimé
+	invitation refuse :> supprimé
+	changement de lobby :> supprimé
+
+Check si reste slot friend disponible poiur rejoindre un game ou on a été invité

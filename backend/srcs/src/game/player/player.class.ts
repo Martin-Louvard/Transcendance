@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
-import { Lobby } from "../classes/lobby.class";
-import { ClientEvents, ServerEvents } from "@shared/class";
+import { Lobby } from "../lobby/lobby.class";
+import { ClientEvents, PlayerInfo, ServerEvents } from "@shared/class";
 
 export class Player {
 	constructor(socket: Socket, id :number) {
@@ -16,6 +16,7 @@ export class Player {
 	lobby: Lobby | null;
 	isReady: boolean;
 	isOnline: boolean;
+	infos: PlayerInfo;
 
 	setReady( isReady: boolean  ): boolean {
 		if (this.lobby == null || this.lobby.instance.hasStarted)

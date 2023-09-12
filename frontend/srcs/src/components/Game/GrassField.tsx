@@ -55,7 +55,6 @@ export function GrassField(props) {
 		createParticles();
 	
 		grassPlaneGeo = new THREE.PlaneGeometry( w, d );
-		console.log(grassParticles);
 		grassPlaneMat = new THREE.MeshBasicMaterial( {color: 0x08731f, side: THREE.DoubleSide} );
 		grassPlane = new THREE.Mesh( grassPlaneGeo, grassPlaneMat );
 		group.add( grassPlane );
@@ -107,7 +106,6 @@ export function GrassField(props) {
         group.add( grassParticles );
 		scene.add(group);
 
-		console.log(grassGeo);
 
 
     }
@@ -117,8 +115,6 @@ export function GrassField(props) {
     function update( dt ){
 
         let t = dt;
-		if (grassParticles)
-			console.log(grassParticles);
         //grassParticles.material.uniforms.time.value = t;
 
     }

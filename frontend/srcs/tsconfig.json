@@ -14,7 +14,7 @@
     "noEmit": true,
     "baseUrl": "./",
     "paths": {
-      "@shared/*": ["./shared/*"],
+      "@shared/*": ["./shared/*", "./../../shared/*"],
     },
     "jsx": "react-jsx",
     /* Linting */

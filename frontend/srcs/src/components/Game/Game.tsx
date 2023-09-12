@@ -64,7 +64,6 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player, key
     const paddleRef = useRef<Mesh>(null)!;
 
     useFrame(() => {
-		//console.log(quaternion);
 		paddleRef.current?.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
 		paddleRef.current?.position.set(position[0], position[1], position[2]);
 		// mise a jour en temps reel si necessaire.
@@ -156,7 +155,6 @@ export const Game: React.FC = () => {
         return `${minutes} : ${seconds < 10 ? '0' : ''}${seconds}`;
     }
 	useEffect(() => {
-		console.log(game.isPlaying);
 		if (!game.isConnected || !game.isPlaying)
 			navigate('/');
 
@@ -222,12 +220,10 @@ export const Render: React.FC = (props) => {
 			pressed: true,
 			id: id,
 		}
-		console.log('up');
 		dispatch({
 			type: 'WEBSOCKET_SEND_INPUT',
 			payload: payload,
 		});
-		//socket.emit<InputPacket>(ClientEvents.InputState, payload);
 	}
 	if (KeyboardInput.right) {
 		const timestamp: number = Math.floor(Date.now() / 1000);
@@ -316,8 +312,6 @@ export const Render: React.FC = (props) => {
 
 	// RELEASED
 	if (!KeyboardInput.up && prevInput.up) {
-		console.log("stop up");
-		console.log(prevInput);
 		const timestamp: number = Math.floor(Date.now() / 1000);
 		const code = 0;
 		const payload: InputPacket = {
@@ -387,7 +381,7 @@ export const Render: React.FC = (props) => {
 			payload: payload,
 		});
 	}
-	if (!KeyboardInput.rotRight  && prevInput.rotRight) {
+	if (!KeyboardInput.rotRight && prevInput.rotRight) {
 		const timestamp: number = Math.floor(Date.now() / 1000);
 		const code = 5;
 		const payload: InputPacket = {

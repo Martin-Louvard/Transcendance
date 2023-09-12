@@ -1,6 +1,6 @@
 import { Timeout } from "@nestjs/schedule";
-import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket} from "@shared/class";
-import { Lobby } from "./lobby.class";
+import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo} from "@shared/class";
+import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
 
@@ -38,6 +38,30 @@ interface World {
 	balls: Sphere[] | null;
 }
 
+interface GameParameters {
+	classic: boolean,
+	duel : boolean,
+	map : {
+		size: [number, number], // width, height
+		goalSize: number, // width
+		medianOffset: number, // length
+	},
+	ball : {
+		globalSpeed: number, // speed
+		reboundForce: number, // force du rebond
+		ballAcceleration: number, // m / sec
+		rotationForce: number, // force de rotation
+	},
+	players: {
+		speed: number, // vitesse X et Z
+		rotationSpeed: number, // vitesse de rotation
+		boostForce: number, // force du boost
+	},
+	general : {
+		time: number, // temps d'une game
+	}
+}
+
 
 export class Instance {
 	constructor(lobby: Lobby) {
@@ -59,7 +83,32 @@ export class Instance {
 	public startTime: number;
 	accelerationRate = 50;
 	maxAcceleration = 5000;
+	private rotationSpeed;
+	automatch: boolean = true;
 	private playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
+	private params: GameParameters = {
+		classic: false,
+		duel: false,
+		map: {
+			size:[100, 200],
+			goalSize: 50,
+			medianOffset: 20,
+		},
+		ball: {
+			globalSpeed: 20,
+			reboundForce: 20,
+			ballAcceleration: 20,
+			rotationForce: 20,
+		},
+		players: {
+			speed: 60,
+			rotationSpeed: 50,
+			boostForce: 20,
+		},
+		general: {
+			time: 180,
+		}
+	};
 
 	// un player quitte pendant le temps d'attente du demarage
 	private data: GameData = {
@@ -81,6 +130,8 @@ export class Instance {
 	}
 
 
+	setParams(params: GameParameters) { this.params = params; this.automatch = false };
+	getParams(): GameParameters {return this.params};
 	isInstanceOfInputPacket(object: any): boolean {
 		return ('code' in object && 'timestamp' in object);
 	}
@@ -147,6 +198,11 @@ export class Instance {
 		this.maxPlayer = this.lobby.mode;
 		this.startTriggered = true;
 		this.generate();
+		let infos: PlayerInfo[] = [];
+		this.lobby.players.forEach((e) => {
+			let info = e.infos;
+			infos.push(info);
+		})
 		const payload: ServerPayloads[ServerEvents.LobbyState] = {
 			lobbyId: this.lobby.id,
 			mode: this.lobby.mode,
@@ -154,6 +210,7 @@ export class Instance {
 			hasFinished: this.hasFinished,
 			playersCount: this.lobby.nbPlayers,
 			isSuspended: this.isSuspended,
+			playersInfo: infos,
 		};
 		console.log(`${this.lobby.id} is full, game starting`);
 		this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
@@ -165,36 +222,30 @@ export class Instance {
 	}
 
 	processInput() {
+
 		let directionVector = new CANNON.Vec3();
 		let worldVelocity: CANNON.Vec3 = new CANNON.Vec3();
 		let rotationQuaternion = new CANNON.Quaternion();
 		let axisY =  new CANNON.Vec3( 0, 1, 0 );
-		let rotateAngle;
 		
 		this.world.players.forEach((e) => {
 			if (e.activeDirections.up) {
-				console.log(e.player.id);
 				directionVector.z = -this.moveDistance;
 			}
 			else if (e.activeDirections.down) {
-				console.log(e.player.id);
 				directionVector.z = this.moveDistance;
 			}
 			if (e.activeDirections.left) {
-				console.log(e.player.id);
 				directionVector.x = -this.moveDistance;
 			}
 			else if (e.activeDirections.right) {
-				console.log(e.player.id);
 				directionVector.x = this.moveDistance;
 			}
 			if (e.activeDirections.rotLeft) {
-				rotateAngle = Math.PI / 2 * (1 / 12);
-				rotationQuaternion.setFromAxisAngle(axisY, rotateAngle);
+				rotationQuaternion.setFromAxisAngle(axisY, this.rotationSpeed);
 				e.body.quaternion = rotationQuaternion.mult(e.body.quaternion);
 			} else if (e.activeDirections.rotRight) {
-				rotateAngle = Math.PI / 2 * (1 / 12);
-				rotationQuaternion.setFromAxisAngle(axisY, -rotateAngle);
+				rotationQuaternion.setFromAxisAngle(axisY, -this.rotationSpeed);
 				e.body.quaternion = rotationQuaternion.mult(e.body.quaternion);
 			}
 			if (e.activeDirections.boost) {
@@ -211,6 +262,8 @@ export class Instance {
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
+			//e.body.velocity.x *= (this.params.ball.globalSpeed / 10);
+			//e.body.velocity.z *= (this.params.ball.globalSpeed / 10);
 			//const coef = new CANNON.Vec3(0.005, 0.005, 0.005);
 			//const velo = e.body.velocity.vmul(coef);
 			//e.body.velocity.vadd(velo);
@@ -226,7 +279,6 @@ export class Instance {
 			if (bl.body.id == contact.bi.id) {
 				this.world.players.forEach((pl) => {
 					if (pl.body.id == contact.bj.id) {
-						console.log("Collision");
 
 						// Calculate the collision normal
 						const collisionNormal = contact.ni;
@@ -242,7 +294,6 @@ export class Instance {
 						// Update the ball's velocity with the new velocity
 						bl.body.velocity.copy(newVelocity);
 			  
-						console.log("New Velocity:", newVelocity);
 			  
 						// Invert the angular rotation (optional)
 						bl.body.angularVelocity.scale(-0.1);
@@ -258,7 +309,6 @@ export class Instance {
 						const impulseForce = impulseDirection.scale(impulseStrength);
 						bl.body.applyImpulse(impulseForce, bl.body.position);
 			  
-						console.log("Angular Velocity:", bl.body.angularVelocity);
 
 					}
 				})
@@ -293,17 +343,11 @@ export class Instance {
 					const impactDirection: CANNON.Vec3 = contact.ri.clone();
 					const angle = Math.atan2(impactDirection.z, impactDirection.x);
 
-					// Calcul de la vitesse de la balle et de la paddle
 					const ballSpeed = ball.body.velocity.length();
 
-					console.log(`ball speed : ${ballSpeed}, angle : ${angle}`)
-					// Calcul de la force d'impulsion en fonction de l'angle, de la vitesse de la balle et de la vitesse de la paddle
 					const impulseForce = (angle * ballSpeed) / 1000;
 
-					// Calcul du vecteur de force d'impulsion
 					const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
-					console.log(impulseVector)
-					// Application de la force d'impulsion à la balle
 					ball.body.applyImpulse(impulseVector, ball.body.position);
 
 				}
@@ -317,7 +361,6 @@ export class Instance {
 	}
 
 	ballStart(ball: Sphere) {
-		console.log("ball Start");
 		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
 		const angle = Math.atan2(direction.z, direction.x);
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
@@ -456,6 +499,18 @@ export class Instance {
 	}
 
 	generate() {
+		console.log(this.params);
+		if (this.params) {
+			let angleMax = Math.PI / 2 * (1 / 6);
+
+			// Appliquer la règle de trois
+			this.rotationSpeed = (this.params.players.rotationSpeed / 100) * (angleMax);
+			this.world.mapWidth = this.params.map.size[0]
+			this.world.mapHeight = this.params.map.size[1]
+			this.moveDistance = this.params.players.speed;
+			this.data.mapWidth = this.params.map.size[0];
+			this.data.mapHeight = this.params.map.size[1];
+		}
 		const groundMaterial: CANNON.Material = new CANNON.Material();
 		this.world.world = new CANNON.World({
 			gravity: new CANNON.Vec3(0, -20, 0),
@@ -509,8 +564,8 @@ export class Instance {
 	playerLogic() {
 		this.world.players.forEach((e) => {
 			e.body.position.y = e.size[1] / 2;
-			if ( (e.player.team == 'home' ? e.body.position.z >= -20 : e.body.position.z <= 20)) {
-				e.body.position.z =  (e.player.team == 'home' ? -20 : 20);
+			if ( (e.player.team == 'home' ? e.body.position.z >= -this.params.map.medianOffset : e.body.position.z <= this.params.map.medianOffset)) {
+				e.body.position.z =  (e.player.team == 'home' ? -this.params.map.medianOffset : this.params.map.medianOffset);
 			}
 			if (e.body.position.z <= -this.world.mapHeight / 2)
 				e.body.position.z = -(this.world.mapHeight / 2);
@@ -530,7 +585,7 @@ export class Instance {
 			this.playerLogic();
 			this.ballPhysics();
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
-			if (this.data.elapsedTime > 180)
+			if (this.data.elapsedTime > this.params.general.time)
 				this.triggerFinish();
 	}, 1000/ 120));
 }

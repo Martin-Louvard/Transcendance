@@ -8,7 +8,6 @@ export async function fetchChatChannels(userId: number): Promise<ChatChannels[]>
 export async function fetchAllRelatedInfoApi(userId: number): Promise<sessionState> {
   try {
     const response = await fetch(`http://localhost:3001/users/id/{id}?id=${userId}`);
-    console.log("FETCH RELATED");
     const data: sessionState = await response.json();
     return data;
   } catch (error) {
@@ -19,7 +18,6 @@ export async function fetchAllRelatedInfoApi(userId: number): Promise<sessionSta
 
 export async function fetchFriendsApi(userId: string): Promise<User[]>  {
     try {
-      console.log("FETCH FRIENDS API");
       const response = await fetch(`http://localhost:3001/users/friends/{id}?id=${userId}`);
       const data: User[] = await response.json();
       return data;
@@ -30,10 +28,8 @@ export async function fetchFriendsApi(userId: string): Promise<User[]>  {
   
 export async function fetchFriendshipsApi(userId: string): Promise<Friendships[]> {
   try {
-    console.log("FETCH FRIENDSHIPS");
     const response = await fetch(`http://localhost:3001/friends/user/{id}?id=${userId}`);
     const data: Friendships[] = await response.json();
-    console.log(data);
     return data;
   } catch (error) {
     throw error;
