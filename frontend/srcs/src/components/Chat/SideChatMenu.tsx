@@ -46,7 +46,10 @@ const SideChatMenu = () => {
   const privateChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => chat.channelType === "private");
   const joinedGroupChannels: ChatChannels[] | undefined =
-    storedJoinedChannels?.filter((chat) => chat.channelType === "created");
+    storedJoinedChannels?.filter((chat) => {
+      if (chat.channelType === "created" || chat.channelType === "Password")
+        return chat;
+    });
   const publicChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => chat.channelType === "public");
   const [chatMenuChoice, setChatMenuChoice] = useState<string>("chatList");
@@ -130,12 +133,6 @@ const SideChatMenu = () => {
   };
 
   const displayList = () => {
-    console.log("=============================");
-    console.log("SEARCHLIST");
-    console.log(searchList);
-    console.log("=============================");
-    console.log("STORED");
-    console.log(storedJoinedChannels);
     return (
       <div>
         {channelsTypeList(privateChannels, "private")}

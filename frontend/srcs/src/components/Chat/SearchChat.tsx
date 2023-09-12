@@ -10,6 +10,10 @@ import {
   resetNotification,
   addNewChatChannel,
 } from "../../redux/sessionSlice";
+import { Popup } from 'reactjs-popup';
+import "reactjs-popup/dist/index.css";
+import toast from 'react-hot-toast';
+
 
 interface searchBarChatProps {
   fetchedChannels: ChatChannels[] | undefined;
@@ -21,6 +25,8 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchResult, setSearchResult] = useState<ChatChannels[] | undefined>([]);
   const [chatBox, setChatBox] = useState<ChatChannels | null>(null);
+  const [selectedChat, setSelectedChat] = useState<ChatChannels | null>(null);
+  const [passwordInput, setPasswordInput] = useState<string>("");
   const dispatch = useAppDispatch();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,6 +36,7 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
   const handleSearch = () => {
     if (fetchedChannels && currentUser){
       const foundChannels: ChatChannels[] | undefined = fetchedChannels.filter((chan) => {
+        console.log(chan);
         if (getName(chan, currentUser.username).toLowerCase().includes(searchTerm.toLowerCase()) 
           && (chan.channelType !== "private" && !chan.participants.includes(currentUser))){
           return chan;
@@ -62,9 +69,31 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
           dispatch(addOpenedChatChannel(chat));
           dispatch(setChatOpen(chat));
         }
+        else {
+          setSelectedChat(chat);
+        }
       }
     }
   }
+
+  const handleJoinWithPasswd = () => {
+    if (currentUser && selectedChat) {
+      if (passwordInput === selectedChat.password){
+        dispatch(addNewChatChannel(selectedChat));
+        dispatch({
+          type: "JOIN_CHAT",
+          payload: [currentUser.id, selectedChat.id],
+        });
+        dispatch(addOpenedChatChannel(selectedChat));
+        dispatch(setChatOpen(selectedChat));
+        setSelectedChat(null);
+        setPasswordInput("");
+      }
+      else {
+        toast.error("Invalid password");
+      }
+    }
+  };
 
   const resultList = (channels: ChatChannels[]) => {
     return (
@@ -102,6 +131,25 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
         </div>
       </div>
       <div>{searchResult ? resultList(searchResult) : ""}</div>
+      <Popup
+        open={!!selectedChat}
+        closeOnDocumentClick={false}
+        onClose={() => setSelectedChat(null)}
+      >
+        <div className="modal">
+          <h2>Enter password to join</h2>
+          <input
+            type="password"
+            placeholder="password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+          />
+          <div className="modal-buttons">
+            <button onClick={() => setSelectedChat(null)}>cancel</button>
+            <button onClick={handleJoinWithPasswd}>join</button>
+          </div>
+        </div>
+      </Popup>
     </>
   );
 };
