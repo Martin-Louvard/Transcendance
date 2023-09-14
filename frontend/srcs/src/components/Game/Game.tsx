@@ -21,7 +21,7 @@ import {HorizontalBlurEffect} from './effects/HorizontalBlur'
 import {BadTVEffect} from './effects/BadTV'
 
 import { GrassField } from "./GrassField";
-import { useWindowSize } from "./Lobby";
+import { useWindowSize } from "./Lobby/CreateMatch";
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
