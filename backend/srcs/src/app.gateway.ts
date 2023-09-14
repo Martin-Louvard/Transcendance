@@ -137,7 +137,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
   createMatch(@ConnectedSocket() client: Socket, @MessageBody() data: {params: GameParameters, info: PlayerInfo}) {
     const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player || player.lobby) // si il est deja dans un lobby on l'autorise pas
-    return ;
+      return ;
     player.infos = data.info;
     this.lobbyService.createLobbyByParameters(data.params, this.server, player);
   }

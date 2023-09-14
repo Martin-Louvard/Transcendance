@@ -10,6 +10,8 @@ export enum LobbyType {
 	auto = 1,
 	create = 2,
 	find = 3,
+	wait = 4,
+	score = 5,
 }
 
 export enum ServerEvents
@@ -93,7 +95,7 @@ export interface GameInvitation {
 	receiver: PlayerInfo,
 	lobby: {
 		id: string,
-		mode: LobbyMode,
+		params: GameParameters,
 	}
 	id: string,
 	timestamp: number,
@@ -109,6 +111,9 @@ export type ServerPayloads = {
 	  	playersCount: number,
 	  	isSuspended: boolean,
 		playersInfo: PlayerInfo[],
+		winner: 'home' | 'visitor' | null,
+		team: 'home' | 'visitor',
+		score: {'home': number, 'visitor': number},
 	},
 	[ServerEvents.GameState]: {
 		gameData: GameData;
@@ -140,7 +145,7 @@ export type ClientPayloads = {
 	[ClientEvents.GameSendRequest]: {
 		senderId: number,
 		receiverId: number,
-		lobbyId: number,
+		lobbyId: string,
 	}
 };
 

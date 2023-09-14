@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Lobby } from './lobby.class';
-import { LobbyMode, InputPacket, GameParameters, PlayerInfo, ServerEvents, ServerPayloads, GameInvitation, ClientPayloads, ClientEvents, LobbyCli } from '@shared/class';
+import { LobbyMode, InputPacket, GameParameters, PlayerInfo, ServerEvents, ServerPayloads, GameInvitation, ClientPayloads, ClientEvents, LobbyCli, LobbySlotType } from '@shared/class';
 import { Player } from '../player/player.class';
 import { Server } from 'socket.io';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
@@ -135,6 +135,8 @@ export class LobbyService {
 		const lobby = this.findLobbyById(data.lobbyId);
 		if (!lobby)
 			return 'lobby not found';
+		if (player.lobby)
+			player.lobby.removePlayer(player);
 		return (lobby.connectPlayer(player))
 	}
 
@@ -165,18 +167,32 @@ export class LobbyService {
 		if (!player || !player.isOnline)
 		  return false
 		const sender = this.playerService.getPlayerById(data.senderId);
+		console.log('sender: ', sender);
 		if (!sender || !sender.isOnline || !sender.lobby || !sender.infos)
-		return false
+			return false
+		const lobby = this.lobbies.get(data.lobbyId);
+		if (!lobby || !lobby.instance || !lobby.instance.getParams())
+			return false;
 		const payload: ServerPayloads[ServerEvents.GameInvitation] = {
 		  sender: sender.infos,
 		  receiver: player.infos,
 		  lobby: {
 			id: sender.lobby.id,
-			mode: sender.lobby.mode,
+			params: lobby.instance.getParams(),
 		  },
 		  id: v4(),
 		  timestamp: Date.now(),
 		}
+		console.log("salut");
+		for (let index = 0; index < lobby.slots.length; index++) {
+			const e = lobby.slots[index];
+			if (!e.full && e.type == LobbySlotType.friend) {
+				e.type = LobbySlotType.invited;
+				e.player = player.infos;
+				break ;
+			}
+		}
+		lobby.dispatchLobbySlots();
 		player.emit<ServerPayloads[ServerEvents.GameInvitation]>(ServerEvents.GameInvitation, payload);
 		sender.emit<GameInvitation>(ServerEvents.SuccessfulInvited, payload);
 	  }

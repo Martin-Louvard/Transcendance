@@ -9,7 +9,7 @@ export interface WebSocketState {
   mapWidth: number;
   mapHeight: number;
   elapsedTime: number;
-  lobbyId: number | null;
+  lobbyId: string | null;
   isPlaying: boolean;
   LobbyType: LobbyType;
   playersInfo: PlayerInfo[];
@@ -20,6 +20,7 @@ export interface WebSocketState {
   sentInvites: ServerPayloads[ServerEvents.GameInvitation][];
   full: boolean;
   lobbies: LobbyCli[];
+  lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor', team: 'home' | 'visitor', timestamp: number} | null,
 }
 
 const initialState: WebSocketState = {
@@ -30,7 +31,7 @@ const initialState: WebSocketState = {
   mapWidth: 0,
   mapHeight: 0,
   elapsedTime: 0,
-  lobbyId: 0,
+  lobbyId: "",
   isPlaying: false,
   LobbyType: LobbyType.none,
   playersInfo: new Array<PlayerInfo>(),
@@ -64,6 +65,7 @@ const initialState: WebSocketState = {
   sentInvites: [],
   full: false,
   lobbies: [],
+  lastGame: null,
 };
 
 const websocketSlice = createSlice({
@@ -81,6 +83,7 @@ const websocketSlice = createSlice({
       state.isPlaying =false;
     },
     setLobbyType: (state, action) => {
+      console.log("JE CHANGE LE LOBBYTYPE POUR :", action.payload)
       state.LobbyType = action.payload;
     },
     setParams: (state, action) => {
@@ -138,7 +141,6 @@ const websocketSlice = createSlice({
     },
     resetGameDatas: (state) => {
       resetParams();
-      state.LobbyType = LobbyType.none;
       state.lobbySlots = [];
       state.balls = [];
       state.players = [];
@@ -183,8 +185,9 @@ const websocketSlice = createSlice({
       state.elapsedTime = action.payload.gameData.elapsedTime;
     },
     setAuthState: (state, action) => {
-      if (!action.payload.lobbyId || action.payload.lobbyId == 0) {        
-        state.LobbyType = LobbyType.none;
+      if (!action.payload.lobbyId || action.payload.lobbyId == 0) {
+        if (state.LobbyType != LobbyType.score)        
+          state.LobbyType = LobbyType.none;
         state.lobbySlots = [];
         state.balls = [];
         state.players = [];
@@ -226,6 +229,12 @@ const websocketSlice = createSlice({
             state.isPlaying = true;
       if (action.payload.hasStarted) {
         state.isPlaying = true;
+      }
+      if (action.payload.hasFinished) {
+        state.isPlaying = false;
+        state.LobbyType = LobbyType.score;
+        console.log("lobbyType changed to score");
+        state.lastGame = {score: action.payload.score, winner: action.payload.winner, team: action.payload.team, timestamp: Date.now()};
       }
       if (action.payload.playersInfo) {
         state.playersInfo = action.payload.playersInfo;

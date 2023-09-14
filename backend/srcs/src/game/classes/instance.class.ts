@@ -130,7 +130,7 @@ export class Instance {
 	}
 
 
-	setParams(params: GameParameters) { this.params = params; this.automatch = false };
+	setParams(params: GameParameters) {console.log(params); this.params = params; this.automatch = false };
 	getParams(): GameParameters {return this.params};
 	isInstanceOfInputPacket(object: any): boolean {
 		return ('code' in object && 'timestamp' in object);
@@ -203,22 +203,44 @@ export class Instance {
 			let info = e.infos;
 			infos.push(info);
 		})
-		const payload: ServerPayloads[ServerEvents.LobbyState] = {
-			lobbyId: this.lobby.id,
-			mode: this.lobby.mode,
-			hasStarted: this.hasStarted,
-			hasFinished: this.hasFinished,
-			playersCount: this.lobby.nbPlayers,
-			isSuspended: this.isSuspended,
-			playersInfo: infos,
-		};
+		this.lobby.players.forEach((e) => {
+			const payload: ServerPayloads[ServerEvents.LobbyState] = {
+				lobbyId: this.lobby.id,
+				mode: this.lobby.mode,
+				hasStarted: this.hasStarted,
+				hasFinished: this.hasFinished,
+				playersCount: this.lobby.nbPlayers,
+				isSuspended: this.isSuspended,
+				playersInfo: infos,
+				winner: null,
+				team: e.team,
+				score: this.data.score,
+			};
+			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
+		})
 		console.log(`${this.lobby.id} is full, game starting`);
-		this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		this.gameLogic();
 	}
 
 	triggerFinish() {
 		this.hasFinished = true;
+		this.lobby.players.forEach((e) => {
+			const payload: ServerPayloads[ServerEvents.LobbyState] = {
+				lobbyId: this.lobby.id,
+				mode: this.lobby.mode,
+				hasStarted: this.hasStarted,
+				hasFinished: this.hasFinished,
+				playersCount: this.lobby.nbPlayers,
+				isSuspended: this.isSuspended,
+				playersInfo: [],
+				team: e.team,
+				winner: this.data.score.home == this.data.score.visitor ? null : this.data.score.home > this.data.score.visitor ? 'home' : 'visitor', 
+				score: this.data.score,
+			};
+			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
+			
+		})
+		console.log(`${this.lobby.id} is finished`);
 	}
 
 	processInput() {
@@ -502,8 +524,6 @@ export class Instance {
 		console.log(this.params);
 		if (this.params) {
 			let angleMax = Math.PI / 2 * (1 / 6);
-
-			// Appliquer la règle de trois
 			this.rotationSpeed = (this.params.players.rotationSpeed / 100) * (angleMax);
 			this.world.mapWidth = this.params.map.size[0]
 			this.world.mapHeight = this.params.map.size[1]
@@ -585,8 +605,11 @@ export class Instance {
 			this.playerLogic();
 			this.ballPhysics();
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
-			if (this.data.elapsedTime > this.params.general.time)
+			console.log(this.data.elapsedTime, " ", this.params.general.time);
+			if (this.data.elapsedTime > this.params.general.time) {
 				this.triggerFinish();
+				this.lobby.clear()
+			}
 	}, 1000/ 120));
 }
 

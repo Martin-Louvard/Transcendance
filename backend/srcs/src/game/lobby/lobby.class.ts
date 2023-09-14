@@ -25,7 +25,6 @@ export class Lobby {
 	nbPlayers: number = 0;
 	instance: Instance;
 	full: boolean;
-	params: {};
 	owner: Player = null;
 
 	public static fromGameParameter(params: GameParameters, server: Server, creator: Player): Lobby {
@@ -36,6 +35,9 @@ export class Lobby {
 
 	public setSlots(slots: LobbySlotCli[]) { this.slots = JSON.parse(JSON.stringify(slots))}
 
+	public dispatchLobbySlots() {
+		this.emit<ServerPayloads[ServerEvents.LobbySlotsState]>(ServerEvents.LobbySlotsState, this.slots);
+	}
 	public isOnlineSlot(): boolean {
 		let isOnlineSlot = false;
 		this.slots.forEach((e) => {
@@ -56,8 +58,7 @@ export class Lobby {
 		if (this.slots && this.slots.length > 0) {
 			console.log('before, ', this.slots);
 			this.slots[this.players.size - 1] = {full: true, type: 0, player: player.infos};
-			this.emit<ServerPayloads[ServerEvents.LobbySlotsState]>(ServerEvents.LobbySlotsState, this.slots);
-			console.log('after, ', this.slots);
+			this.dispatchLobbySlots();
 		}
 		if (this.nbPlayers == this.mode) {
 			this.full = true;
@@ -86,13 +87,12 @@ export class Lobby {
 			if (this.slots[i] && !this.slots[i].player && this.slots.at(i + 1).player)
 				[this.slots[i], this.slots[i + 1]] = [this.slots[i + 1], this.slots[i]];
 		}
-		this.emit<ServerPayloads[ServerEvents.LobbySlotsState]>(ServerEvents.LobbySlotsState, this.slots);
 	}
 
 	removePlayer(player: Player):boolean {
 		try {
 
-			if (player.lobby == null || !player) {
+			if (player.lobby == null || !player || !player.socket) {
 				console.log("remove player error");
 				return false;
 			}
@@ -121,6 +121,7 @@ export class Lobby {
 				this.dispatchAuthState();
 				player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 				this.deletePlayerFromSlot(player);
+				this.dispatchLobbySlots();
 				return true;
 			} // if not deleted we try different way
 			this.players.forEach((e, key) => {
@@ -146,6 +147,7 @@ export class Lobby {
 					this.dispatchAuthState();
 					player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 					this.deletePlayerFromSlot(player);
+					this.dispatchLobbySlots();
 					return true
 				}
 			})
@@ -189,16 +191,22 @@ export class Lobby {
 			let info: PlayerInfo = e.infos
 			playersInfos.push(info);
 		})
-		const payload: ServerPayloads[ServerEvents.LobbyState] = {
-			lobbyId: this.id,
-			mode: this.mode,
-			hasStarted: this.instance.hasStarted,
-			hasFinished: this.instance.hasFinished,
-			playersCount: this.nbPlayers,
-			isSuspended: this.instance.isSuspended,
-			playersInfo: playersInfos,
-		}
-		this.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
+		this.players.forEach((e) => {
+			const payload: ServerPayloads[ServerEvents.LobbyState] = {
+				lobbyId: this.id,
+				mode: this.mode,
+				hasStarted: this.instance.hasStarted,
+				hasFinished: this.instance.hasFinished,
+				playersCount: this.nbPlayers,
+				isSuspended: this.instance.isSuspended,
+				playersInfo: playersInfos,
+				team: e.team,
+				winner: null,
+				score: null,
+			}
+			this.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
+
+		})
 	}
 	public emit<T>(event: ServerEvents, payload: T) {
 		this.server.to(this.id).emit(event, payload);

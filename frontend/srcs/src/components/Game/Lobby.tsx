@@ -9,13 +9,16 @@ import { WebSocketState, deleteInvitedGame, deleteSentInvite, resetParams, setDu
 import toast from 'react-hot-toast';
 import FolderIcon from '@mui/icons-material/Folder';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import { createTheme, useTheme } from '@mui/material/styles';
+import { purple } from '@mui/material/colors';
 
 const AutoMatch: React.FC = (props) => {
   const [gameState, setGameState] = useState({isDouble: false, isDuel: false})
   const dispatch = useAppDispatch();
   const user: User | undefined = props.user;
   const game: WebSocketState = props.game;
-  //const setParams = props.setParams;
+  const lobbyState = props.lobbyState
 
   useEffect(() => {
     if (gameState.isDouble && user) {
@@ -54,6 +57,7 @@ const MapParams: React.FC = (props) => {
   const setMapParam = props.setMapParam;
   const size = props.size;
   const sliderSize = props.sliderSize;
+  const sliderStyle =props.sliderStyle
 
   return (
     <Card variant="outlined" sx={{marginX: size.width / 10 / 4}}>
@@ -67,56 +71,12 @@ const MapParams: React.FC = (props) => {
                 
               <Stack spacing={5} direction="row" sx={{ mt: 0, mb: 1 }} alignItems="center">
                 <p>Width</p>
-                <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={{
-                  color: '#B45AFF',
-                  width: sliderSize,
-                  '& .MuiSlider-valueLabel': {
-                    lineHeight: 1.2,
-                    fontSize: 12,
-                    background: 'unset',
-                    padding: 0,
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50% 50% 50% 0',
-                    backgroundColor: '#B45AFF',
-                    transformOrigin: 'bottom left',
-                    transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                    '&:before': { display: 'none' },
-                    '&.MuiSlider-valueLabelOpen': {
-                      transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                    },
-                    '& > *': {
-                      transform: 'rotate(45deg)',
-                    },
-                  },
-                }}
+                <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
                 onChange={(_, val) => {setMapParam(prev => ({...prev, size: [val as number, prev.size[1]]}))}}/>
               </Stack>
               <Stack spacing={5} direction="row" sx={{ mt: 0, mb: 1}} alignItems="center">
                 <p>Height</p>
-                <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={{
-                  color: '#B45AFF',
-                  width: sliderSize,
-                  '& .MuiSlider-valueLabel': {
-                    lineHeight: 1.2,
-                    fontSize: 12,
-                    background: 'unset',
-                    padding: 0,
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50% 50% 50% 0',
-                    backgroundColor: '#B45AFF',
-                    transformOrigin: 'bottom left',
-                    transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                    '&:before': { display: 'none' },
-                    '&.MuiSlider-valueLabelOpen': {
-                      transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                    },
-                    '& > *': {
-                      transform: 'rotate(45deg)',
-                    },
-                  },
-                }}
+                <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
                 onChange={(_, val) => {setMapParam(prev => ({...prev, size: [prev.size[0], val as number]}))}}/>
               </Stack>
             </Stack>
@@ -124,57 +84,13 @@ const MapParams: React.FC = (props) => {
           {/*Goal Size Size*/}
           <Stack spacing={2} direction="column" sx={{ mt: 30, mb: 1}} alignItems="center">
               <p>Goal Size</p>
-              <Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto" max={mapParam.size[0]} min={Math.floor(mapParam.size[0] / 8)} sx={{
-                color: '#B45AFF',
-                width: sliderSize,
-                '& .MuiSlider-valueLabel': {
-                  lineHeight: 1.2,
-                  fontSize: 12,
-                  background: 'unset',
-                  padding: 0,
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50% 50% 50% 0',
-                  backgroundColor: '#B45AFF',
-                  transformOrigin: 'bottom left',
-                  transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                  '&:before': { display: 'none' },
-                  '&.MuiSlider-valueLabelOpen': {
-                    transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                  },
-                  '& > *': {
-                    transform: 'rotate(45deg)',
-                  },
-                },
-              }}
+              <Slider defaultValue={0} aria-label="Default" valueLabelDisplay="auto" max={mapParam.size[0]} min={Math.floor(mapParam.size[0] / 8)} sx={sliderStyle}
               onChange={(_, val) => {setMapParam(prev => ({...prev, goalSize: val as number}))}}/>
           </Stack>
           {/*Median Offset Size*/}
           <Stack spacing={2} direction="column" sx={{ mt: 30, mb: 1}} alignItems="center">
               <p>Median Offset</p>
-              <Slider defaultValue={10} aria-label="Default" valueLabelDisplay="auto" max={40} min={0} sx={{
-                color: '#B45AFF',
-                width: sliderSize,
-                '& .MuiSlider-valueLabel': {
-                  lineHeight: 1.2,
-                  fontSize: 12,
-                  background: 'unset',
-                  padding: 0,
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50% 50% 50% 0',
-                  backgroundColor: '#B45AFF',
-                  transformOrigin: 'bottom left',
-                  transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                  '&:before': { display: 'none' },
-                  '&.MuiSlider-valueLabelOpen': {
-                    transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                  },
-                  '& > *': {
-                    transform: 'rotate(45deg)',
-                  },
-                },
-              }}
+              <Slider defaultValue={10} aria-label="Default" valueLabelDisplay="auto" max={40} min={0} sx={sliderStyle}
               onChange={(_, val) => {setMapParam(prev => ({...prev, medianOffset: val as number}))}}/>
           </Stack>
         </Stack>
@@ -188,6 +104,7 @@ const BallParam: React.FC = (props) => {
   const setBallParam = props.setBallParam;
   const sliderSize = props.sliderSize;
   const size = props.size;
+  const sliderStyle =props.sliderStyle
 
   return (
     <Card>
@@ -196,110 +113,22 @@ const BallParam: React.FC = (props) => {
       <Stack spacing={size.width > 700 ? 8 : 2} direction={size.width > 700 ? "row" : "column"} sx={{ mb: 1, px: size.width > 1000 ? size.width / 10 / 4 : size.width > 700 ? size.width / 10 / 8 : 0} } alignItems="center">
           <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1, }} alignItems="center">
             <p>Speed</p>
-            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={{
-              color: '#B45AFF',
-              width: sliderSize,
-              '& .MuiSlider-valueLabel': {
-                lineHeight: 1.2,
-                fontSize: 12,
-                background: 'unset',
-                padding: 0,
-                width: 32,
-                height: 32,
-                borderRadius: '50% 50% 50% 0',
-                backgroundColor: '#B45AFF',
-                transformOrigin: 'bottom left',
-                transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                '&:before': { display: 'none' },
-                '&.MuiSlider-valueLabelOpen': {
-                  transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                },
-                '& > *': {
-                  transform: 'rotate(45deg)',
-                },
-              },
-            }}
+            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
             onChange={(_, val) => {setBallParam(prev => ({...prev, globalSpeed: val as number}))}}/>
           </Stack>
           <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
             <p>Rebound Force</p>
-            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={{
-              color: '#B45AFF',
-              width: sliderSize,
-              '& .MuiSlider-valueLabel': {
-                lineHeight: 1.2,
-                fontSize: 12,
-                background: 'unset',
-                padding: 0,
-                width: 32,
-                height: 32,
-                borderRadius: '50% 50% 50% 0',
-                backgroundColor: '#B45AFF',
-                transformOrigin: 'bottom left',
-                transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                '&:before': { display: 'none' },
-                '&.MuiSlider-valueLabelOpen': {
-                  transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                },
-                '& > *': {
-                  transform: 'rotate(45deg)',
-                },
-              },
-            }}
+            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
             onChange={(_, val) => {setBallParam(prev => ({...prev, reboundForce: val as number}))}}/>
           </Stack>
           <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
             <p>Acceleration</p>
-            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={{
-              color: '#B45AFF',
-              width: sliderSize,
-              '& .MuiSlider-valueLabel': {
-                lineHeight: 1.2,
-                fontSize: 12,
-                background: 'unset',
-                padding: 0,
-                width: 32,
-                height: 32,
-                borderRadius: '50% 50% 50% 0',
-                backgroundColor: '#B45AFF',
-                transformOrigin: 'bottom left',
-                transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                '&:before': { display: 'none' },
-                '&.MuiSlider-valueLabelOpen': {
-                  transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                },
-                '& > *': {
-                  transform: 'rotate(45deg)',
-                },
-              },
-            }}
+            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
             onChange={(_, val) => {setBallParam(prev => ({...prev, ballAcceleration: val as number}))}}/>
           </Stack>
           <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
             <p>Rotation Force</p>
-            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={{
-              color: '#B45AFF',
-              width: sliderSize,
-              '& .MuiSlider-valueLabel': {
-                lineHeight: 1.2,
-                fontSize: 12,
-                background: 'unset',
-                padding: 0,
-                width: 32,
-                height: 32,
-                borderRadius: '50% 50% 50% 0',
-                backgroundColor: '#B45AFF',
-                transformOrigin: 'bottom left',
-                transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                '&:before': { display: 'none' },
-                '&.MuiSlider-valueLabelOpen': {
-                  transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                },
-                '& > *': {
-                  transform: 'rotate(45deg)',
-                },
-              },
-            }}
+            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
             onChange={(_, val) => {setBallParam(prev => ({...prev, rotationForce: val as number}))}}/>
           </Stack>
         </Stack>
@@ -313,6 +142,7 @@ const PlayersParam: React.FC = (props) => {
   const setPlayersParam = props.setPlayersParam;
   const sliderSize = props.sliderSize;
   const size = props.size;
+  const sliderStyle =props.sliderStyle
 
   return (
     <Card>
@@ -321,83 +151,17 @@ const PlayersParam: React.FC = (props) => {
       <Stack spacing={size.width > 700 ? 8 : 2} direction={size.width > 700 ? "row" : "column"} sx={{ mb: 1, px: size.width > 600 ? size.width / 10 / 3: size.width > 400 ? size.width / 10 / 8 : 0} } alignItems="center">
           <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1, }} alignItems="center">
             <p>Speed</p>
-            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={150} min={10} sx={{
-              color: '#B45AFF',
-              width: sliderSize,
-              '& .MuiSlider-valueLabel': {
-                lineHeight: 1.2,
-                fontSize: 12,
-                background: 'unset',
-                padding: 0,
-                width: 32,
-                height: 32,
-                borderRadius: '50% 50% 50% 0',
-                backgroundColor: '#B45AFF',
-                transformOrigin: 'bottom left',
-                transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                '&:before': { display: 'none' },
-                '&.MuiSlider-valueLabelOpen': {
-                  transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                },
-                '& > *': {
-                  transform: 'rotate(45deg)',
-                },
-              },
-            }}
+            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={150} min={10} sx={sliderStyle}
             onChange={(_, val) => {setPlayersParam(prev => ({...prev, speed: val as number}))}}/>
           </Stack>
           <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
             <p>Rotation Speed</p>
-            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={100} min={10} sx={{
-              color: '#B45AFF',
-              width: sliderSize,
-              '& .MuiSlider-valueLabel': {
-                lineHeight: 1.2,
-                fontSize: 12,
-                background: 'unset',
-                padding: 0,
-                width: 32,
-                height: 32,
-                borderRadius: '50% 50% 50% 0',
-                backgroundColor: '#B45AFF',
-                transformOrigin: 'bottom left',
-                transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                '&:before': { display: 'none' },
-                '&.MuiSlider-valueLabelOpen': {
-                  transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                },
-                '& > *': {
-                  transform: 'rotate(45deg)',
-                },
-              },
-            }}
+            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={100} min={10} sx={sliderStyle}
             onChange={(_, val) => {setPlayersParam(prev => ({...prev, rotationSpeed: val as number}))}}/>
           </Stack>
           <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
             <p>Boost Force</p>
-            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={{
-              color: '#B45AFF',
-              width: sliderSize,
-              '& .MuiSlider-valueLabel': {
-                lineHeight: 1.2,
-                fontSize: 12,
-                background: 'unset',
-                padding: 0,
-                width: 32,
-                height: 32,
-                borderRadius: '50% 50% 50% 0',
-                backgroundColor: '#B45AFF',
-                transformOrigin: 'bottom left',
-                transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-                '&:before': { display: 'none' },
-                '&.MuiSlider-valueLabelOpen': {
-                  transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-                },
-                '& > *': {
-                  transform: 'rotate(45deg)',
-                },
-              },
-            }}
+            <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
             onChange={(_, val) => {setPlayersParam(prev => ({...prev, boostForce: val as number}))}}/>
           </Stack>
         </Stack>
@@ -411,35 +175,14 @@ const GeneralParam: React.FC = (props) => {
   const setGeneralParam = props.setGeneralParam;
   const sliderSize = props.sliderSize;
   const size = props.size;
+  const sliderStyle =props.sliderStyle
   
   return (
     <Card>
       <p>General Param</p>
       <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1, }} alignItems="center">
         <p>Time (seconds)</p>
-        <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={600} min={60} sx={{
-          color: '#B45AFF',
-          width: 150,
-          '& .MuiSlider-valueLabel': {
-            lineHeight: 1.2,
-            fontSize: 12,
-            background: 'unset',
-            padding: 0,
-            width: 32,
-            height: 32,
-            borderRadius: '50% 50% 50% 0',
-            backgroundColor: '#B45AFF',
-            transformOrigin: 'bottom left',
-            transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
-            '&:before': { display: 'none' },
-            '&.MuiSlider-valueLabelOpen': {
-              transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
-            },
-            '& > *': {
-              transform: 'rotate(45deg)',
-            },
-          },
-        }}
+        <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={600} min={60} sx={sliderStyle}
         onChange={(_, val) => {setGeneralParam(prev => ({...prev, time: val as number}))}}/>
       </Stack>
     </Card>
@@ -471,7 +214,7 @@ export interface GameParameters {
 	}
 }
 
-function useWindowSize() {
+export function useWindowSize() {
   const [size, setSize] = useState({width: 0, height: 0});
   useLayoutEffect(() => {
     function updateSize() {
@@ -483,7 +226,6 @@ function useWindowSize() {
   }, []);
   return size;
 }
-//TODO: GROS BUG ICI, LE BUT C'EST DE POUVOIR FAIRE PASSER TOUT PAR LE STORE REDUX
 
 const CreateMatchLobby: React.FC = (props) => {
   const size = props.size;
@@ -499,13 +241,12 @@ const CreateMatchLobby: React.FC = (props) => {
   const [indexInviteSlot, setIndexInviteSlot] = useState(-1);
 
     useEffect(() => {
-      //game.sentInvites.forEach((e) => {
-      //  dispatch(deleteSentInvite(e));
-      //})
-      setAcceptedFriendships(friendships?.filter((friendship) => {
+      if (!friendships)
+        return;
+      setAcceptedFriendships(friendships.filter((friendship) => {
         return friendship.status === 'ACCEPTED';
       }));
-      setInvitableFriends(friendships?.filter((friendship) => {
+      setInvitableFriends(friendships.filter((friendship) => {
         return friendship.status === 'ACCEPTED' && game.sentInvites.findIndex((invite) => 
         invite.receiver.id == (friendship.sender_id == user?.id ? friendship.user_id : friendship.sender_id)
         ) == -1 && game.lobbySlots.findIndex((slot) => 
@@ -573,7 +314,7 @@ const CreateMatchLobby: React.FC = (props) => {
     if (!game.lobbySlots)
       return ;
     return game.lobbySlots.map((slot, index) =>
-    index < (game.params.duel ? 2 : 4) ?
+    game.params && index < (game.params.duel ? 2 : 4) ?
       slot.full && slot.player != null ?
       <div key={index}>
         {
@@ -621,13 +362,14 @@ const CreateMatchLobby: React.FC = (props) => {
                     <ListItem disableGutters key={key}>
                       <ListItemButton onClick={() => {
                         if (inviteFriend(friend.friend_id == user?.id  ? friend.user :friend.friend, key)) {
-                          if (indexInviteSlot == -1)
-                            return ;
-                          let newSlots: LobbySlotCli[] = JSON.parse(JSON.stringify(game.lobbySlots)); 
-                          newSlots[indexInviteSlot].type = LobbySlotType.invited;
-                          newSlots[indexInviteSlot].player = {username: friend.friend_id == user?.id  ? friend.user.username :friend.friend.username, avatar: friend.friend_id == user?.id  ? friend.user.avatar :friend.friend.avatar, id: friend.friend_id == user?.id  ? friend.user.id :friend.friend.id}
-                          dispatch(setLobbySlots(newSlots));
-                          toast.success(`${newSlots[indexInviteSlot].player?.username} invited`);
+                          //if (indexInviteSlot == -1)
+                          //  return ;
+                          //let newSlots: LobbySlotCli[] = JSON.parse(JSON.stringify(game.lobbySlots)); 
+                          //newSlots[indexInviteSlot].type = LobbySlotType.invited;
+                          //newSlots[indexInviteSlot].player = {username: friend.friend_id == user?.id  ? friend.user.username :friend.friend.username, avatar: friend.friend_id == user?.id  ? friend.user.avatar :friend.friend.avatar, id: friend.friend_id == user?.id  ? friend.user.id :friend.friend.id}
+                          //dispatch(setLobbySlots(newSlots));
+                          //toast.success(`${newSlots[indexInviteSlot].player?.username} invited`);
+                          // TODO: Faire envoyer les slots depuis le back tout le temps
                         }
                         setOpen(false);
                       }}>
@@ -700,7 +442,7 @@ const CreateMatchLobby: React.FC = (props) => {
             </Button>
           </div>
       :
-        null
+        <></>
     )
   }
 
@@ -721,7 +463,7 @@ const CreateMatchLobby: React.FC = (props) => {
         :
         <Button disabled>Start Game</Button>
       }
-      <Button onClick={() => {leaveLobby()}}>Leave</Button>
+      <Button color='error' onClick={() => {leaveLobby()}}>Leave</Button>
     </div>
   )
 }
@@ -753,8 +495,28 @@ const CreateMatch: React.FC = (props) => {
     time: 180,
   })
   const [sliderSize, setSliderSize] = useState((size.width / 100) * 10);
-  //const setParams = props.setParams;
-  //const [params, setParams] = useState<GameParameters | null>(null);
+  const sliderStyle = {
+    width: sliderSize,
+    '& .MuiSlider-valueLabel': {
+      lineHeight: 1.2,
+      fontSize: 12,
+      background: 'unset',
+      padding: 0,
+      width: 32,
+      height: 32,
+      borderRadius: '50% 50% 50% 0',
+      backgroundColor: "#90caf9",
+      transformOrigin: 'bottom left',
+      transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
+      '&:before': { display: 'none' },
+      '&.MuiSlider-valueLabelOpen': {
+        transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
+      },
+      '& > *': {
+        transform: 'rotate(45deg)',
+      },
+    },
+  }
 
 
   useEffect(() => {
@@ -783,7 +545,7 @@ const CreateMatch: React.FC = (props) => {
 
 
   return (
-    game.LobbyType != LobbyType.create &&
+    game.LobbyType == LobbyType.create &&
     <Card>
         <ButtonGroup size="large" variant="contained" sx={{margin: 4}}>
           <Button onClick={() => {setClassic(true)}} disabled={classic}>Basic</Button>
@@ -801,18 +563,14 @@ const CreateMatch: React.FC = (props) => {
           <Card id="ultimate-params" sx={{ maxHeight: size.height - 200, overflow: 'auto' }}>
 
               <ButtonGroup size="large" variant="contained" sx={{margin:4}}>
-                <Button onClick={() => {setDuel(true)}} disabled={duel} sx={{
-                backgroundColor: "#B45AFF",
-              }}>Duel</Button>
-                <Button onClick={() => {setDuel(false)}} disabled={!duel} sx={{
-                backgroundColor: "#B45AFF",
-              }}>Double</Button>
+                <Button onClick={() => {setDuel(true)}} disabled={duel}>Duel</Button>
+                <Button onClick={() => {setDuel(false)}} disabled={!duel}>Double</Button>
               </ButtonGroup>
               <Stack spacing={2}>
-                <MapParams mapParam={mapParam} setMapParam={setMapParam} size={size} sliderSize={sliderSize}/>
-                <BallParam ballParam={ballParam} setBallParam={setBallParam} size={size} sliderSize={sliderSize}/>
-                <PlayersParam playersParam={playersParam} setPlayersParam={setPlayersParam} size={size} sliderSize={sliderSize}/>
-                <GeneralParam generalParam={generalParam} setGeneralParam={setGeneralParam}  size={size} sliderSize={sliderSize}/>
+                <MapParams sliderStyle={sliderStyle} mapParam={mapParam} setMapParam={setMapParam} size={size} sliderSize={sliderSize}/>
+                <BallParam sliderStyle={sliderStyle} ballParam={ballParam} setBallParam={setBallParam} size={size} sliderSize={sliderSize}/>
+                <PlayersParam sliderStyle={sliderStyle} playersParam={playersParam} setPlayersParam={setPlayersParam} size={size} sliderSize={sliderSize}/>
+                <GeneralParam sliderStyle={sliderStyle} generalParam={generalParam} setGeneralParam={setGeneralParam}  size={size} sliderSize={sliderSize}/>
               </Stack>
               <Button variant="contained" sx={{
                 margin: 4,
@@ -830,6 +588,7 @@ const Demo = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
 }));
 
+
 //function getNbPlayer(slots: LobbySlotCli[]) {
 //  let nb: 0;
 //  slots.forEach((e) => {
@@ -841,7 +600,7 @@ const Demo = styled('div')(({ theme }) => ({
 const JoinMatch: React.FC = () => {
   const game = useAppSelector((state) => state.websocket);
   const dispatch = useAppDispatch();
-  const [renderLobbies, setRenderLobbies] = useState(null);
+  const [renderLobbies, setRenderLobbies] = useState<Element[] | null>(null);
   const user = useAppSelector((state) => state.session.user);
 
   useEffect(() => {
@@ -860,19 +619,20 @@ const JoinMatch: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log(game.lobbies);
+    if (!game.lobbies)
+      return ;
     setRenderLobbies(game.lobbies.map((lobby, key) => (
       <ListItem
       secondaryAction={
-            <Button onClick={() => {joinLobby(lobby.id)}}>JOIN</Button>
-        }
-        >
+        <Button onClick={() => {joinLobby(lobby.id)}}>JOIN</Button>
+      }
+      >
         <ListItemAvatar>
           <Avatar src={lobby.creator.avatar}/>
         </ListItemAvatar>
         <ListItemText
           primary={`${lobby.creator.username}'s lobby`}
-          secondary={secondary ? 'Secondary text' : null}
+          secondary={secondary ? 'Secondary text' : ""}
           />
       </ListItem>
     )))
@@ -896,22 +656,33 @@ const JoinMatch: React.FC = () => {
   );
 }
 
-export const Lobby: React.FC = () => {
-  const [lobbyState, setLobbyState] = useState({isAuto: false, isCreate: false, isJoin: false});
+export const LobbyDisplayScore: React.FC = (props) => {
+  const game = useAppSelector((state) => state.websocket);
+
+  return (
+    game.lastGame &&
+      <div>
+        <p>{game.lastGame.winner} win the game</p>
+      </div>
+  )
+}
+
+export const Lobby: React.FC = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const game = useAppSelector((state) => state.websocket);
+  const lobbyType = useAppSelector((state) => state.websocket.LobbyType)
   const user = useAppSelector((state) => state.session.user);
-  //const [params, setParams] = useState<GameParameters | null>(null);
   const size = useWindowSize();
-  let isSearching = false;
+  const theme = useTheme();
+  console.log(theme.palette.primary.main);
+  
 
   useEffect(() => {
       if (game.isConnected && game.isPlaying && game.lobbyId) {
         navigate('/game/' + game.lobbyId);
       }
     }, [game.lobbyId, game.isPlaying])
-
 
   function leaveLobby(): void {
     dispatch(resetParams());
@@ -927,38 +698,47 @@ export const Lobby: React.FC = () => {
     dispatch(setLobbyType(LobbyType.none));
   }
 
-  //useEffect(() => {
-  //  game.sentInvites.forEach((e) => {
-  //    dispatch(deleteSentInvite(e));
-  //  })
-  //})
+  useEffect(() => {
+    console.log(game.LobbyType);
+  }, [lobbyType])
 
   return (
-    lobbyState.isAuto && !game.lobbyId && game.LobbyType == LobbyType.none ?
-      <AutoMatch setParams={setParams} user={user} game={game}/>
-    :
-    lobbyState.isCreate && !game.lobbyId  && game.LobbyType == LobbyType.none?
-      <CreateMatch user={user} game={game} leaveLobby={leaveLobby} setParams={setParams} size={size}/>
-    :
-    lobbyState.isJoin && !game.lobbyId  && game.LobbyType == LobbyType.none ?
-      <JoinMatch/>
-    :
-    !game.lobbyId && !game.isPlaying  && game.LobbyType == LobbyType.none?
-    <div className='play-buttons'>
-       <ButtonGroup size="large" variant="contained">
-        <Button className="auto-button" onClick={() => {setLobbyState({isAuto: true, isCreate: false, isJoin: false})}}>Auto Match</Button>
-        <Button className="create-button" onClick={() => {setLobbyState({isAuto: false, isCreate: true, isJoin: false})}}>Create game</Button>
-        <Button className="join-button" onClick={() => {setLobbyState({isAuto: false, isCreate: false, isJoin: true})}}>Join Game</Button>
-      </ButtonGroup>
+    <div>
+      {
+      lobbyType != LobbyType.none &&
+      <Button color={'primary'} onClick={() => {dispatch(setLobbyType(LobbyType.none))}}>
+        <ArrowCircleLeftIcon />
+      </Button>
+      }{
+      !game.lobbyId && lobbyType == LobbyType.auto ?
+        <AutoMatch user={user} game={game}/>
+      :
+      !game.lobbyId  && lobbyType == LobbyType.create?
+        <CreateMatch user={user} game={game} leaveLobby={leaveLobby} setParams={setParams} size={size}/>
+      :
+      !game.lobbyId  && lobbyType == LobbyType.find ?
+        <JoinMatch/>
+      :
+      !game.lobbyId && !game.isPlaying  && lobbyType == LobbyType.none?
+      <div className='play-buttons'>
+        <ButtonGroup size="large" variant="contained">
+          <Button className="auto-button" onClick={() => {dispatch(setLobbyType(LobbyType.auto))}}>Auto Match</Button>
+          <Button className="create-button" onClick={() => {dispatch(setLobbyType(LobbyType.create))}}>Create game</Button>
+          <Button className="join-button" onClick={() => {dispatch(setLobbyType(LobbyType.find))}}>Join Game</Button>
+        </ButtonGroup>
+      </div>
+      :
+      game.isPlaying && game.lobbyId ? 
+      <div className='current-game-block'>
+        <p>You are currently in a game : </p>
+        <Button variant="contained" className="join-current-game" onClick={() => {navigate('/game/' + game.lobbyId)}}>Join Game</Button>
+      </div>
+      :
+      lobbyType != LobbyType.none && lobbyType != LobbyType.score ?
+      <CreateMatchLobby game={game} size={size} leaveLobby={leaveLobby}/>
+      : lobbyType == LobbyType.score &&
+        <LobbyDisplayScore/>
+    }
     </div>
-    :
-    game.isPlaying && game.lobbyId ? 
-    <div className='current-game-block'>
-      <p>You are currently in a game : </p>
-      <Button variant="contained" className="join-current-game" onClick={() => {navigate('/game/' + game.lobbyId)}}>Join Game</Button>
-    </div>
-    :
-    game.LobbyType != LobbyType.none &&
-    <CreateMatchLobby game={game} size={size} leaveLobby={leaveLobby}/>
   );
 }

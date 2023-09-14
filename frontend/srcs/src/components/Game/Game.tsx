@@ -21,6 +21,7 @@ import {HorizontalBlurEffect} from './effects/HorizontalBlur'
 import {BadTVEffect} from './effects/BadTV'
 
 import { GrassField } from "./GrassField";
+import { useWindowSize } from "./Lobby";
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
@@ -97,6 +98,8 @@ const Camera: React.FC = (props) => {
 	}, [])
 
 	useFrame(() => {
+		if (!player)
+			return ;
 		camera.position.set(player.position[0], player.position[1], player.position[2]).add(cameraOffset);
 		camera.lookAt(player.position[0], player.position[1], player.position[2]);
 		if (camRotationStart)
@@ -148,6 +151,7 @@ function Effects() {
 export const Game: React.FC = () => {
 	const game = useAppSelector((state) => state.websocket);
 	const navigate = useNavigate();
+	const size = useWindowSize();
 
     function formatElapsedTime(elapsedTime: number) {
         const minutes = Math.floor(Math.round(elapsedTime) / 60);
@@ -161,9 +165,9 @@ export const Game: React.FC = () => {
 	}, [game])
 
 	return (
-		game.score ?
+		game.score?
 		<>
-			<div id="info" style={{position:"absolute", top:"100px", left: "20px", color:"white"}}>
+			<div id="info" style={{position:"absolute", top:"50px", left:(size.width / 2).toString() + "px", zIndex:10000, width:"100px" , color:"white", backgroundColor:"black"}}>
 				<div id='score'>
 					{game.score.home}
 					-

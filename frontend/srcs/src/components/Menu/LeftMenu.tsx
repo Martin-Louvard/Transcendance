@@ -10,8 +10,8 @@ import { Status } from '../../Types';
 import { useAppDispatch } from '../../redux/hooks';
 import { Friendships } from '../../Types';
 import FriendCard from '../UserProfileCards/FriendCard';
-import { deleteInvitedGame, setLobbyType } from '../../redux/websocketSlice';
-import { GameInvitation, LobbyMode, LobbyType } from '@shared/class';
+import { deleteInvitedGame, setLobbyType, setParams } from '../../redux/websocketSlice';
+import { ClientEvents, ClientPayloads, GameInvitation, LobbyMode, LobbyType } from '@shared/class';
 
 const LeftMenu: React.FC = () => {
   const user = useAppSelector((state) => state.session.user)
@@ -23,6 +23,7 @@ const LeftMenu: React.FC = () => {
   const [selectedFriendship, setSelectedFriendship] = useState(Object)
   const gameRequest = useAppSelector((state) => state.websocket.invitedGames);
   const dispatch = useAppDispatch();
+  const game = useAppSelector((state) => state.websocket)
 
   useEffect(()=>{
     if (friendships){
@@ -113,7 +114,9 @@ const LeftMenu: React.FC = () => {
       type: "WEBSOCKET_SEND_DELETE_GAME_INVITATION",
       payload: request,
     })
-
+    if (!request.lobby.params)
+      return ;
+    dispatch(setParams(request.lobby.params));
   }
 
   const renderGameNotifcation = () => (

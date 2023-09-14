@@ -1,9 +1,9 @@
 import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
-import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, setAuthState, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
+import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, setAuthState, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
 import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat } from './sessionSlice';
-import { ClientEvents, ServerEvents, Input, InputPacket, GameInvitation} from '@shared/class';
+import { ClientEvents, ServerEvents, Input, InputPacket, GameInvitation, ServerPayloads, LobbyType} from '@shared/class';
 import { useAppSelector } from './hooks';
 
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
@@ -22,10 +22,17 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
         socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
-        socket.on(ServerEvents.AuthState, (data: any) => {store.dispatch(setAuthState(data))})
-        socket.on(ServerEvents.LobbyState, (data: any) => {store.dispatch(setLobbyState(data))})
+        socket.on(ServerEvents.AuthState, (data: ServerPayloads[ServerEvents.AuthState]) => {
+          if (data.lobbyId)
+            store.dispatch(setLobbyType(LobbyType.wait));
+          store.dispatch(setAuthState(data));})
+        socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => {console.log(data); 
+          if (data.hasFinished)
+            store.dispatch(setLobbyType(LobbyType.score));
+        store.dispatch(setLobbyState(data))})
         socket.on(ServerEvents.GameState, (data: any) => {store.dispatch(setGameState(data))})
-        socket.on(ServerEvents.LobbySlotsState, (data: any) => {store.dispatch(setLobbySlots(data))})
+        socket.on(ServerEvents.LobbySlotsState, (data: any) => {store.dispatch(setLobbyType(LobbyType.wait))
+          store.dispatch(setLobbySlots(data))})
         socket.on(ServerEvents.GameInvitation, (data: GameInvitation) => {store.dispatch(addInvitedGame(data))})
         socket.on(ServerEvents.SuccessfulInvited, (data: GameInvitation) => {store.dispatch(addSentInvte(data));
           setTimeout(() => {
