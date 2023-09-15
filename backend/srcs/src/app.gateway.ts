@@ -12,6 +12,8 @@ import { GameService } from './game/game.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode } from './Types';
 import { FriendsService } from './friends/friends.service';
+import * as bcrypt from 'bcrypt';
+export const roundsOfHashing = 10;
 
 @WebSocketGateway({ cors: '*' })
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -148,13 +150,18 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       participants: number[];
     },
   ): Promise<void> {
+
+    const hashedPassword = await bcrypt.hash(
+      body.password,
+      roundsOfHashing,
+    );
     const newChatChannel = await this.prisma.chatChannel.create({
       data: {
         owner: { connect: { id: body.ownerId } },
         admins: { connect: { id: body.ownerId } },
         name: body.name,
         channelType: body.channelType,
-        password: body.password,
+        password: hashedPassword,
         participants: {
           connect: body.participants.map((p) => {
             return { id: p };

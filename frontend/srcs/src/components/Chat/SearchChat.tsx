@@ -80,10 +80,35 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
     }
   }
 
-  const handleJoinWithPasswd = () => {
+  const  checkPassword = async () =>{
+
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      password: passwordInput,
+     })
+  };
+  try{
+    const response =  await fetch(`http://localhost:3001/chat-channels/${selectedChat?.id}`, requestOptions)
+    if (response.ok)
+    {
+      const data = await response.json();
+      return(data);
+    }
+  }catch(err) {
+    console.log(err);
+  }
+}
+
+  const handleJoinWithPasswd = async () => {
 
     if (currentUser && selectedChat) {
-      if (passwordInput === selectedChat.password){
+      const passwordValid = await checkPassword()
+      if (passwordValid){
         dispatch({
           type: "JOIN_CHAT",
           payload: [currentUser.id, selectedChat.id],
