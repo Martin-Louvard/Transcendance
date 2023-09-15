@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, KeyboardEvent } from "react";
 import { ChatChannels } from "../../Types.ts";
 import { BsFillPersonFill, BsSearch } from "react-icons/bs";
 import { getName } from "./functions.ts";
@@ -36,13 +36,18 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
   const handleSearch = () => {
     if (fetchedChannels && currentUser){
       const foundChannels: ChatChannels[] | undefined = fetchedChannels.filter((chan) => {
-        console.log(chan);
         if (getName(chan, currentUser.username).toLowerCase().includes(searchTerm.toLowerCase()) 
           && (chan.channelType !== "private" && !chan.participants.includes(currentUser))){
           return chan;
         }
       });
       setSearchResult(foundChannels);
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
     }
   };
 
@@ -61,7 +66,6 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
       }
       else {
         if (!chat.password){
-          dispatch(addNewChatChannel(chat));
           dispatch({
             type: "JOIN_CHAT",
             payload: [currentUser.id, chat.id],
@@ -77,9 +81,9 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
   }
 
   const handleJoinWithPasswd = () => {
+
     if (currentUser && selectedChat) {
       if (passwordInput === selectedChat.password){
-        dispatch(addNewChatChannel(selectedChat));
         dispatch({
           type: "JOIN_CHAT",
           payload: [currentUser.id, selectedChat.id],
@@ -125,6 +129,7 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
           placeholder="search..."
           value={searchTerm}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
         />
         <div onClick={handleSearch}>
           <BsSearch />

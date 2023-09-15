@@ -53,12 +53,13 @@ export const sessionSlice = createSlice({
       }
     },
     addNewChatChannel: (state, action) => {
+
       const newChat = action.payload;
       if (
         !state.JoinedChatChannels?.some(
           (channel) => channel.id === newChat.id,
         )){
-        state.JoinedChatChannels?.push(action.payload);
+        state.JoinedChatChannels?.push(newChat);
       }
     },
     removeOpenedChatChannel: (state, action) => {
