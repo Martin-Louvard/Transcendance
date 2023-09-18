@@ -11,19 +11,7 @@ import HistoryCard from '../UserProfileCards/HistoryCard';
 import ChatCreator from '../Chat/ChatCreator';
 
 const Dashboard: React.FC = () => {
-  const user = useAppSelector((state) => state.session.user);
-  const dispatch = useAppDispatch();
-  const isInitialLoadRef = useRef(true);
   const [contentToShow, setContentToShow] = useState< "profile" | "friends" | "games" | "friendUser"| "lobby"  >("lobby");
-
-  useEffect(() => {
-    if (isInitialLoadRef.current) {
-      isInitialLoadRef.current = false;
-      if (user) {
-        dispatch({ type: 'WEBSOCKET_CONNECT', payload: user.id });
-      }
-    }
-  }, [dispatch, user]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLImageElement>) => {
     event.preventDefault();

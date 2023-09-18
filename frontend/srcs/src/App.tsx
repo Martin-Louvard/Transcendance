@@ -11,7 +11,7 @@ import Dashboard from './components/Dashboard/Dashboard.tsx';
 import Authentication from './components/Authentication/Authentication.tsx';
 import { websocketDisconnected } from './redux/websocketSlice.ts';
 
-function App() {
+export function App() {
   const user = useAppSelector((state) => state.session.user);
   const isConnected = useAppSelector((state) => state.websocket.isConnected);
   const dispatch = useAppDispatch();
@@ -19,12 +19,12 @@ function App() {
   useEffect(() => {
     dispatch(websocketDisconnected());
     if (user) {
+      console.log(user.access_token);
       dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, user.access_token] });
     }
   }, [user]);
 
   return (
-    <>
     <Router>
       <Toaster/>
       <Navbar/>
@@ -34,7 +34,6 @@ function App() {
           <Route path="/game/:id" element={<Game />} />
         </Routes>
     </Router>
-    </>
   )
 }
 

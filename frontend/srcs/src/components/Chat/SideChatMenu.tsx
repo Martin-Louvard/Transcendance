@@ -1,5 +1,3 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
-import  { ChatChannels, Message }  from '../../Types.ts';
 import React, { useState, useEffect } from "react";
 import { ChatChannels } from "../../Types.ts";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";

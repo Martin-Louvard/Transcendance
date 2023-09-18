@@ -18,6 +18,7 @@ export class AppService {
   async auth(client: Socket): Promise<void> {
     try {
       console.log(`${client.id} try to connect`);
+      console.log(client.handshake);
       if (!client.handshake.auth.token) {
         throw "no jwt token"
       }
@@ -29,6 +30,7 @@ export class AppService {
           throw "user not registered";
         this.playerService.connectPlayer({id: user.id, username: user.username, avatar: user.avatar, socket: client});
     } catch (error) {
+      console.log(error);
       this.logger.log("Client disconnected - Invalid JWT Token");
       client.disconnect();
     }

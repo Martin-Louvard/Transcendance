@@ -5,6 +5,7 @@ import { Friend, Friendships } from "src/Types";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParams } from "../../../redux//websocketSlice";
 import { BallParam, GeneralParam, MapParams, PlayersParam } from "./Params";
+import { User } from "../../../Types";
   
   export function useWindowSize() {
 	const [size, setSize] = useState({width: 0, height: 0});
@@ -97,11 +98,14 @@ import { BallParam, GeneralParam, MapParams, PlayersParam } from "./Params";
   
 	return (
 	  game.LobbyType == LobbyType.create &&
-	  <Card>
-		  <ButtonGroup size="large" variant="contained" sx={{margin: 4}}>
+	  <Card sx={{backgroundColor: 'transparent', color:'white', fontFamily:'Avenir', width:'100%', height:'100%'}}>
+		<div style={{display:'flex', justifyContent:'center', bottom:100, flexDirection:'column'}}>
+			<p>Type: </p>
+		  <ButtonGroup size="large" variant="contained" sx={{margin: 4, display: 'flex', justifyContent:'center', flexDirection:'columns'}}>
 			<Button onClick={() => {setClassic(true)}} disabled={classic}>Basic</Button>
 			<Button onClick={() => {setClassic(false)}} disabled={!classic}>Ultimate</Button>
 		  </ButtonGroup>
+		  </div>
 		   {
 		   classic ?
 			<Button variant="contained" sx={{
@@ -111,24 +115,32 @@ import { BallParam, GeneralParam, MapParams, PlayersParam } from "./Params";
 			  storeParams();
 			}}> GO </Button>
 		  :
-			<Card id="ultimate-params" sx={{ maxHeight: size.height - 200, overflow: 'auto' }}>
-  
-				<ButtonGroup size="large" variant="contained" sx={{margin:4}}>
-				  <Button onClick={() => {setDuel(true)}} disabled={duel}>Duel</Button>
-				  <Button onClick={() => {setDuel(false)}} disabled={!duel}>Double</Button>
-				</ButtonGroup>
-				<Stack spacing={2}>
+			<Card id="ultimate-params" sx={{backgroundColor: 'transparent',width:'100%', maxHeight: size.height - 200, overflow: 'auto', fontFamily:'avenir', display: 'flex', flexDirection:'column'}}>
+				<div style={{display:'flex', flexDirection:'column', color:'white'}}>
+					<p>Mode: </p>
+					<ButtonGroup size="large" variant="contained" sx={{margin:4, display:'flex', justifyContent:'center', color:'white'}}>
+					<Button onClick={() => {setDuel(true)}} disabled={duel}>Duel</Button>
+					<Button onClick={() => {setDuel(false)}} disabled={!duel}>Double</Button>
+					</ButtonGroup>
+				</div>
+				<Stack spacing={2} sx={{display:'flex', flexDirection:'column'}}>
 				  <MapParams sliderStyle={sliderStyle} mapParam={mapParam} setMapParam={setMapParam} size={size} sliderSize={sliderSize}/>
 				  <BallParam sliderStyle={sliderStyle} ballParam={ballParam} setBallParam={setBallParam} size={size} sliderSize={sliderSize}/>
 				  <PlayersParam sliderStyle={sliderStyle} playersParam={playersParam} setPlayersParam={setPlayersParam} size={size} sliderSize={sliderSize}/>
 				  <GeneralParam sliderStyle={sliderStyle} generalParam={generalParam} setGeneralParam={setGeneralParam}  size={size} sliderSize={sliderSize}/>
 				</Stack>
-				<Button variant="contained" sx={{
-				  margin: 4,
-				}}
-				onClick={() => {
-				  storeParams();
-				}}> GO </Button>
+				<div style={{display:"flex", justifyContent:"center"}}>
+
+					<Button size="small" fullWidth={false} variant="contained" sx={{
+						margin: 4,
+						width:"100px",
+						display:'flex',
+						justifyContent:'center',
+						marginBottom:'100px'
+					}}onClick={() => {	storeParams();	}}>
+						GO
+					</Button>
+					</div>
 			</Card>
 			}
 		  </Card>

@@ -14,7 +14,7 @@ export const MapParams: React.FC = (props) => {
 	const sliderStyle =props.sliderStyle
   
 	return (
-	  <Card variant="outlined" sx={{marginX: size.width / 10 / 4}}>
+	  <Card variant="outlined" sx={{marginX: size.width / 10 / 4, backgroundColor: 'transparent', color:'white'}}>
 		<CardContent>
 		  <p>Map parameters: </p>
 		  <Stack spacing={size.width > 700 ? 16 : 2} direction={size.width > 700 ? "row" : "column"} sx={{ mb: 1, px: size.width > 1000 ? size.width / 10 / 4 : size.width > 700 ? size.width / 10 / 8 : 0} } alignItems="center">
@@ -61,10 +61,10 @@ export const MapParams: React.FC = (props) => {
 	const sliderStyle =props.sliderStyle
   
 	return (
-	  <Card>
+	  <Card sx={{backgroundColor: 'transparent', color:'white'}}>
 		<p>Ball Parameters : </p>
 		<CardContent>
-		<Stack spacing={size.width > 700 ? 8 : 2} direction={size.width > 700 ? "row" : "column"} sx={{ mb: 1, px: size.width > 1000 ? size.width / 10 / 4 : size.width > 700 ? size.width / 10 / 8 : 0} } alignItems="center">
+		<Stack spacing={size.width > 700 ? 8 : 2} direction={size.width > 700 ? "row" : "column"} sx={{color:'white', mb: 1, px: size.width > 1000 ? size.width / 10 / 4 : size.width > 700 ? size.width / 10 / 8 : 0} } alignItems="center">
 			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1, }} alignItems="center">
 			  <p>Speed</p>
 			  <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
@@ -99,10 +99,10 @@ export const MapParams: React.FC = (props) => {
 	const sliderStyle =props.sliderStyle
   
 	return (
-	  <Card>
+	  <Card sx={{backgroundColor: 'transparent', color:'white'}}>
 		<p>Players Parameters : </p>
 		<CardContent>
-		<Stack spacing={size.width > 700 ? 8 : 2} direction={size.width > 700 ? "row" : "column"} sx={{ mb: 1, px: size.width > 600 ? size.width / 10 / 3: size.width > 400 ? size.width / 10 / 8 : 0} } alignItems="center">
+		<Stack spacing={size.width > 700 ? 8 : 2} direction={size.width > 700 ? "row" : "column"} sx={{color:'white', mb: 1, px: size.width > 600 ? size.width / 10 / 3: size.width > 400 ? size.width / 10 / 8 : 0} } alignItems="center">
 			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1, }} alignItems="center">
 			  <p>Speed</p>
 			  <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={150} min={10} sx={sliderStyle}
@@ -132,9 +132,9 @@ export const MapParams: React.FC = (props) => {
 	const sliderStyle =props.sliderStyle
 	
 	return (
-	  <Card>
+	  <Card sx={{backgroundColor: 'transparent'}}>
 		<p>General Param</p>
-		<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1, }} alignItems="center">
+		<Stack spacing={0} direction="column" sx={{mt: 0, mb: 1, color:'white'}} alignItems="center">
 		  <p>Time (seconds)</p>
 		  <Slider defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={600} min={60} sx={sliderStyle}
 		  onChange={(_, val) => {setGeneralParam(prev => ({...prev, time: val as number}))}}/>

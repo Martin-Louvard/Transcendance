@@ -5,7 +5,7 @@ import {Button, ButtonGroup, Slider, Stack, Card, CardContent, Avatar, Dialog, D
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { useDispatch } from 'react-redux';
 import { Friend, Friendships, User } from 'src/Types';
-import { WebSocketState, deleteInvitedGame, deleteSentInvite, resetParams, setDuel, setLobbies, setLobbySlots, setLobbyState, setLobbyType, setParams } from '../../../redux/websocketSlice';
+import { WebSocketState, deleteInvitedGame, deleteSentInvite, resetLobbyData, resetParams, setDuel, setLobbies, setLobbySlots, setLobbyState, setLobbyType, setParams } from '../../../redux/websocketSlice';
 import toast from 'react-hot-toast';
 import FolderIcon from '@mui/icons-material/Folder';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -44,7 +44,6 @@ export const Lobby: React.FC = (props) => {
     }, [game.lobbyId, game.isPlaying])
 
   function leaveLobby(): void {
-    dispatch(resetParams());
     const payload: ClientPayloads[ClientEvents.LobbyState] = {
       leaveLobby: true,
       mode: null,
@@ -62,42 +61,47 @@ export const Lobby: React.FC = (props) => {
   //}, [lobbyType])
 
   return (
-    <div>
-      {
-      lobbyType != LobbyType.none &&
-      <Button color={'primary'} onClick={() => {dispatch(setLobbyType(LobbyType.none))}}>
-        <ArrowCircleLeftIcon />
-      </Button>
-      }{
-      !game.lobbyId && lobbyType == LobbyType.auto ?
-        <AutoMatch user={user} game={game}/>
-      :
-      !game.lobbyId  && lobbyType == LobbyType.create?
-        <CreateMatch user={user} game={game} leaveLobby={leaveLobby} setParams={setParams} size={size}/>
-      :
-      !game.lobbyId  && lobbyType == LobbyType.find ?
-        <JoinMatch/>
-      :
-      !game.lobbyId && !game.isPlaying  && lobbyType == LobbyType.none?
-      <div className='play-buttons'>
-        <ButtonGroup size="large" variant="contained">
-          <Button className="auto-button" onClick={() => {dispatch(setLobbyType(LobbyType.auto))}}>Auto Match</Button>
-          <Button className="create-button" onClick={() => {dispatch(setLobbyType(LobbyType.create))}}>Create game</Button>
-          <Button className="join-button" onClick={() => {dispatch(setLobbyType(LobbyType.find))}}>Join Game</Button>
-        </ButtonGroup>
-      </div>
-      :
-      game.isPlaying && game.lobbyId ? 
-      <div className='current-game-block'>
-        <p>You are currently in a game : </p>
-        <Button variant="contained" className="join-current-game" onClick={() => {navigate('/game/' + game.lobbyId)}}>Join Game</Button>
-      </div>
-      :
-      lobbyType != LobbyType.none && lobbyType != LobbyType.score ?
-      <CreateMatchLobby game={game} size={size} leaveLobby={leaveLobby}/>
-      : lobbyType == LobbyType.score &&
+    <div style={{position: "relative", width: "100%", height:"100%"}}>
+      <div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"row"}}>
+        {
+          lobbyType != LobbyType.none &&
+            <Button color={'primary'} onClick={() => {dispatch(setLobbyType(LobbyType.none))}}>
+              <ArrowCircleLeftIcon />
+            </Button>
+        }
+        <div style={{display: 'flex', }}>
+        {
+          !game.lobbyId && lobbyType == LobbyType.auto ?
+          <AutoMatch user={user} game={game}/>
+          :
+          !game.lobbyId  && lobbyType == LobbyType.create?
+          <CreateMatch user={user} game={game} leaveLobby={leaveLobby} setParams={setParams} size={size}/>
+          :
+          !game.lobbyId  && lobbyType == LobbyType.find ?
+          <JoinMatch/>
+          :
+          !game.lobbyId && !game.isPlaying  && lobbyType == LobbyType.none?
+          <div className='play-buttons' style={{width:'100%'}}>
+          <ButtonGroup size="large" variant="contained">
+            <Button className="auto-button" onClick={() => {dispatch(setLobbyType(LobbyType.auto))}}>Auto Match</Button>
+            <Button className="create-button" onClick={() => {dispatch(setLobbyType(LobbyType.create))}}>Create game</Button>
+            <Button className="join-button" onClick={() => {dispatch(setLobbyType(LobbyType.find))}}>Join Game</Button>
+          </ButtonGroup>
+        </div>
+        :
+        game.isPlaying && game.lobbyId ? 
+        <div className='current-game-block' style={{width:'100%'}}>
+          <p>You are currently in a game : </p>
+          <Button variant="contained" className="join-current-game" onClick={() => {navigate('/game/' + game.lobbyId)}}>Join Game</Button>
+        </div>
+        :
+        lobbyType != LobbyType.none && lobbyType != LobbyType.score ?
+        <CreateMatchLobby game={game} size={size} leaveLobby={leaveLobby}/>
+        : lobbyType == LobbyType.score &&
         <LobbyDisplayScore/>
-    }
+        }
+        </div>
+      </div>
     </div>
   );
 }

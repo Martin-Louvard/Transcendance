@@ -1,6 +1,6 @@
 import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
-import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
+import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, resetLobbyData, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
 import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat } from './sessionSlice';
 import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType} from '@shared/class';
@@ -12,6 +12,8 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
   return (next: Dispatch<AnyAction>) => (action: AnyAction) => {
     switch (action.type) {
       case 'WEBSOCKET_CONNECT':
+        if (!action.payload || action.payload.lenght == 0)
+          return ;
         socket = io("http://localhost:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
 
         socket.on('connect', () => {
@@ -29,10 +31,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
         socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
         socket.on(ServerEvents.AuthState, (data: ServerPayloads[ServerEvents.AuthState]) => {
-          if (data.lobbyId && store.getState().websocket.LobbyType != LobbyType.score && store.getState().websocket.LobbyType != LobbyType.auto) {
+          const state = store.getState().websocket;
 
+          if (state.lobbyId && !data.lobbyId)
+            store.dispatch(resetLobbyData())
+          if (data.lobbyId && state.LobbyType != LobbyType.score && state.LobbyType != LobbyType.auto)
             store.dispatch(setLobbyType(LobbyType.wait));
-          }
           store.dispatch(setAuthState(data));})
         socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => {
           if (data.hasFinished)
