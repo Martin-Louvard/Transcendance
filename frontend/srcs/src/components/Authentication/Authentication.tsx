@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import LoginForm from '../Forms/LoginForm';
-import SignupForm from '../Forms/SignupForm';
-import { useAppDispatch } from '../../redux/hooks';
-import { setSessionUser, setToken, fetchRelatedUserData } from '../../redux/sessionSlice';
-import { login2fa, login42 } from '../../api';
-import './Authentication.scss';
-import toast from 'react-hot-toast';
+import LoginForm from '../Forms/LoginForm.js';
+import SignupForm from '../Forms/SignupForm.js';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks.js';
+import './Authentication.scss'
+import toast from 'react-hot-toast'
+import { useNavigate } from "react-router-dom";
+import verify from './verify.js';
+import { fetchRelatedUserData, setSessionUser, setToken } from '../../redux/sessionSlice.js';
+import { login2fa, login42 } from '../../api.js';
 
 const Authentication: React.FC = () => {
-  const [showLogin, setShowLogin] = useState<boolean>(true);
-  const queryParameters = new URLSearchParams(window.location.search);
-  const Api42uid: string = import.meta.env.VITE_42API_UID;
-  const dispatch = useAppDispatch();
-  const isInitialLoadRef = useRef<boolean>(true);
+  const [showLogin, setShowLogin] = useState(true);
+  const queryParameters = new URLSearchParams(window.location.search)
+  const Api42uid = import.meta.env.VITE_42API_UID;
+  const user = useAppSelector((state) => state.session.user);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch()
+  const isInitialLoadRef = useRef(true); 
 
   useEffect(() => {
     if (isInitialLoadRef.current && queryParameters.has('code')) {
@@ -21,6 +25,15 @@ const Authentication: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    async function verifyToken() {
+      if (await verify(user.access_token))
+          navigate('/');
+    }
+    if (user && user.access_token)
+      verifyToken();
+  }, [user])
+  
   const handleLoginClick = () => {
     setShowLogin(true);
   };
@@ -31,12 +44,12 @@ const Authentication: React.FC = () => {
 
   const auth42 = async (code42: string | null) => {
     const user = await login42(code42);
-    if (user) {
+    if (user && user.id) {
       if (!user.twoFAEnabled) {
         dispatch(setSessionUser(user));
         dispatch(setToken(user.access_token));
-        if (user.id) dispatch(fetchRelatedUserData(user.id));
-        toast.success('Logged in');
+        if (user) dispatch(fetchRelatedUserData(user.id));
+          toast.success('Logged in');
       } else {
         const code = window.prompt('Enter your code from google authenticator', '000000');
         const user2fa = await login2fa(code, user, user.access_token);

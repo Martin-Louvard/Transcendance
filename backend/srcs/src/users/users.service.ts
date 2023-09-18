@@ -245,10 +245,14 @@ export class UsersService {
   }
 
   async findAvatar(username: string, res) {
-    const user = await this.prisma.user.findUnique({ where: { username } });
-    if (!user)
-      throw new NotFoundException(`No user found for username: ${username}`);
-    return of(res.sendFile(join(process.cwd(), user.avatar)));
+    try {
+      const user = await this.prisma.user.findUnique({ where: { username } });
+      if (!user)
+        throw new NotFoundException(`No user found for username: ${username}`);
+      return of(res.sendFile(join(process.cwd(), user.avatar)));
+    } catch (e)  {
+      return (e);
+    }
   }
 
   async setTwoFactorAuthenticationSecret(secret: string, username: string) {

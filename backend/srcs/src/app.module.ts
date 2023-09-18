@@ -8,15 +8,15 @@ import { ChatMessagesModule } from './chat-messages/chat-messages.module';
 import { AuthModule } from './auth/auth.module';
 import { FriendsModule } from './friends/friends.module';
 import { AppGateway } from './app.gateway';
-import { GameService } from './game/game.service';
-import { GameController } from './game/game.controller';
-import { GameModule } from './game/game.module';
+
+
+
 import { LobbyModule } from './game/lobby/lobby.module';
 import { PlayerModule } from './game/player/player.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, ChatChannelsModule, ChatMessagesModule, AuthModule, FriendsModule, GameModule, LobbyModule, PlayerModule],
-  controllers: [AppController, GameController],
-  providers: [AppService, AppGateway, GameService],
+  imports: [PrismaModule, UsersModule, ChatChannelsModule, ChatMessagesModule, AuthModule, FriendsModule, LobbyModule, PlayerModule],
+  controllers: [AppController],
+  providers: [AppService, AppGateway],
 })
 export class AppModule {}
