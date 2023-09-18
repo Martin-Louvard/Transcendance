@@ -27,7 +27,7 @@ export enum ServerEvents
 
   LobbySlotsState = 'server.lobby.slots.state',
 
-  GameInvitation = 'server.game.invitation',
+  GameRequest = 'server.game.invitation',
 
   SuccessfulInvited = 'server.successfull.invite',
 
@@ -90,7 +90,7 @@ export interface LobbySlotCli  {
 	player: PlayerInfo | null;
 }
 
-export interface GameInvitation {
+export interface GameRequest {
 	sender: PlayerInfo,
 	receiver: PlayerInfo,
 	lobby: {
@@ -124,7 +124,9 @@ export type ServerPayloads = {
 		owner: string,
 	},
 	[ServerEvents.LobbySlotsState]: LobbySlotCli[],
-	[ServerEvents.GameInvitation]: GameInvitation;
+	[ServerEvents.GameRequest]: {sent: GameRequest[], received: GameRequest[]};
+	[ServerEvents.DeleteSentGameRequest]: GameRequest;
+	[ServerEvents.DeleteGameRequest]: GameRequest;
 };
 
 export type ClientPayloads = {

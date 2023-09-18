@@ -227,7 +227,6 @@ export const sessionSlice = createSlice({
       }
     },
     updateFriendRequest: (state, action) => {
-      console.log("hey");
       if (state.friendships === undefined || state.friendships.length === 0) {
         state.friendships = [action.payload];
       }

@@ -7,20 +7,7 @@ import SideChatMenu from '../Chat/SideChatMenu';
 import ChatBoxes from '../Chat/ChatBox';
 
 const Dashboard: React.FC = () => {
-  const user = useAppSelector((state) => state.session.user);
-  const dispatch = useAppDispatch();
-  const isInitialLoadRef = useRef(true);
 
-  useEffect(() => {
-    if (isInitialLoadRef.current) {
-      isInitialLoadRef.current = false;
-      if (user) {
-        dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, user.access_token] });
-      }
-    }
-  }, [dispatch, user]);
-
-     
   return (
     <div className="dashboard-wrapper">
       <LeftMenu />

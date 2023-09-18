@@ -1,9 +1,9 @@
 import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
-import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, setAuthState, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
+import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
 import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat } from './sessionSlice';
-import { ClientEvents, ServerEvents, Input, InputPacket, GameInvitation, ServerPayloads, LobbyType} from '@shared/class';
+import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType} from '@shared/class';
 import { useAppSelector } from './hooks';
 
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
@@ -14,8 +14,14 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       case 'WEBSOCKET_CONNECT':
         socket = io("http://localhost:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
 
-        socket.on('connect', () => store.dispatch(websocketConnected()));
-        socket.on('disconnect', () => store.dispatch(websocketDisconnected()));
+        socket.on('connect', () => {
+          store.dispatch(setWaitingToConnect(false));
+          store.dispatch(websocketConnected())
+        });
+        socket.on('disconnect', () => {
+          store.dispatch(setWaitingToConnect(false));
+          store.dispatch(websocketDisconnected())
+        });
         socket.on('message', (data: any) => {store.dispatch(receiveMessage(data))});
         socket.on('friend_request', (data: any) => {store.dispatch(updateFriendRequest(data))});
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
@@ -23,18 +29,22 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
         socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
         socket.on(ServerEvents.AuthState, (data: ServerPayloads[ServerEvents.AuthState]) => {
-          if (data.lobbyId)
+          if (data.lobbyId && store.getState().websocket.LobbyType != LobbyType.score && store.getState().websocket.LobbyType != LobbyType.auto) {
+
             store.dispatch(setLobbyType(LobbyType.wait));
+          }
           store.dispatch(setAuthState(data));})
-        socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => {console.log(data); 
+        socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => {
           if (data.hasFinished)
             store.dispatch(setLobbyType(LobbyType.score));
         store.dispatch(setLobbyState(data))})
         socket.on(ServerEvents.GameState, (data: any) => {store.dispatch(setGameState(data))})
-        socket.on(ServerEvents.LobbySlotsState, (data: any) => {store.dispatch(setLobbyType(LobbyType.wait))
+        socket.on(ServerEvents.LobbySlotsState, (data: any) => {
+          if ( store.getState().websocket.LobbyType != LobbyType.score && store.getState().websocket.LobbyType != LobbyType.auto)
+            store.dispatch(setLobbyType(LobbyType.wait))
           store.dispatch(setLobbySlots(data))})
-        socket.on(ServerEvents.GameInvitation, (data: GameInvitation) => {store.dispatch(addInvitedGame(data))})
-        socket.on(ServerEvents.SuccessfulInvited, (data: GameInvitation) => {store.dispatch(addSentInvte(data));
+        socket.on(ServerEvents.GameRequest, (data: GameRequest) => {store.dispatch(setGameRequests(data))})
+        socket.on(ServerEvents.SuccessfulInvited, (data: GameRequest) => {store.dispatch(addSentInvte(data));
           setTimeout(() => {
             store.dispatch(deleteSentInviteById(data.id));
             store.dispatch({
@@ -43,10 +53,10 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
             })
           }, 60000)
         })
-        socket.on(ServerEvents.DeleteSentGameRequest, (data: GameInvitation) => {store.dispatch(deleteSentInviteById(data.id))})
-        socket.on(ServerEvents.DeleteGameRequest, (data: GameInvitation) => {store.dispatch(deleteInvitedGameById(data.id))})
+        socket.on(ServerEvents.DeleteSentGameRequest, (data: GameRequest) => {data && data.id && store.dispatch(deleteSentInviteById(data.id))})
+        socket.on(ServerEvents.DeleteGameRequest, (data: GameRequest) => {data && data.id && store.dispatch(deleteInvitedGameById(data.id))})
         socket.on(ServerEvents.LobbyFull, (data: boolean) => {store.dispatch(setLobbyFull(data))});
-        socket.on(ServerEvents.GetLobbies, (data: any) => {console.log(data); store.dispatch(setLobbies(data))})
+        socket.on(ServerEvents.GetLobbies, (data: any) => {store.dispatch(setLobbies(data))})
         break;
 
       case 'WEBSOCKET_SEND_MESSAGE':

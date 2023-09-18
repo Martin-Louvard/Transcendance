@@ -49,7 +49,6 @@ export const JoinMatch: React.FC = () => {
 			/>
 		</ListItem>
 	  )))
-	  console.log("lobbies rendered :> ", renderLobbies);
   
 	}, [game.lobbies])
 	const [dense, setDense] = useState(false);

@@ -22,6 +22,7 @@ import {BadTVEffect} from './effects/BadTV'
 
 import { GrassField } from "./GrassField";
 import { useWindowSize } from "./Lobby/CreateMatch";
+import { websocketConnected } from "/src/redux/websocketSlice";
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
@@ -61,7 +62,7 @@ interface PaddleProps {
 	team: 'visitor' | 'home' | null,
 }
 
-const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player, key }) => {
+const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player }) => {
     const paddleRef = useRef<Mesh>(null)!;
 
     useFrame(() => {
@@ -72,7 +73,7 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player, key
     });
 
     return (
-		<mesh>
+		<mesh >
 			<Box
 				ref={paddleRef}
 				args={size}
@@ -152,6 +153,7 @@ export const Game: React.FC = () => {
 	const game = useAppSelector((state) => state.websocket);
 	const navigate = useNavigate();
 	const size = useWindowSize();
+	const dispatch = useAppDispatch();
 
     function formatElapsedTime(elapsedTime: number) {
         const minutes = Math.floor(Math.round(elapsedTime) / 60);

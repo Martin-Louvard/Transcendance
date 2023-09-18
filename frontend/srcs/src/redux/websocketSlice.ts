@@ -1,5 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit';
-import {PlayerBody, Ball, LobbyMode, LobbyType, PlayerInfo, GameParameters, LobbySlotCli, ServerPayloads, ServerEvents, LobbyCli } from '@shared/class'
+import {PlayerBody, Ball, LobbyMode, LobbyType, PlayerInfo, GameParameters, LobbySlotCli, ServerPayloads, ServerEvents, LobbyCli, GameRequest } from '@shared/class'
 
 export interface WebSocketState {
   isConnected: boolean;
@@ -16,11 +16,12 @@ export interface WebSocketState {
   params: GameParameters;
   owner: string | null;
   lobbySlots: LobbySlotCli[];
-  invitedGames: ServerPayloads[ServerEvents.GameInvitation][];
-  sentInvites: ServerPayloads[ServerEvents.GameInvitation][];
+  invitedGames: GameRequest[];
+  sentInvites: GameRequest[];
   full: boolean;
   lobbies: LobbyCli[];
   lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor', team: 'home' | 'visitor', timestamp: number} | null,
+  isWaitingToConnect: boolean;
 }
 
 const initialState: WebSocketState = {
@@ -66,6 +67,7 @@ const initialState: WebSocketState = {
   full: false,
   lobbies: [],
   lastGame: null,
+  isWaitingToConnect: false,
 };
 
 const websocketSlice = createSlice({
@@ -73,17 +75,17 @@ const websocketSlice = createSlice({
   initialState,
   reducers: {
     websocketConnected: (state) => {
-      console.log("connected")
       state.isConnected = true;
     },
     websocketDisconnected: (state) => {
-      console.log("disconnected")
       state.isConnected = false;
       state.lobbyId = null;
       state.isPlaying =false;
     },
+    setWaitingToConnect(state, action) {
+        state.isWaitingToConnect = action.payload;
+    },
     setLobbyType: (state, action) => {
-      console.log("JE CHANGE LE LOBBYTYPE POUR :", action.payload)
       state.LobbyType = action.payload;
     },
     setParams: (state, action) => {
@@ -91,6 +93,10 @@ const websocketSlice = createSlice({
     },
     setLobbySlots: (state, action) => {
       state.lobbySlots = JSON.parse(JSON.stringify(action.payload)); 
+    },
+    setGameRequests: (state, action) => {;
+      state.sentInvites = [...action.payload.sent];
+      state.invitedGames = [...action.payload.received];
     },
     addInvitedGame: (state, action) => {
       if (!state.invitedGames)
@@ -222,7 +228,6 @@ const websocketSlice = createSlice({
       state.owner = action.payload.owner;
     },
     setLobbyState: (state, action) => {
-      //console.log('game reducer: lobby State')
       if (!state.lobbyId)
         state.lobbyId = action.payload.lobbyId;
       if (action.payload.hasStarted && !state.isPlaying)
@@ -233,7 +238,6 @@ const websocketSlice = createSlice({
       if (action.payload.hasFinished) {
         state.isPlaying = false;
         state.LobbyType = LobbyType.score;
-        console.log("lobbyType changed to score");
         state.lastGame = {score: action.payload.score, winner: action.payload.winner, team: action.payload.team, timestamp: Date.now()};
       }
       if (action.payload.playersInfo) {
@@ -248,6 +252,6 @@ const websocketSlice = createSlice({
   },
 });
 
-export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, resetGameDatas, addInvitedGame, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies} = websocketSlice.actions;
+export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, resetGameDatas, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect} = websocketSlice.actions;
 
 export default websocketSlice.reducer;

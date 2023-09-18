@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Lobby } from './lobby.class';
-import { LobbyMode, InputPacket, GameParameters, PlayerInfo, ServerEvents, ServerPayloads, GameInvitation, ClientPayloads, ClientEvents, LobbyCli, LobbySlotType } from '@shared/class';
+import { LobbyMode, InputPacket, GameParameters, PlayerInfo, ServerEvents, ServerPayloads, GameRequest, ClientPayloads, ClientEvents, LobbyCli, LobbySlotType } from '@shared/class';
 import { Player } from '../player/player.class';
 import { Server } from 'socket.io';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
@@ -12,7 +12,7 @@ import { v4 } from 'uuid';
 export class LobbyService {
 	public constructor(private readonly playerService: PlayerService) {
 	}
-	gameRequest: GameInvitation[];
+	gameRequest: GameRequest[];
 	private readonly logger = new Logger("LobbyService");
 	private lobbies: Map<string, Lobby> = new Map<string, Lobby>();
 	test: number = 3;
@@ -41,6 +41,7 @@ export class LobbyService {
 		if (!player.lobby)
 			return false;
 		const lobby = player.lobby;
+		this.playerService.deleteRequests(player.id, player.id);
 		lobby.removePlayer(player);
 		this.logger.log(`${player.id} leave lobby ${lobby.id}`);
 		if (lobby.nbPlayers == 0)
@@ -131,7 +132,6 @@ export class LobbyService {
 	}
 
 	joinLobby(player: Player, data: {lobbyId: string, info: PlayerInfo}) {
-		player.infos = data.info;
 		const lobby = this.findLobbyById(data.lobbyId);
 		if (!lobby)
 			return 'lobby not found';
@@ -144,7 +144,6 @@ export class LobbyService {
 		try {
 			if (!player || player.lobby)
 				return ;
-			player.infos = data.info;
 			let lobbyFinded: boolean = false;
 			this.lobbies.forEach(lobby => {
 				if (data.mode == lobby.mode && lobby.instance && !lobby.instance.hasStarted && lobby.instance.automatch) {
@@ -152,6 +151,7 @@ export class LobbyService {
 					lobby.connectPlayer(player);
 					lobbyFinded = true;
 					lobby.dispatchLobbyState();
+					return ;
 				}
 			});
 			if (!lobbyFinded) {
@@ -164,16 +164,24 @@ export class LobbyService {
 	}
 
 	invitePlayer(player: Player, data: ClientPayloads[ClientEvents.GameSendRequest]): boolean {
-		if (!player || !player.isOnline)
+		if (!player || !player.getIsOnline())
 		  return false
 		const sender = this.playerService.getPlayerById(data.senderId);
-		console.log('sender: ', sender);
-		if (!sender || !sender.isOnline || !sender.lobby || !sender.infos)
+		if (!sender || !sender.getIsOnline() || !sender.lobby || !sender.infos)
 			return false
 		const lobby = this.lobbies.get(data.lobbyId);
 		if (!lobby || !lobby.instance || !lobby.instance.getParams())
 			return false;
-		const payload: ServerPayloads[ServerEvents.GameInvitation] = {
+		let isAlreadyInvited = false;
+		this.playerService.requests.forEach((req) => {
+			if (player.id == req.receiver.id) {
+				isAlreadyInvited = true;
+				return ;
+			}
+		})
+		if (isAlreadyInvited)
+			return false;
+		const payload: GameRequest = {
 		  sender: sender.infos,
 		  receiver: player.infos,
 		  lobby: {
@@ -183,7 +191,6 @@ export class LobbyService {
 		  id: v4(),
 		  timestamp: Date.now(),
 		}
-		console.log("salut");
 		for (let index = 0; index < lobby.slots.length; index++) {
 			const e = lobby.slots[index];
 			if (!e.full && e.type == LobbySlotType.friend) {
@@ -193,8 +200,7 @@ export class LobbyService {
 			}
 		}
 		lobby.dispatchLobbySlots();
-		player.emit<ServerPayloads[ServerEvents.GameInvitation]>(ServerEvents.GameInvitation, payload);
-		sender.emit<GameInvitation>(ServerEvents.SuccessfulInvited, payload);
+		this.playerService.addRequest(payload);
 	  }
 
 	// TODO: Pour le moment on clear tout toues les 5 minutes, une fois le jeu codé il faudra

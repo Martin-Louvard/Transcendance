@@ -11,7 +11,7 @@ import { useAppDispatch } from '../../redux/hooks';
 import { Friendships } from '../../Types';
 import FriendCard from '../UserProfileCards/FriendCard';
 import { deleteInvitedGame, setLobbyType, setParams } from '../../redux/websocketSlice';
-import { ClientEvents, ClientPayloads, GameInvitation, LobbyMode, LobbyType } from '@shared/class';
+import { ClientEvents, ClientPayloads, GameRequest, LobbyMode, LobbyType } from '@shared/class';
 
 const LeftMenu: React.FC = () => {
   const user = useAppSelector((state) => state.session.user)
@@ -104,7 +104,7 @@ const LeftMenu: React.FC = () => {
         </ul>
     </div>
   )
-  function joinLobby(request: GameInvitation) {
+  function joinLobby(request: GameRequest) {
     dispatch(setLobbyType(LobbyType.create));
     dispatch({
       type: "WEBSOCKET_SEND_JOIN_LOBBY",

@@ -1,13 +1,14 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Server, Socket } from 'socket.io';
-import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket, GameParameters, PlayerInfo, GameInvitation } from '@shared/class';
+import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket, GameParameters, PlayerInfo, GameRequest } from '@shared/class';
 import { JwtService } from '@nestjs/jwt';
 import { AppService } from './app.service';
 import { LobbyService } from './game/lobby/lobby.service';
 import { PlayerService } from './game/player/player.service';
 import { FriendsService } from './friends/friends.service';
 import { Player } from './game/player/player.class';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ cors: '*' })
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -18,6 +19,8 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     private readonly lobbyService: LobbyService,
     private readonly playerService: PlayerService
   ) {}
+  
+  private readonly logger = new Logger("AppGateway");
 
   @WebSocketServer()
   server: Server;
@@ -26,40 +29,43 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     this.appService.auth(client);
   }
 
-
   afterInit(server: Server) {
     return this.lobbyService.setServer(server);
   }
 
   handleDisconnect(client: Socket) {
-		const player  = this.playerService.getPlayer(client.id);
+		const player  = this.playerService.getPlayerBySocketId(client.id);
+    if (!player)
+      return ;
     return this.playerService.disconnectPlayer(player);
   }
 
   @SubscribeMessage('automatch')
   autoMatch(@ConnectedSocket() client: Socket, @MessageBody() data: {mode: LobbyMode, info: PlayerInfo}) {
-    const player: Player = this.playerService.getPlayer(client.id);
-    if (!player || player.socket.id != client.id)
+    const player  = this.playerService.getPlayerBySocketId(client.id);
+    if (!player || player.socket.id != client.id) {
+      if (!player) 
+        this.logger.log(`Automatch failed: Player with id : ${data.info.id} with socketId: ${client.id} does not exist`);
+      else
+      this.logger.log(`Automatch failed: Sender socket id : ${client.id} does not match with registered player socket : ${player.socket.id} `);
       return ;
+    }
     this.lobbyService.automatch(player, data, this.server);
   }
 
   @SubscribeMessage(ClientEvents.DeleteGameRequest)
-  deleteGameRequest(@ConnectedSocket() client: Socket, @MessageBody() data: GameInvitation) {
+  deleteGameRequest(@ConnectedSocket() client: Socket, @MessageBody() data: GameRequest) {
     try {
       if (!data || !data.sender || !data.sender.id || !data.receiver || !data.receiver.id) {
         return false;
       }
     const receiver = this.playerService.getPlayerById(data.receiver.id);
     const sender = this.playerService.getPlayerById(data.sender.id);
-    const current = this.playerService.getPlayer(client.id)
+    const current = this.playerService.getPlayerBySocketId(client.id)
     if (!receiver || !sender || !current) {
       return false;
     }
-    if (sender.id == current.id)
-      receiver.emit<GameInvitation>(ServerEvents.DeleteGameRequest, data);
-    else if (receiver.id == current.id)
-      sender.emit<GameInvitation>(ServerEvents.DeleteSentGameRequest, data);
+    this.playerService.deleteRequests(undefined, undefined, undefined, data.id);
     } catch(err) {
       console.log(err);
   }
@@ -73,7 +79,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
 
   @SubscribeMessage(ClientEvents.StartGame)
   handleStart(@ConnectedSocket() client: Socket) {
-    const player = this.playerService.getPlayer(client.id);
+    const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player)
       return 'player not found';
     const lobby = player.lobby;
@@ -97,7 +103,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
 
   @SubscribeMessage(ClientEvents.LobbyState)
   lobbyStateHandling(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.LobbyState]) {
-		const player: Player = this.playerService.getPlayer(client.id);
+		const player  = this.playerService.getPlayerBySocketId(client.id);
 		if (!player || player.socket.id != client.id || !player.lobby )
 			return ;
     if (data.leaveLobby) {
@@ -119,14 +125,14 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
   @SubscribeMessage(ClientEvents.GameSendRequest)
   HandleGameInvitation(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.GameSendRequest]) {
 		const player = this.playerService.getPlayerById(data.receiverId);
-		if (!player || !player.isOnline)
+		if (!player || !player.getIsOnline())
 		  return false
     this.lobbyService.invitePlayer(player, data);
   }
 
   @SubscribeMessage(ClientEvents.JoinLobby)
   JoinLobby(@ConnectedSocket() client: Socket, @MessageBody() data: {lobbyId: string, info: PlayerInfo}) {
-    const player = this.playerService.getPlayer(client.id);
+    const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player)
       return 'player not found';
     if (!this.lobbyService.joinLobby(player, data))

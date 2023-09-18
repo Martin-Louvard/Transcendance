@@ -36,8 +36,6 @@ export const Lobby: React.FC = (props) => {
   const user = useAppSelector((state) => state.session.user);
   const size = useWindowSize();
   const theme = useTheme();
-  console.log(theme.palette.primary.main);
-  
 
   useEffect(() => {
       if (game.isConnected && game.isPlaying && game.lobbyId) {
@@ -59,9 +57,9 @@ export const Lobby: React.FC = (props) => {
     dispatch(setLobbyType(LobbyType.none));
   }
 
-  useEffect(() => {
-    console.log(game.LobbyType);
-  }, [lobbyType])
+  //useEffect(() => {
+  //  console.log(game.LobbyType);
+  //}, [lobbyType])
 
   return (
     <div>

@@ -46,9 +46,9 @@ export class Lobby {
 		})
 		return (isOnlineSlot);
 	}
+
  	connectPlayer(player: Player):boolean {
 		if (player.lobby != null || this.full || !player) {
-			console.log(`error in connection, player lobby = ${player.lobby}, full = ${this.full}, player = ${player}`);
 			return false;
 		}
 		this.players.set(player.socket.id, player);
@@ -56,7 +56,6 @@ export class Lobby {
 		player.lobby = this;
 		player.socket.join(this.id);
 		if (this.slots && this.slots.length > 0) {
-			console.log('before, ', this.slots);
 			this.slots[this.players.size - 1] = {full: true, type: 0, player: player.infos};
 			this.dispatchLobbySlots();
 		}
@@ -98,9 +97,7 @@ export class Lobby {
 			}
 			player.socket.leave(this.id);
 			let isDeleted = this.players.delete(player.socket.id);
-			console.log(`player lobby size : ${this.players.size}`);
 			if (isDeleted) {
-				console.log("player deleted");
 				player.isReady = false;
 				player.lobby = null;
 				this.nbPlayers--;
@@ -151,7 +148,6 @@ export class Lobby {
 					return true
 				}
 			})
-			console.log(`player not deleted ${player.socket.id} id : ${player.id}`)
 			return false;
 		} catch(error) {
 			console.log(error);
@@ -165,6 +161,10 @@ export class Lobby {
 	setPlayerOnline(player: Player):boolean {
 		if (!player || !player.lobby)
 			return false;
+		if (this.full && this.owner.id == player.id)
+			this.emit<boolean>(ServerEvents.LobbyFull, true);
+		else if (this.owner.id == player.id)
+			this.emit<boolean>(ServerEvents.LobbyFull, false);
 		player.socket.join(this.id);
 	}
 	isAllReady(): boolean {
@@ -181,7 +181,6 @@ export class Lobby {
 			hasStarted: this.instance.hasStarted,
 			owner: this.owner.infos.username
 		}
-		console.log('owner: ', this.owner.infos.username);
 		this.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 	}
 
@@ -214,7 +213,6 @@ export class Lobby {
 	
 	clear() {
 		this.players.forEach((player) => {
-			console.log("player deleting");
 			this.removePlayer(player);
 			this.players.delete(player.socket.id);
 		})

@@ -140,7 +140,6 @@ export class Instance {
 		if (this.isInstanceOfInputPacket(data)) {
 			const paddle = this.world.players.get(data.id);
 			const input: InputPacket = data;
-			console.log(data);
 
 			if (!paddle)
 				return undefined; //player dont exist error
@@ -345,13 +344,10 @@ export class Instance {
 			const bi = contact.bi;
 			const bj = contact.bj;
 
-			if ((this.world.balls.find(ball => ball.body === bi) && this.world.walls.includes(bj)) )
-				console.log('contact');
 			if ((this.world.balls.find(ball => ball.body === bi) && this.world.walls.includes(bj)) ||
 				(this.world.balls.find(ball => ball.body === bj) && this.world.walls.includes(bi))) {
 					const ball = this.world.balls.find(ball => ball.body === bi || ball.body === bj);
 					const wall = this.world.walls.find(wall => wall == bj || wall == bi);
-				console.log(wall.id);
 				if (wall.id == 99) {
 					console.log('HOME score 1 point');
 					this.data.score.home += 1;
@@ -605,8 +601,7 @@ export class Instance {
 			this.playerLogic();
 			this.ballPhysics();
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
-			console.log(this.data.elapsedTime, " ", this.params.general.time);
-			if (this.data.elapsedTime > this.params.general.time) {
+			if (this.data.elapsedTime > 10 /*this.params.general.time*/) {
 				this.triggerFinish();
 				this.lobby.clear()
 			}
