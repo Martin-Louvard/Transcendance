@@ -37,12 +37,16 @@ const SideChatMenu = () => {
         : "open-chat-menu chat-menu-transition-open",
     );
   };
-  const generalChannels: ChatChannels[] | undefined =
-    storedJoinedChannels?.filter((chat) => chat.channelType === "general");
-  const privateChannels: ChatChannels[] | undefined =
-    storedJoinedChannels?.filter((chat) => chat.channelType === "private");
-  const joinedGroupChannels: ChatChannels[] | undefined =
-    storedJoinedChannels?.filter((chat) => chat.channelType === "created");
+
+  let generalChannels: ChatChannels[] | undefined = undefined;
+  let privateChannels: ChatChannels[] | undefined = undefined;
+  let joinedGroupChannels: ChatChannels[] | undefined = undefined;
+  if (Array.isArray(storedJoinedChannels) ) {
+    generalChannels =
+      storedJoinedChannels?.filter((chat) => chat.channelType === "general");
+    privateChannels = storedJoinedChannels?.filter((chat) => chat.channelType === "private");
+    joinedGroupChannels = storedJoinedChannels?.filter((chat) => chat.channelType === "created");
+  }
 
   const handleChatTypeListClick = (_type: string) => {
     if (minimizedList?.includes(_type)) {
