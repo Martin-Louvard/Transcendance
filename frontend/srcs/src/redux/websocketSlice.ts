@@ -87,6 +87,10 @@ const websocketSlice = createSlice({
     },
     setLobbyType: (state, action) => {
       state.LobbyType = action.payload;
+      if (state.LobbyType == LobbyType.classic)
+        state.params.classic = true;
+      else if (state.LobbyType == LobbyType.auto)
+        state.params.classic = false;
     },
     setParams: (state, action) => {
       state.params = JSON.parse(JSON.stringify(action.payload)); 
