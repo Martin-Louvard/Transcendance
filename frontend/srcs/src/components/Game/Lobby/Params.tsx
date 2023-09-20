@@ -132,7 +132,7 @@ export const MapParams: React.FC = (props) => {
 	const sliderStyle =props.sliderStyle
 	
 	return (
-	  <Card sx={{backgroundColor: 'transparent'}}>
+	  <Card sx={{backgroundColor: 'transparent', color:'white'}}>
 		<p>General Param</p>
 		<Stack spacing={0} direction="column" sx={{mt: 0, mb: 1, color:'white'}} alignItems="center">
 		  <p>Time (seconds)</p>
