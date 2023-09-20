@@ -7,6 +7,7 @@ import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { PlayerService } from '../player/player.service';
 import { v4 } from 'uuid';
+import { ClassicInstance } from '../classes/classicInstance';
 
 @Injectable()
 export class LobbyService {
@@ -59,6 +60,7 @@ export class LobbyService {
 	createLobby(mode: LobbyMode, server: Server, creator: Player) {
 		try {
 			const lobby = new Lobby(mode, server, creator);
+			console.log(lobby.instance instanceof ClassicInstance);
 			if (!lobby)
 				return ;
 			this.logger.log(`Lobby ${lobby.id} created`);
@@ -156,6 +158,29 @@ export class LobbyService {
 			});
 			if (!lobbyFinded) {
 				this.createLobby(data.mode, server, player);
+			}
+			return true;
+		} catch (error) {
+			return error
+		}
+	}
+
+	automatchClassic(player: Player, data: {info: PlayerInfo}, server:Server): boolean {
+		try {
+			if (!player || player.lobby)
+				return ;
+			let lobbyFinded: boolean = false;
+			this.lobbies.forEach(lobby => {
+				if (lobby.instance instanceof ClassicInstance && !lobby.instance.hasStarted) {
+					this.logger.log(`player ${player.id} joined ${lobby.id}`);
+					lobby.connectPlayer(player);
+					lobbyFinded = true;
+					lobby.dispatchLobbyState();
+					return ;
+				}
+			});
+			if (!lobbyFinded) {
+				this.createLobby(LobbyMode.classic, server, player);
 			}
 			return true;
 		} catch (error) {

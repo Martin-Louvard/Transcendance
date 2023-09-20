@@ -2,7 +2,7 @@ import { Box, OrbitControls, PerspectiveCamera, TrackballControls, useTexture } 
 import { Canvas, extend, useFrame, useThree} from "@react-three/fiber";
 import React, { useEffect, useRef, forwardRef, useState, useMemo, useLayoutEffect} from "react";
 import { socket } from "../../socket";
-import { ServerEvents, ServerPayloads, ClientEvents, ClientPayloads, Input, InputPacket, Player} from '@shared/class';
+import { ServerEvents, ServerPayloads, ClientEvents, ClientPayloads, Input, InputPacket, Player, LobbyType} from '@shared/class';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import { DoubleSide, Mesh, PlaneGeometry, SphereGeometry, Vector3 } from "three";
 import { InstancedBufferGeometry, Float32BufferAttribute, BufferAttribute } from 'three';
@@ -23,6 +23,7 @@ import {BadTVEffect} from './effects/BadTV'
 import { GrassField } from "./GrassField";
 import { useWindowSize } from "./Lobby/CreateMatch";
 import { websocketConnected } from "/src/redux/websocketSlice";
+import { WebSocketState } from "src/redux/websocketSlice";
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
@@ -87,6 +88,7 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player }) =
 const Camera: React.FC = (props) => {
 	let player = props.player;
 	let cameraOffset: Vector3 = new Vector3(0, 3, -10);
+	let classic: boolean = props.classic;
 
 	if (player && player.team == 'visitor')
 		cameraOffset.z *= -1;
@@ -101,8 +103,15 @@ const Camera: React.FC = (props) => {
 	useFrame(() => {
 		if (!player)
 			return ;
-		camera.position.set(player.position[0], player.position[1], player.position[2]).add(cameraOffset);
-		camera.lookAt(player.position[0], player.position[1], player.position[2]);
+		if (classic) {
+			camera.position.set(0, 150, 0)
+			camera.lookAt(0,0, 0);
+			if (player.team == 'home')
+				camera.rotation.z = Math.PI;
+		} else {
+			camera.position.set(player.position[0], player.position[1], player.position[2]).add(cameraOffset);
+			camera.lookAt(player.position[0], player.position[1], player.position[2]);
+		}
 		if (camRotationStart)
 			camera.rotation.set(camRotationStart.x, camRotationStart.y, camRotationStart.z);
 	}, [])
@@ -194,7 +203,7 @@ export const Render: React.FC = (props) => {
 	const [me, setMe] = useState(null);
 	const [KeyboardInput, prevInput] = useKeyboardInput();
 	const user = useAppSelector((state) => state.session.user);
-	const game = props.game;
+	const game: WebSocketState = props.game;
 	const dispatch = useAppDispatch();
 
 
@@ -437,7 +446,7 @@ export const Render: React.FC = (props) => {
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
 					<GrassField position={[0, 0, 0]} width={game.mapHeight} height={game.mapWidth}/>
-					<Camera player={me}/>
+					<Camera player={me} classic={game.params.classic}/>
 					<Wall size={[game.mapWidth, 10, 2]} position={[0, 5, game.mapHeight / 2]} />
 					<Wall size={[game.mapWidth, 10, 2]} position={[0, 5, -game.mapHeight / 2]}/>
 					<Wall size={[2, 10, game.mapHeight]} position={[game.mapWidth / 2, 5, 0]} />

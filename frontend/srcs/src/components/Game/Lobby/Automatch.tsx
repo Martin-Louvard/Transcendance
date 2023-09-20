@@ -33,12 +33,23 @@ export const AutoMatch: React.FC = (props) => {
 	useEffect(() => {
 	  setGameState({isDouble: false, isDuel: false});
 	}, [])
+
+	function findClassicGame() {
+		if (!user)
+			return ;
+		setLobbyType(LobbyType.classic);
+		dispatch({
+			type: 'WEBSOCKET_SEND_CLASSICAUTOMATCH',
+			payload: {info:{username: user.username, avatar: user.avatar, id: user.id}}
+		})
+	}
   
 	  return (
 		  <div>
 			 <ButtonGroup size="large" variant="contained">
-			  <Button onClick={() => {setGameState({isDuel: true, isDouble: false});}}>Duel</Button>
-			  <Button onClick={() => {setGameState({isDuel: false, isDouble: true });}}>Double</Button>
+				<Button onClick={() => {findClassicGame()}}>Classic</Button>
+				<Button onClick={() => {setGameState({isDuel: true, isDouble: false});}}>Duel</Button>
+				<Button onClick={() => {setGameState({isDuel: false, isDouble: true });}}>Double</Button>
 			</ButtonGroup>
 		  </div>
 	  );

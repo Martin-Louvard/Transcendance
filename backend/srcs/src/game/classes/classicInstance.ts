@@ -63,17 +63,17 @@ interface GameParameters {
 }
 
 
-export class Instance {
+export class ClassicInstance {
 	constructor(lobby: Lobby) {
-		console.log("Instance created");
+		console.log("ClassicInstance created");
 		this.lobby = lobby;
-		this.id = Instance.nbInstances++;
+		this.id = ClassicInstance.nbInstances++;
 	}
 	lobby: Lobby;
 	private static nbInstances: number = 0;
 	public readonly id: number = 0;
 	private interval = new Array();
-	private maxPlayer: number;
+	private maxPlayer: number = 2;
 	hasStarted: boolean = false; // A recuperer dans l'instance
 	hasFinished: boolean = false; // A recuperer dans l'instance
 	isSuspended: boolean = false; // A recuperer dans l'instance
@@ -145,23 +145,11 @@ export class Instance {
 			if (!paddle)
 				return undefined; //player dont exist error
 			switch (input.code) {
-				case 0: // move up
-					if (data.pressed)
-						paddle.activeDirections.up = true;
-					else
-						paddle.activeDirections.up = false;
-					break ;
 				case 1: // move right
 					if (data.pressed)
 						paddle.activeDirections.right = true;
 					else
 						paddle.activeDirections.right = false;
-					break ;
-				case 2: // move down
-					if (data.pressed)
-						paddle.activeDirections.down = true;
-					else
-						paddle.activeDirections.down = false;
 					break ;
 				case 3: //move left
 					if (data.pressed)
@@ -175,20 +163,6 @@ export class Instance {
 					else
 						paddle.activeDirections.boost = false;
 					break ;
-				case 5: // rotate right
-					if (data.pressed)
-						paddle.activeDirections.rotRight = true;
-					else
-						paddle.activeDirections.rotRight = false;
-					break ;
-				case 6: // rotate left
-					if (data.pressed)
-						paddle.activeDirections.rotLeft = true;
-					else
-						paddle.activeDirections.rotLeft = false;
-					break ;
-				default:
-					break;
 			}
 			//paddle.lastMovement = 
 		}
@@ -249,27 +223,11 @@ export class Instance {
 		let axisY =  new CANNON.Vec3( 0, 1, 0 );
 		
 		this.world.players.forEach((e) => {
-			if (e.activeDirections.up) {
-				directionVector.z = -this.moveDistance;
-			}
-			else if (e.activeDirections.down) {
-				directionVector.z = this.moveDistance;
-			}
 			if (e.activeDirections.left) {
 				directionVector.x = -this.moveDistance;
 			}
 			else if (e.activeDirections.right) {
 				directionVector.x = this.moveDistance;
-			}
-			if (e.activeDirections.rotLeft) {
-				rotationQuaternion.setFromAxisAngle(axisY, this.rotationSpeed);
-				e.body.quaternion = rotationQuaternion.mult(e.body.quaternion);
-			} else if (e.activeDirections.rotRight) {
-				rotationQuaternion.setFromAxisAngle(axisY, -this.rotationSpeed);
-				e.body.quaternion = rotationQuaternion.mult(e.body.quaternion);
-			}
-			if (e.activeDirections.boost) {
-				console.log("BOOOOSt");
 			}
 			e.body.quaternion.vmult(directionVector, worldVelocity);
 			e.body.velocity.x = worldVelocity.x;
@@ -600,7 +558,7 @@ export class Instance {
 			this.playerLogic();
 			this.ballPhysics();
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
-			if (this.data.elapsedTime > 10 /*this.params.general.time*/) {
+			if (this.data.elapsedTime > 100 /*this.params.general.time*/) {
 				this.triggerFinish();
 				this.lobby.clear()
 			}

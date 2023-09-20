@@ -117,6 +117,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         }
         break;
       
+        case 'WEBSOCKET_SEND_CLASSICAUTOMATCH':
+          if (socket && socket.connected) {
+            socket.emit('automatchClassic', action.payload);
+          }
+          break ;
+      
       case 'WEBSOCKET_SEND_LOBBYSTATE':
           if (socket && socket.connected) {
             socket.emit(ClientEvents.LobbyState, action.payload);

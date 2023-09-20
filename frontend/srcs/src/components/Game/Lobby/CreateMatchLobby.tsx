@@ -74,16 +74,17 @@ import LoopIcon from '@mui/icons-material/Loop';
 	  }
   
 	function renderPlayerSlot(slot, index) {
+		console.log("=> ", game.params.classic);
 		return (
-		  <div key={index} style={{height:'250px'}}>
-			{game.params && index < (game.params.duel ? 2 : 4) ?
-			  slot.full && slot.player != null ?
+		<div key={index} style={{height:'250px'}}>
+			{game.params && index < (game.params.duel || game.params.classic ? 2 : 4) ?
+			slot.full && slot.player != null ?
 				renderFilledSlot(slot, index) :
 				renderEmptySlot(slot, index)
-			  :
-			  <></>
+			:
+			<></>
 			}
-		  </div>
+		</div>
 		);
 	  }
 	  
@@ -146,9 +147,26 @@ import LoopIcon from '@mui/icons-material/Loop';
 		  return (
 			<div key={index}>
 			  <div style={{ height: 55 }} />
-			  <Button key={index} variant="contained" sx={{ width: 100, height: 100 }} onClick={() => handleEmptySlotClick(index)} disableElevation disableTouchRipple>
-				Waiting for opponent
-			  </Button>
+			  <Button variant="contained" sx={{  flexDirection:'column', width:"100px", height:"100px", lineHeight:'1', fontSize:"0.7rem" }} onClick={() => handleFriendSlotClick(index)}>
+					<div style={{height:100}}/>
+					<LoopIcon
+						sx={{
+							marginBottom:'12px',
+							animation: "spin 2s linear infinite",
+							"@keyframes spin": {
+								"0%": {
+									transform: "rotate(360deg)",
+								},
+								"100%": {
+									transform: "rotate(0deg)",
+								},
+							},
+						}}
+					/>
+					<p style={{marginTop:0, marginBottom:14}}>
+						Searching Players...
+					</p>
+				</Button>
 			</div>
 		  );
 		}

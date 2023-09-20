@@ -53,6 +53,19 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     this.lobbyService.automatch(player, data, this.server);
   }
 
+  @SubscribeMessage('automatchClassic')
+  autoMatchClassic(@ConnectedSocket() client: Socket, @MessageBody() data: {info: PlayerInfo}) {
+    const player  = this.playerService.getPlayerBySocketId(client.id);
+    if (!player || player.socket.id != client.id) {
+      if (!player) 
+        this.logger.log(`Automatch failed: Player with id : ${data.info.id} with socketId: ${client.id} does not exist`);
+      else
+      this.logger.log(`Automatch failed: Sender socket id : ${client.id} does not match with registered player socket : ${player.socket.id} `);
+      return ;
+    }
+    this.lobbyService.automatchClassic(player, data, this.server);
+  }
+
   @SubscribeMessage(ClientEvents.DeleteGameRequest)
   deleteGameRequest(@ConnectedSocket() client: Socket, @MessageBody() data: GameRequest) {
     try {
