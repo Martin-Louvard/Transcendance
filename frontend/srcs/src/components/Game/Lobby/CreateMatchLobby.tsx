@@ -32,8 +32,6 @@ import LoopIcon from '@mui/icons-material/Loop';
 		slot.player && slot.player.id == (friendship.sender_id == user?.id ? friendship.user_id : friendship.sender_id && slot.type == LobbySlotType.invited)
 		) == -1
 	}))
-	console.log('ftiends: ', friendships, ', friends invitable : ', invitableFriend, ' game request sent: ', game.sentInvites);
-
 	}, [friendships, game.sentInvites, game.invitedGames, game.lobbySlots])
   
 	useEffect(() => {

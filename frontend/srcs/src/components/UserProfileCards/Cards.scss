@@ -1,6 +1,6 @@
 $card-padding: 10px;
 $main-bg-color: #131313;
-$secondary-bg-color: #4d4848;
+$secondary-bg-color: #FFFFFFFF;
 $overlay-bg-color: rgba(0, 0, 0, 0.7);
 $font-color: wheat;
 $picture-size: 150px;
@@ -105,7 +105,9 @@ $friend-picture-size: 50px;
   align-items: center;
 
 .item {
-  background-color: $secondary-bg-color;
+  border:solid 1px;
+  border-color: $secondary-bg-color;
+  background-color: $main-bg-color;
   display: flex;
   flex-direction: row;
   justify-content:space-between;

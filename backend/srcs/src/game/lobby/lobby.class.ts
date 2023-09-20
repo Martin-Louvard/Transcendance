@@ -140,7 +140,6 @@ export class Lobby {
 							return ;
 						})
 					}
-					console.log(`player socket id : $${player.socket.id} and id in the array : ${e.socket.id}`);
 					this.dispatchAuthState();
 					player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 					this.deletePlayerFromSlot(player);

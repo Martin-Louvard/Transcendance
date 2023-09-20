@@ -86,9 +86,9 @@ const LeftMenu: React.FC = () => {
   const renderNotifications = () => (   
   <div className="friends-card-wrapper">
     <h2>Friend Requests</h2>
-        <ul className="list">
+        <ul className="friend-list">
           {friendRequests ? friendRequests.map((friendship, index) => (
-            <li className="item" key={index}>
+            <li className="friend-item" key={index}>
             <div className='friend-picture' onClick={()=>{setSelectedFriendship(friendship); setContentToShow("friendUser") }}>
               <img src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
             </div>

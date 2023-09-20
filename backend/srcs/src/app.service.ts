@@ -17,8 +17,6 @@ export class AppService {
 
   async auth(client: Socket): Promise<void> {
     try {
-      console.log(`${client.id} try to connect`);
-      console.log(client.handshake);
       if (!client.handshake.auth.token) {
         throw "no jwt token"
       }

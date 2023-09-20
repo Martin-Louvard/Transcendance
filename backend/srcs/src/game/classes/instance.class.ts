@@ -217,7 +217,6 @@ export class Instance {
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
-		console.log(`${this.lobby.id} is full, game starting`);
 		this.gameLogic();
 	}
 
@@ -239,7 +238,6 @@ export class Instance {
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 			
 		})
-		console.log(`${this.lobby.id} is finished`);
 	}
 
 	processInput() {

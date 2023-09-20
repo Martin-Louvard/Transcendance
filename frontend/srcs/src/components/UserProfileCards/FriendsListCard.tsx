@@ -5,6 +5,9 @@ import Form from "../Forms/Form";
 import { toast } from "react-hot-toast";
 import { Friendships, Status } from "../../Types";
 import StatusDot from "./StatusDot";
+import { setLobbyType, setParams } from "../../redux/websocketSlice";
+import { GameRequest } from "@shared/class";
+import { Avatar } from "@mui/material";
 
 const FriendsListCard: React.FC = () =>{
     const user = useAppSelector((state) => state.session.user);
@@ -14,7 +17,8 @@ const FriendsListCard: React.FC = () =>{
     const [selectedFriendship, setSelectedFriendship] = useState(Object)
     const [newFriendUsername, setNewFriendUsername] = useState('');
     const dispatch = useAppDispatch();
-    const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships)
+    const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
+    const gameRequest= useAppSelector((state) => state.websocket.invitedGames)
 
     useEffect(()=>{
       if (friendships){
@@ -49,9 +53,7 @@ const FriendsListCard: React.FC = () =>{
             <ul className="list">
               {friendRequests ? friendRequests.map((friendship, index) => (
                 <li className="item" key={index}>
-                <div className='friend-picture' onClick={()=>{setSelectedFriendship(friendship); setContentToShow("friendUser") }}>
-                  <img src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
-                </div>
+                  <Avatar onClick={()=>{setSelectedFriendship(friendship); setContentToShow("friendUser") }} sx={{width:'60px', height:"60px"}} src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
                 <div>
                   <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
                   <div className='accept-deny'>
@@ -64,6 +66,58 @@ const FriendsListCard: React.FC = () =>{
             </ul>
         </div>
       )
+    
+      const renderGameRequests = () => (
+        
+        <div className="friends-card-wrapper">
+          <h2>Game Requests</h2>
+              <ul className="list">
+                {gameRequest ? gameRequest.map((request, index, requests) => (
+                  <li className="item" key={index}>
+                    <Avatar src={request.sender.avatar} sx={{width:"60px", height:"60px"}}/>
+                  <div>
+                    <p>{request.sender.username}</p>
+                    <div className='accept-deny'>
+                      <button onClick={() => {joinLobby(request);dispatch(deleteInvitedGame(request))}} >Join Game ✅</button>
+                      <button onClick={() => {dispatch(deleteInvitedGame(request));     dispatch({
+                        type: "WEBSOCKET_SEND_DELETE_GAME_INVITATION",
+                        payload: request,
+                      })}}>Decline ❌</button>
+                    </div>
+                  </div>
+                  </li>
+                )) : <></>}
+              </ul>
+          </div>
+        )
+    
+
+        useEffect(()=>{
+    if (friendships){
+      let friendshipstmp: Friendships[] = [];
+      friendships.forEach((e) => {
+        if (e.status === Status.PENDING && e.sender_id != user?.id)
+          friendshipstmp.push(e);
+      })
+      setFriendRequest(friendshipstmp);
+    }
+  }, [friendships])
+
+
+  function joinLobby(request: GameRequest) {
+    dispatch(setLobbyType(LobbyType.create));
+    dispatch({
+      type: "WEBSOCKET_SEND_JOIN_LOBBY",
+      payload: {lobbyId: request.lobby.id, info: {username: user?.username, avatar: user?.avatar, id: user?.id}},
+    })
+    dispatch({
+      type: "WEBSOCKET_SEND_DELETE_GAME_INVITATION",
+      payload: request,
+    })
+    if (!request.lobby.params)
+      return ;
+    dispatch(setParams(request.lobby.params));
+  }
 
     const friendList = () =>{
       return (
@@ -80,6 +134,7 @@ const FriendsListCard: React.FC = () =>{
           </div>
         </Form>
         {friendRequests?.length ? renderNotifications() : ""}
+        {gameRequest?.length  ? renderGameRequests() : ""}
         <h2>My Friends</h2>
         <ul className="list">
           {friendshipsAccepted
@@ -101,7 +156,6 @@ const FriendsListCard: React.FC = () =>{
       </div>
       )
     }
-
   return (
     <>
         {showFriend ? (

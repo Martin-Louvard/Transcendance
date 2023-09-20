@@ -19,7 +19,6 @@ export function App() {
   useEffect(() => {
     dispatch(websocketDisconnected());
     if (user) {
-      console.log(user.access_token);
       dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, user.access_token] });
     }
   }, [user]);

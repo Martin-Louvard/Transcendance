@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
         My Profile
       </button>
       <button id="play" onClick={handleClick}>
-        PLAY
+        Play
       </button>
     </div>
   );

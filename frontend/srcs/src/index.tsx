@@ -6,6 +6,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import './index.scss'
 import { ThemeProvider, createTheme } from '@mui/material';
 import App from './App.js';
+import './fonts/f25/F25_Bank_Printer_Bold.otf';
 
 const theme = createTheme({
   palette: {
