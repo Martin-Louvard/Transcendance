@@ -5,6 +5,7 @@ import { Friend, Friendships } from "src/Types";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParams } from "../../../redux//websocketSlice";
 import LoopIcon from '@mui/icons-material/Loop';
+import './Lobby.scss'
 
   export const CreateMatchLobby: React.FC = (props) => {
 	const size = props.size;
@@ -91,21 +92,21 @@ import LoopIcon from '@mui/icons-material/Loop';
 	  function renderFilledSlot(slot, index) {
 		return (
 		  <div>
-			{slot.player.username == game.owner && game.LobbyType != LobbyType.auto ?
+			{slot.player.username == game.owner && game.LobbyType != LobbyType.auto && game.LobbyType != LobbyType.classic?
 			  <img src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} />
 			  :
 			  <div style={{ height: 55 }} />
 			}
 			<Button key={index} variant="contained" sx={getPlayerSlotStyle(slot)} disabled disableElevation disableTouchRipple>
-			  <Avatar src={slot.player.avatar} alt={slot.player.username + " avatar"} sx={{ marginTop: "20px", width: 56, height: 56 }} />
-			  <p> {getPlayerName(slot)} </p>
+			  <Avatar src={slot.player.avatar} alt={slot.player.username + " avatar"} sx={{marginTop: "20px", width: 56, height: 56 }} />
+			  <p className="username-text"> {getPlayerName(slot)} </p>
 			</Button>
 		  </div>
 		);
 	  }
 	  
 	  function renderEmptySlot(slot, index) {
-		if (slot.type == LobbySlotType.friend && game.LobbyType != LobbyType.auto) {
+		if (slot.type == LobbySlotType.friend && game.LobbyType != LobbyType.auto && game.LobbyType != LobbyType.classic) {
 		  return (
 			<div key={index} style={{ display: "flex", flexDirection: "column" }}>
 			  	<div style={{ height: 55}} />
@@ -136,7 +137,7 @@ import LoopIcon from '@mui/icons-material/Loop';
 			</div>
 		  );
 
-		} else if (slot.type == LobbySlotType.invited && game.LobbyType != LobbyType.auto && slot.player) {
+		} else if (slot.type == LobbySlotType.invited && game.LobbyType != LobbyType.auto && game.LobbyType != LobbyType.classic && slot.player) {
 		  return (
 			<div>
 			  <div style={{ height: 55 }} />
@@ -173,11 +174,10 @@ import LoopIcon from '@mui/icons-material/Loop';
 	};
 	  
 	  function getPlayerSlotStyle(slot) {
-		const isOwner = game.owner == slot.player.username && game.LobbyType != LobbyType.auto;
+		const isOwner = game.owner == slot.player.username && game.LobbyType != LobbyType.auto && game.LobbyType != LobbyType.classic;
 		const backgroundColor = isOwner ? "#FFD700" : "#e8e8e8";
 		const boxShadow = isOwner ? "0 0px 10px #FFD700" : null;
-		const color = isOwner ? "black" : "white";
-	  
+		const color = "black" 
 		return {
 		  width: 100,
 		  height: 100,

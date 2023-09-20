@@ -87,9 +87,9 @@ const websocketSlice = createSlice({
     },
     setLobbyType: (state, action) => {
       state.LobbyType = action.payload;
-      if (state.LobbyType == LobbyType.classic)
+      if (action.payload == LobbyType.classic)
         state.params.classic = true;
-      else if (state.LobbyType == LobbyType.auto)
+      else if (action.payload == LobbyType.auto)
         state.params.classic = false;
     },
     setParams: (state, action) => {

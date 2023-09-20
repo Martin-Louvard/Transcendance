@@ -62,10 +62,16 @@ export class Lobby {
 			this.slots[this.players.size - 1] = {full: true, type: 0, player: player.infos};
 			this.dispatchLobbySlots();
 		}
-		if (this.nbPlayers == 2) {
+		if (this.nbPlayers == this.mode && this.instance instanceof Instance) {
 			this.full = true;
+			if (this.instance.automatch)
 				this.instance.triggerStart();
+			else
+				this.emit<boolean>(ServerEvents.LobbyFull, true);
 			return ;
+		} else if (this.nbPlayers == 2 && this.instance instanceof ClassicInstance) {
+			this.full = true;
+			this.instance.triggerStart();
 		}
 		this.dispatchAuthState();
 		return true;

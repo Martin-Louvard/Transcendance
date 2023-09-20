@@ -37,7 +37,7 @@ export const AutoMatch: React.FC = (props) => {
 	function findClassicGame() {
 		if (!user)
 			return ;
-		setLobbyType(LobbyType.classic);
+		dispatch(setLobbyType(LobbyType.classic));
 		dispatch({
 			type: 'WEBSOCKET_SEND_CLASSICAUTOMATCH',
 			payload: {info:{username: user.username, avatar: user.avatar, id: user.id}}
