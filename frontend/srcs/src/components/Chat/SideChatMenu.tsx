@@ -15,6 +15,7 @@ import ChatCreator from "./ChatCreator.tsx";
 import SearchBarChat from "./SearchChat.tsx";
 import { BsFillPersonFill, BsSearch } from "react-icons/bs";
 import { fetchChatChannelsApi } from "../../api.ts"
+import ChatBoxes from "./ChatBox.tsx";
 
 const SideChatMenu = () => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -31,10 +32,7 @@ const SideChatMenu = () => {
   const [minimizedList, setMinimizedList] = useState<string[] | undefined>([]);
   const [isChatList, setIsChatList] = useState<boolean>(true);
   const [searchList, setSearchList] = useState<ChatChannels[] | undefined>([]);
-  // ================================================================== //
   const userName = currentUser?.username;
-  // La variable au dessus est dangereuse
-  // ================================================================== //
   const toggleMenu = () => {
     setMenuCss((prevCss) =>
       prevCss.startsWith("open")
@@ -55,15 +53,6 @@ const SideChatMenu = () => {
     storedJoinedChannels?.filter((chat) => chat.channelType === "public");
   const [chatMenuChoice, setChatMenuChoice] = useState<string>("chatList");
 
-  let generalChannels: ChatChannels[] | undefined = undefined;
-  let privateChannels: ChatChannels[] | undefined = undefined;
-  let joinedGroupChannels: ChatChannels[] | undefined = undefined;
-  if (Array.isArray(storedJoinedChannels) ) {
-    generalChannels =
-      storedJoinedChannels?.filter((chat) => chat.channelType === "general");
-    privateChannels = storedJoinedChannels?.filter((chat) => chat.channelType === "private");
-    joinedGroupChannels = storedJoinedChannels?.filter((chat) => chat.channelType === "created");
-  }
 
   const handleChatTypeListClick = (_type: string) => {
     if (minimizedList?.includes(_type)) {
@@ -183,6 +172,7 @@ const SideChatMenu = () => {
       }
     }
   };
+	
 
   const displayChoice = () => {
     if (chatMenuChoice === "chatList")
