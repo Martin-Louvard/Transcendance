@@ -1,10 +1,17 @@
 // Variables
 $primary-color: #646cff;
 $secondary-color: #535bf2;
-$background-color: #242424;
+$background-color: #13131313;
 $light-color: #f9f9f9;
 $dark-color: #1a1a1a;
 $secondary-bg-color: #4d4848;
+
+@font-face {
+  font-family: "f25";
+  src: local("f25"),
+   url("./fonts/f25/F25_Bank_Printer_Bold.otf") format('OpenType');
+  font-weight: bold;
+ }
 
 // Mixins
 @mixin button-style {
@@ -22,16 +29,16 @@ $secondary-bg-color: #4d4848;
 
 // Base Styles
 html {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'f25', "Avenir", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 20px;
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: $background-color;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  //font-synthesis: none;
+  //text-rendering: optimizeLegibility;
+  //-moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -47,18 +54,20 @@ body {
   width: 100vw;
   height: 100vh;
   text-align: center;
+  align-items: center;
   display: flex;
   flex-direction: column;
   top: 0;
   bottom: 0;
   flex: 1;
   padding: 0;
+  background-color: $background-color;
 }
 
 // Links
 a {
   font-weight: 500;
-  color: $primary-color;
+  color: white;
   text-decoration: inherit;
 
   &:hover {
@@ -101,7 +110,7 @@ ul{
     flex-direction: row;
   }
 
-.friend-item {
+.item {
   background-color: $secondary-bg-color;
   display: flex;
   flex-direction: column;
@@ -133,7 +142,7 @@ ul{
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: #cdcdcd;
   }
 
   a:hover {

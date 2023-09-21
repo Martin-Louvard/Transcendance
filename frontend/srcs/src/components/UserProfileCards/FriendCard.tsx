@@ -54,7 +54,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
   };
 
   return (
-    <div className="profile-card-wrapper">
+    <div className="card-wrapper">
       {chatOpen ? <Chat chatId={friendship.chat_id} /> : showGames ? <HistoryCard /> : <Profile/>}
     </div>
   );

@@ -58,7 +58,7 @@ const ChatCreator: React.FC = () => {
   
 
   return (
-    <div className="chat-container">
+    <div className="card-wrapper">
       <Form title="Chat Creator" buttonText="Create" onSubmit={handleSubmit}>
         <label htmlFor="name">Name</label>
         <input

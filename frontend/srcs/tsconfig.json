@@ -12,14 +12,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "baseUrl": "./",
+    "paths": {
+      "@shared/*": ["./shared/*", "./../../shared/*"],
+    },
     "jsx": "react-jsx",
-
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "src/shaders"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

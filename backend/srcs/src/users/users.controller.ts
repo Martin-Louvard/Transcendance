@@ -97,7 +97,11 @@ export class UsersController {
 
   @Get('avatar/:username/:randomString')
   findAvatarWithRefresh(@Param('username') username: string, @Res() res){
-    return this.usersService.findAvatar(username, res)
+    try {
+      return this.usersService.findAvatar(username, res)
+    } catch(e) {
+      return (e);
+    }
   }
 
   @Get('avatar/:username')

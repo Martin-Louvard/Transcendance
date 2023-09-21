@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { Lobby } from "../lobby/lobby.class";
-import { ClientEvents, ServerEvents } from "src/Types";
+import { ClientEvents, GameRequest, PlayerInfo, ServerEvents, ServerPayloads } from "@shared/class";
 
 export class Player {
 	constructor(socket: Socket, id :number) {
@@ -10,12 +10,13 @@ export class Player {
 		this.lobby = null;
 		this.isOnline = true;
 	};
-
+	team: 'home' | 'visitor';
 	id: number;
 	socket: Socket | null;
 	lobby: Lobby | null;
 	isReady: boolean;
-	isOnline: boolean;
+	private isOnline: boolean;
+	infos: PlayerInfo;
 
 	setReady( isReady: boolean  ): boolean {
 		if (this.lobby == null || this.lobby.instance.hasStarted)
@@ -29,6 +30,7 @@ export class Player {
 		this.socket.emit(event, payload);
 	}
 
+	public getIsOnline() {return (this.isOnline)};
 
 	// TODO: Comment handle la deconnexion d'un jouer dans un game ?
 	// TODO: Si le joueur est offline + de {secondes} quitter le lobby et terminer la game

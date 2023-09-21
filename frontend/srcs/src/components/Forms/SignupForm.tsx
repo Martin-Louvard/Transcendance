@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import Form from './Form';
 import { useAppDispatch } from '../../redux/hooks';
 import './Forms.scss'
-import { ClientEvents, ClientPayloads } from '../Game/Type';
-import { socket } from '../../socket';
 import toast from "react-hot-toast"
 import { setSessionUser, setToken } from '../../redux/sessionSlice';
 import { fetchRelatedUserData } from '../../redux/sessionThunks';

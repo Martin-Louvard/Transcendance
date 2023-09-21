@@ -22,9 +22,16 @@ export class AuthService {
             throw new UnauthorizedException('Invalid password');
         }
         //strip the password from the user object
-        const user = await this.usersService.findOne(username);
-        const payload = { sub: user.id, username: user.username };
-        return {...user, access_token: await this.jwtService.signAsync(payload)};
+        try {
+            const user = await this.usersService.findOne(username);
+            const payload = { sub: user.id, username: user.username };
+            const token = await this.jwtService.signAsync(payload);
+            const userUpdate = {...user, access_token: token}
+            return (userUpdate)
+            //return {...user, access_token: };
+        } catch(error) {
+            return (error);
+        }
     }
 
     async loginWith2fa(username: string,  code: string) {
@@ -90,4 +97,5 @@ export class AuthService {
             return(err);
         }
     }
+
 }

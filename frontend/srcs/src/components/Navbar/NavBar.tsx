@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { cleanSession } from '../../redux/sessionSlice';
 
 const Navbar: React.FC = () => {
-  const logo = '/pong.svg'
+  const logo = '/marvin.png'
   const user = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
 

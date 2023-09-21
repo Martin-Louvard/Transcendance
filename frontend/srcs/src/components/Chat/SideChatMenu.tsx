@@ -26,6 +26,7 @@ const SideChatMenu = () => {
     (state) => state.session.OpenedChatChannels,
   );
   const [chatBox, setChatBox] = useState<ChatChannels | null>(null);
+  const [showChatCreator, setShowChatCreator] = useState(false)
   const [menuCss, setMenuCss] = useState("open-chat-menu");
   const [minimizedList, setMinimizedList] = useState<string[] | undefined>([]);
   const [isChatList, setIsChatList] = useState<boolean>(true);
@@ -54,6 +55,16 @@ const SideChatMenu = () => {
     storedJoinedChannels?.filter((chat) => chat.channelType === "public");
   const [chatMenuChoice, setChatMenuChoice] = useState<string>("chatList");
 
+  let generalChannels: ChatChannels[] | undefined = undefined;
+  let privateChannels: ChatChannels[] | undefined = undefined;
+  let joinedGroupChannels: ChatChannels[] | undefined = undefined;
+  if (Array.isArray(storedJoinedChannels) ) {
+    generalChannels =
+      storedJoinedChannels?.filter((chat) => chat.channelType === "general");
+    privateChannels = storedJoinedChannels?.filter((chat) => chat.channelType === "private");
+    joinedGroupChannels = storedJoinedChannels?.filter((chat) => chat.channelType === "created");
+  }
+
   const handleChatTypeListClick = (_type: string) => {
     if (minimizedList?.includes(_type)) {
       setMinimizedList(minimizedList.filter((item) => item !== _type));
@@ -80,10 +91,12 @@ const SideChatMenu = () => {
     }
   };
 
+
+
+
   const channelsList = (channels: ChatChannels[]) => {
     return (
       <div>
-        {" "}
         {channels.map((chat: ChatChannels) => (
           <li
             className={`chat-item${chatBox === chat ? "-active" : ""}`}
@@ -184,9 +197,10 @@ const SideChatMenu = () => {
 
   return (
     <div className={`chat-menu-wrapper ${menuCss}`}>
+      <ChatBoxes />
       <img
         className={`logo-nav chat-menu-icon`}
-        src={"/menu.svg"}
+        src={"/comments.svg"}
         alt="Chat Menu"
         onClick={toggleMenu}
       />
