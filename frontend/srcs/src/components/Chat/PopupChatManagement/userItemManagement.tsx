@@ -10,8 +10,8 @@ const UserListItem = ({user, chat}: {user: User; chat: ChatChannels}) => {
   const currentUser = useAppSelector((state) => state.session.user);
 
   const isKickable = () => {
-    if ((chat?.Admins.includes(currentUser!) 
-      && !chat?.Admins.includes(user)) || (chat?.Owner.id === currentUser?.id))
+    if ((chat?.admins.includes(currentUser!) 
+      && !chat?.admins.includes(user)) || (chat?.owner.id === currentUser?.id))
       return true;
     else
       return false;
@@ -19,11 +19,11 @@ const UserListItem = ({user, chat}: {user: User; chat: ChatChannels}) => {
   return (
     <>
       <div className="management-chat-user-list-username">{user.username}
-      {chat.Owner.id === user.id ? <GiImperialCrown /> : ""}
+      {chat.owner.id === user.id ? <GiImperialCrown /> : ""}
       </div>
       <div></div>
       <div><AddUserButton user={user}/></div>
-      <div>{chat?.Owner.id === currentUser?.id ? <AdminAddButton user={user} chat={chat} /> : ""}</div>
+      <div>{chat?.owner.id === currentUser?.id ? <AdminAddButton user={user} chat={chat} /> : ""}</div>
       <div>{isKickable() ? <KickUserButton user={user} chat={chat}/> : "" } </div>
     </>
   );
