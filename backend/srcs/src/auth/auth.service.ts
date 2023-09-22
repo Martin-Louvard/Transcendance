@@ -72,6 +72,9 @@ export class AuthService {
                 dbUser = await this.usersService.findBy42Email(userInfo.email)
             }
             catch(err){
+                const usernametaken = await this.prisma.user.findUnique({where:{username: userInfo.login}});
+                while (usernametaken.username == userInfo.login)
+                    userInfo.login = userInfo.login + Math.floor(Math.random() * (10000));
                 await this.prisma.user.create({data: {username: userInfo.login, email42: userInfo.email, email: userInfo.email}});
                 dbUser = await this.usersService.findBy42Email(userInfo.email)
             }
