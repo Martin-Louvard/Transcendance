@@ -262,6 +262,9 @@ export class AppGateway
       where: { id: body[1] },
       data: { participants: { connect: { id: newUser.id } } },
       include: {
+        owner: true,
+        admins: true,
+        messages: true,
         participants: true,
       },
     });
@@ -280,8 +283,10 @@ export class AppGateway
       where: { id: parseInt(body[0]) },
       data: { admins: { connect: { id: newAdmin.id } } },
       include: {
-        participants: true,
+        owner: true,
         admins: true,
+        messages: true,
+        participants: true,
       },
     });
     this.server.emit('add_admin', updatedChats);
@@ -303,7 +308,12 @@ export class AppGateway
     });
     const chat = await this.prisma.chatChannel.findUnique({
       where: { id: parseInt(body[0]) },
-      include: { admins: true },
+      include: {
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
+      },
     });
     const updatedAdmins = chat.admins.filter(
       (user) => user.id !== adminToRemove.id,
@@ -313,6 +323,12 @@ export class AppGateway
       where: { id: chat.id },
       data: {
         admins: { set: updatedAdmins.map((user) => ({ id: user.id })) },
+      },
+      include: {
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
       },
     });
     this.server.emit('remove_admin', updatedChat);
@@ -348,7 +364,12 @@ export class AppGateway
 
     const chat = await this.prisma.chatChannel.findUnique({
       where: { id: chatId },
-      include: { participants: true },
+      include: {
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
+      },
     });
     const updateParticipants = chat.participants.filter(
       (user) => user.id !== oldOwner,
@@ -360,6 +381,12 @@ export class AppGateway
         participants: {
           set: updateParticipants.map((user) => ({ id: user.id })),
         },
+      },
+      include: {
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
       },
     });
     this.server.emit('change_owner', updatedChannel);
@@ -375,7 +402,12 @@ export class AppGateway
     });
     const chat = await this.prisma.chatChannel.findUnique({
       where: { id: parseInt(body[0]) },
-      include: { participants: true, admins: true },
+      include: {
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
+      },
     });
     const updatedParticipants = chat.participants.filter(
       (user) => user.id !== userToKick.id,
@@ -391,6 +423,12 @@ export class AppGateway
           set: updatedParticipants.map((user) => ({ id: user.id })),
         },
         admins: { set: updatedAdmins.map((user) => ({ id: user.id })) },
+      },
+      include: {
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
       },
     });
     this.server.emit('kick_user', updatedChat);
@@ -446,7 +484,12 @@ export class AppGateway
     });
     const channel = this.prisma.chatChannel.findUnique({
       where: { id: body[0] },
-      include: { friendship: true, participants: true },
+      include: {
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
+      },
     });
     this.server.emit('update_chat', channel);
   }
@@ -489,7 +532,12 @@ export class AppGateway
       friendship = await this.friendService.findOne(update.id);
       const chat = await this.prisma.chatChannel.findUnique({
         where: { id: friendship.chat_id },
-        include: { friendship: true, messages: true, participants: true },
+        include: {
+          owner: true,
+          admins: true,
+          messages: true,
+          participants: true,
+        },
       });
       const friendplayer = this.playerService.getPlayerById(friend_id);
       const friend_socket = friendplayer ? friendplayer.socket : undefined;

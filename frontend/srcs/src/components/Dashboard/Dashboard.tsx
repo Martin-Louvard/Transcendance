@@ -23,8 +23,8 @@ const Dashboard: React.FC = () => {
   };
 
   const renderContent = () => {
-
-    if (contentToShow === "profile") return <ProfileCard />;
+    console.log(contentToShow);
+    if (contentToShow === "profile") return <ProfileCard/>;
     if (contentToShow === "friends") return <FriendsListCard />;
     if (contentToShow === "games") return <HistoryCard />;
     if (contentToShow === "lobby") return <Lobby />;
