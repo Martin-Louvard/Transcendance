@@ -1,4 +1,5 @@
 import React, { useState, KeyboardEvent } from "react";
+import { AiOutlineSend } from 'react-icons/ai';
 
 interface MessageInputProps {
   handleSendMessage: (currentMessage: string) => void;
@@ -22,13 +23,15 @@ const MessageInput: React.FC<MessageInputProps> = ({ handleSendMessage }) => {
         onChange={(e) => setCurrentMessage(e.target.value)}
         onKeyDown={handleKeyDown}
       />
-      <button
+      <button className="send-button"
         onClick={() => {
           handleSendMessage(currentMessage);
           setCurrentMessage("");
         }}
       >
-        Send
+        <div>
+          <AiOutlineSend />
+        </div>
       </button>
     </div>
   );

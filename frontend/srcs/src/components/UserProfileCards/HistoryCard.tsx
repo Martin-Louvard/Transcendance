@@ -16,11 +16,11 @@ const HistoryCard = () => {
 
   return (
     <>
-      <div className="history-card-wrapper">
+      <div className="card-wrapper">
         <h2>Game History</h2>
-        <ul className="friend-list">
+        <ul className="list">
           {gameScores.map((game, index) => (
-            <li className="friend-item" key={index}>
+            <li className="item" key={index}>
                 <p>Date: {game.date.toDateString()}</p>
                 <p>Score: {game.score}</p>
             </li>

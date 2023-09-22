@@ -1,8 +1,8 @@
 import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
-import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
+import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, resetLobbyData, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
-import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat } from './sessionSlice';
+import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat, addNewChatChannel, updateOneChat } from './sessionSlice';
 import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType} from '@shared/class';
 import { useAppSelector } from './hooks';
 
@@ -12,6 +12,8 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
   return (next: Dispatch<AnyAction>) => (action: AnyAction) => {
     switch (action.type) {
       case 'WEBSOCKET_CONNECT':
+        if (!action.payload || action.payload.lenght == 0)
+          return ;
         socket = io("http://localhost:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
 
         socket.on('connect', () => {
@@ -26,13 +28,25 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('friend_request', (data: any) => {store.dispatch(updateFriendRequest(data))});
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
+
+        socket.on('leave_chat', (data: any) => {store.dispatch(updateOneChat(data))});
+        socket.on('change_owner', (data: any) => {store.dispatch(updateOneChat(data))});
+
+        socket.on('delete_chat', (data: any) => {store.dispatch(updateChat(data))});
+
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
+        socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
+        socket.on('add_admin', (data: any) => {store.dispatch(updateOneChat(data))});
+        socket.on('kick_user', (data: any) => {store.dispatch(updateOneChat(data))});
+        socket.on('remove_admin', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
         socket.on(ServerEvents.AuthState, (data: ServerPayloads[ServerEvents.AuthState]) => {
-          if (data.lobbyId && store.getState().websocket.LobbyType != LobbyType.score && store.getState().websocket.LobbyType != LobbyType.auto) {
+          const state = store.getState().websocket;
 
+          if (state.lobbyId && !data.lobbyId)
+            store.dispatch(resetLobbyData())
+          if (data.lobbyId && state.LobbyType != LobbyType.score && state.LobbyType != LobbyType.auto)
             store.dispatch(setLobbyType(LobbyType.wait));
-          }
           store.dispatch(setAuthState(data));})
         socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => {
           if (data.hasFinished)
@@ -69,7 +83,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           if (socket && socket.connected) {
             socket.emit(ClientEvents.GetLobbies, action.payload);
           }
-          break;
+        break;
 
       case 'WEBSOCKET_SEND_GAME_START':
         if (socket && socket.connected) {
@@ -113,6 +127,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         }
         break;
       
+        case 'WEBSOCKET_SEND_CLASSICAUTOMATCH':
+          if (socket && socket.connected) {
+            socket.emit('automatchClassic', action.payload);
+          }
+          break ;
+      
       case 'WEBSOCKET_SEND_LOBBYSTATE':
           if (socket && socket.connected) {
             socket.emit(ClientEvents.LobbyState, action.payload);
@@ -137,11 +157,54 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         }
         break;
 
+      case 'JOIN_CHAT':
+        if (socket && socket.connected) {
+          socket.emit('join_chat', action.payload);
+        }
+        break;
+      
+      case 'CHANGE_OWNER':
+        if (socket && socket.connected) {
+          socket.emit('change_owner', action.payload);
+        }
+        break;
+      
+      case 'LEAVE_CHAT':
+        if (socket && socket.connected) {
+          socket.emit('leave_chat', action.payload);
+        }
+        break;
+
       case 'UPDATE_CHAT':
         if (socket && socket.connected) {
           socket.emit('update_chat', action.payload);
         }
         break;
+
+      case 'DEL_CHAT':
+        if (socket && socket.connected) {
+          socket.emit('delete_chat', action.payload);
+        }
+        break;
+
+      case 'ADD_ADMIN':
+        if (socket && socket.connected) {
+          socket.emit('add_admin', action.payload);
+        }
+        break;
+
+      case 'KICK_USER':
+        if (socket && socket.connected) {
+          socket.emit('kick_user', action.payload);
+        }
+        break;
+
+      case 'REMOVE_ADMIN':
+        if (socket && socket.connected) {
+          socket.emit('remove_admin', action.payload);
+        }
+        break;
+
       case 'MSG_READ':
         if (socket && socket.connected) {
           socket.emit('read', action.payload);

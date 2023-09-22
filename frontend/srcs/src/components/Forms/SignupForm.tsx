@@ -4,6 +4,7 @@ import { useAppDispatch } from '../../redux/hooks';
 import './Forms.scss'
 import toast from "react-hot-toast"
 import { setSessionUser, setToken } from '../../redux/sessionSlice';
+import { fetchRelatedUserData } from '../../redux/sessionThunks';
 import { login } from '../../api';
 
 const SignupForm: React.FC = () => {
@@ -35,8 +36,15 @@ const SignupForm: React.FC = () => {
       toast.success("Logged in")
       dispatch(setSessionUser(user))
       dispatch(setToken(user.access_token))
-    }catch(err) {
-      console.log(err);
+      dispatch(fetchRelatedUserData(user.id))
+
+      const payloads: ClientPayloads[ClientEvents.AuthState] = {
+        id: user.id,
+        token: user.access_token,
+      }
+      socket.emit(ClientEvents.AuthState, payloads);
+    }catch(error) {
+      console.log(error)
     }
   }
 

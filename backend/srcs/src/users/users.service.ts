@@ -30,7 +30,30 @@ export class UsersService {
       roundsOfHashing,
     );
     createUserDto.password = hashedPassword;
-    return this.prisma.user.create({ data: createUserDto });
+    const newUser = await this.prisma.user.create({ data: createUserDto });
+
+    const chatGeneral = await this.prisma.chatChannel.findFirst({
+      where: { name: 'WorldChannel' },
+    });
+    const chatGeneralId = chatGeneral.id;
+
+    await this.prisma.chatChannel.update({
+      where: { id: chatGeneralId },
+      data: {
+        participants: {
+          connect: [{ id: newUser.id }],
+        },
+      },
+    });
+
+    await this.prisma.user.update({
+      where: { id: newUser.id },
+      data: {
+        JoinedChatChannels: { connect: [{ id: chatGeneralId }] },
+      },
+    });
+
+    return newUser;
   }
 
   findAll() {
@@ -77,7 +100,9 @@ export class UsersService {
       where: { id },
       include: {
         games: true,
-        JoinedChatChannels: { include: { messages: true, friendship: true, participants: true } },
+        JoinedChatChannels: {
+          include: { messages: true, friendship: true, participants: true },
+        },
         OwnedChatChannels: { include: { messages: true } },
         BannedFromChatChannels: { include: { messages: true } },
         AdminOnChatChannels: { include: { messages: true } },

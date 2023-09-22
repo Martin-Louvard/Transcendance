@@ -1,6 +1,7 @@
 import * as CANNON from 'cannon-es'
 
 export enum LobbyMode {
+	classic = 0,
 	duel = 2,
 	double = 4,
 }
@@ -9,9 +10,10 @@ export enum LobbyType {
 	none = 0,
 	auto = 1,
 	create = 2,
-	find = 3,
-	wait = 4,
-	score = 5,
+	classic = 3,
+	find = 4,
+	wait = 5,
+	score = 6,
 }
 
 export enum ServerEvents

@@ -3,7 +3,10 @@ import { ChatChannels, Message } from "../../Types.ts";
 export function getName(chat: ChatChannels, userName: string | undefined) {
   let chatName = chat.name;
   let other = "";
-
+  if (!chatName)
+    chatName = "";
+  if (chatName!.length > 1)
+    return chatName;
   if (!chatName && chat.participants?.length > 1) {
     chatName = chat.participants.filter((p) => {
       if (p.username !== userName) return p;

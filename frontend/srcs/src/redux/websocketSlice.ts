@@ -145,14 +145,43 @@ const websocketSlice = createSlice({
       newState.splice(index, index + 1);
       state.sentInvites = [...newState]
     },
-    resetGameDatas: (state) => {
-      resetParams();
-      state.lobbySlots = [];
+    resetLobbyData: (state) => {
+      state.LobbyType = LobbyType.none;
       state.balls = [];
+      state.elapsedTime = 0;
+      state.full = false;
+      state.isPlaying = false;
+      state.lobbyId = null;
+      state.lobbySlots = [];
+      state.mapHeight = 0;
       state.players = [];
       state.owner = null;
       state.playersInfo = [];
-      // reset game datas
+      state.mapWidth = 0;
+      state.params = {
+        classic: true,
+        duel: false,
+        map: {
+         size: [200, 100],
+         goalSize: 20,
+         medianOffset: 20,
+        },
+        ball: {
+         globalSpeed: 10, // speed
+         reboundForce: 10, // force du rebond
+         ballAcceleration: 0.5, // m / sec
+         rotationForce: 1, // force de rotation
+        },
+        players: {
+         speed: 60, // vitesse X et Z
+         rotationSpeed: 10, // vitesse de rotation
+         boostForce: 10, // force du boost
+        },
+        general: {
+         time: 180,
+        }
+       }
+       state.score = {'home': 0, 'visitor': 0};
     },
     resetParams: (state) => {
       state.params = {
@@ -252,6 +281,6 @@ const websocketSlice = createSlice({
   },
 });
 
-export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, resetGameDatas, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect} = websocketSlice.actions;
+export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect, resetLobbyData} = websocketSlice.actions;
 
 export default websocketSlice.reducer;

@@ -6,24 +6,27 @@ import { v4 as uuidv4, v4 } from 'uuid';
 import { Instance } from "../classes/instance.class";
 import { Injectable } from '@nestjs/common';
 import { LobbySlot } from "src/Types";
+import { ClassicInstance } from "../classes/classicInstance";
 
 @Injectable()
 export class Lobby {
 	constructor(mode: LobbyMode, private readonly server: Server, creator: Player) {
 		this.mode = mode;
 		this.id = uuidv4();
-		this.instance = new Instance(this);
+		if (mode == LobbyMode.classic)
+			this.instance = new ClassicInstance(this);
+		else
+			this.instance = new Instance(this);
 		this.full = false;
 		this.owner = creator;
 		this.slots = [{full: true, type: 0, player: {username: creator.infos.username, avatar: creator.infos.avatar, id: creator.id }}, {full: false, type: 0, player: null}, {full: false, type: 0, player: null}, {full: false, type: 0, player: null}];
 	};
-
 	id: string;
 	mode: LobbyMode;
 	players: Map<string, Player> = new Map<string, Player>();
 	slots: LobbySlotCli[];
 	nbPlayers: number = 0;
-	instance: Instance;
+	instance: Instance | ClassicInstance;
 	full: boolean;
 	owner: Player = null;
 
@@ -59,12 +62,9 @@ export class Lobby {
 			this.slots[this.players.size - 1] = {full: true, type: 0, player: player.infos};
 			this.dispatchLobbySlots();
 		}
-		if (this.nbPlayers == this.mode) {
+		if (this.nbPlayers == 2) {
 			this.full = true;
-			if (this.instance.automatch)
 				this.instance.triggerStart();
-			else
-				this.emit<boolean>(ServerEvents.LobbyFull, true);
 			return ;
 		}
 		this.dispatchAuthState();
@@ -140,7 +140,6 @@ export class Lobby {
 							return ;
 						})
 					}
-					console.log(`player socket id : $${player.socket.id} and id in the array : ${e.socket.id}`);
 					this.dispatchAuthState();
 					player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 					this.deletePlayerFromSlot(player);

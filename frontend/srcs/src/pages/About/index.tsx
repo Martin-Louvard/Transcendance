@@ -6,13 +6,13 @@ const About = () => {
     <h2>Website by </h2>
     <ul  className="authors">
     <div className="row">
-    <li className="friend-item" >
+    <li className="item" >
         <div className='friend-picture'>
             <img src="/martin.jpg"/>
         </div>
         <p>Martin Louvard</p>
     </li>
-    <li className="friend-item" >
+    <li className="item" >
         <div className='friend-picture'>
             <img src="/default.jpg"/>
         </div>
@@ -20,13 +20,13 @@ const About = () => {
     </li>
     </div>
     <div className="row">
-    <li className="friend-item" >
+    <li className="item" >
         <div className='friend-picture'>
             <img src="/default.jpg"/>
         </div>
         <p>Clement Vidon</p>
     </li>
-    <li className="friend-item" >
+    <li className="item" >
         <div className='friend-picture'>
             <img src="/default.jpg"/>
         </div>

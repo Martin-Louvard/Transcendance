@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { Friend, Friendships } from "src/Types";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParams } from "../../../redux//websocketSlice";
+import LoopIcon from '@mui/icons-material/Loop';
 
   export const CreateMatchLobby: React.FC = (props) => {
 	const size = props.size;
@@ -31,7 +32,6 @@ import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParam
 		slot.player && slot.player.id == (friendship.sender_id == user?.id ? friendship.user_id : friendship.sender_id && slot.type == LobbySlotType.invited)
 		) == -1
 	}))
-
 	}, [friendships, game.sentInvites, game.invitedGames, game.lobbySlots])
   
 	useEffect(() => {
@@ -74,16 +74,17 @@ import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParam
 	  }
   
 	function renderPlayerSlot(slot, index) {
+		console.log("=> ", game.params.classic);
 		return (
-		  <div key={index}>
-			{game.params && index < (game.params.duel ? 2 : 4) ?
-			  slot.full && slot.player != null ?
+		<div key={index} style={{height:'250px'}}>
+			{game.params && index < (game.params.duel || game.params.classic ? 2 : 4) ?
+			slot.full && slot.player != null ?
 				renderFilledSlot(slot, index) :
 				renderEmptySlot(slot, index)
-			  :
-			  <></>
+			:
+			<></>
 			}
-		  </div>
+		</div>
 		);
 	  }
 	  
@@ -107,25 +108,34 @@ import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParam
 		if (slot.type == LobbySlotType.friend && game.LobbyType != LobbyType.auto) {
 		  return (
 			<div key={index} style={{ display: "flex", flexDirection: "column" }}>
-			  <div style={{ height: 55 }} />
-			  <Button variant="contained" sx={{ width: 100, height: 100 }} onClick={() => handleFriendSlotClick(index)}>
-				Friends
-			  </Button>
+			  	<div style={{ height: 55}} />
+			  	<Button variant="contained" sx={{  flexDirection:'column', width:"100px", height:"100px", lineHeight:'1', fontSize:"0.7rem" }} onClick={() => handleFriendSlotClick(index)}>
+					<div style={{height:100}}/>
+					<LoopIcon
+						sx={{
+							marginBottom:'12px',
+							animation: "spin 2s linear infinite",
+							"@keyframes spin": {
+								"0%": {
+									transform: "rotate(360deg)",
+								},
+								"100%": {
+									transform: "rotate(0deg)",
+								},
+							},
+						}}
+					/>
+					<p style={{marginTop:0, marginBottom:14}}>
+						Searching Players...
+					</p>
+				</Button>
 			  <Button sx={{ alignSelf: "center", width: "auto" }} onClick={() => { setOpen(true); setIndexInviteSlot(index) }}>
 				Invite
 			  </Button>
 			  {renderInviteDialog()}
 			</div>
 		  );
-		} else if (game.LobbyType != LobbyType.auto && slot.type == LobbySlotType.online) {
-		  return (
-			<div key={index}>
-			  <div style={{ height: 55 }} />
-			  <Button key={index} variant="contained" sx={{ width: 100, height: 100 }} onClick={() => handleOnlineSlotClick(index)} disableElevation>
-				Opened to Online
-			  </Button>
-			</div>
-		  );
+
 		} else if (slot.type == LobbySlotType.invited && game.LobbyType != LobbyType.auto && slot.player) {
 		  return (
 			<div>
@@ -137,13 +147,30 @@ import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParam
 		  return (
 			<div key={index}>
 			  <div style={{ height: 55 }} />
-			  <Button key={index} variant="contained" sx={{ width: 100, height: 100 }} onClick={() => handleEmptySlotClick(index)} disableElevation disableTouchRipple>
-				Waiting for opponent
-			  </Button>
+			  <Button variant="contained" sx={{  flexDirection:'column', width:"100px", height:"100px", lineHeight:'1', fontSize:"0.7rem" }} onClick={() => handleFriendSlotClick(index)}>
+					<div style={{height:100}}/>
+					<LoopIcon
+						sx={{
+							marginBottom:'12px',
+							animation: "spin 2s linear infinite",
+							"@keyframes spin": {
+								"0%": {
+									transform: "rotate(360deg)",
+								},
+								"100%": {
+									transform: "rotate(0deg)",
+								},
+							},
+						}}
+					/>
+					<p style={{marginTop:0, marginBottom:14}}>
+						Searching Players...
+					</p>
+				</Button>
 			</div>
 		  );
 		}
-	  }
+	};
 	  
 	  function getPlayerSlotStyle(slot) {
 		const isOwner = game.owner == slot.player.username && game.LobbyType != LobbyType.auto;
@@ -214,8 +241,6 @@ import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParam
 		);
 	  }
 	  
-	  // Add additional helper functions as needed
-	  
 	  function handleFriendSlotClick(index) {
 		if (user && game.owner != user.username)
 		  return;
@@ -234,12 +259,12 @@ import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParam
 	  
 	  function renderInvitedSlot(slot, index) {
 		return (
-		  <div  style={{ height: 55 }}>
-			<div />
-			<Button key={index} variant="contained" sx={{ width: 100, height: 100, flexDirection: "column" }} disabled disableElevation disableTouchRipple>
+		  <div  style={{ height:"200px" }}>
+			<div style={{display:"flex", flexDirection:"column"}}/>
+			<Button key={index} variant="contained" sx={{ width: 100, height:100}} disabled disableElevation disableTouchRipple>
 			  <p> Waiting for : {slot.player && slot.player.username ? slot.player.username : console.log(slot) }... </p>
 			</Button>
-			<Button sx={{ alignSelf: "center", width: "auto" }} onClick={() => handleCancelInviteClick(index)}>
+			<Button sx={{ }} onClick={() => handleCancelInviteClick(index)}>
 			  Cancel
 			</Button>
 		  </div>
@@ -276,22 +301,26 @@ import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParam
 	  
   
 	return (
-	  game && game.params &&
-	  <div style={{width: size.width, height: size.height / 2, position:"relative"}}>
-		  <Stack sx={game.params.duel ?{flexDirection:"row", height:250, width:500, position:"absolute", top:"50%",gap:"30px", left:size.width / 2 - 100 } : {flexDirection:"row", height:250, width:500, position:"absolute", top:"50%",gap:"30px", left:size.width / 2 - 250} }>
-		   {renderSlots}
+	<div style={{display:"flex"}}>
+	{
+		game && game.params &&
+		<div style={{width: size.width, height: size.height / 2, position:"relative"}}>
+		<Stack sx={{position:'relative', flexDirection:"row", gap:"30px", justifyContent:'center', alignContent:'center'}}>
+		{renderSlots}
 		</Stack>
 		{user && game.owner == user.username &&
-		game.full && !console.log("full : ", game.full) ?
-		  <Button onClick={() => {
-			dispatch({
-			  type: "WEBSOCKET_SEND_GAME_START",
-			})
-		  }}>Start Game</Button>
-		  :
-		  <Button disabled>Start Game</Button>
+			game.full && !console.log("full : ", game.full) ?
+			<Button onClick={() => {
+				dispatch({
+					type: "WEBSOCKET_SEND_GAME_START",
+				})
+			}}>Start Game</Button>
+			:
+			<Button disabled>Start Game</Button>
 		}
 		<Button color='error' onClick={() => {leaveLobby()}}>Leave</Button>
-	  </div>
+		</div>
+	}
+	</div>
 	)
   }
