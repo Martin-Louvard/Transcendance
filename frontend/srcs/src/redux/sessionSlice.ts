@@ -86,6 +86,15 @@ export const sessionSlice = createSlice({
         chat.id === updatedChat.id ? { ...chat, isOpen: false } : chat
       );
     },
+    updateOneChat: (state, action) => {
+      const updatedChat: ChatChannels = action.payload;
+      state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
+        if (updatedChat.id === chat.id){
+          return updatedChat;
+        }
+        return chat;
+      })
+    },
     resetNotification: (state, action) => {
       const updatedChat: ChatChannels = action.payload;
       const userId = state.user?.id;
@@ -371,7 +380,8 @@ export const {
   resetNotification,
   updateChatNotification,
   setNotifications,
-  addNewChatChannel
+  addNewChatChannel,
+  updateOneChat,
 } = sessionSlice.actions;
 export { fetchRelatedUserData };
 export default sessionSlice.reducer;

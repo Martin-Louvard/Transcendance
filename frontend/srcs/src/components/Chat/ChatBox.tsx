@@ -10,6 +10,9 @@ import {
 import Chat from "./Chat";
 import { getName } from "./functions.ts";
 import "./ChatBox.scss";
+import { AiFillSetting } from "react-icons/ai";
+import PopupManagement from "./PopupChatManagement/PopupManagement.tsx"
+
 
 const ChatBoxes = () => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -18,6 +21,8 @@ const ChatBoxes = () => {
   );
   const dispatch = useAppDispatch();
   const [minimizedChat, setMinimizedChat] = useState<number[]>([]);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [selectedChat, setSelectedChat] = useState<ChatChannels | undefined>(undefined);
 
   const handleToggleChatClose = (chat: ChatChannels) => {
     dispatch(setChatClose(chat));
@@ -59,6 +64,11 @@ const ChatBoxes = () => {
             >
               {minimizedChat.includes(chat.id) ? "+" : "_"}
             </button>
+            <div className="chat-box-setting-button" onClick={()=> {
+              setIsOpen(true);
+              setSelectedChat(chat);}}>
+              <AiFillSetting />
+            </div>
             <img
               onClick={() => handleToggleChatClose(chat)}
               src={"cross.svg"}
@@ -86,6 +96,7 @@ const ChatBoxes = () => {
           </div>
         ))}
       </div>
+      <PopupManagement chat={selectedChat} isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   );
 };

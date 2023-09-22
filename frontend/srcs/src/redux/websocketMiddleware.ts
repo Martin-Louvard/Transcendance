@@ -2,7 +2,7 @@ import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
 import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, resetLobbyData, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
-import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat } from './sessionSlice';
+import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat, addNewChatChannel, updateOneChat } from './sessionSlice';
 import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType} from '@shared/class';
 import { useAppSelector } from './hooks';
 
@@ -30,7 +30,8 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
         socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
-        //        socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
+        socket.on('add_admin', (data: any) => {store.dispatch(updateOneChat(data))});
+        socket.on('kick_user', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
         socket.on(ServerEvents.AuthState, (data: ServerPayloads[ServerEvents.AuthState]) => {
           const state = store.getState().websocket;
@@ -75,7 +76,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           if (socket && socket.connected) {
             socket.emit(ClientEvents.GetLobbies, action.payload);
           }
-          break;
+        break;
 
       case 'WEBSOCKET_SEND_GAME_START':
         if (socket && socket.connected) {
@@ -160,6 +161,19 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           socket.emit('update_chat', action.payload);
         }
         break;
+
+      case 'ADD_ADMIN':
+        if (socket && socket.connected) {
+          socket.emit('add_admin', action.payload);
+        }
+        break;
+
+      case 'KICK_USER':
+        if (socket && socket.connected) {
+          socket.emit('kick_user', action.payload);
+        }
+        break;
+
       case 'MSG_READ':
         if (socket && socket.connected) {
           socket.emit('read', action.payload);

@@ -204,6 +204,48 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     this.server.emit('join_chat', updatedChats);
   }
 
+  @SubscribeMessage('add_admin')
+  async handleAddAdmin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const newAdmin = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const updatedChats = await this.prisma.chatChannel.update({
+      where: { id: parseInt(body[0]) },
+      data: { admins: { connect: { id: newAdmin.id } } },
+      include: {
+        participants: true,
+        admins: true,
+      },
+    });
+    console.log(updatedChats);
+    this.server.emit('add_admin', updatedChats);
+  }
+
+  @SubscribeMessage('kick_user')
+  async handleKickUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const userToKick = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    })
+    const chat = await this.prisma.chatChannel.findUnique({
+      where: { id: parseInt(body[0]) },
+      include: { participants: true, admins: true }
+    });
+    const updatedParticipants = chat.participants.filter((user) => user.id !== userToKick.id);
+    const updatedAdmins = chat.admins.filter((user) => user.id !== userToKick.id);
+
+    const updatedChat = await this.prisma.chatChannel.update({
+      where: { id: chat.id },
+      data: {}
+    });
+  }
+
+
   @SubscribeMessage('create_chat')
   async handleCreateChat(
     @ConnectedSocket() client: Socket,

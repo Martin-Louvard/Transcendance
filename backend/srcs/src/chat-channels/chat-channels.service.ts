@@ -26,7 +26,7 @@ export class ChatChannelsService {
 
   async checkPassword(id: number, password: string){
     const chat = await this.prisma.chatChannel.findUnique({where: { id } });
-    const chatPassword =  chat.password.toString()
+    const chatPassword = chat.password.toString()
     const isPasswordValid = await bcrypt.compare(password, chatPassword);
 
     if (!isPasswordValid)
