@@ -34,6 +34,7 @@ const ChangeInfo = ({setChangeInfoOpen}: {setChangeInfoOpen: Dispatch<SetStateAc
         if (response.ok)
         {
             const newUser = await response.json();
+            newUser.access_token = access_token;
             toast.success("Information updated")
             dispatch(setSessionUser(newUser))
             setChangeInfoOpen(false)
