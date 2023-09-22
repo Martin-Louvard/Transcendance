@@ -9,9 +9,21 @@ import ProfileCard from '../UserProfileCards/ProfileCard';
 import FriendsListCard from '../UserProfileCards/FriendsListCard';
 import HistoryCard from '../UserProfileCards/HistoryCard';
 import ChatCreator from '../Chat/ChatCreator';
+import { Friendships, Status } from '/src/Types';
+import Notification from '../UserProfileCards/Notification.tsx';
 
 const Dashboard: React.FC = () => {
   const [contentToShow, setContentToShow] = useState< "profile" | "friends" | "games" | "friendUser"| "lobby"  >("lobby");
+  const user = useAppSelector((state) => state.session.user);
+  const friendships = useAppSelector((state) => state.session.friendships);
+  const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
+
+
+  useEffect(()=>{
+    if (friendships){
+      setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
+    }
+  },[friendships])
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLImageElement>) => {
     event.preventDefault();
@@ -33,8 +45,10 @@ const Dashboard: React.FC = () => {
 
   const renderMenuButtons = () => (
     <div className='menu-bottom'>
+      
       <button id="friends" onClick={handleClick}>
         Friends
+        <Notification number={friendRequests?.length}/>
       </button>
       <button id="history" onClick={handleClick}>
         LeaderBoard
