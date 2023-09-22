@@ -14,7 +14,7 @@ const UserListItem = ({user, chat}: {user: User; chat: ChatChannels}) => {
       && !chat?.Admins.includes(user)) || (chat?.Owner.id === currentUser?.id))
       return true;
     else
-      return false
+      return false;
   };
   return (
     <>

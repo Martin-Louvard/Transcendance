@@ -28,6 +28,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('friend_request', (data: any) => {store.dispatch(updateFriendRequest(data))});
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
+
+        socket.on('leave_chat', (data: any) => {store.dispatch(updateOneChat(data))});
+        socket.on('change_owner', (data: any) => {store.dispatch(updateOneChat(data))});
+
+        socket.on('delete_chat', (data: any) => {store.dispatch(updateChat(data))});
+
         socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
         socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
         socket.on('add_admin', (data: any) => {store.dispatch(updateOneChat(data))});
@@ -156,10 +162,28 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           socket.emit('join_chat', action.payload);
         }
         break;
+      
+      case 'CHANGE_OWNER':
+        if (socket && socket.connected) {
+          socket.emit('change_owner', action.payload);
+        }
+        break;
+      
+      case 'LEAVE_CHAT':
+        if (socket && socket.connected) {
+          socket.emit('leave_chat', action.payload);
+        }
+        break;
 
       case 'UPDATE_CHAT':
         if (socket && socket.connected) {
           socket.emit('update_chat', action.payload);
+        }
+        break;
+
+      case 'DEL_CHAT':
+        if (socket && socket.connected) {
+          socket.emit('delete_chat', action.payload);
         }
         break;
 

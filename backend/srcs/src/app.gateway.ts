@@ -223,6 +223,14 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     this.server.emit('add_admin', updatedChats);
   }
 
+  @SubscribeMessage('leave_chat')
+  async handleLeaveChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+
+  }
+
   @SubscribeMessage('remove_admin')
   async handleRemoveAdmin(
     @ConnectedSocket() client: Socket,
@@ -246,6 +254,51 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
       },
     });
     this.server.emit('remove_admin', updatedChat);
+  }
+
+  @SubscribeMessage('delete_chat')
+  async handleRemoveChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    await this.prisma.chatChannel.delete({
+      where: { id: parseInt(body[0]) },
+    });
+    const updatedChats = await this.prisma.chatChannel.findMany({
+      include: {
+        participants: true,
+        bannedUsers: true,
+        admins: true,
+        messages: true,
+      },
+    });
+    this.server.emit('delete_chat', updatedChats);
+  }
+
+  @SubscribeMessage('change_owner')
+  async handleChangeOwner(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const chatId = parseInt(body[0]);
+    const newOwnerId = parseInt(body[1]);
+    const oldOwner = parseInt(body[2]);
+
+    const chat = await this.prisma.chatChannel.findUnique({
+      where: { id: chatId },
+      include: { participants: true }
+    });
+    const updateParticipants = chat.participants.filter(
+      (user) => user.id !== oldOwner);
+    const updatedChannel = await this.prisma.chatChannel.update({
+      where: { id: chatId },
+      data: {
+        ownerId: newOwnerId,
+        participants: {
+          set: updateParticipants.map((user) => ({ id: user.id }))},
+      }
+    });
+    this.server.emit('change_owner', updatedChannel);
   }
 
   @SubscribeMessage('kick_user')

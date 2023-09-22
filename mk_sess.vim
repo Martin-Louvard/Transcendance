@@ -191,7 +191,7 @@ set shortmess=aoO
 argglobal
 %argdel
 $argadd ./
-edit frontend/srcs/src/components/Chat/PopupChatManagement/leaveChatButton.tsx
+edit backend/srcs/src/app.gateway.ts
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -201,7 +201,10 @@ vsplit
 wincmd w
 wincmd _ | wincmd |
 split
-1wincmd k
+wincmd _ | wincmd |
+split
+2wincmd k
+wincmd w
 wincmd w
 let &splitbelow = s:save_splitbelow
 let &splitright = s:save_splitright
@@ -213,10 +216,12 @@ set winheight=1
 set winminwidth=0
 set winwidth=1
 exe 'vert 1resize ' . ((&columns * 105 + 105) / 211)
-exe '2resize ' . ((&lines * 26 + 27) / 55)
+exe '2resize ' . ((&lines * 17 + 27) / 55)
 exe 'vert 2resize ' . ((&columns * 105 + 105) / 211)
-exe '3resize ' . ((&lines * 26 + 27) / 55)
+exe '3resize ' . ((&lines * 17 + 27) / 55)
 exe 'vert 3resize ' . ((&columns * 105 + 105) / 211)
+exe '4resize ' . ((&lines * 17 + 27) / 55)
+exe 'vert 4resize ' . ((&columns * 105 + 105) / 211)
 argglobal
 nnoremap <buffer> <silent>  F :w:! eslint % --fix :e
 nnoremap <buffer> <silent>  f :w:! prettier --write %:e
@@ -255,8 +260,8 @@ setlocal nodiff
 setlocal equalprg=
 setlocal errorformat=%+A\ %#%f\ %#(%l\\,%c):\ %m,%C%m
 setlocal expandtab
-if &filetype != 'typescriptreact'
-setlocal filetype=typescriptreact
+if &filetype != 'typescript'
+setlocal filetype=typescript
 endif
 setlocal fixendofline
 setlocal foldcolumn=0
@@ -279,7 +284,7 @@ setlocal imsearch=-1
 setlocal include=
 setlocal includeexpr=
 setlocal indentexpr=GetStyledIndent()
-setlocal indentkeys=0{,0},0),0],0,,!^F,o,O,e,*<Return>,<>>,<<>,/,*;,*<:>,*<Return>
+setlocal indentkeys=0{,0},0),0],0,,!^F,o,O,e,*<Return>,<>>,<<>,/,*;,*<:>,*<Return>,0],0)
 setlocal noinfercase
 setlocal iskeyword=@,48-57,_,192-255,$
 setlocal keywordprg=
@@ -325,8 +330,8 @@ setlocal statusline=
 setlocal suffixesadd=.ts,.tsx
 setlocal swapfile
 setlocal synmaxcol=3000
-if &syntax != 'typescriptreact'
-setlocal syntax=typescriptreact
+if &syntax != 'typescript'
+setlocal syntax=typescript
 endif
 setlocal tabstop=2
 setlocal tagcase=
@@ -350,15 +355,156 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 1 - ((0 * winheight(0) + 26) / 53)
+let s:l = 272 - ((32 * winheight(0) + 26) / 53)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
+keepjumps 272
+normal! 07|
+wincmd w
+argglobal
+if bufexists("frontend/srcs/src/redux/websocketMiddleware.ts") | buffer frontend/srcs/src/redux/websocketMiddleware.ts | else | edit frontend/srcs/src/redux/websocketMiddleware.ts | endif
+nnoremap <buffer> <silent>  F :w:! eslint % --fix :e
+nnoremap <buffer> <silent>  f :w:! prettier --write %:e
+setlocal keymap=
+setlocal noarabic
+setlocal autoindent
+setlocal backupcopy=
+setlocal balloonexpr=
+setlocal nobinary
+setlocal nobreakindent
+setlocal breakindentopt=
+setlocal bufhidden=
+setlocal buflisted
+setlocal buftype=
+setlocal nocindent
+setlocal cinkeys=0{,0},0),0],:,0#,!^F,o,O,e
+setlocal cinoptions=
+setlocal cinwords=if,else,while,do,for,switch
+set colorcolumn=0
+setlocal colorcolumn=0
+setlocal comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
+setlocal commentstring=//\ %s
+setlocal complete=.,w,b,u,t,i
+setlocal concealcursor=
+setlocal conceallevel=0
+setlocal completefunc=
+setlocal nocopyindent
+setlocal cryptmethod=
+setlocal nocursorbind
+setlocal nocursorcolumn
+setlocal nocursorline
+setlocal cursorlineopt=both
+setlocal define=
+setlocal dictionary=
+setlocal nodiff
+setlocal equalprg=
+setlocal errorformat=%+A\ %#%f\ %#(%l\\,%c):\ %m,%C%m
+setlocal expandtab
+if &filetype != 'typescript'
+setlocal filetype=typescript
+endif
+setlocal fixendofline
+setlocal foldcolumn=0
+setlocal foldenable
+setlocal foldexpr=0
+setlocal foldignore=#
+setlocal foldlevel=0
+setlocal foldmarker={{{,}}}
+setlocal foldmethod=manual
+setlocal foldminlines=1
+setlocal foldnestmax=20
+setlocal foldtext=foldtext()
+setlocal formatexpr=
+setlocal formatoptions=croql
+setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
+setlocal formatprg=
+setlocal grepprg=
+setlocal iminsert=0
+setlocal imsearch=-1
+setlocal include=
+setlocal includeexpr=
+setlocal indentexpr=GetStyledIndent()
+setlocal indentkeys=0{,0},0),0],0,,!^F,o,O,e,*<Return>,<>>,<<>,/,*;,*<:>,*<Return>,0],0)
+setlocal noinfercase
+setlocal iskeyword=@,48-57,_,192-255,$
+setlocal keywordprg=
+setlocal nolinebreak
+setlocal nolisp
+setlocal lispwords=
+setlocal nolist
+setlocal listchars=
+setlocal makeencoding=
+setlocal makeprg=tsc\ \ $*\ %
+setlocal matchpairs=(:),{:},[:]
+setlocal nomodeline
+setlocal modifiable
+setlocal nrformats=bin,octal,hex
+set number
+setlocal number
+setlocal numberwidth=4
+setlocal omnifunc=styledcomplete#CompleteSC
+setlocal path=
+setlocal nopreserveindent
+setlocal nopreviewwindow
+setlocal quoteescape=\\
+setlocal noreadonly
+set relativenumber
+setlocal relativenumber
+setlocal norightleft
+setlocal rightleftcmd=search
+setlocal noscrollbind
+setlocal scrolloff=-1
+setlocal shiftwidth=2
+setlocal noshortname
+setlocal showbreak=
+setlocal sidescrolloff=-1
+setlocal signcolumn=auto
+setlocal nosmartindent
+setlocal softtabstop=2
+setlocal nospell
+setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
+setlocal spellfile=
+setlocal spelllang=en
+setlocal spelloptions=
+setlocal statusline=
+setlocal suffixesadd=.ts,.tsx
+setlocal swapfile
+setlocal synmaxcol=3000
+if &syntax != 'typescript'
+setlocal syntax=typescript
+endif
+setlocal tabstop=2
+setlocal tagcase=
+setlocal tagfunc=
+setlocal tags=
+setlocal termwinkey=
+setlocal termwinscroll=10000
+setlocal termwinsize=
+setlocal textwidth=80
+setlocal thesaurus=
+setlocal thesaurusfunc=
+setlocal noundofile
+setlocal undolevels=-123456
+setlocal varsofttabstop=
+setlocal vartabstop=
+setlocal virtualedit=
+setlocal wincolor=
+setlocal nowinfixheight
+setlocal nowinfixwidth
+setlocal wrap
+setlocal wrapmargin=0
+silent! normal! zE
+let &fdl = &fdl
+let s:l = 36 - ((10 * winheight(0) + 8) / 17)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 36
 normal! 0
 wincmd w
 argglobal
-if bufexists("frontend/srcs/src/components/Chat/PopupChatManagement/userItemManagement.tsx") | buffer frontend/srcs/src/components/Chat/PopupChatManagement/userItemManagement.tsx | else | edit frontend/srcs/src/components/Chat/PopupChatManagement/userItemManagement.tsx | endif
+if bufexists("frontend/srcs/src/components/Chat/PopupChatManagement/leaveChatButton.tsx") | buffer frontend/srcs/src/components/Chat/PopupChatManagement/leaveChatButton.tsx | else | edit frontend/srcs/src/components/Chat/PopupChatManagement/leaveChatButton.tsx | endif
 nnoremap <buffer> <silent>  F :w:! eslint % --fix :e
 nnoremap <buffer> <silent>  f :w:! prettier --write %:e
 setlocal keymap=
@@ -491,16 +637,15 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 27 - ((20 * winheight(0) + 13) / 26)
+let s:l = 23 - ((12 * winheight(0) + 8) / 17)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 27
+keepjumps 23
 normal! 0
 wincmd w
 argglobal
-if bufexists("frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx") | buffer frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx | else | edit frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx | endif
-balt backend/srcs/src/chat-channels/chat-channels.service.ts
+if bufexists("backend/srcs/src/chat-channels/chat-channels.service.ts") | buffer backend/srcs/src/chat-channels/chat-channels.service.ts | else | edit backend/srcs/src/chat-channels/chat-channels.service.ts | endif
 nnoremap <buffer> <silent>  F :w:! eslint % --fix :e
 nnoremap <buffer> <silent>  f :w:! prettier --write %:e
 setlocal keymap=
@@ -538,8 +683,8 @@ setlocal nodiff
 setlocal equalprg=
 setlocal errorformat=%+A\ %#%f\ %#(%l\\,%c):\ %m,%C%m
 setlocal expandtab
-if &filetype != 'typescriptreact'
-setlocal filetype=typescriptreact
+if &filetype != 'typescript'
+setlocal filetype=typescript
 endif
 setlocal fixendofline
 setlocal foldcolumn=0
@@ -562,7 +707,7 @@ setlocal imsearch=-1
 setlocal include=
 setlocal includeexpr=
 setlocal indentexpr=GetStyledIndent()
-setlocal indentkeys=0{,0},0),0],0,,!^F,o,O,e,*<Return>,<>>,<<>,/,*;,*<:>,*<Return>
+setlocal indentkeys=0{,0},0),0],0,,!^F,o,O,e,*<Return>,<>>,<<>,/,*;,*<:>,*<Return>,0],0)
 setlocal noinfercase
 setlocal iskeyword=@,48-57,_,192-255,$
 setlocal keywordprg=
@@ -608,8 +753,8 @@ setlocal statusline=
 setlocal suffixesadd=.ts,.tsx
 setlocal swapfile
 setlocal synmaxcol=3000
-if &syntax != 'typescriptreact'
-setlocal syntax=typescriptreact
+if &syntax != 'typescript'
+setlocal syntax=typescript
 endif
 setlocal tabstop=2
 setlocal tagcase=
@@ -633,35 +778,38 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 10 - ((9 * winheight(0) + 13) / 26)
+let s:l = 38 - ((0 * winheight(0) + 8) / 17)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 10
-normal! 032|
+keepjumps 38
+normal! 0
 wincmd w
 exe 'vert 1resize ' . ((&columns * 105 + 105) / 211)
-exe '2resize ' . ((&lines * 26 + 27) / 55)
+exe '2resize ' . ((&lines * 17 + 27) / 55)
 exe 'vert 2resize ' . ((&columns * 105 + 105) / 211)
-exe '3resize ' . ((&lines * 26 + 27) / 55)
+exe '3resize ' . ((&lines * 17 + 27) / 55)
 exe 'vert 3resize ' . ((&columns * 105 + 105) / 211)
+exe '4resize ' . ((&lines * 17 + 27) / 55)
+exe 'vert 4resize ' . ((&columns * 105 + 105) / 211)
 tabnext 1
+badd +21 frontend/srcs/src/components/Chat/PopupChatManagement/leaveChatButton.tsx
+badd +18 frontend/srcs/src/components/Chat/PopupChatManagement/userItemManagement.tsx
+badd +11 frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx
 badd +28 backend/srcs/src/chat-channels/chat-channels.service.ts
 badd +17 frontend/srcs/src/components/UserProfileCards/FriendsListCard.tsx
 badd +14 frontend/srcs/src/components/Chat/PopupChatManagement/PopupManagement.tsx
-badd +1 frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx
 badd +1 frontend/srcs/src/components/Chat/PopupChatManagement/inviteToGameButton.tsx
 badd +6 frontend/srcs/src/components/Chat/PopupChatManagement/chatSettings.tsx
-badd +6 frontend/srcs/src/components/Chat/PopupChatManagement/userItemManagement.tsx
 badd +24 frontend/srcs/src/components/Chat/PopupChatManagement/addUserButton.tsx
 badd +81 frontend/srcs/src/components/Chat/SearchChat.tsx
 badd +1 frontend/srcs/src/components/Chat/SideChatMenu.tsx
 badd +179 frontend/srcs/src/redux/sessionSlice.ts
 badd +41 frontend/srcs/src/Types.ts
 badd +238 backend/srcs/src/app.gateway.ts
-badd +1 .
 badd +170 frontend/srcs/src/redux/websocketMiddleware.ts
-badd +1 frontend/srcs/src/components/Chat/PopupChatManagement/leaveChatButton.tsx
+badd +1 ,.
+badd +1 .
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
 endif
