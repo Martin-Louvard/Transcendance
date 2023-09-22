@@ -51,4 +51,29 @@ export class ChatChannelsService {
   remove(id: number) {
     return this.prisma.chatChannel.delete({ where: { id } });
   }
+
+  async addUserToGeneralChat(user)
+  {
+    const chatGeneral = await this.prisma.chatChannel.findFirst({
+      where: { name: 'WorldChannel' },
+    });
+    const chatGeneralId = chatGeneral.id;
+
+    await this.prisma.chatChannel.update({
+      where: { id: chatGeneralId },
+      data: {
+        participants: {
+          connect: [{ id: user.id }],
+        },
+      },
+    });
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        JoinedChatChannels: { connect: [{ id: chatGeneralId }] },
+      },
+    });
+
+  }
 }
