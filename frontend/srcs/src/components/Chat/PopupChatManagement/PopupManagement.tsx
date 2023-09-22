@@ -18,7 +18,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         onClose={() => setIsOpen(false)}
     >
       <div className="management-chat-popup">
-        {chat?.Admins.includes(currentUser!) ? "" : <ChatSettings chat={chat}/>}
+        {chat?.Owner.id === currentUser.?id ?  <ChatSettings chat={chat}/>: ""}
       </div>
       <ul>
         {chat?.participants.map((user)=>{
