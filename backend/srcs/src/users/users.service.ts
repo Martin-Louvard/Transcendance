@@ -303,14 +303,15 @@ export class UsersService {
   {
     let dbUser;
     try{
+
       dbUser = await this.findBy42Email(userInfo.email)
     }
     catch(err){
+
         const usernametaken = await this.prisma.user.findUnique({where:{username: userInfo.login}});
-        while (usernametaken.username == userInfo.login)
+        while (usernametaken && usernametaken.username == userInfo.login)
             userInfo.login = userInfo.login + Math.floor(Math.random() * (10000));
-        await this.prisma.user.create({data: {username: userInfo.login, email42: userInfo.email, email: userInfo.email}});
-        dbUser = await this.findBy42Email(userInfo.email)
+        dbUser = await this.prisma.user.create({data: {username: userInfo.login, email42: userInfo.email, email: userInfo.email}});
         await this.chatChannelService.addUserToGeneralChat(dbUser);
     }
     return dbUser;
