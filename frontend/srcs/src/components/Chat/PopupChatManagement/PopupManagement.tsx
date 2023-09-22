@@ -16,6 +16,8 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
     }
   }, [chat, currentUser]);
 
+  console.log(chat?.owner);
+
   return (
     <Popup
         open={isOpen}
