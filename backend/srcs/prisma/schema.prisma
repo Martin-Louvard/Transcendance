@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "binary"
 }
 
@@ -11,91 +11,95 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Status{
-  PENDING 
-  ACCEPTED 
+enum Status {
+  PENDING
+  ACCEPTED
   DECLINED
   CANCELED
   BLOCKED
 }
 
-enum UserStatus{
+enum UserStatus {
   OFFLINE
   ONLINE
   INGAME
 }
 
 model User {
-  id                      Int           @id @default(autoincrement())
-  username                String        @unique
-  email                   String        @unique
-  email42                 String?       @unique
-  password                String?
-  avatar                  String?       @default("default.jpg")
-  status                  UserStatus    @default(OFFLINE)
-  twoFAEnabled            Boolean       @default(false)
-  twoFASecret             String?
-  victoriesCount          Int           @default(0)
-  defeatCount             Int           @default(0)
-  rank                    String        @default("Noobie")
-  level                   Int           @default(0)
-  achievements            Json?
-  friends                 Friends[]     @relation(name: "user")
-  friendUserFriends       Friends[]     @relation(name: "friend_user")
-  games                   Game[]
-  JoinedChatChannels      ChatChannel[] @relation("JoinedChannels")
-  OwnedChatChannels       ChatChannel[] @relation("OwnedChannels")
-  BannedFromChatChannels  ChatChannel[] @relation("BannedFromChannels")
-  AdminOnChatChannels	    ChatChannel[] @relation("AdminOnChannels")
-  chatMessages            ChatMessage[]
-  createdAt               DateTime      @default(now())
+  id                     Int           @id @default(autoincrement())
+  username               String        @unique
+  email                  String        @unique
+  email42                String?       @unique
+  password               String?
+  avatar                 String?       @default("default.jpg")
+  status                 UserStatus    @default(OFFLINE)
+  twoFAEnabled           Boolean       @default(false)
+  twoFASecret            String?
+  victoriesCount         Int           @default(0)
+  defeatCount            Int           @default(0)
+  rank                   String        @default("Noobie")
+  level                  Int           @default(0)
+  achievements           Json?
+  friends                Friends[]     @relation(name: "user")
+  friendUserFriends      Friends[]     @relation(name: "friend_user")
+  games                  Game[]        @relation("PlayersInGame")
+  JoinedChatChannels     ChatChannel[] @relation("JoinedChannels")
+  OwnedChatChannels      ChatChannel[] @relation("OwnedChannels")
+  BannedFromChatChannels ChatChannel[] @relation("BannedFromChannels")
+  AdminOnChatChannels    ChatChannel[] @relation("AdminOnChannels")
+  GameAsHome             Game[]        @relation("HomeTeam")
+  GameAsVisitor          Game[]        @relation("VisitorTeam")
+  chatMessages           ChatMessage[]
+  createdAt              DateTime      @default(now())
 }
 
 model Friends {
-  id                      Int           @id @default(autoincrement())
-  user_id                 Int
-  friend_id               Int
-  status                  Status        @default(PENDING)
-  sender_id               Int
-  chat_id                 Int?          @unique
-  chat                    ChatChannel?  @relation(fields: [chat_id], references: [id])
-  user                    User          @relation(name: "user", fields: [user_id], references: [id])
-  friend                  User          @relation(name: "friend_user", fields: [friend_id], references: [id])
-  createdAt               DateTime      @default(now())
-  updatedAt               DateTime      @updatedAt
+  id        Int          @id @default(autoincrement())
+  user_id   Int
+  friend_id Int
+  status    Status       @default(PENDING)
+  sender_id Int
+  chat_id   Int?         @unique
+  chat      ChatChannel? @relation(fields: [chat_id], references: [id])
+  user      User         @relation(name: "user", fields: [user_id], references: [id])
+  friend    User         @relation(name: "friend_user", fields: [friend_id], references: [id])
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
   @@unique([user_id, friend_id])
 }
 
 model ChatChannel {
-  id                      Int           @id @default(autoincrement())
-  ownerId                 Int
-  owner                   User          @relation("OwnedChannels", fields: [ownerId], references: [id])
-  password                String?
-  channelType             String?
-  name                    String?
-  friendship              Friends?
-  admins		              User[]	      @relation("AdminOnChannels")
-  participants            User[]        @relation("JoinedChannels")
-  bannedUsers             User[]        @relation("BannedFromChannels")
-  messages                ChatMessage[]
+  id           Int           @id @default(autoincrement())
+  ownerId      Int
+  owner        User          @relation("OwnedChannels", fields: [ownerId], references: [id])
+  password     String?
+  channelType  String?
+  name         String?
+  friendship   Friends?
+  admins       User[]        @relation("AdminOnChannels")
+  participants User[]        @relation("JoinedChannels")
+  bannedUsers  User[]        @relation("BannedFromChannels")
+  messages     ChatMessage[]
 }
 
 model ChatMessage {
-  id                       Int          @id @default(autoincrement())
-  channel                  ChatChannel  @relation(fields: [channelId], references: [id])
-  channelId                Int
-  sender                   User         @relation(fields: [senderId], references: [id])
-  senderId                 Int
-  content                  String
-  createdAt                DateTime     @default(now())
-  readersId				   Int[]	
+  id        Int         @id @default(autoincrement())
+  channel   ChatChannel @relation(fields: [channelId], references: [id])
+  channelId Int
+  sender    User        @relation(fields: [senderId], references: [id])
+  senderId  Int
+  content   String
+  createdAt DateTime    @default(now())
+  readersId Int[]
 }
 
 model Game {
-  id                       Int          @id @default(autoincrement())
-  players                  User[]
-  gameData                 Json?
-  status                   String       @default("Created")
-  createdAt                DateTime     @default(now())
+  id        Int      @id @default(autoincrement())
+  scoreHome     Int
+  scoreVisitor  Int
+  players   User[]   @relation("PlayersInGame")
+  home      User[]   @relation("HomeTeam")
+  visitor   User[]   @relation("VisitorTeam")
+  createdAt DateTime @default(now())
 }

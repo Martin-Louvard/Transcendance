@@ -3,6 +3,7 @@ import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, In
 import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
+import { Injectable } from "@nestjs/common";
 
 interface Sphere {
 	radius: number;
@@ -62,7 +63,6 @@ interface GameParameters {
 	}
 }
 
-
 export class Instance {
 	constructor(lobby: Lobby) {
 		console.log("Instance created");
@@ -112,7 +112,7 @@ export class Instance {
 	};
 
 	// un player quitte pendant le temps d'attente du demarage
-	private data: GameData = {
+	public data: GameData = {
 		mapHeight:  200,
 		mapWidth: 100,
 		balls: null,
@@ -223,6 +223,7 @@ export class Instance {
 
 	triggerFinish() {
 		this.hasFinished = true;
+		this.lobby.autodestroy();
 		this.lobby.players.forEach((e) => {
 			const payload: ServerPayloads[ServerEvents.LobbyState] = {
 				lobbyId: this.lobby.id,
@@ -602,7 +603,6 @@ export class Instance {
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
 			if (this.data.elapsedTime > 10 /*this.params.general.time*/) {
 				this.triggerFinish();
-				this.lobby.clear()
 			}
 	}, 1000/ 120));
 }

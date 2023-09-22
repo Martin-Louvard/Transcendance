@@ -5,7 +5,10 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setLobbyType } from "../../../redux/websocketSlice";
 
 const Demo = styled('div')(({ theme }) => ({
-	backgroundColor: theme.palette.background.paper,
+	backgroundColor: "transparent",
+	width:"500px",
+	border: "solid",
+	borderRadius:10,
   }));
   
   
@@ -32,6 +35,7 @@ export const JoinMatch: React.FC = () => {
 	}
   
 	useEffect(() => {
+		console.log(game.lobbies);
 	  if (!game.lobbies)
 		  return ;
 	  setRenderLobbies(game.lobbies.map((lobby, key) => (
@@ -54,9 +58,9 @@ export const JoinMatch: React.FC = () => {
 	const [dense, setDense] = useState(false);
 	const [secondary, setSecondary] = useState(false);
 	return (
-	  <div sx={{width:"100%"}}>
+	  <div>
 		<Grid item xs={12} md={6}  sx={{width:"50%", m:"auto"}}>
-			<Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
+			<Typography sx={{ mt: 4, mb: 2}} variant="h6" component="div">
 			  Avalaible Lobbies
 			</Typography>
 			<Demo>

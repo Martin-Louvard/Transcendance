@@ -7,6 +7,7 @@ import { Instance } from "../classes/instance.class";
 import { Injectable } from '@nestjs/common';
 import { LobbySlot } from "src/Types";
 import { ClassicInstance } from "../classes/classicInstance";
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable()
 export class Lobby {
@@ -30,6 +31,12 @@ export class Lobby {
 	full: boolean;
 	owner: Player = null;
 
+	private destroySubject = new BehaviorSubject<boolean>(false);
+	destroy$: Observable<boolean> = this.destroySubject.asObservable();
+
+	public autodestroy() {
+		this.destroySubject.next(true);
+	}
 	public static fromGameParameter(params: GameParameters, server: Server, creator: Player): Lobby {
 		const lobby = new Lobby(params.duel ? LobbyMode.duel : LobbyMode.double, server, creator);
 		lobby.instance.setParams(params);
@@ -44,7 +51,7 @@ export class Lobby {
 	public isOnlineSlot(): boolean {
 		let isOnlineSlot = false;
 		this.slots.forEach((e) => {
-			if (!e.full && e.type == LobbySlotType.online)
+			if (!e.full)
 				isOnlineSlot = true;
 		})
 		return (isOnlineSlot);
@@ -76,6 +83,7 @@ export class Lobby {
 		this.dispatchAuthState();
 		return true;
 	}
+
 	deletePlayerFromSlot(player: Player) {
 		if (!this.slots || this.slots.length < 1)
 			return ;

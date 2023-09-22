@@ -112,7 +112,7 @@ export class ClassicInstance {
 	};
 
 	// un player quitte pendant le temps d'attente du demarage
-	private data: GameData = {
+	public data: GameData = {
 		mapHeight:  200,
 		mapWidth: 100,
 		balls: null,
@@ -197,6 +197,7 @@ export class ClassicInstance {
 
 	triggerFinish() {
 		this.hasFinished = true;
+		this.lobby.autodestroy();
 		this.lobby.players.forEach((e) => {
 			const payload: ServerPayloads[ServerEvents.LobbyState] = {
 				lobbyId: this.lobby.id,
@@ -560,7 +561,6 @@ export class ClassicInstance {
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
 			if (this.data.elapsedTime > 100 /*this.params.general.time*/) {
 				this.triggerFinish();
-				this.lobby.clear()
 			}
 	}, 1000/ 120));
 }

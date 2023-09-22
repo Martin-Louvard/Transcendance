@@ -1,4 +1,5 @@
 import * as CANNON from 'cannon-es'
+import { User } from 'src/users/entities/user.entity';
 
 export enum LobbyMode {
 	classic = 0,
@@ -65,6 +66,8 @@ export enum ClientEvents
   StartGame = 'client.start.game',
 
   GetLobbies = 'client.get.lobbies',
+
+  AddGame = 'client.add.game',
 }
 
 export interface LobbyCli {
@@ -150,6 +153,13 @@ export type ClientPayloads = {
 		senderId: number,
 		receiverId: number,
 		lobbyId: string,
+	},
+	[ClientEvents.AddGame]: {
+		players: PlayerInfo[],
+		score: {'home': number, 'visitor': number},
+		home: PlayerInfo[],
+		visitor: PlayerInfo[],
+		winner: PlayerInfo,
 	}
 };
 
@@ -240,4 +250,22 @@ export interface GameParameters {
 	general : {
 		time: number, // temps d'une game
 	}
+}
+
+	//  model Game {
+	//	id        Int      @id @default(autoincrement())
+	//	scoreHome     Int
+	//	scoreVisitor  Int
+	//	players   User[]   @relation("PlayersInGame")
+	//	home      User[]   @relation("HomeTeam")
+	//	visitor   User[]   @relation("VisitorTeam")
+	//	createdAt DateTime @default(now())
+	//  }
+
+export interface Game {
+	scoreHome: number;
+	scoreVisitor: number;
+	players: User[];
+	home: User[];
+	visitor: User[];
 }

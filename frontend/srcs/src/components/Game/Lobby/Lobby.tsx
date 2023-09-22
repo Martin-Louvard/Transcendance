@@ -65,11 +65,11 @@ export const Lobby: React.FC = (props) => {
       <div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"row"}}>
         {
           lobbyType != LobbyType.none &&
-            <Button color={'primary'} onClick={() => {dispatch(setLobbyType(LobbyType.none))}}>
+            <Button sx={{width:"30%"}} color={'primary'} onClick={() => {dispatch(setLobbyType(LobbyType.none))}}>
               <ArrowCircleLeftIcon />
             </Button>
         }
-        <div style={{display: 'flex', }}>
+        <div style={{display: 'flex'}}>
         {
           !game.lobbyId && lobbyType == LobbyType.auto ?
           <AutoMatch user={user} game={game}/>

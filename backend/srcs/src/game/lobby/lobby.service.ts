@@ -1,6 +1,6 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Body, Injectable, Logger, OnModuleInit, Post } from '@nestjs/common';
 import { Lobby } from './lobby.class';
-import { LobbyMode, InputPacket, GameParameters, PlayerInfo, ServerEvents, ServerPayloads, GameRequest, ClientPayloads, ClientEvents, LobbyCli, LobbySlotType } from '@shared/class';
+import { LobbyMode, InputPacket, GameParameters, PlayerInfo, ServerEvents, ServerPayloads, GameRequest, ClientPayloads, ClientEvents, LobbyCli, LobbySlotType, Game } from '@shared/class';
 import { Player } from '../player/player.class';
 import { Server } from 'socket.io';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
@@ -8,24 +8,27 @@ import { CronJob } from 'cron';
 import { PlayerService } from '../player/player.service';
 import { v4 } from 'uuid';
 import { ClassicInstance } from '../classes/classicInstance';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class LobbyService {
-	public constructor(private readonly playerService: PlayerService) {
+	public constructor(private readonly playerService: PlayerService, private readonly prismaService: PrismaService) {
 	}
 	gameRequest: GameRequest[];
 	private readonly logger = new Logger("LobbyService");
 	private lobbies: Map<string, Lobby> = new Map<string, Lobby>();
-	test: number = 3;
 	server: Server;
 
 
 	setServer(server: Server) {
 		this.server = server;
 	}
+
 	findLobbyById(id: string): Lobby {
 		return (this.lobbies.get(id));
 	}
+
 	sendToInstance<T extends InputPacket>(id:string, data: T, senderId: string) {
 		const lobby = this.lobbies.get(id);
 		if (!lobby || !lobby.instance) {
@@ -34,10 +37,12 @@ export class LobbyService {
 		}
 		lobby.instance.processGameData<T>(data);
 	}
+
 	addLobby(lobby: Lobby) {
 		if (lobby)
 			this.lobbies.set(lobby.id, lobby);
 	}
+
 	leaveLobby(player: Player) {
 		if (!player.lobby)
 			return false;
@@ -57,10 +62,13 @@ export class LobbyService {
 		player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
 		return (true);
 	}
+
 	createLobby(mode: LobbyMode, server: Server, creator: Player) {
 		try {
 			const lobby = new Lobby(mode, server, creator);
-			console.log(lobby.instance instanceof ClassicInstance);
+			lobby.destroy$.subscribe(() => {
+				this.postGame(lobby.id);
+			})
 			if (!lobby)
 				return ;
 			this.logger.log(`Lobby ${lobby.id} created`);
@@ -69,14 +77,14 @@ export class LobbyService {
 			this.lobbies.set(lobby.id, lobby);
 			lobby.dispatchLobbyState();
 		} catch (error) {
-			console.log(error);
 			return error
 		}
 	}
-	
+
 	getJoinableLobbies() {
 		let lobbies:LobbyCli[] = [];
 		this.lobbies.forEach((e) => {
+			console.log("automatch: ", e.instance.automatch, e.isOnlineSlot);
 			if (e.instance && !e.instance.hasStarted && !e.instance.automatch && e.isOnlineSlot())
 				lobbies.push({id: e.id, slots: e.slots, creator: e.owner.infos});
 		})
@@ -90,6 +98,9 @@ export class LobbyService {
 				return ;
 			} else if (params.duel) {
 				const lobby = Lobby.fromGameParameter(params, server, creator);
+				lobby.destroy$.subscribe(() => {
+					this.postGame(lobby.id);
+				})
 				if (!lobby)
 					return ;
 				this.logger.log(`Lobby ${lobby.id} created`);
@@ -99,6 +110,9 @@ export class LobbyService {
 				lobby.dispatchLobbyState();
 			} else {
 				const lobby = Lobby.fromGameParameter(params, server, creator);
+				lobby.destroy$.subscribe(() => {;
+					this.postGame(lobby.id);
+				})
 				if (!lobby)
 					return ;
 				this.logger.log(`Lobby ${lobby.id} created`);
@@ -112,6 +126,7 @@ export class LobbyService {
 			return error
 		}
 	}
+
 	getPlayerLobby(player: Player): Lobby | null {
 		this.lobbies.forEach(lobby => {
 			lobby.players.forEach(e => {
@@ -121,9 +136,11 @@ export class LobbyService {
 		});
 		return (null)
 	}
+
 	removeLobbyById(id: string) {
 		this.lobbies.delete(id);
 	}
+
 	removeLobby(lobby: Lobby) {
 		try {
 			this.lobbies.delete(lobby.id)
@@ -227,18 +244,74 @@ export class LobbyService {
 		lobby.dispatchLobbySlots();
 		this.playerService.addRequest(payload);
 	  }
+	//  model Game {
+	//	id        Int      @id @default(autoincrement())
+	//	scoreHome     Int
+	//	scoreVisitor  Int
+	//	players   User[]   @relation("PlayersInGame")
+	//	home      User[]   @relation("HomeTeam")
+	//	visitor   User[]   @relation("VisitorTeam")
+	//	createdAt DateTime @default(now())
+	//  }
+	//@Post()
+	async postGame(id: string) {
+		const lobby = this.lobbies.get(id);
+		if (!lobby)
+			return ;
+		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance;
+		const players = [...lobby.players.values()];
+		console.log(players);
+		const users = await this.prismaService.user.findUnique({
+			where: {
+				id: players[0].id,
+			}
+		});
+		console.log(users);
+		//const visitorInfos = players.filter((pl) => pl.team == 'visitor');
+		//const homeInfos = players.filter((pl) => pl.team == 'home');
+		//const visitor = await this.prismaService.user.findMany({
+		//	where: {
+		//		id: {in: duel ? [visitorInfos[0].id] : [visitorInfos[0].id, visitorInfos[1].id]},
+		//	}
+		//})
+		//const home = await this.prismaService.user.findMany({
+		//	where: {
+		//		id: {in: duel ? [homeInfos[0].id] : [homeInfos[0].id, homeInfos[1].id]},
+		//	}
+		//})
+		//console.log(lobby.instance);
+		//const game = await this.prismaService.game.create({
+		//	data: {
+		//	  scoreHome: lobby.instance.data.score.home,
+		//	  scoreVisitor: lobby.instance.data.score.visitor,
+		//	  players: {
+		//		connect: users.map((user) => ({ id: user.id })),
+		//	  },
+		//	  home: {
+		//		connect: home.map((user) => ({ id: user.id })),
+		//	  },
+		//	  visitor: {
+		//		connect: visitor.map((user) => ({ id: user.id })),
+		//	  },
+		//	},
+		//  });
+		//  console.log('salut');
+		//this.prismaService.game.create({data: game});
+		//console.log(res);
+	}
+
 
 	// TODO: Pour le moment on clear tout toues les 5 minutes, une fois le jeu codé il faudra
 	// TODO... clear que les games terminé toutes les 5 minutes
 	@Cron(CronExpression.EVERY_5_MINUTES,
 		{name: 'lobby_cleaner'})
 	clearLobbies() {
-		//this.lobbies.forEach((lobby: Lobby) => {
-		//	if (lobby.instance.hasFinished) {
-		//		lobby.clear();
-		//		this.lobbies.delete(lobby.id);
-		//	}
-		//})
-		//this.logger.log("Lobbies cleaned");
+		this.lobbies.forEach((lobby: Lobby) => {
+			if (lobby.instance.hasFinished) {
+				lobby.clear();
+				this.lobbies.delete(lobby.id);
+			}
+		})
+		this.logger.log("Lobbies cleaned");
 	}
 }
