@@ -84,7 +84,14 @@ export class UsersService {
       include: {
         games: true,
         JoinedChatChannels: {
-          include: { messages: true, friendship: true, participants: true },
+          include: {
+            owner: true,
+            messages: true,
+            friendship: true,
+            participants: true,
+            admins: true,
+            bannedUsers: true,
+          },
         },
         OwnedChatChannels: { include: { messages: true } },
         BannedFromChatChannels: { include: { messages: true } },

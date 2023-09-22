@@ -4,12 +4,17 @@ import { ChatChannels } from "../../../Types.ts";
 import { useAppSelector } from "../../../redux/hooks";
 import UserListItem from "./userItemManagement.tsx";
 import ChatSettings from "./chatSettings.tsx";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefined; isOpen: boolean; setIsOpen:React.Dispatch<React.SetStateAction<boolean>>} ) => {
   const currentUser = useAppSelector((state) => state.session.user);
-  if (chat === undefined)
-    return ("");
+  const [isDefine, setIsDefine] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (chat !== undefined && currentUser !== undefined) {
+      setIsDefine(chat.owner.id === currentUser.id);
+    }
+  }, [chat, currentUser]);
 
   return (
     <Popup
@@ -18,12 +23,13 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         onClose={() => setIsOpen(false)}
     >
       <div className="management-chat-popup">
-        {chat?.Admins.includes(currentUser!) ? "" : <ChatSettings chat={chat}/>}
+        {isDefine  ?  <ChatSettings chat={chat!}/>: ""}
       </div>
       <ul>
         {chat?.participants.map((user)=>{
           if (currentUser?.id !== user?.id)
-            return (<UserListItem user={user} chat={chat} />);
+            return (<UserListItem key={user.id} user={user} chat={chat} />);
+          return null;
       })}
       </ul>
     </Popup>
