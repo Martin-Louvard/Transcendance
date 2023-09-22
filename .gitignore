@@ -40,4 +40,4 @@ lerna-debug.log*
 /backend/srcs/uploads
 /backend/srcs/core
 
-try.vim
+*.vim

@@ -165,7 +165,7 @@ set background=dark
 set backspace=indent,eol,start
 set fileencodings=ucs-bom,utf-8,default,latin1
 set helplang=en
-set indentkeys=0{,0},0),0],0,,!^F,o,O,e,*<Return>,<>>,<<>,/,*;,*<:>,*<Return>,0],0)
+set indentkeys=0{,0},0),0],0,,!^F,o,O,e,*<Return>,<>>,<<>,/,*;,*<:>,*<Return>
 set nomodeline
 set mouse=a
 set omnifunc=ale#completion#OmniFunc
@@ -191,7 +191,7 @@ set shortmess=aoO
 argglobal
 %argdel
 $argadd ./
-edit backend/srcs/src/chat-channels/chat-channels.service.ts
+edit frontend/srcs/src/components/Chat/PopupChatManagement/leaveChatButton.tsx
 let s:save_splitbelow = &splitbelow
 let s:save_splitright = &splitright
 set splitbelow splitright
@@ -255,8 +255,8 @@ setlocal nodiff
 setlocal equalprg=
 setlocal errorformat=%+A\ %#%f\ %#(%l\\,%c):\ %m,%C%m
 setlocal expandtab
-if &filetype != 'typescript'
-setlocal filetype=typescript
+if &filetype != 'typescriptreact'
+setlocal filetype=typescriptreact
 endif
 setlocal fixendofline
 setlocal foldcolumn=0
@@ -279,7 +279,7 @@ setlocal imsearch=-1
 setlocal include=
 setlocal includeexpr=
 setlocal indentexpr=GetStyledIndent()
-setlocal indentkeys=0{,0},0),0],0,,!^F,o,O,e,*<Return>,<>>,<<>,/,*;,*<:>,*<Return>,0],0)
+setlocal indentkeys=0{,0},0),0],0,,!^F,o,O,e,*<Return>,<>>,<<>,/,*;,*<:>,*<Return>
 setlocal noinfercase
 setlocal iskeyword=@,48-57,_,192-255,$
 setlocal keywordprg=
@@ -325,8 +325,8 @@ setlocal statusline=
 setlocal suffixesadd=.ts,.tsx
 setlocal swapfile
 setlocal synmaxcol=3000
-if &syntax != 'typescript'
-setlocal syntax=typescript
+if &syntax != 'typescriptreact'
+setlocal syntax=typescriptreact
 endif
 setlocal tabstop=2
 setlocal tagcase=
@@ -350,16 +350,15 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 28 - ((26 * winheight(0) + 26) / 53)
+let s:l = 1 - ((0 * winheight(0) + 26) / 53)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 28
-normal! 045|
+keepjumps 1
+normal! 0
 wincmd w
 argglobal
-if bufexists("frontend/srcs/src/components/UserProfileCards/FriendsListCard.tsx") | buffer frontend/srcs/src/components/UserProfileCards/FriendsListCard.tsx | else | edit frontend/srcs/src/components/UserProfileCards/FriendsListCard.tsx | endif
-balt frontend/srcs/src/components/Chat/PopupChatManagement/PopupManagement.tsx
+if bufexists("frontend/srcs/src/components/Chat/PopupChatManagement/userItemManagement.tsx") | buffer frontend/srcs/src/components/Chat/PopupChatManagement/userItemManagement.tsx | else | edit frontend/srcs/src/components/Chat/PopupChatManagement/userItemManagement.tsx | endif
 nnoremap <buffer> <silent>  F :w:! eslint % --fix :e
 nnoremap <buffer> <silent>  f :w:! prettier --write %:e
 setlocal keymap=
@@ -492,15 +491,16 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 17 - ((16 * winheight(0) + 13) / 26)
+let s:l = 27 - ((20 * winheight(0) + 13) / 26)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 17
+keepjumps 27
 normal! 0
 wincmd w
 argglobal
 if bufexists("frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx") | buffer frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx | else | edit frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx | endif
+balt backend/srcs/src/chat-channels/chat-channels.service.ts
 nnoremap <buffer> <silent>  F :w:! eslint % --fix :e
 nnoremap <buffer> <silent>  f :w:! prettier --write %:e
 setlocal keymap=
@@ -633,12 +633,12 @@ setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 11 - ((10 * winheight(0) + 13) / 26)
+let s:l = 10 - ((9 * winheight(0) + 13) / 26)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 11
-normal! 02|
+keepjumps 10
+normal! 032|
 wincmd w
 exe 'vert 1resize ' . ((&columns * 105 + 105) / 211)
 exe '2resize ' . ((&lines * 26 + 27) / 55)
@@ -646,19 +646,22 @@ exe 'vert 2resize ' . ((&columns * 105 + 105) / 211)
 exe '3resize ' . ((&lines * 26 + 27) / 55)
 exe 'vert 3resize ' . ((&columns * 105 + 105) / 211)
 tabnext 1
+badd +28 backend/srcs/src/chat-channels/chat-channels.service.ts
+badd +17 frontend/srcs/src/components/UserProfileCards/FriendsListCard.tsx
 badd +14 frontend/srcs/src/components/Chat/PopupChatManagement/PopupManagement.tsx
+badd +1 frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx
 badd +1 frontend/srcs/src/components/Chat/PopupChatManagement/inviteToGameButton.tsx
 badd +6 frontend/srcs/src/components/Chat/PopupChatManagement/chatSettings.tsx
 badd +6 frontend/srcs/src/components/Chat/PopupChatManagement/userItemManagement.tsx
-badd +14 frontend/srcs/src/components/UserProfileCards/FriendsListCard.tsx
 badd +24 frontend/srcs/src/components/Chat/PopupChatManagement/addUserButton.tsx
 badd +81 frontend/srcs/src/components/Chat/SearchChat.tsx
 badd +1 frontend/srcs/src/components/Chat/SideChatMenu.tsx
 badd +179 frontend/srcs/src/redux/sessionSlice.ts
 badd +41 frontend/srcs/src/Types.ts
-badd +0 frontend/srcs/src/components/Chat/PopupChatManagement/addAdminButton.tsx
+badd +238 backend/srcs/src/app.gateway.ts
 badd +1 .
-badd +0 backend/srcs/src/chat-channels/chat-channels.service.ts
+badd +170 frontend/srcs/src/redux/websocketMiddleware.ts
+badd +1 frontend/srcs/src/components/Chat/PopupChatManagement/leaveChatButton.tsx
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
 endif
@@ -671,7 +674,6 @@ if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

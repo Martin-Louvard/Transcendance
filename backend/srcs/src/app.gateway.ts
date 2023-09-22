@@ -220,8 +220,32 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
         admins: true,
       },
     });
-    console.log(updatedChats);
     this.server.emit('add_admin', updatedChats);
+  }
+
+  @SubscribeMessage('remove_admin')
+  async handleRemoveAdmin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const adminToRemove = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const chat = await this.prisma.chatChannel.findUnique({
+      where: { id: parseInt(body[0]) },
+      include: { admins: true }
+    });
+    const updatedAdmins = chat.admins.filter(
+      (user) => user.id !== adminToRemove.id
+    );
+
+    const updatedChat = await this.prisma.chatChannel.update({
+      where: { id: chat.id },
+      data: {
+        admins: { set: updatedAdmins.map((user) => ({ id: user.id })) },
+      },
+    });
+    this.server.emit('remove_admin', updatedChat);
   }
 
   @SubscribeMessage('kick_user')
@@ -231,20 +255,29 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
   ): Promise<void> {
     const userToKick = await this.prisma.user.findUnique({
       where: { id: parseInt(body[1]) },
-    })
+    });
     const chat = await this.prisma.chatChannel.findUnique({
       where: { id: parseInt(body[0]) },
       include: { participants: true, admins: true }
     });
-    const updatedParticipants = chat.participants.filter((user) => user.id !== userToKick.id);
-    const updatedAdmins = chat.admins.filter((user) => user.id !== userToKick.id);
+    const updatedParticipants = chat.participants.filter(
+      (user) => user.id !== userToKick.id
+    );
+    const updatedAdmins = chat.admins.filter(
+      (user) => user.id !== userToKick.id
+    );
 
     const updatedChat = await this.prisma.chatChannel.update({
       where: { id: chat.id },
-      data: {}
+      data: {
+        participants: {
+          set: updatedParticipants.map((user) => ({ id: user.id })),
+        },
+        admins: { set: updatedAdmins.map((user) => ({ id: user.id })) },
+      },
     });
+    this.server.emit('kick_user', updatedChat);
   }
-
 
   @SubscribeMessage('create_chat')
   async handleCreateChat(

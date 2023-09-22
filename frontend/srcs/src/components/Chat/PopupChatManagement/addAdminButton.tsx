@@ -9,12 +9,11 @@ const AdminAddButton = ({user, chat}: {user:User; chat:ChatChannels}) => {
 
   const handleAddAdmin = () => {
     if (currentUser && user){
-      if (chat.Admins.includes(currentUser)){
-        if (!chat.Admins.includes(user)){
-          dispatch({type: 'ADD_ADMIN', payload:[chat.id, user.id]})
-        }
-        else {
-        }
+      if (!chat.Admins.includes(user)){
+        dispatch({type: 'ADD_ADMIN', payload:[chat.id, user.id]})
+      }
+      else {
+        dispatch({type: 'REMOVE_ADMIN', payload:[chat.id, user.id]})
       }
     }
   };

@@ -32,6 +32,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
         socket.on('add_admin', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('kick_user', (data: any) => {store.dispatch(updateOneChat(data))});
+        socket.on('remove_admin', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('read', (data: any) => {store.dispatch(updateChat(data))});
         socket.on(ServerEvents.AuthState, (data: ServerPayloads[ServerEvents.AuthState]) => {
           const state = store.getState().websocket;
@@ -171,6 +172,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       case 'KICK_USER':
         if (socket && socket.connected) {
           socket.emit('kick_user', action.payload);
+        }
+        break;
+
+      case 'REMOVE_ADMIN':
+        if (socket && socket.connected) {
+          socket.emit('remove_admin', action.payload);
         }
         break;
 
