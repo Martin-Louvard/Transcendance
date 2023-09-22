@@ -74,6 +74,7 @@ export interface ChatChannels {
   channelType?: string;
   messages: Message[];
   participants: User[];
+  bannedUsers: User[];
   isOpen: boolean;
   notifications: number ;
 }

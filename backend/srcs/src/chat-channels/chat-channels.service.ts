@@ -16,6 +16,7 @@ export class ChatChannelsService {
   findAll() {
     return this.prisma.chatChannel.findMany({
       include: {
+        owner: true,
         participants: true,
         bannedUsers: true,
         admins: true,
@@ -24,20 +25,25 @@ export class ChatChannelsService {
     });
   }
 
-  async checkPassword(id: number, password: string){
-    const chat = await this.prisma.chatChannel.findUnique({where: { id } });
-    const chatPassword = chat.password.toString()
+  async checkPassword(id: number, password: string) {
+    const chat = await this.prisma.chatChannel.findUnique({ where: { id } });
+    const chatPassword = chat.password.toString();
     const isPasswordValid = await bcrypt.compare(password, chatPassword);
 
-    if (!isPasswordValid)
-      return false;
+    if (!isPasswordValid) return false;
     return true;
   }
 
   findOne(id: number) {
     return this.prisma.chatChannel.findUnique({
       where: { id },
-      include: { messages: true },
+      include: {
+        messages: true,
+        participants: true,
+        owner: true,
+        admins: true,
+        bannedUsers: true,
+      },
     });
   }
 
