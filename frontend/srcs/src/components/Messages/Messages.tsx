@@ -45,6 +45,7 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
             message.senderId === user?.id ? "user1" : "user2"
           }`}
         >
+          <img src={message.sender.avatar}/>
           <span className="content">{message.content}</span>
         </div>
       ))}

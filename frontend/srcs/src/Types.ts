@@ -60,6 +60,7 @@ export interface Message {
   id: number;
   channelId: number;
   senderId: number;
+  sender: User;
   content: string;
   readersId: number[] | undefined;
 }
