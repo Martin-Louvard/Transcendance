@@ -53,13 +53,28 @@ export const sessionSlice = createSlice({
       }
     },
     addNewChatChannel: (state, action) => {
-
       const newChat = action.payload;
       if (
         !state.JoinedChatChannels?.some(
           (channel) => channel.id === newChat.id,
         )){
         state.JoinedChatChannels?.push(newChat);
+      }
+      else {
+        state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
+          if (newChat.id === chat.id){
+            return newChat;
+          }
+          return chat;
+        })
+        if (state.OpenedChatChannels.filter((chat) => chat.id === newChat.id).length > 0) {
+          state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) => {
+            if (newChat.id === chat.id){
+              return newChat;
+            }
+            return chat;
+          })
+        }
       }
     },
     removeOpenedChatChannel: (state, action) => {

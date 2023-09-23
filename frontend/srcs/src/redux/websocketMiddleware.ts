@@ -29,13 +29,10 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
         socket.on('block_user', (data: any) => {store.dispatch(updateBlockStatus(data))})
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
-
         socket.on('leave_chat', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('change_owner', (data: any) => {store.dispatch(updateOneChat(data))});
-
         socket.on('delete_chat', (data: any) => {store.dispatch(updateChat(data))});
-
-        socket.on('update_chat', (data: any) => {store.dispatch(updateChat(data))});
+        socket.on('update_chat', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
         socket.on('add_admin', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('kick_user', (data: any) => {store.dispatch(updateOneChat(data))});

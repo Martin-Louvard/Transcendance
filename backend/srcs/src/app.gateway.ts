@@ -234,7 +234,7 @@ export class AppGateway
   ): Promise<void> {
     const message = await this.prisma.chatMessage.create({
       data: { channelId: body[0], senderId: body[1], content: body[2] },
-      include: {sender:true}
+      include: { sender: true },
     });
     this.server.emit('message', message);
   }
@@ -247,7 +247,7 @@ export class AppGateway
     const updatedMessage = await this.prisma.chatMessage.update({
       where: { id: body[0] },
       data: { readersId: { push: parseInt(body[1]) } },
-      include: {sender:true}
+      include: { sender: true },
     });
     this.server.emit('read', updatedMessage);
   }
@@ -266,7 +266,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -287,7 +287,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -318,7 +318,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -338,7 +338,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -354,7 +354,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -374,7 +374,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
       },
     });
     this.server.emit('delete_chat', updatedChats);
@@ -394,7 +394,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -412,7 +412,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -432,7 +432,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -454,7 +454,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -493,7 +493,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -514,7 +514,7 @@ export class AppGateway
       include: {
         owner: true,
         admins: true,
-        messages: {include: {sender: true}},
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -592,7 +592,7 @@ export class AppGateway
         include: {
           owner: true,
           admins: true,
-          messages: {include: {sender: true}},
+          messages: { include: { sender: true } },
           participants: true,
         },
       });

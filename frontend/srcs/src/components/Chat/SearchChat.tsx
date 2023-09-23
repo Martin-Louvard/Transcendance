@@ -36,8 +36,9 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
   const handleSearch = () => {
     if (fetchedChannels && currentUser){
       const foundChannels: ChatChannels[] | undefined = fetchedChannels.filter((chan) => {
+        console.log(chan.channelType);
         if (getName(chan, currentUser.username).toLowerCase().includes(searchTerm.toLowerCase()) 
-          && (chan.channelType !== "private" && !chan.participants.includes(currentUser))){
+          && (chan.channelType !== "Private" && !chan.participants.includes(currentUser))){
           return chan;
         }
       });
@@ -65,7 +66,7 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
         }
       }
       else {
-        if (!chat.password){
+        if (chat.channelType !== "Password"){
           dispatch({
             type: "JOIN_CHAT",
             payload: [currentUser.id, chat.id],

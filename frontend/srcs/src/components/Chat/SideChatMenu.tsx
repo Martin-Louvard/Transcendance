@@ -43,7 +43,7 @@ const SideChatMenu = () => {
   const generalChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => chat.channelType === "general");
   const privateChannels: ChatChannels[] | undefined =
-    storedJoinedChannels?.filter((chat) => chat.channelType === "Private");
+    storedJoinedChannels?.filter((chat) => chat.channelType === "private");
   const joinedGroupChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => {
       if (chat.channelType === "created" || chat.channelType === "Password")
