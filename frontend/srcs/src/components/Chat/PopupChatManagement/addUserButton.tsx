@@ -15,6 +15,7 @@ const AddUserButton = ({user}: {user:User}) => {
 }
 
   const handleAddUser = (user: User) => {
+
     if (currentUser && user){
       if (currentFriends && currentFriends.filter((f) => f.id === user.id).length > 0){
         return ;
@@ -25,7 +26,7 @@ const AddUserButton = ({user}: {user:User}) => {
     }
   };
   return (
-    <div className="management-add-user-button" onClick={()=> handleAddUser(user)}>
+    <div className="management-button" onClick={()=> handleAddUser(user)}>
       <BsPersonAdd />
     </div>
   );
