@@ -451,6 +451,36 @@ export class AppGateway
     this.server.emit('update_chat', channel);
   }
 
+  @SubscribeMessage('block_user')
+  async handleBlockUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const friendRecv = await this.friendService.friendshipExists(
+      parseInt(body[1]),
+      parseInt(body[0]),
+    );
+    if (friendRecv) {
+      const updatedFriend = await this.prisma.friends.update({
+        where: { id: friendRecv.id },
+        data: { status: 'BLOCKED' },
+      });
+      this.server.emit('block_user', updatedFriend);
+    } else {
+      const createdFriendShip = await this.friendService.create({
+        user_id: parseInt(body[1]),
+        friend_id: parseInt(body[0]),
+        sender_id: parseInt(body[1]),
+        chat_id: 0,
+      });
+      const updatedFriend = await this.prisma.friends.update({
+        where: { id: createdFriendShip.id },
+        data: { status: 'BLOCKED' },
+      });
+      this.server.emit('block_user', updatedFriend);
+    }
+  }
+
   @SubscribeMessage('friend_request')
   async handleNewFriendRequest(
     @ConnectedSocket() client: Socket,

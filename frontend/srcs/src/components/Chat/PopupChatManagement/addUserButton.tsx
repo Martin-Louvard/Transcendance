@@ -16,10 +16,8 @@ const AddUserButton = ({user}: {user:User}) => {
 
   const handleAddUser = (user: User) => {
     if (currentUser && user){
-      if (currentFriends){
-        if (currentFriends.filter((f) => f.id === user.id).length > 0){
-          return ;
-        }
+      if (currentFriends && currentFriends.filter((f) => f.id === user.id).length > 0){
+        return ;
       }
       else {
         sendFriendRequest();

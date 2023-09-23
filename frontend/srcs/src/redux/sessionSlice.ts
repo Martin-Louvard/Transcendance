@@ -287,6 +287,24 @@ export const sessionSlice = createSlice({
         );
       }
     },
+    updateBlockStatus: (state, action) => {
+      const updatedFriendShip = action.payload;
+      if (state.friendships){
+        if (state.friendships.filter((friendShip) => friendShip.id === updatedFriendShip.id).length > 0){
+          state.friendships = state.friendships.map((friendShip) => {
+            if (friendShip.id === updatedFriendShip.id)
+              return updatedFriendShip;
+            return friendShip;
+          });
+        }
+        else {
+          state.friendships.push(updatedFriendShip);
+        }
+      }
+      else {
+        state.friendships = [updatedFriendShip];
+      }
+    },
     updateFriendStatus: (state, action) => {
       if (state.friendships)
         state.friendships = state.friendships.map((f) => {
@@ -382,6 +400,7 @@ export const {
   setNotifications,
   addNewChatChannel,
   updateOneChat,
+  updateBlockStatus,
 } = sessionSlice.actions;
 export { fetchRelatedUserData };
 export default sessionSlice.reducer;
