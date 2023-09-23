@@ -15,9 +15,14 @@ const AddUserButton = ({user}: {user:User}) => {
 }
 
   const handleAddUser = (user: User) => {
+
     if (currentUser && user){
       if (currentFriends && currentFriends.filter((f) => f.id === user.id).length > 0){
+<<<<<<< HEAD
         return ;
+=======
+          return ;
+>>>>>>> 3bad2c60516462d4a8b6242f756f94ed73010ffb
       }
       else {
         sendFriendRequest();
@@ -25,7 +30,7 @@ const AddUserButton = ({user}: {user:User}) => {
     }
   };
   return (
-    <div className="management-add-user-button" onClick={()=> handleAddUser(user)}>
+    <div className="management-button" onClick={()=> handleAddUser(user)}>
       <BsPersonAdd />
     </div>
   );

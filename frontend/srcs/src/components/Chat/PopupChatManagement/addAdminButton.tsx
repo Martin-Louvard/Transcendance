@@ -19,7 +19,7 @@ const AdminAddButton = ({user, chat}: {user:User; chat:ChatChannels}) => {
   };
 
   return (
-    <div className="management-add-admin-button" onClick={()=> handleAddAdmin()}>
+    <div className="management-button" onClick={()=> handleAddAdmin()}>
       {chat?.admins.includes(user) ? <TbCrownOff /> : <TbCrown />}
     </div>
   );
