@@ -296,7 +296,32 @@ export class AppGateway
   async handleLeaveChat(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: Array<any>,
-  ): Promise<void> {}
+  ): Promise<void> {
+    const chatRecv = await this.prisma.chatChannel.findUnique({
+      where: { id: parseInt(body[0]) },
+      include: { participants: true },
+    });
+
+    const updatedParticipants = chatRecv.participants.filter(
+      (user) => user.id !== parseInt(body[1]),
+    );
+
+    const updatedChat = await this.prisma.chatChannel.update({
+      where: { id: chatRecv.id },
+      data: {
+        participants: {
+          set: updatedParticipants.map((user) => ({ id: user.id })),
+        },
+      },
+      include: {
+        owner: true,
+        admins: true,
+        messages: true,
+        participants: true,
+      },
+    });
+    this.server.emit('leave_chat', updatedChat);
+  }
 
   @SubscribeMessage('remove_admin')
   async handleRemoveAdmin(

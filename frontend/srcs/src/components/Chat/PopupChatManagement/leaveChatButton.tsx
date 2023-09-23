@@ -1,5 +1,6 @@
 import { User, ChatChannels } from "../../../Types.ts";
 import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
+import {GiExitDoor} from "react-icons/gi";
 
 const LeaveChatButton = ({chat}: {chat:ChatChannels}) => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -7,9 +8,9 @@ const LeaveChatButton = ({chat}: {chat:ChatChannels}) => {
 
   const handleLeaveButton = () => {
     if (currentUser) {
-      if (chat.Owner.id === currentUser.id) {
-        if (chat.Admins.filter((admin) => admin.id !== currentUser.id).length > 0){
-          const newOwner = chat.Admins.filter((admin) => admin.id !== currentUser.id)[0];
+      if (chat.owner.id === currentUser.id) {
+        if (chat.admins.filter((admin) => admin.id !== currentUser.id).length > 0){
+          const newOwner = chat.admins.filter((admin) => admin.id !== currentUser.id)[0];
           dispatch({type:'CHANGE_OWNER', payload:[chat.id, newOwner.id, currentUser.id]})
         }
         else {
@@ -30,6 +31,7 @@ const LeaveChatButton = ({chat}: {chat:ChatChannels}) => {
 
   return (
     <div className="management-leave-button" onClick={()=> handleLeaveButton()}>
+      <GiExitDoor />
   </div>);
 };
 export default LeaveChatButton;

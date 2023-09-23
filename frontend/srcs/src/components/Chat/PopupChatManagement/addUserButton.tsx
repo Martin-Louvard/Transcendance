@@ -18,11 +18,7 @@ const AddUserButton = ({user}: {user:User}) => {
 
     if (currentUser && user){
       if (currentFriends && currentFriends.filter((f) => f.id === user.id).length > 0){
-<<<<<<< HEAD
         return ;
-=======
-          return ;
->>>>>>> 3bad2c60516462d4a8b6242f756f94ed73010ffb
       }
       else {
         sendFriendRequest();
