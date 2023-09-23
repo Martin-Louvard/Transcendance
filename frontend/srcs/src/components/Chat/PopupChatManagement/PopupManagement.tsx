@@ -36,7 +36,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
           return null;
       })}
     </ul>
-    <div className="popup-leave-chat-button"><LeaveChatButton chat={chat!} /></div>
+    <div className="popup-leave-chat-button"><LeaveChatButton chat={chat!} setIsOpen={setIsOpen} /></div>
     </Popup>
   );
 };

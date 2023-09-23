@@ -245,6 +245,19 @@ export const sessionSlice = createSlice({
         updateChatNotification(updatedJoinedChannels);
       }
     },
+    addReaderId: (state, action) => {
+      const updatedMessage: Message = action.payload;
+      state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
+        if (chat.id === updatedMessage.channelId){
+          chat.messages = chat.messages.map((msg) => {
+            if (msg.id === updatedMessage.id)
+              return  updatedMessage;
+            return msg;
+          });
+        }
+        return  chat;
+      });
+    },
     updateFriendRequest: (state, action) => {
       if (state.friendships === undefined || state.friendships.length === 0) {
         state.friendships = [action.payload];
@@ -401,6 +414,7 @@ export const {
   addNewChatChannel,
   updateOneChat,
   updateBlockStatus,
+  addReaderId,
 } = sessionSlice.actions;
 export { fetchRelatedUserData };
 export default sessionSlice.reducer;

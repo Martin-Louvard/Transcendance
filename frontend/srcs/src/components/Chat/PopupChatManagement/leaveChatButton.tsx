@@ -2,7 +2,7 @@ import { User, ChatChannels } from "../../../Types.ts";
 import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
 import {GiExitDoor} from "react-icons/gi";
 
-const LeaveChatButton = ({chat}: {chat:ChatChannels}) => {
+const LeaveChatButton = ({chat, setIsOpen}: {chat: ChatChannels; setIsOpen:React.Dispatch<React.SetStateAction<boolean>>} ) => {
   const currentUser = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
 
@@ -26,12 +26,13 @@ const LeaveChatButton = ({chat}: {chat:ChatChannels}) => {
       else {
         dispatch({type:'LEAVE_CHAT', payload:[chat.id, currentUser.id]});
       }
+      setIsOpen(false);
     }
   };
 
   return (
     <div className="management-leave-button" onClick={()=> handleLeaveButton()}>
-      <GiExitDoor />
+      {"LEAVE"}<GiExitDoor />
   </div>);
 };
 export default LeaveChatButton;
