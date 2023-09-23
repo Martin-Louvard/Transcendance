@@ -65,7 +65,7 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
         }
       }
       else {
-        if (!chat.password){
+        if (chat.channelType !== "Password"){
           dispatch({
             type: "JOIN_CHAT",
             payload: [currentUser.id, chat.id],

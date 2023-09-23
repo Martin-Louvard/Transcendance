@@ -12,12 +12,14 @@ const arrowStyle = { color: '#000' };
 const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefined; isOpen: boolean; setIsOpen:React.Dispatch<React.SetStateAction<boolean>>} ) => {
   const currentUser = useAppSelector((state) => state.session.user);
   const [isDefine, setIsDefine] = useState<boolean>(false);
+  const currentOpenedChat = useAppSelector((state) => state.session.OpenedChatChannels.find(
+    (chann) => chann.id === chat?.id));
 
   useEffect(() => {
-    if (chat !== undefined && currentUser !== undefined) {
-      setIsDefine(chat.owner.id === currentUser.id);
+    if (currentOpenedChat !== undefined && currentUser !== undefined) {
+      setIsDefine(currentOpenedChat.owner.id === currentUser.id);
     }
-  }, [chat, currentUser]);
+  }, [currentOpenedChat, currentUser]);
 
   return (
     <Popup
@@ -26,17 +28,17 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         onClose={() => setIsOpen(false)}
         {...{contentStyle, arrowStyle }}  
     >
-      <div className="management-chat-popup">
-        {isDefine  ?  <ChatSettings chat={chat!}/>: ""}
+      <div className="management-currentOpenedChat-popup">
+        {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
       </div>
       <ul>
-        {chat?.participants.map((user)=>{
+        {currentOpenedChat?.participants.map((user)=>{
           if (currentUser?.id !== user?.id)
-            return (<UserListItem key={user.id} user={user} chat={chat} />);
+            return (<UserListItem key={user.id} user={user} chat={currentOpenedChat} />);
           return null;
       })}
     </ul>
-    <div className="popup-leave-chat-button"><LeaveChatButton chat={chat!} setIsOpen={setIsOpen} /></div>
+    <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
     </Popup>
   );
 };
