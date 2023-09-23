@@ -47,8 +47,10 @@ const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
           <h6> Victories:{friend.victoriesCount} </h6>
           <h6> Defeats:{friend.defeatCount} </h6>
       </div>
+      <div className='list'>
         <button onClick={() => setShowGames(true)}>Game History</button>
         {options()}
+        </div>
       </>
     );
   };

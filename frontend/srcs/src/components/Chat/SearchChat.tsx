@@ -136,9 +136,11 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
           >
             <div className="chat-name-in-menu">
               <div>{getName(chat, currentUser?.username)}</div>
-              <div>{`${chat.participants.length}`}</div>
               <div>
-                <BsFillPersonFill />
+                <div>{`${chat.participants.length}`}</div>
+                <div>
+                  <BsFillPersonFill />
+                </div>
               </div>
             </div>
           </li>
