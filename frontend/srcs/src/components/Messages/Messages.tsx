@@ -39,15 +39,17 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
   return (
     <div className="chat-messages" ref={chatMessagesRef}>
       {messages?.map((message, index) => (
+        <>
+        <img className="sender-profile-pic" src={message.sender.avatar}/>
         <div
           key={index}
           className={`chat-message ${
             message.senderId === user?.id ? "user1" : "user2"
           }`}
         >
-          <img src={message.sender.avatar}/>
           <span className="content">{message.content}</span>
         </div>
+        </>
       ))}
     </div>
   );
