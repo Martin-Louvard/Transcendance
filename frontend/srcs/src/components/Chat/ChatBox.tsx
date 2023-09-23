@@ -59,12 +59,12 @@ const ChatBoxes = () => {
           </div>
           <div className="chat-name-wrapper-right">
             <button
-              className="minimized-box-button"
+              className="chat-box-button"
               onClick={() => handleMinimize(chat)}
             >
-              {minimizedChat.includes(chat.id) ? "+" : "_"}
+              {minimizedChat.includes(chat.id) ? "+" : "-"}
             </button>
-            <div className="chat-box-setting-button" onClick={()=> {
+            <div className="chat-box-button" onClick={()=> {
               setIsOpen(true);
               setSelectedChat(chat);}}>
               <AiFillSetting />
@@ -73,7 +73,7 @@ const ChatBoxes = () => {
               onClick={() => handleToggleChatClose(chat)}
               src={"cross.svg"}
               alt="Close"
-              className="box-close-button"
+              className="chat-box-button"
             />
           </div>
         </div>

@@ -86,7 +86,7 @@ export class UsersService {
         JoinedChatChannels: {
           include: {
             owner: true,
-            messages: true,
+            messages: {include: {sender: true}},
             friendship: true,
             participants: true,
             admins: true,
