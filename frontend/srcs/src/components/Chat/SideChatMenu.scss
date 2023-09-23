@@ -20,7 +20,6 @@ $chat-menu-icon-open: 15vw;
   border-top-left-radius: 20px;
   border-left: solid 1px white;
   border-top: solid 1px white;
-
 }
 
 .search-chat-input {
@@ -36,16 +35,19 @@ $chat-menu-icon-open: 15vw;
 	justify-content: space-evenly;
 	width: auto;
 	right: 0;
+  overflow: hidden;
+  width:100%;
 }
 
 .channel-type-wrapper {
 	display: flex;
-	justify-content: space-between;
+	justify-content: space-around;
 }
 
 .chat-menu-header {
 	display: flex;
 	justify-content: space-evenly;
+  width: 100%;
 }
 
 .chat-exit-button {
