@@ -6,7 +6,7 @@ import {
   setChatOpen,
   resetNotification,
 } from "../../redux/sessionSlice";
-import { VscFoldDown, VscFoldUp } from "react-icons/vsc";
+import { VscTriangleDown, VscTriangleLeft } from "react-icons/vsc";
 import { IoIosChatboxes } from "react-icons/io";
 import "./SideChatMenu.scss";
 import { getName } from "./functions.ts";
@@ -126,9 +126,7 @@ const SideChatMenu = () => {
             onClick={() => handleChatTypeListClick(_type)}
           >
             <div className="channel-type-name"> {`${_type}`} </div>
-            <div>
-              {minimizedList?.includes(_type) ? <VscFoldUp /> : <VscFoldDown />}
-            </div>
+              {minimizedList?.includes(_type) ? <VscTriangleLeft /> : <VscTriangleDown />}
           </div>
           <div>{minimizedList?.includes(_type) ? "" : channelsList(list)}</div>
         </ul>
@@ -192,7 +190,7 @@ const SideChatMenu = () => {
       <ChatBoxes />
       <img
         className={`logo-nav chat-menu-icon`}
-        src={"/comments.svg"}
+        src={"/chat-icon.svg"}
         alt="Chat Menu"
         onClick={toggleMenu}
       />
