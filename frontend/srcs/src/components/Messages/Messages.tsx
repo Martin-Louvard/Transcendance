@@ -40,16 +40,33 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
     <div className="chat-messages" ref={chatMessagesRef}>
       {messages?.map((message, index) => (
         <>
-        <img className="sender-profile-pic" src={message.sender.avatar}/>
+        <div className={`message-wrapper  ${
+          message.senderId === user?.id ? "left" : "right"
+        }`}  key={index}>
         <div
-          key={index}
+         
           className={`chat-message ${
             message.senderId === user?.id ? "user1" : "user2"
           }`}
         >
           <span className="content">{message.content}</span>
         </div>
-        </>
+       
+      </div>
+
+{
+  messages[index + 1] && message.senderId !== messages[index + 1].senderId || !messages[index +1] ? 
+ <div className={`message-infos  ${
+  message.senderId === user?.id ? "left" : "right"
+}`}>
+   <img className="sender-profile-pic" src={ 'http://localhost:3001/users/avatar/' +
+      message.sender.username +
+      '/' + message.sender.avatar.split('/').reverse()[0]}/>
+   <span className="message-username">{message.sender.username}</span>
+ </div>
+ : ""
+ }
+ </>
       ))}
     </div>
   );

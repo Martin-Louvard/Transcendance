@@ -17,6 +17,13 @@
 	border-color: black;
 }
 
+.message-wrapper{
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+
+}
+
 .chat-messages{
     text-align: left;
     font-size: small;
@@ -33,23 +40,36 @@
     font-size: 10px;
     min-width: 10%;
     padding: 5px;
+}
+
+.left{
+    left: 0;
+    align-self:flex-end;
+
+}
+
+.right{
+    right: 0;
+    align-self:flex-start;
 
 }
 
 .user1{
-    right: 0;
     background-color: rgb(145, 137, 63);
-    align-self:flex-end;
     border-radius: 20px 20px 8px 20px;
     max-width: 80%;
+    width: fit-content;
+    align-self: flex-end;
+
 }
 
 .user2{
-    left: 0;
     background-color: rgb(108, 135, 66);
-    align-self:flex-start;
     border-radius: 20px 20px 20px 8px;
     max-width: 80%;
+    width: fit-content;
+    align-self: flex-start;
+
 }
 
 .send-button {
@@ -68,7 +88,61 @@
 	align-items: center;
 }
 
+.message-infos{
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-start;
+    margin-bottom: 10px;
+}
+
 .sender-profile-pic{
+    border-radius: 50%;
+    overflow: hidden;
     height: 15px;
     width:15px;
+}
+
+.message-username{
+    font-size: smaller;
+    margin-left: 5px;
+}
+
+.popup-user-list-item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    margin:5px;
+    overflow: hidden;
+}
+
+
+.link-to-user{
+    cursor: pointer;
+    border-radius: 15%;
+    padding-right: 10px;
+    .div{
+        margin: 5px;
+    }
+
+    &:hover{
+        background-color: grey;
+    }
+}
+
+.popup-profile-pic{
+    border-radius: 50%;
+    overflow: hidden;
+    height: 45px;
+    width: 45px;
+    margin:10px;
+}
+
+.management-button{
+    cursor: pointer;
+    border-radius: 15%;
+    padding: 10px;
+    &:hover{
+        background-color: grey;
+    }
 }
