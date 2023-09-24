@@ -22,7 +22,6 @@ export interface WebSocketState {
   lobbies: LobbyCli[];
   lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor', team: 'home' | 'visitor', timestamp: number} | null,
   isWaitingToConnect: boolean;
-  contentToShow:  "profile" | "friends" | "games" | "friendUser"| "lobby"  ;
   paramsReceived: boolean;
 }
 
@@ -70,7 +69,6 @@ const initialState: WebSocketState = {
   lobbies: [],
   lastGame: null,
   isWaitingToConnect: false,
-  contentToShow: 'lobby',
   paramsReceived: false,
 };
 
@@ -95,9 +93,6 @@ const websocketSlice = createSlice({
         state.params.classic = true;
       else if (action.payload == LobbyType.auto)
         state.params.classic = false;
-    },
-    setContentToShow: (state, action) => {
-      state.contentToShow = action.payload;
     },
     setParams: (state, action) => {
       state.params = JSON.parse(JSON.stringify(action.payload)); 
@@ -295,6 +290,6 @@ const websocketSlice = createSlice({
   },
 });
 
-export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect, resetLobbyData, setContentToShow, setParamsReceived} = websocketSlice.actions;
+export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect, resetLobbyData, setParamsReceived} = websocketSlice.actions;
 
 export default websocketSlice.reducer;

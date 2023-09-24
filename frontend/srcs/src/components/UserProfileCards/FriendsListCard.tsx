@@ -5,7 +5,7 @@ import Form from "../Forms/Form";
 import { toast } from "react-hot-toast";
 import { ContentOptions, Friendships, Status } from "../../Types";
 import StatusDot from "./StatusDot";
-import { deleteInvitedGame, setContentToShow, setLobbyType, setParams } from "../../redux/websocketSlice";
+import {setLobbyType, setParams } from "../../redux/websocketSlice";
 import { GameRequest, LobbyType } from "@shared/class";
 import { Avatar } from "@mui/material";
 import { setContentToShow, setFriendProfile } from "../../redux/sessionSlice";

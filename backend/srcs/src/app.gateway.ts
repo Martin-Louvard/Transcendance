@@ -183,6 +183,7 @@ export class AppGateway
     } catch(err) {
       console.log(err);
   }
+  }
 
   @SubscribeMessage(ClientEvents.GetLobbies)
   getLobbies(@ConnectedSocket() client: Socket) {
