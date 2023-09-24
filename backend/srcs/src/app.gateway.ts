@@ -322,7 +322,7 @@ export class AppGateway
         participants: true,
       },
     });
-    this.server.emit('leave_chat', updatedChat);
+    this.server.emit('leave_chat', [updatedChat, parseInt(body[1])]);
   }
 
   @SubscribeMessage('remove_admin')
@@ -369,15 +369,7 @@ export class AppGateway
     await this.prisma.chatChannel.delete({
       where: { id: parseInt(body[0]) },
     });
-    const updatedChats = await this.prisma.chatChannel.findMany({
-      include: {
-        participants: true,
-        bannedUsers: true,
-        admins: true,
-        messages: { include: { sender: true } },
-      },
-    });
-    this.server.emit('delete_chat', updatedChats);
+    this.server.emit('delete_chat', parseInt(body[0]));
   }
 
   @SubscribeMessage('change_owner')
@@ -458,7 +450,7 @@ export class AppGateway
         participants: true,
       },
     });
-    this.server.emit('kick_user', updatedChat);
+    this.server.emit('kick_user', [updatedChat, userToKick.id]);
   }
 
   @SubscribeMessage('create_chat')

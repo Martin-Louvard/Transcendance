@@ -21,6 +21,11 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
     }
   }, [currentOpenedChat, currentUser]);
 
+  useEffect(() => {
+    if (!currentOpenedChat?.participants.filter((user) => user.id === currentUser?.id).length)
+      setIsOpen(false);
+  }, [currentOpenedChat]);
+
   return (
     <Popup
         open={isOpen}

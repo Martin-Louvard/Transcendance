@@ -112,6 +112,50 @@ export const sessionSlice = createSlice({
         chat.id === updatedChat.id ? { ...chat, isOpen: false } : chat
       );
     },
+    beenKicked: (state, action) => {
+      const userKickedId = action.payload[1];
+      const fromChannel = action.payload[0];
+
+      if (state.user?.id === userKickedId){
+        state.JoinedChatChannels = state.JoinedChatChannels?.filter((chann) => chann.id != fromChannel.id);
+        state.OpenedChatChannels = state.OpenedChatChannels.filter((chann) => chann.id != fromChannel.id);
+      }
+      else {
+        state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
+          if (fromChannel.id === chat.id){
+            return fromChannel;
+          }
+          return chat;
+        })
+        state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) => {
+          if (fromChannel.id === chat.id){
+            return fromChannel;
+          }
+          return chat;
+        })
+      }
+    },
+    leaveChat: (state, action) => {
+      const updatedChann = action.payload[0];
+      if (state.user?.id === action.payload[1]){
+        state.JoinedChatChannels = state.JoinedChatChannels?.filter((chann) => chann.id != updatedChann.id);
+        state.OpenedChatChannels = state.OpenedChatChannels.filter((chann) => chann.id != updatedChann.id);
+      }
+      else {
+        state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
+          if (updatedChann.id === chat.id){
+            return updatedChann;
+          }
+          return chat;
+        })
+        state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) => {
+          if (updatedChann.id === chat.id){
+            return updatedChann;
+          }
+          return chat;
+        })
+      }
+    },
     updateOneChat: (state, action) => {
       const updatedChat: ChatChannels = action.payload;
       state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
@@ -443,6 +487,8 @@ export const {
   updateOneChat,
   updateBlockStatus,
   addReaderId,
+  leaveChat,
+  beenKicked,
 } = sessionSlice.actions;
 export { fetchRelatedUserData };
 export default sessionSlice.reducer;
