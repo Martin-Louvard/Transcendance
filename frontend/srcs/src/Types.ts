@@ -1,3 +1,5 @@
+import { ConeTwistConstraint } from "cannon-es";
+
 export enum Status {
   PENDING = "PENDING",
   ACCEPTED = "ACCEPTED",
@@ -11,6 +13,15 @@ export enum UserStatus {
   ONLINE = "ONLINE",
   INGAME = "INGAME"
 }
+
+export enum ContentOptions{
+  PROFILE = "profile",
+  FRIENDS = "friends",
+  HISTORY= "games",
+  PLAY = "lobby",
+  FRIENDPROFILE = "friendProfile"
+}
+
 
 export interface User {
   id: number;
@@ -79,3 +90,5 @@ export interface ChatChannels {
   isOpen: boolean;
   notifications: number ;
 }
+
+

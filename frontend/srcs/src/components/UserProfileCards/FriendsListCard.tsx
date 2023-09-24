@@ -3,23 +3,22 @@ import { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
 import { toast } from "react-hot-toast";
-import { Friendships, Status } from "../../Types";
+import { ContentOptions, Friendships, Status } from "../../Types";
 import StatusDot from "./StatusDot";
 import { setLobbyType, setParams } from "../../redux/websocketSlice";
 import { GameRequest } from "@shared/class";
 import { Avatar } from "@mui/material";
+import { setContentToShow, setFriendProfile } from "../../redux/sessionSlice";
 
 const FriendsListCard: React.FC = () =>{
     const user = useAppSelector((state) => state.session.user);
     const friendships = useAppSelector((state) => state.session.friendships);
     const [friendshipsAccepted, setFriendshipsAccepted] = useState(friendships)
-    const [showFriend, setShowFriend] = useState(false)
-    const [selectedFriendship, setSelectedFriendship] = useState(Object)
     const [newFriendUsername, setNewFriendUsername] = useState('');
     const dispatch = useAppDispatch();
     const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
     const gameRequest= useAppSelector((state) => state.websocket.invitedGames)
-
+    const contentToShow = useAppSelector((state) => state.session.contentToShow)
     useEffect(()=>{
       if (friendships){
         setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
@@ -43,8 +42,8 @@ const FriendsListCard: React.FC = () =>{
     };
   
     const displayFriendProfile = (friendship: Friendships) => {
-      setShowFriend(true);
-      setSelectedFriendship(friendship);
+      dispatch(setFriendProfile(friendship.user_id === user?.id ? friendship.friend : friendship.user)); 
+      dispatch(setContentToShow(ContentOptions.FRIENDPROFILE));
     };
 
     const renderNotifications = () => (   
@@ -53,7 +52,7 @@ const FriendsListCard: React.FC = () =>{
             <ul className="list">
               {friendRequests ? friendRequests.map((friendship, index) => (
                 <li className="item" key={index}>
-                  <Avatar onClick={()=>{setSelectedFriendship(friendship); setContentToShow("friendUser") }} sx={{width:'60px', height:"60px"}} src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
+                  <Avatar onClick={()=>{displayFriendProfile(friendship)}} sx={{width:'60px', height:"60px"}} src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
                 <div>
                   <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
                   <div className='accept-deny'>
@@ -146,7 +145,7 @@ const FriendsListCard: React.FC = () =>{
                       src={friendship.friend_id == user?.id ? friendship.user.avatar:friendship.friend.avatar}
                     />
                   </div>
-                  <StatusDot status={friendship.friend_id == user?.id ? friendship.user.status:friendship.friend.status}/>
+                  <StatusDot status={friendship.friend_id == user?.id ? friendship.user.status:friendship.friend.status} style={"position-large"}/>
                 </div>
                 <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
               </li>
@@ -158,11 +157,9 @@ const FriendsListCard: React.FC = () =>{
     }
   return (
     <>
-        {showFriend ? (
-          <FriendCard friendship={selectedFriendship}/>
-        ) : (
+        {
           friendList()
-        )}
+        }
     </>
   );
 };

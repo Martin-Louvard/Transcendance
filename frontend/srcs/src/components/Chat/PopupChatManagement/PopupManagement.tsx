@@ -24,7 +24,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
   return (
     <Popup
         open={isOpen}
-        closeOnDocumentClick={false}
+        closeOnDocumentClick={true}
         onClose={() => setIsOpen(false)}
         {...{contentStyle, arrowStyle }}  
     >

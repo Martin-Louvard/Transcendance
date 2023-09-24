@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { User, ChatChannels, Friendships, Friend, Message } from "../Types";
+import { User, ChatChannels, Friendships, Friend, Message, ContentOptions } from "../Types";
 import { fetchRelatedUserData } from "./sessionThunks";
 import { initNotifications } from './sessionFunctions';
 
@@ -16,6 +16,8 @@ export interface sessionState {
   OpenedChatChannels: ChatChannels[];
   loading: boolean;
   error: string | undefined;
+  contentToShow: string;
+  friendProfile: User | undefined;
 }
 
 // Define the initial state using that type
@@ -31,6 +33,9 @@ const initialState: sessionState = {
   OpenedChatChannels: [],
   loading: false,
   error: undefined,
+  contentToShow: "lobby",
+  friendProfile: undefined,
+
 };
 
 // Utiliser createSlice permet d'ecrire les reducers comme si on mutait le state car il marche avec Immer qui sous le capot s'occupe de transformer le state de maniere immutable
@@ -39,6 +44,12 @@ export const sessionSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
+    setContentToShow: (state, action) => {
+      state.contentToShow = action.payload;
+    },
+    setFriendProfile: (state, action) => {
+      state.friendProfile = action.payload;
+    },
     addOpenedChatChannel: (state, action) => {
       const chatChannel = action.payload;
       if (
@@ -406,6 +417,8 @@ export const sessionSlice = createSlice({
 });
 
 export const {
+  setContentToShow,
+  setFriendProfile,
   setSessionUser,
   setToken,
   setFriends,

@@ -106,3 +106,43 @@
     font-size: smaller;
     margin-left: 5px;
 }
+
+.popup-user-list-item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    margin:5px;
+    overflow: hidden;
+}
+
+
+.link-to-user{
+    cursor: pointer;
+    border-radius: 15%;
+    padding-right: 10px;
+    .div{
+        margin: 5px;
+    }
+
+    &:hover{
+        background-color: grey;
+    }
+}
+
+.popup-profile-pic{
+    border-radius: 50%;
+    overflow: hidden;
+    height: 45px;
+    width: 45px;
+    margin:10px;
+}
+
+.management-button{
+    cursor: pointer;
+    border-radius: 15%;
+    padding: 10px;
+    &:hover{
+        background-color: grey;
+    }
+}

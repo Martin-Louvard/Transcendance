@@ -1,30 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import Chat from '../Chat/Chat';
 import HistoryCard from './HistoryCard';
-import { Friendships, Status } from '../../Types';
+import { User, Status, Friendships } from '../../Types';
 
 interface FriendCardProps {
-  friendship: Friendships;
+  userToDisplay: User;
 }
 
-const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
+const FriendCard: React.FC<FriendCardProps> = ({ userToDisplay }) => {
   const user = useAppSelector((state) => state.session.user);
-  const friend = friendship.friend_id === user?.id ? friendship.user : friendship.friend;
+  const [friendship, setFriendship] = useState<Friendships>();
+  const friendships = useAppSelector((state)=> state.session.friendships);
   const [chatOpen, setChatOpen] = useState<boolean>(false);
   const [showGames, setShowGames] = useState<boolean>(false);
   const dispatch = useAppDispatch();
 
+  useEffect(()=>{
+    const friendshipExists = friendships?.find((f) => {
+     return userToDisplay.id === f.user_id || userToDisplay.id === f.friend_id
+    })
+    setFriendship(friendshipExists)
+  },[userToDisplay]) 
+
   const deleteFriendship = async () => {
-     dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username, Status.CANCELED] })
+     dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship?.id, friendship?.friend_id == user?.id ? friendship?.user.username:friendship?.friend.username, Status.CANCELED] })
   };
 
   const blockFriendship = async () => {
-    dispatch({type: "WEBSOCKET_SEND_FRIEND_REQUEST", payload: [friendship.id, friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username, Status.BLOCKED] })
+    dispatch({type: "WEBSOCKET_SEND_FRIEND_REQUEST", payload: [friendship?.id, friendship?.friend_id == user?.id ? friendship?.user.username:friendship?.friend.username, Status.BLOCKED] })
   }
 
   const options = () =>{
-    if (friendship.status === Status.ACCEPTED){
+    if (friendship?.status === Status.ACCEPTED){
       return(<>
         <button onClick={() => setChatOpen(true)}>Open Private Chat</button>
         <button onClick={() => deleteFriendship()}>Delete From Friends</button>
@@ -38,14 +46,14 @@ const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
     return (
       <>
         <div className="profile-picture">
-          <img src={friend.avatar} alt={`${friend.username}'s Avatar`} />
+          <img src={userToDisplay.avatar} alt={`${userToDisplay.username}'s Avatar`} />
         </div>
 
         <div className='user-info'>
-          <h3> {friend.username} </h3>
-          <h6> {friend.rank} </h6>
-          <h6> Victories:{friend.victoriesCount} </h6>
-          <h6> Defeats:{friend.defeatCount} </h6>
+          <h3> {userToDisplay.username} </h3>
+          <h6> {userToDisplay.rank} </h6>
+          <h6> Victories:{userToDisplay.victoriesCount} </h6>
+          <h6> Defeats:{userToDisplay.defeatCount} </h6>
       </div>
       <div className='list'>
         <button onClick={() => setShowGames(true)}>Game History</button>
@@ -57,7 +65,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ friendship }) => {
 
   return (
     <div className="card-wrapper">
-      {chatOpen ? <Chat chatId={friendship.chat_id} /> : showGames ? <HistoryCard /> : <Profile/>}
+      {chatOpen && friendship ? <Chat chatId={friendship.chat_id} /> : showGames ? <HistoryCard /> : <Profile/>}
     </div>
   );
 };
