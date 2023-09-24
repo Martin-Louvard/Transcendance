@@ -1,7 +1,7 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Server, Socket } from 'socket.io';
-import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket, GameParameters, PlayerInfo, GameRequest } from '@shared/class';
+import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket, GameParameters, PlayerInfo, GameRequest, LobbySlotType } from '@shared/class';
 import { JwtService } from '@nestjs/jwt';
 import { AppService } from './app.service';
 import { LobbyService } from './game/lobby/lobby.service';
@@ -9,6 +9,7 @@ import { PlayerService } from './game/player/player.service';
 import { FriendsService } from './friends/friends.service';
 import { Player } from './game/player/player.class';
 import { Logger } from '@nestjs/common';
+import { Lobby } from './game/lobby/lobby.class';
 
 @WebSocketGateway({ cors: '*' })
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -67,18 +68,63 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
   }
 
   @SubscribeMessage(ClientEvents.DeleteGameRequest)
-  deleteGameRequest(@ConnectedSocket() client: Socket, @MessageBody() data: GameRequest) {
+  deleteGameRequest(@ConnectedSocket() client: Socket, @MessageBody() data: GameRequest | number) {
     try {
-      if (!data || !data.sender || !data.sender.id || !data.receiver || !data.receiver.id) {
+      console.log("delete game request: ", data);
+      if (typeof data === "number") {
+        this.playerService.deleteRequests(undefined, data);
+        const player = this.playerService.getPlayer(data);
+        if (player.lobby) {
+          console.log("player already has a lobby");
+          return true;
+        }
+        const sender = this.playerService.getPlayerBySocketId(client.id);
+        if (!sender) {
+          console.log("player not found")
+          return false;
+        }
+        console.log(sender.id);
+        const lobby = sender.lobby;
+        if (!lobby) {
+          console.log("lobby not found");
+          return false ;
+        }
+        console.log("before: ", lobby.slots);
+        const index = lobby.slots.findIndex((slot) => slot.player.id == data);
+        lobby.slots[index].full = false;
+        lobby.slots[index].type = LobbySlotType.friend;
+        lobby.slots[index].player = undefined;
+        lobby.dispatchLobbySlots();
+        console.log("after: ", lobby.slots);
+      } else {
+        if (!data || !data.sender || !data.sender.id || !data.receiver || !data.receiver.id) {
+          return false;
+        }
+      const receiver = this.playerService.getPlayerById(data.receiver.id);
+      const sender = this.playerService.getPlayerById(data.sender.id);
+      const current = this.playerService.getPlayerBySocketId(client.id)
+      if (!receiver || !sender || !current) {
         return false;
       }
-    const receiver = this.playerService.getPlayerById(data.receiver.id);
-    const sender = this.playerService.getPlayerById(data.sender.id);
-    const current = this.playerService.getPlayerBySocketId(client.id)
-    if (!receiver || !sender || !current) {
-      return false;
-    }
-    this.playerService.deleteRequests(undefined, undefined, undefined, data.id);
+      this.playerService.deleteRequests(undefined, undefined, undefined, data.id);
+      const lobby = this.lobbyService.getLobby(data.lobby.id);
+      if (!lobby)
+        return false;
+      let isInLobby = false;
+      lobby.players.forEach((e) => {
+        if (e.id == receiver.id) {
+          isInLobby = true ;
+          return ;
+        }
+      })
+      if (!lobby || isInLobby)
+        return false;
+      const index = lobby.slots.findIndex((slot) => slot.player.id == data.receiver.id);
+      lobby.slots[index].full = false;
+      lobby.slots[index].type = LobbySlotType.friend;
+      lobby.slots[index].player = undefined;
+      lobby.dispatchLobbySlots();
+      }
     } catch(err) {
       console.log(err);
   }
@@ -128,10 +174,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     const lobby = this.playerService.getLobby(client.id);
     if (lobby) {
       lobby.setSlots(data);
-      lobby.players.forEach((e) => {
-        if (e.socket.id != client.id)
-          e.emit<ServerPayloads[ServerEvents.LobbySlotsState]>(ServerEvents.LobbySlotsState, lobby.slots);
-      })
+      lobby.dispatchLobbySlots();
     }
   }
 
@@ -152,13 +195,23 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
       return 'cant join lobby';
   }
 
+  @SubscribeMessage(ClientEvents.CreateLobby)
+  createLobby(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.CreateLobby]) {
+    console.log(data);
+    const player = this.playerService.getPlayer(data.id);
+    if (!player || player.lobby)
+      return ;
+    this.lobbyService.createLobby(undefined, this.server, player);
+  }
+
   @SubscribeMessage(ClientEvents.ParameterState)
   createMatch(@ConnectedSocket() client: Socket, @MessageBody() data: {params: GameParameters, info: PlayerInfo}) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player || player.lobby) // si il est deja dans un lobby on l'autorise pas
+    if (!player || !player.lobby || player.lobby.owner.id != player.id) // si il est deja dans un lobby on l'autorise pas
       return ;
     player.infos = data.info;
-    this.lobbyService.createLobbyByParameters(data.params, this.server, player);
+    player.lobby.setParams(data.params);
+    //this.lobbyService.createLobbyByParameters(data.params, this.server, player);
   }
 
   @SubscribeMessage('message')

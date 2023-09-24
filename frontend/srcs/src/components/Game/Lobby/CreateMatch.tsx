@@ -21,12 +21,12 @@ import { User } from "../../../Types";
   }
   
   export const CreateMatch: React.FC = (props) => {
-	const user: User | undefined = props.user;
-	const game: WebSocketState = props.game;
+	const user = useAppSelector((state) => state.session.user);
+	const game: WebSocketState = useAppSelector((state) => state.websocket);
 	const dispatch = useAppDispatch();
-	const size = props.size;
-	const [classic, setClassic] = useState(true);
+	const size = useWindowSize();
 	const [duel, setDuel] = useState(false);
+	const params = useAppSelector((state) => state.websocket.params)
 	const [mapParam, setMapParam] = useState({
 	  size: [200, 100],
 	  goalSize: 20,
@@ -77,7 +77,7 @@ import { User } from "../../../Types";
   
 	function storeParams(): void {
 	  const params: GameParameters = {
-		classic: classic,
+		classic: 'false',
 		duel: duel,
 		map: mapParam,
 		ball: ballParam,
@@ -94,55 +94,81 @@ import { User } from "../../../Types";
 		dispatch(setLobbyType(LobbyType.create));
 	  }
 	}
-  
+
+	function createLobby() {
+		if (user) {
+			dispatch({
+			  type: 'WEBSOCKET_SEND_CREATE_LOBBY',
+			  payload: {id: user.id},
+			});
+		  }
+	}
+
+
+	//useEffect(() => {
+		//if (params.map.goalSize !== mapParam.goalSize || params.map.medianOffset !== mapParam.medianOffset || params.map.size !== mapParam.size)
+		//	console.log(params.map, mapParam);
+		//	setMapParam(params.map);
+		//if (params.ball != ballParam)
+		//	setBallParam(params.ball);
+		//if (params.players != playersParam)	
+		//	setPlayersParam(params.players);
+		//if (params.general != generalParam)
+		//	setGeneralParam(params.general);
+		//if (duel != params.duel)
+		//	setDuel(params.duel);
+	//}, [params])
+
+	useEffect(() => {
+		console.log("received :", params);
+		setMapParam(params.map);
+		setBallParam(params.ball);
+		setPlayersParam(params.players);
+		setGeneralParam(params.general);
+		setDuel(params.duel);
+	}, [game.paramsReceived])
+
+	useEffect(() => {
+		if ((game.lobbyId && game.owner == user?.username) || !game.lobbyId) {
+			storeParams();
+		} else if (params) {
+			setMapParam(params.map);
+			setBallParam(params.ball);
+			setPlayersParam(params.players);
+			setGeneralParam(params.general);
+			setDuel(params.duel);
+		} else {
+			// reinitialiser
+		}
+	}, [duel, mapParam, ballParam, playersParam, generalParam])
   
 	return (
-	  game.LobbyType == LobbyType.create &&
-	  <Card sx={{backgroundColor: 'transparent', color:'white', fontFamily:'Avenir', width:'100%', height:'100%'}}>
-		<div style={{display:'flex', justifyContent:'center', bottom:100, flexDirection:'column'}}>
-			<p>Type: </p>
-		  <ButtonGroup size="large" variant="contained" sx={{margin: 4, display: 'flex', justifyContent:'center', flexDirection:'columns'}}>
-			<Button onClick={() => {setClassic(true)}} disabled={classic}>Basic</Button>
-			<Button onClick={() => {setClassic(false)}} disabled={!classic}>Ultimate</Button>
-		  </ButtonGroup>
-		  </div>
-		   {
-		   classic ?
-			<Button variant="contained" sx={{
-			  margin: 4,
-			}}
-			onClick={() => {
-			  storeParams();
-			}}> GO </Button>
-		  :
-			<Card id="ultimate-params" sx={{backgroundColor: 'transparent',width:'100%', maxHeight: size.height - 200, overflow: 'auto', fontFamily:'avenir', display: 'flex', flexDirection:'column'}}>
-				<div style={{display:'flex', flexDirection:'column', color:'white'}}>
-					<p>Mode: </p>
-					<ButtonGroup size="large" variant="contained" sx={{margin:4, display:'flex', justifyContent:'center', color:'white'}}>
+		<Stack id="ultimate-params" sx={{backgroundColor: 'transparent',width:'100%', maxHeight: size.height - 200, overflow: 'auto', fontFamily:'avenir', display: 'flex', flexDirection:'column'}}>
+			<div style={{display:'flex', flexDirection:'column', color:'white'}}>
+				<p>Mode: </p>
+				<ButtonGroup size="large" variant="contained" sx={{boxShadow:'0' ,margin:4, display:'flex', justifyContent:'center', color:'white'}}>
 					<Button onClick={() => {setDuel(true)}} disabled={duel}>Duel</Button>
 					<Button onClick={() => {setDuel(false)}} disabled={!duel}>Double</Button>
-					</ButtonGroup>
-				</div>
-				<Stack spacing={2} sx={{display:'flex', flexDirection:'column'}}>
-				  <MapParams sliderStyle={sliderStyle} mapParam={mapParam} setMapParam={setMapParam} size={size} sliderSize={sliderSize}/>
-				  <BallParam sliderStyle={sliderStyle} ballParam={ballParam} setBallParam={setBallParam} size={size} sliderSize={sliderSize}/>
-				  <PlayersParam sliderStyle={sliderStyle} playersParam={playersParam} setPlayersParam={setPlayersParam} size={size} sliderSize={sliderSize}/>
-				  <GeneralParam sliderStyle={sliderStyle} generalParam={generalParam} setGeneralParam={setGeneralParam}  size={size} sliderSize={sliderSize}/>
-				</Stack>
-				<div style={{display:"flex", justifyContent:"center"}}>
+				</ButtonGroup>
+			</div>
+			<Stack spacing={2} sx={{boxShadow:'0', display:'flex', flexDirection:'column'}}>
+				<MapParams sliderStyle={sliderStyle} mapParam={mapParam} setMapParam={setMapParam} size={size} sliderSize={sliderSize}/>
+				<BallParam sliderStyle={sliderStyle} ballParam={ballParam} setBallParam={setBallParam} size={size} sliderSize={sliderSize}/>
+				<PlayersParam sliderStyle={sliderStyle} playersParam={playersParam} setPlayersParam={setPlayersParam} size={size} sliderSize={sliderSize}/>
+				<GeneralParam sliderStyle={sliderStyle} generalParam={generalParam} setGeneralParam={setGeneralParam}  size={size} sliderSize={sliderSize}/>
+			</Stack>
+			<div style={{display:"flex", justifyContent:"center"}}>
 
-					<Button size="small" fullWidth={false} variant="contained" sx={{
-						margin: 4,
-						width:"100px",
-						display:'flex',
-						justifyContent:'center',
-						marginBottom:'100px'
-					}}onClick={() => {	storeParams();	}}>
-						GO
-					</Button>
-					</div>
-			</Card>
-			}
-		  </Card>
+				<Button size="small" fullWidth={false} variant="contained" sx={{
+					margin: 4,
+					width:"100px",
+					display:'flex',
+					justifyContent:'center',
+					marginBottom:'100px'
+				}}onClick={() => {	createLobby(); storeParams();	}}>
+					GO
+				</Button>
+				</div>
+		</Stack>
 	);
   }

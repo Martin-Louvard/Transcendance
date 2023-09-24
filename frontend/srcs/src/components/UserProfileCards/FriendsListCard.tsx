@@ -5,11 +5,11 @@ import Form from "../Forms/Form";
 import { toast } from "react-hot-toast";
 import { Friendships, Status } from "../../Types";
 import StatusDot from "./StatusDot";
-import { setLobbyType, setParams } from "../../redux/websocketSlice";
-import { GameRequest } from "@shared/class";
+import { deleteInvitedGame, setContentToShow, setLobbyType, setParams } from "../../redux/websocketSlice";
+import { GameRequest, LobbyType } from "@shared/class";
 import { Avatar } from "@mui/material";
 
-const FriendsListCard: React.FC = () =>{
+const FriendsListCard: React.FC = (props) =>{
     const user = useAppSelector((state) => state.session.user);
     const friendships = useAppSelector((state) => state.session.friendships);
     const [friendshipsAccepted, setFriendshipsAccepted] = useState(friendships)
@@ -53,7 +53,7 @@ const FriendsListCard: React.FC = () =>{
             <ul className="list">
               {friendRequests ? friendRequests.map((friendship, index) => (
                 <li className="item" key={index}>
-                  <Avatar onClick={()=>{setSelectedFriendship(friendship); setContentToShow("friendUser") }} sx={{width:'60px', height:"60px"}} src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
+                  <Avatar onClick={()=>{setSelectedFriendship(friendship); dispatch(setContentToShow("friendUser")) }} sx={{width:'60px', height:"60px"}} src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
                 <div>
                   <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
                   <div className='accept-deny'>
@@ -78,8 +78,8 @@ const FriendsListCard: React.FC = () =>{
                   <div>
                     <p>{request.sender.username}</p>
                     <div className='accept-deny'>
-                      <button onClick={() => {joinLobby(request);dispatch(deleteInvitedGame(request))}} >Join Game ✅</button>
-                      <button onClick={() => {dispatch(deleteInvitedGame(request));     dispatch({
+                      <button onClick={() => {joinLobby(request)}} >Join Game ✅</button>
+                      <button onClick={() => {dispatch({
                         type: "WEBSOCKET_SEND_DELETE_GAME_INVITATION",
                         payload: request,
                       })}}>Decline ❌</button>
@@ -116,6 +116,7 @@ const FriendsListCard: React.FC = () =>{
     })
     if (!request.lobby.params)
       return ;
+    dispatch(setContentToShow('lobby'));
     dispatch(setParams(request.lobby.params));
   }
 

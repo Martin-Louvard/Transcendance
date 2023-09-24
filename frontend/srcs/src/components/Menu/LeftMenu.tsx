@@ -57,7 +57,7 @@ const LeftMenu: React.FC = () => {
     if (fullscreen) return null;
 
     if (contentToShow === "profile") return <ProfileCard />;
-    if (contentToShow === "friends") return <FriendsListCard />;
+    if (contentToShow === "friends") return <FriendsListCard setContentToShow={setContentToShow}/>;
     if (contentToShow === "games") return <HistoryCard />;
     if (contentToShow === "chat") return <ChatCreator />;
     if (contentToShow === "friendUser") return <FriendCard friendship={selectedFriendship}/>;

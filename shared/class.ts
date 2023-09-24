@@ -41,6 +41,8 @@ export enum ServerEvents
   LobbyFull = 'server.lobby.full',
 
   GetLobbies = 'server.get.lobbies',
+
+  ParametersState = 'server.parameters.state',
 }
 
 export enum ClientEvents
@@ -68,6 +70,8 @@ export enum ClientEvents
   GetLobbies = 'client.get.lobbies',
 
   AddGame = 'client.add.game',
+
+  CreateLobby = 'client.create.lobby',
 }
 
 export interface LobbyCli {
@@ -129,9 +133,10 @@ export type ServerPayloads = {
 		owner: string,
 	},
 	[ServerEvents.LobbySlotsState]: LobbySlotCli[],
-	[ServerEvents.GameRequest]: {sent: GameRequest[], received: GameRequest[]};
-	[ServerEvents.DeleteSentGameRequest]: GameRequest;
-	[ServerEvents.DeleteGameRequest]: GameRequest;
+	[ServerEvents.GameRequest]: {sent: GameRequest[], received: GameRequest[]},
+	[ServerEvents.DeleteSentGameRequest]: GameRequest,
+	[ServerEvents.DeleteGameRequest]: GameRequest,
+	[ServerEvents.ParametersState]: GameParameters,
 };
 
 export type ClientPayloads = {
@@ -160,6 +165,9 @@ export type ClientPayloads = {
 		home: PlayerInfo[],
 		visitor: PlayerInfo[],
 		winner: PlayerInfo,
+	}
+	[ClientEvents.CreateLobby]: {
+		id: number,
 	}
 };
 

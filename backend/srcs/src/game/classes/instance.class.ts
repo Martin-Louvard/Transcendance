@@ -223,7 +223,9 @@ export class Instance {
 
 	triggerFinish() {
 		this.hasFinished = true;
-		this.lobby.autodestroy();
+		this.interval.forEach((e) => {
+			clearInterval(e);
+		})
 		this.lobby.players.forEach((e) => {
 			const payload: ServerPayloads[ServerEvents.LobbyState] = {
 				lobbyId: this.lobby.id,

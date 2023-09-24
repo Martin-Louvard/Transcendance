@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParams } from "../../../redux//websocketSlice";
 import LoopIcon from '@mui/icons-material/Loop';
 import './Lobby.scss'
+import { CreateMatch } from "./CreateMatch";
 
   export const CreateMatchLobby: React.FC = (props) => {
 	const size = props.size;
@@ -30,7 +31,7 @@ import './Lobby.scss'
 		return friendship.status === 'ACCEPTED' && game.sentInvites.findIndex((invite) => 
 		invite.receiver.id == (friendship.sender_id == user?.id ? friendship.user_id : friendship.sender_id)
 		) == -1 && game.lobbySlots.findIndex((slot) => 
-		slot.player && slot.player.id == (friendship.sender_id == user?.id ? friendship.user_id : friendship.sender_id && slot.type == LobbySlotType.invited)
+		slot.player && slot.player.id == (friendship.sender_id == user?.id ? friendship.user_id : friendship.sender_id)
 		) == -1
 	}))
 	}, [friendships, game.sentInvites, game.invitedGames, game.lobbySlots])
@@ -53,15 +54,16 @@ import './Lobby.scss'
 		  }
 		})
 	}, [game.sentInvites])
-  
-	useEffect(() => {
-	  if (user && game.owner == user.username) {
-		dispatch({
-		  type: 'WEBSOCKET_SEND_LOBBY_SLOTS',
-		  payload: game.lobbySlots,
-		});
-	  }
-	}, [game.lobbySlots])
+
+	//useEffect(() => {
+	//  if (user && game.owner == user.username ) {
+	//	dispatch({
+	//	  type: 'WEBSOCKET_SEND_LOBBY_SLOTS',
+	//	  payload: game.lobbySlots,
+	//	});
+	//  }
+	////  console.log("salut");
+	//}, [game.lobbySlots])
 
 	function createRenderSlots() {
 		if (!game.lobbySlots)
@@ -75,10 +77,9 @@ import './Lobby.scss'
 	  }
   
 	function renderPlayerSlot(slot, index) {
-		console.log("=> ", game.params.classic);
 		return (
 		<div key={index} style={{height:'250px'}}>
-			{game.params && index < (game.params.duel || game.params.classic ? 2 : 4) ?
+			{game.params ?
 			slot.full && slot.player != null ?
 				renderFilledSlot(slot, index) :
 				renderEmptySlot(slot, index)
@@ -110,7 +111,7 @@ import './Lobby.scss'
 		  return (
 			<div key={index} style={{ display: "flex", flexDirection: "column" }}>
 			  	<div style={{ height: 55}} />
-			  	<Button variant="contained" sx={{  flexDirection:'column', width:"100px", height:"100px", lineHeight:'1', fontSize:"0.7rem" }} onClick={() => handleFriendSlotClick(index)}>
+			  	<Button variant="contained" sx={{  flexDirection:'column', width:"100px", height:"100px", lineHeight:'1', fontSize:"0.7rem" }}>
 					<div style={{height:100}}/>
 					<LoopIcon
 						sx={{
@@ -148,7 +149,7 @@ import './Lobby.scss'
 		  return (
 			<div key={index}>
 			  <div style={{ height: 55 }} />
-			  <Button variant="contained" sx={{  flexDirection:'column', width:"100px", height:"100px", lineHeight:'1', fontSize:"0.7rem" }} onClick={() => handleFriendSlotClick(index)}>
+			  <Button variant="contained" sx={{  flexDirection:'column', width:"100px", height:"100px", lineHeight:'1', fontSize:"0.7rem" }}>
 					<div style={{height:100}}/>
 					<LoopIcon
 						sx={{
@@ -240,87 +241,71 @@ import './Lobby.scss'
 		  </Dialog>
 		);
 	  }
-	  
-	  function handleFriendSlotClick(index) {
-		if (user && game.owner != user.username)
-		  return;
-		let newSlots = JSON.parse(JSON.stringify(game.lobbySlots));
-		newSlots[index].type = LobbySlotType.online;
-		dispatch(setLobbySlots(newSlots));
-	  }
-	  
-	  function handleOnlineSlotClick(index) {
-		if (user && game.owner != user.username)
-		  return;
-		let newSlots = JSON.parse(JSON.stringify(game.lobbySlots));
-		newSlots[index].type = LobbySlotType.friend;
-		dispatch(setLobbySlots(newSlots));
-	  }
-	  
+
 	  function renderInvitedSlot(slot, index) {
 		return (
 		  <div  style={{ height:"200px" }}>
 			<div style={{display:"flex", flexDirection:"column"}}/>
 			<Button key={index} variant="contained" sx={{ width: 100, height:100}} disabled disableElevation disableTouchRipple>
-			  <p> Waiting for : {slot.player && slot.player.username ? slot.player.username : console.log(slot) }... </p>
+			  <p> Waiting for : {slot.player && slot.player.username ? slot.player.username : ""}... </p>
 			</Button>
-			<Button sx={{ }} onClick={() => handleCancelInviteClick(index)}>
+			<Button sx={{ }} onClick={() => handleCancelInviteClick(slot)}>
 			  Cancel
 			</Button>
 		  </div>
 		);
 	  }
 	  
-	  function handleCancelInviteClick(index) {
-		let newSlots = JSON.parse(JSON.stringify(game.lobbySlots));
-		newSlots[index].type = LobbySlotType.friend;
-		newSlots[index].player = null;
-		dispatch(setLobbySlots(newSlots));
-		if (!game.lobbySlots[index].player)
-		  return;
-		const request = getRequestSent(game.lobbySlots[index].player?.id);
-		if (!request)
-		  return;
-		dispatch(deleteSentInvite(request));
+	  function handleCancelInviteClick(slot: LobbySlotCli) {
+		console.log(slot);
+		if (!slot.player)
+			return;
+		const request = game.sentInvites.find((e) => e.receiver.id == slot.player.id);
+		if (!request) {
+			if (slot.player) {
+				dispatch({
+					type: "WEBSOCKET_SEND_DELETE_GAME_INVITATION",
+					payload: slot.player.id,
+				});
+				console.log(slot.player.id);
+			}
+			return;
+		}
+		//dispatch(deleteSentInvite(request));
 		dispatch({
 		  type: "WEBSOCKET_SEND_DELETE_GAME_INVITATION",
 		  payload: request,
 		});
 	  }
 	  
-	  function handleEmptySlotClick(index) {
-		if (user && game.owner != user.username) {
-		  return;
-		}
-		let newSlots = JSON.parse(JSON.stringify(game.lobbySlots));
-		newSlots[index].type = LobbySlotType.friend;
-		dispatch(setLobbySlots(newSlots));
-	  }
-	  
-			
-	  
   
 	return (
-	<div style={{display:"flex"}}>
+	<div style={{display:"flex", flexDirection:'row', height:"100%"}}>
+		{/*<div style={{height:"100vh"}}/>*/}
 	{
 		game && game.params &&
-		<div style={{width: size.width, height: size.height / 2, position:"relative"}}>
+		<div style={{width: "50%", height: size.height / 2, position:"relative"}}>
 		<Stack sx={{position:'relative', flexDirection:"row", gap:"30px", justifyContent:'center', alignContent:'center'}}>
 		{renderSlots}
 		</Stack>
 		{user && game.owner == user.username &&
-			game.full && !console.log("full : ", game.full) ?
+			game.full ?
 			<Button onClick={() => {
 				dispatch({
 					type: "WEBSOCKET_SEND_GAME_START",
 				})
 			}}>Start Game</Button>
-			:
+			: game.LobbyType != LobbyType.classic && game.LobbyType != LobbyType.auto &&
 			<Button disabled>Start Game</Button>
 		}
 		<Button color='error' onClick={() => {leaveLobby()}}>Leave</Button>
 		</div>
-	}
+	}	
+	{
+		game.LobbyType != LobbyType.auto && game.LobbyType != LobbyType.classic &&
+		<div style={{width:"100%"}}>
+			<CreateMatch/>
+		</div>}
 	</div>
 	)
   }

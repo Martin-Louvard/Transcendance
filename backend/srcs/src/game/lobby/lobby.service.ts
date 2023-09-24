@@ -1,4 +1,4 @@
-import { Body, Injectable, Logger, OnModuleInit, Post } from '@nestjs/common';
+import { Body, Get, Injectable, Logger, OnModuleInit, Post, Query } from '@nestjs/common';
 import { Lobby } from './lobby.class';
 import { LobbyMode, InputPacket, GameParameters, PlayerInfo, ServerEvents, ServerPayloads, GameRequest, ClientPayloads, ClientEvents, LobbyCli, LobbySlotType, Game } from '@shared/class';
 import { Player } from '../player/player.class';
@@ -10,6 +10,7 @@ import { v4 } from 'uuid';
 import { ClassicInstance } from '../classes/classicInstance';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from 'src/users/entities/user.entity';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class LobbyService {
@@ -19,6 +20,7 @@ export class LobbyService {
 	private readonly logger = new Logger("LobbyService");
 	private lobbies: Map<string, Lobby> = new Map<string, Lobby>();
 	server: Server;
+	requests: Map<string, GameRequest> = new Map<string, GameRequest>();
 
 
 	setServer(server: Server) {
@@ -50,6 +52,7 @@ export class LobbyService {
 		this.playerService.deleteRequests(player.id, player.id);
 		lobby.removePlayer(player);
 		this.logger.log(`${player.id} leave lobby ${lobby.id}`);
+		player.lobby = null;
 		if (lobby.nbPlayers == 0)
 			this.removeLobby(lobby);
 		else
@@ -66,9 +69,6 @@ export class LobbyService {
 	createLobby(mode: LobbyMode, server: Server, creator: Player) {
 		try {
 			const lobby = new Lobby(mode, server, creator);
-			lobby.destroy$.subscribe(() => {
-				this.postGame(lobby.id);
-			})
 			if (!lobby)
 				return ;
 			this.logger.log(`Lobby ${lobby.id} created`);
@@ -79,6 +79,10 @@ export class LobbyService {
 		} catch (error) {
 			return error
 		}
+	}
+
+	getLobby(id: string) {
+		return (this.lobbies.get(id));
 	}
 
 	getJoinableLobbies() {
@@ -93,14 +97,12 @@ export class LobbyService {
 
 	createLobbyByParameters(params: GameParameters, server: Server, creator: Player) {
 		try {
+			console.log(params);
 			if (params.classic) {
 				// TODO: create classic lobby
 				return ;
 			} else if (params.duel) {
 				const lobby = Lobby.fromGameParameter(params, server, creator);
-				lobby.destroy$.subscribe(() => {
-					this.postGame(lobby.id);
-				})
 				if (!lobby)
 					return ;
 				this.logger.log(`Lobby ${lobby.id} created`);
@@ -110,9 +112,6 @@ export class LobbyService {
 				lobby.dispatchLobbyState();
 			} else {
 				const lobby = Lobby.fromGameParameter(params, server, creator);
-				lobby.destroy$.subscribe(() => {;
-					this.postGame(lobby.id);
-				})
 				if (!lobby)
 					return ;
 				this.logger.log(`Lobby ${lobby.id} created`);
@@ -253,7 +252,7 @@ export class LobbyService {
 	//	visitor   User[]   @relation("VisitorTeam")
 	//	createdAt DateTime @default(now())
 	//  }
-	//@Post()
+
 	async postGame(id: string) {
 		const lobby = this.lobbies.get(id);
 		if (!lobby)
@@ -261,57 +260,57 @@ export class LobbyService {
 		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance;
 		const players = [...lobby.players.values()];
 		console.log(players);
-		const users = await this.prismaService.user.findUnique({
+		const users = await this.prismaService.user.findMany({
 			where: {
-				id: players[0].id,
-			}
+				id: {in: duel ? [players[0].id, players[1].id] : [players[0].id, players[1].id, players[2].id, players[3].id]},
+			},
 		});
-		console.log(users);
-		//const visitorInfos = players.filter((pl) => pl.team == 'visitor');
-		//const homeInfos = players.filter((pl) => pl.team == 'home');
-		//const visitor = await this.prismaService.user.findMany({
-		//	where: {
-		//		id: {in: duel ? [visitorInfos[0].id] : [visitorInfos[0].id, visitorInfos[1].id]},
-		//	}
-		//})
-		//const home = await this.prismaService.user.findMany({
-		//	where: {
-		//		id: {in: duel ? [homeInfos[0].id] : [homeInfos[0].id, homeInfos[1].id]},
-		//	}
-		//})
-		//console.log(lobby.instance);
-		//const game = await this.prismaService.game.create({
-		//	data: {
-		//	  scoreHome: lobby.instance.data.score.home,
-		//	  scoreVisitor: lobby.instance.data.score.visitor,
-		//	  players: {
-		//		connect: users.map((user) => ({ id: user.id })),
-		//	  },
-		//	  home: {
-		//		connect: home.map((user) => ({ id: user.id })),
-		//	  },
-		//	  visitor: {
-		//		connect: visitor.map((user) => ({ id: user.id })),
-		//	  },
-		//	},
-		//  });
-		//  console.log('salut');
-		//this.prismaService.game.create({data: game});
+		const visitorInfos = players.filter((pl) => pl.team == 'visitor');
+		const homeInfos = players.filter((pl) => pl.team == 'home');
+		const visitor = await this.prismaService.user.findMany({
+			where: {
+				id: {in: duel ? [visitorInfos[0].id] : [visitorInfos[0].id, visitorInfos[1].id]},
+			}
+		})
+		const home = await this.prismaService.user.findMany({
+			where: {
+				id: {in: duel ? [homeInfos[0].id] : [homeInfos[0].id, homeInfos[1].id]},
+			}
+		})
+		console.log(lobby.instance);
+		const game = await this.prismaService.game.create({
+			data: {
+			  scoreHome: lobby.instance.data.score.home,
+			  scoreVisitor: lobby.instance.data.score.visitor,
+			  players: {
+				connect: users.map((user) => ({ id: user.id })),
+			  },
+			  home: {
+				connect: home.map((user) => ({ id: user.id })),
+			  },
+			  visitor: {
+				connect: visitor.map((user) => ({ id: user.id })),
+			  },
+			},
+		  });
+		this.prismaService.game.create({data: game});
 		//console.log(res);
 	}
 
 
 	// TODO: Pour le moment on clear tout toues les 5 minutes, une fois le jeu codé il faudra
 	// TODO... clear que les games terminé toutes les 5 minutes
-	@Cron(CronExpression.EVERY_5_MINUTES,
+	@Cron(CronExpression.EVERY_30_SECONDS,
 		{name: 'lobby_cleaner'})
 	clearLobbies() {
-		this.lobbies.forEach((lobby: Lobby) => {
+		this.lobbies.forEach(async (lobby: Lobby) => {
 			if (lobby.instance.hasFinished) {
+				await this.postGame(lobby.id);
+				this.logger.log(`Lobby ${lobby.id} deleted`);
 				lobby.clear();
 				this.lobbies.delete(lobby.id);
 			}
 		})
-		this.logger.log("Lobbies cleaned");
+		//this.logger.log("Lobbies cleaned");
 	}
 }

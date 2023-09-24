@@ -5,10 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setLobbyType } from "../../../redux/websocketSlice";
 
 const Demo = styled('div')(({ theme }) => ({
-	backgroundColor: "transparent",
-	width:"500px",
-	border: "solid",
-	borderRadius:10,
+	backgroundColor: theme.palette.background.paper,
   }));
   
   
@@ -35,37 +32,36 @@ export const JoinMatch: React.FC = () => {
 	}
   
 	useEffect(() => {
-		console.log(game.lobbies);
 	  if (!game.lobbies)
 		  return ;
 	  setRenderLobbies(game.lobbies.map((lobby, key) => (
-		<ListItem key={key}
-		secondaryAction={
-		  <Button onClick={() => {joinLobby(lobby.id)}}>JOIN</Button>
-		}
-		>
-		  <ListItemAvatar>
-			<Avatar src={lobby.creator.avatar}/>
-		  </ListItemAvatar>
-		  <ListItemText
-			primary={`${lobby.creator.username}'s lobby`}
-			secondary={secondary ? 'Secondary text' : ""}
-			/>
-		</ListItem>
+		<div style={{width:"500px", backgroundColor:"transparent", borderColor:"white", border:"3px solid", borderRadius:"15px"}}>
+			<ListItem key={key}
+			secondaryAction={
+				<Button onClick={() => {joinLobby(lobby.id)}}>JOIN</Button>
+			}
+			>
+			<ListItemAvatar>
+				<Avatar src={lobby.creator.avatar}/>
+			</ListItemAvatar>
+			<ListItemText
+				primary={`${lobby.creator.username}'s lobby`}
+				secondary={secondary ? 'Secondary text' : ""}
+				/>
+			</ListItem>
+		</div>
 	  )))
   
 	}, [game.lobbies])
 	const [dense, setDense] = useState(false);
 	const [secondary, setSecondary] = useState(false);
 	return (
-	  <div>
+	  <div sx={{width:"100%"}}>
 		<Grid item xs={12} md={6}  sx={{width:"50%", m:"auto"}}>
-			<Typography sx={{ mt: 4, mb: 2}} variant="h6" component="div">
+			<Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
 			  Avalaible Lobbies
 			</Typography>
-			<Demo>
-				{renderLobbies}
-			</Demo>
+			{renderLobbies}
 		</Grid>
 	  </div>
 	);
