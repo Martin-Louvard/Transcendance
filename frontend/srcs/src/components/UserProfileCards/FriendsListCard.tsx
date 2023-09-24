@@ -3,30 +3,35 @@ import { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
 import { toast } from "react-hot-toast";
-import { Friendships, Status } from "../../Types";
+import { ContentOptions, Friendships, Status } from "../../Types";
 import StatusDot from "./StatusDot";
 import { deleteInvitedGame, setContentToShow, setLobbyType, setParams } from "../../redux/websocketSlice";
 import { GameRequest, LobbyType } from "@shared/class";
 import { Avatar } from "@mui/material";
+import { setContentToShow, setFriendProfile } from "../../redux/sessionSlice";
 
 const FriendsListCard: React.FC = (props) =>{
     const user = useAppSelector((state) => state.session.user);
     const friendships = useAppSelector((state) => state.session.friendships);
     const [friendshipsAccepted, setFriendshipsAccepted] = useState(friendships)
-    const [showFriend, setShowFriend] = useState(false)
-    const [selectedFriendship, setSelectedFriendship] = useState(Object)
     const [newFriendUsername, setNewFriendUsername] = useState('');
     const dispatch = useAppDispatch();
     const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
     const gameRequest= useAppSelector((state) => state.websocket.invitedGames)
+    const contentToShow = useAppSelector((state) => state.session.contentToShow)
+    
+    
+  const getAccepted = ()=>{
+    if (friendships){
+      setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
+    }
+    const accepted = friendships?.filter(f => f.status === Status.ACCEPTED)
+    if (accepted)
+      setFriendshipsAccepted(accepted)
+  }
 
     useEffect(()=>{
-      if (friendships){
-        setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
-      }
-      const accepted = friendships?.filter(f => f.status === Status.ACCEPTED)
-      if (accepted)
-        setFriendshipsAccepted(accepted)
+      getAccepted()
     },[friendships])
 
 
@@ -43,8 +48,8 @@ const FriendsListCard: React.FC = (props) =>{
     };
   
     const displayFriendProfile = (friendship: Friendships) => {
-      setShowFriend(true);
-      setSelectedFriendship(friendship);
+      dispatch(setFriendProfile(friendship.user_id === user?.id ? friendship.friend : friendship.user)); 
+      dispatch(setContentToShow(ContentOptions.FRIENDPROFILE));
     };
 
     const renderNotifications = () => (   
@@ -53,7 +58,7 @@ const FriendsListCard: React.FC = (props) =>{
             <ul className="list">
               {friendRequests ? friendRequests.map((friendship, index) => (
                 <li className="item" key={index}>
-                  <Avatar onClick={()=>{setSelectedFriendship(friendship); dispatch(setContentToShow("friendUser")) }} sx={{width:'60px', height:"60px"}} src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
+                  <Avatar onClick={()=>{displayFriendProfile(friendship)}} sx={{width:'60px', height:"60px"}} src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
                 <div>
                   <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
                   <div className='accept-deny'>
@@ -120,6 +125,32 @@ const FriendsListCard: React.FC = (props) =>{
     dispatch(setParams(request.lobby.params));
   }
 
+  const displayFriendships = () =>{
+
+return (
+  <>
+  <h2>My Friends</h2>
+        <ul className="list">
+          {friendshipsAccepted
+            ? friendshipsAccepted.map((friendship, index) => (
+              <li className="item" onClick={() => displayFriendProfile(friendship)} key={index}>
+                <div className="picture-indicator">
+                  <div className='friend-picture'>
+                    <img 
+                      src={friendship.friend_id == user?.id ? friendship.user.avatar:friendship.friend.avatar}
+                    />
+                  </div>
+                  <StatusDot status={friendship.friend_id == user?.id ? friendship.user.status:friendship.friend.status} style={"position-large"}/>
+                </div>
+                <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
+              </li>
+            )) 
+          : null}
+        </ul>
+        </>
+      )
+  }
+
     const friendList = () =>{
       return (
       <div className="card-wrapper">
@@ -136,34 +167,16 @@ const FriendsListCard: React.FC = (props) =>{
         </Form>
         {friendRequests?.length ? renderNotifications() : ""}
         {gameRequest?.length  ? renderGameRequests() : ""}
-        <h2>My Friends</h2>
-        <ul className="list">
-          {friendshipsAccepted
-            ? friendshipsAccepted.map((friendship, index) => (
-              <li className="item" onClick={() => displayFriendProfile(friendship)} key={index}>
-                <div className="picture-indicator">
-                  <div className='friend-picture'>
-                    <img 
-                      src={friendship.friend_id == user?.id ? friendship.user.avatar:friendship.friend.avatar}
-                    />
-                  </div>
-                  <StatusDot status={friendship.friend_id == user?.id ? friendship.user.status:friendship.friend.status}/>
-                </div>
-                <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
-              </li>
-            )) 
-          : null}
-        </ul>
+        {displayFriendships()}
+        
       </div>
       )
     }
   return (
     <>
-        {showFriend ? (
-          <FriendCard friendship={selectedFriendship}/>
-        ) : (
+        {
           friendList()
-        )}
+        }
     </>
   );
 };

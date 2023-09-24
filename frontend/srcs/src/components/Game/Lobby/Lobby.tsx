@@ -62,6 +62,8 @@ export const Lobby: React.FC = (props) => {
 
   return (
     <div style={{position: "relative", width: "100%", height:"100%"}}>
+       <div>
+          <img src="/marvin2.png" className="logo" alt="PONGƎD logo" />
       <div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"row"}}>
         {
           lobbyType != LobbyType.none && !game.lobbyId &&
@@ -81,6 +83,7 @@ export const Lobby: React.FC = (props) => {
           <JoinMatch/>
           :
           !game.lobbyId && !game.isPlaying  && lobbyType == LobbyType.none?
+         
           <div className='play-buttons' style={{width:'100%'}}>
           <ButtonGroup size="large" variant="contained">
             <Button className="auto-button" onClick={() => {dispatch(setLobbyType(LobbyType.auto))}}>Auto Match</Button>
@@ -103,5 +106,7 @@ export const Lobby: React.FC = (props) => {
         </div>
       </div>
     </div>
+    </div>
+
   );
 }

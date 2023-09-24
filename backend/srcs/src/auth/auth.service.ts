@@ -8,7 +8,7 @@ import { env } from 'process';
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService, private jwtService: JwtService, private readonly usersService: UsersService) {}
+    constructor(private prisma: PrismaService, private jwtService: JwtService, private usersService: UsersService) {}
     
     //Need to find the right type for the Promise return
     async login(username: string, pass: string): Promise<any> {
@@ -67,14 +67,7 @@ export class AuthService {
             const data = await response.json();
             const token_42 = data.access_token ;
             const userInfo =  await this.get42UserInfo(token_42)
-            let dbUser;
-            try{
-                dbUser = await this.usersService.findBy42Email(userInfo.email)
-            }
-            catch(err){
-                await this.prisma.user.create({data: {username: userInfo.login, email42: userInfo.email, email: userInfo.email}});
-                dbUser = await this.usersService.findBy42Email(userInfo.email)
-            }
+            let dbUser = await this.usersService.createOrLogin42(userInfo);
             const payload = { sub: dbUser.id, username: dbUser.username };
             return {...dbUser, access_token: await this.jwtService.signAsync(payload)};
           }catch(err) {

@@ -5,24 +5,24 @@ import { User } from 'src/users/entities/user.entity';
 import { ChatMessage } from 'src/chat-messages/entities/chat-message.entity';
 
 export class UpdateChatChannelDto extends PartialType(CreateChatChannelDto) {
-    @ApiPropertyOptional()
-    password: string
+  @ApiPropertyOptional()
+  password: string;
 
-    @ApiPropertyOptional()
-    channelType: string
+  @ApiPropertyOptional()
+  channelType: string;
 
-    @ApiPropertyOptional()
-    name: string
+  @ApiPropertyOptional()
+  name: string;
 
-    @ApiPropertyOptional()
-    admins: User
+  @ApiPropertyOptional()
+  admins: User;
 
-    @ApiPropertyOptional()
-    participants: User
+  @ApiPropertyOptional()
+  participants: User;
 
-    @ApiPropertyOptional()
-    bannedUsers: User
+  @ApiPropertyOptional()
+  bannedUsers: User;
 
-    @ApiPropertyOptional()
-    messages: ChatMessage
+  @ApiPropertyOptional()
+  messages: ChatMessage;
 }

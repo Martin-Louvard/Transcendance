@@ -34,6 +34,7 @@ const ProfileCard: React.FC = () => {
           const result = await response.json()
           dispatch(setSessionUser(result))
           setAvatarUrl(result.avatar);
+          toast.success("Avatar updated");
         }
       }  catch(err) {
         console.log(err);

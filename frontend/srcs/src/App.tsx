@@ -13,13 +13,14 @@ import { websocketDisconnected } from './redux/websocketSlice.ts';
 
 export function App() {
   const user = useAppSelector((state) => state.session.user);
+  const access_token = useAppSelector((state) => state.session.access_token);
   const isConnected = useAppSelector((state) => state.websocket.isConnected);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(websocketDisconnected());
     if (user) {
-      dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, user.access_token] });
+      dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, access_token] });
     }
   }, [user]);
 

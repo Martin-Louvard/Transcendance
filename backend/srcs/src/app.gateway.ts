@@ -1,4 +1,13 @@
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket, GameParameters, PlayerInfo, GameRequest, LobbySlotType } from '@shared/class';
@@ -7,26 +16,45 @@ import { AppService } from './app.service';
 import { LobbyService } from './game/lobby/lobby.service';
 import { PlayerService } from './game/player/player.service';
 import { FriendsService } from './friends/friends.service';
+import * as bcrypt from 'bcrypt';
+export const roundsOfHashing = 10;
 import { Player } from './game/player/player.class';
 import { Logger } from '@nestjs/common';
 import { Lobby } from './game/lobby/lobby.class';
 
 @WebSocketGateway({ cors: '*' })
-export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class AppGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
   constructor(
     private prisma: PrismaService,
     private friendService: FriendsService,
     private readonly appService: AppService,
     private readonly lobbyService: LobbyService,
-    private readonly playerService: PlayerService
+    private readonly playerService: PlayerService,
   ) {}
-  
-  private readonly logger = new Logger("AppGateway");
+
+  connected_clients = new Map<number, Socket>();
+  private readonly logger = new Logger('AppGateway');
 
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
+    if (client.handshake.auth.user_id) {
+      const user_id_string = client.handshake.auth.user_id;
+      const user_id = parseInt(user_id_string);
+      this.connected_clients.set(user_id, client);
+      console.log(user_id)
+      this.server.emit('update_friend_connection_state', {
+        user_id: user_id,
+        status: 'ONLINE',
+      });
+      await this.prisma.user.update({
+        where: { id: user_id },
+        data: { status: 'ONLINE' },
+      });
+    }
     this.appService.auth(client);
   }
 
@@ -34,35 +62,62 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     return this.lobbyService.setServer(server);
   }
 
-  handleDisconnect(client: Socket) {
-		const player  = this.playerService.getPlayerBySocketId(client.id);
-    if (!player)
-      return ;
+  async handleDisconnect(client: Socket) {
+    if (client.handshake.auth.user_id) {
+      const user_id_string = client.handshake.auth.user_id;
+      const user_id = parseInt(user_id_string);
+      this.connected_clients.delete(user_id);
+      this.server.emit('update_friend_connection_state', {
+        user_id: user_id,
+        status: 'OFFLINE',
+      });
+      await this.prisma.user.update({
+        where: { id: user_id },
+        data: { status: 'OFFLINE' },
+      });
+    }
+
+    const player = this.playerService.getPlayerBySocketId(client.id);
+    if (!player) return;
     return this.playerService.disconnectPlayer(player);
   }
 
   @SubscribeMessage('automatch')
-  autoMatch(@ConnectedSocket() client: Socket, @MessageBody() data: {mode: LobbyMode, info: PlayerInfo}) {
-    const player  = this.playerService.getPlayerBySocketId(client.id);
+  autoMatch(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { mode: LobbyMode; info: PlayerInfo },
+  ) {
+    const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player || player.socket.id != client.id) {
-      if (!player) 
-        this.logger.log(`Automatch failed: Player with id : ${data.info.id} with socketId: ${client.id} does not exist`);
+      if (!player)
+        this.logger.log(
+          `Automatch failed: Player with id : ${data.info.id} with socketId: ${client.id} does not exist`,
+        );
       else
-      this.logger.log(`Automatch failed: Sender socket id : ${client.id} does not match with registered player socket : ${player.socket.id} `);
-      return ;
+        this.logger.log(
+          `Automatch failed: Sender socket id : ${client.id} does not match with registered player socket : ${player.socket.id} `,
+        );
+      return;
     }
     this.lobbyService.automatch(player, data, this.server);
   }
 
   @SubscribeMessage('automatchClassic')
-  autoMatchClassic(@ConnectedSocket() client: Socket, @MessageBody() data: {info: PlayerInfo}) {
-    const player  = this.playerService.getPlayerBySocketId(client.id);
+  autoMatchClassic(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { info: PlayerInfo },
+  ) {
+    const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player || player.socket.id != client.id) {
-      if (!player) 
-        this.logger.log(`Automatch failed: Player with id : ${data.info.id} with socketId: ${client.id} does not exist`);
+      if (!player)
+        this.logger.log(
+          `Automatch failed: Player with id : ${data.info.id} with socketId: ${client.id} does not exist`,
+        );
       else
-      this.logger.log(`Automatch failed: Sender socket id : ${client.id} does not match with registered player socket : ${player.socket.id} `);
-      return ;
+        this.logger.log(
+          `Automatch failed: Sender socket id : ${client.id} does not match with registered player socket : ${player.socket.id} `,
+        );
+      return;
     }
     this.lobbyService.automatchClassic(player, data, this.server);
   }
@@ -128,49 +183,54 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     } catch(err) {
       console.log(err);
   }
-  }
 
   @SubscribeMessage(ClientEvents.GetLobbies)
   getLobbies(@ConnectedSocket() client: Socket) {
-    client.emit(ServerEvents.GetLobbies ,this.lobbyService.getJoinableLobbies());
-
+    client.emit(
+      ServerEvents.GetLobbies,
+      this.lobbyService.getJoinableLobbies(),
+    );
   }
 
   @SubscribeMessage(ClientEvents.StartGame)
   handleStart(@ConnectedSocket() client: Socket) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player)
-      return 'player not found';
+    if (!player) return 'player not found';
     const lobby = player.lobby;
-    if (!lobby)
-      return 'lobby not found';
-    if (!lobby.full)
-      return 'lobby not full';
-    if (!lobby.instance)
-      return 'no lobby instance';
+    if (!lobby) return 'lobby not found';
+    if (!lobby.full) return 'lobby not full';
+    if (!lobby.instance) return 'no lobby instance';
     if (lobby.instance.hasStarted || lobby.instance.hasFinished)
-      return 'game cannot be restarted'
+      return 'game cannot be restarted';
     lobby.instance.triggerStart();
   }
 
   @SubscribeMessage(ClientEvents.InputState)
-  handleInputState(@ConnectedSocket() client: Socket, @MessageBody() data: InputPacket) {
+  handleInputState(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: InputPacket,
+  ) {
     const lobby = this.playerService.getLobby(client.id);
     if (lobby)
       this.lobbyService.sendToInstance<InputPacket>(lobby.id, data, client.id);
   }
 
   @SubscribeMessage(ClientEvents.LobbyState)
-  lobbyStateHandling(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.LobbyState]) {
-		const player  = this.playerService.getPlayerBySocketId(client.id);
-		if (!player || player.socket.id != client.id || !player.lobby )
-			return ;
+  lobbyStateHandling(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: ClientPayloads[ClientEvents.LobbyState],
+  ) {
+    const player = this.playerService.getPlayerBySocketId(client.id);
+    if (!player || player.socket.id != client.id || !player.lobby) return;
     if (data.leaveLobby) {
       this.lobbyService.leaveLobby(player);
     }
   }
   @SubscribeMessage(ClientEvents.LobbySlotsState)
-  lobbySlotsHandling(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.LobbySlotsState]) {
+  lobbySlotsHandling(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: ClientPayloads[ClientEvents.LobbySlotsState],
+  ) {
     const lobby = this.playerService.getLobby(client.id);
     if (lobby) {
       lobby.setSlots(data);
@@ -179,20 +239,23 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
   }
 
   @SubscribeMessage(ClientEvents.GameSendRequest)
-  HandleGameInvitation(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.GameSendRequest]) {
-		const player = this.playerService.getPlayerById(data.receiverId);
-		if (!player || !player.getIsOnline())
-		  return false
+  HandleGameInvitation(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: ClientPayloads[ClientEvents.GameSendRequest],
+  ) {
+    const player = this.playerService.getPlayerById(data.receiverId);
+    if (!player || !player.getIsOnline()) return false;
     this.lobbyService.invitePlayer(player, data);
   }
 
   @SubscribeMessage(ClientEvents.JoinLobby)
-  JoinLobby(@ConnectedSocket() client: Socket, @MessageBody() data: {lobbyId: string, info: PlayerInfo}) {
+  JoinLobby(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { lobbyId: string; info: PlayerInfo },
+  ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player)
-      return 'player not found';
-    if (!this.lobbyService.joinLobby(player, data))
-      return 'cant join lobby';
+    if (!player) return 'player not found';
+    if (!this.lobbyService.joinLobby(player, data)) return 'cant join lobby';
   }
 
   @SubscribeMessage(ClientEvents.CreateLobby)
@@ -205,7 +268,10 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
   }
 
   @SubscribeMessage(ClientEvents.ParameterState)
-  createMatch(@ConnectedSocket() client: Socket, @MessageBody() data: {params: GameParameters, info: PlayerInfo}) {
+  createMatch(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { params: GameParameters; info: PlayerInfo },
+  ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player || !player.lobby || player.lobby.owner.id != player.id) // si il est deja dans un lobby on l'autorise pas
       return ;
@@ -221,6 +287,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
   ): Promise<void> {
     const message = await this.prisma.chatMessage.create({
       data: { channelId: body[0], senderId: body[1], content: body[2] },
+      include: { sender: true },
     });
     this.server.emit('message', message);
   }
@@ -232,9 +299,219 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
   ): Promise<void> {
     const updatedMessage = await this.prisma.chatMessage.update({
       where: { id: body[0] },
-      data: { readersId: { push: parseInt(body[3]) } },
+      data: { readersId: { push: parseInt(body[1]) } },
+      include: { sender: true },
     });
     this.server.emit('read', updatedMessage);
+  }
+
+  @SubscribeMessage('join_chat')
+  async handleJoinChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const newUser = await this.prisma.user.findUnique({
+      where: { id: body[0] },
+    });
+    const updatedChats = await this.prisma.chatChannel.update({
+      where: { id: body[1] },
+      data: { participants: { connect: { id: newUser.id } } },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    this.server.emit('join_chat', updatedChats);
+  }
+
+  @SubscribeMessage('add_admin')
+  async handleAddAdmin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const newAdmin = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const updatedChats = await this.prisma.chatChannel.update({
+      where: { id: parseInt(body[0]) },
+      data: { admins: { connect: { id: newAdmin.id } } },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    this.server.emit('add_admin', updatedChats);
+  }
+
+  @SubscribeMessage('leave_chat')
+  async handleLeaveChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const chatRecv = await this.prisma.chatChannel.findUnique({
+      where: { id: parseInt(body[0]) },
+      include: { participants: true },
+    });
+
+    const updatedParticipants = chatRecv.participants.filter(
+      (user) => user.id !== parseInt(body[1]),
+    );
+
+    const updatedChat = await this.prisma.chatChannel.update({
+      where: { id: chatRecv.id },
+      data: {
+        participants: {
+          set: updatedParticipants.map((user) => ({ id: user.id })),
+        },
+      },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    this.server.emit('leave_chat', updatedChat);
+  }
+
+  @SubscribeMessage('remove_admin')
+  async handleRemoveAdmin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const adminToRemove = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const chat = await this.prisma.chatChannel.findUnique({
+      where: { id: parseInt(body[0]) },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    const updatedAdmins = chat.admins.filter(
+      (user) => user.id !== adminToRemove.id,
+    );
+
+    const updatedChat = await this.prisma.chatChannel.update({
+      where: { id: chat.id },
+      data: {
+        admins: { set: updatedAdmins.map((user) => ({ id: user.id })) },
+      },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    this.server.emit('remove_admin', updatedChat);
+  }
+
+  @SubscribeMessage('delete_chat')
+  async handleRemoveChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    await this.prisma.chatChannel.delete({
+      where: { id: parseInt(body[0]) },
+    });
+    const updatedChats = await this.prisma.chatChannel.findMany({
+      include: {
+        participants: true,
+        bannedUsers: true,
+        admins: true,
+        messages: { include: { sender: true } },
+      },
+    });
+    this.server.emit('delete_chat', updatedChats);
+  }
+
+  @SubscribeMessage('change_owner')
+  async handleChangeOwner(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const chatId = parseInt(body[0]);
+    const newOwnerId = parseInt(body[1]);
+    const oldOwner = parseInt(body[2]);
+
+    const chat = await this.prisma.chatChannel.findUnique({
+      where: { id: chatId },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    const updateParticipants = chat.participants.filter(
+      (user) => user.id !== oldOwner,
+    );
+    const updatedChannel = await this.prisma.chatChannel.update({
+      where: { id: chatId },
+      data: {
+        ownerId: newOwnerId,
+        participants: {
+          set: updateParticipants.map((user) => ({ id: user.id })),
+        },
+      },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    this.server.emit('change_owner', updatedChannel);
+  }
+
+  @SubscribeMessage('kick_user')
+  async handleKickUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const userToKick = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const chat = await this.prisma.chatChannel.findUnique({
+      where: { id: parseInt(body[0]) },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    const updatedParticipants = chat.participants.filter(
+      (user) => user.id !== userToKick.id,
+    );
+    const updatedAdmins = chat.admins.filter(
+      (user) => user.id !== userToKick.id,
+    );
+
+    const updatedChat = await this.prisma.chatChannel.update({
+      where: { id: chat.id },
+      data: {
+        participants: {
+          set: updatedParticipants.map((user) => ({ id: user.id })),
+        },
+        admins: { set: updatedAdmins.map((user) => ({ id: user.id })) },
+      },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    this.server.emit('kick_user', updatedChat);
   }
 
   @SubscribeMessage('create_chat')
@@ -249,13 +526,14 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
       participants: number[];
     },
   ): Promise<void> {
+    const hashedPassword = await bcrypt.hash(body.password, roundsOfHashing);
     const newChatChannel = await this.prisma.chatChannel.create({
       data: {
         owner: { connect: { id: body.ownerId } },
         admins: { connect: { id: body.ownerId } },
         name: body.name,
         channelType: body.channelType,
-        password: body.password,
+        password: hashedPassword,
         participants: {
           connect: body.participants.map((p) => {
             return { id: p };
@@ -268,7 +546,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
       include: {
         owner: true,
         admins: true,
-        messages: true,
+        messages: { include: { sender: true } },
         participants: true,
       },
     });
@@ -286,9 +564,44 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
     });
     const channel = this.prisma.chatChannel.findUnique({
       where: { id: body[0] },
-      include: { friendship: true, participants: true },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
     });
     this.server.emit('update_chat', channel);
+  }
+
+  @SubscribeMessage('block_user')
+  async handleBlockUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const friendRecv = await this.friendService.friendshipExists(
+      parseInt(body[1]),
+      parseInt(body[0]),
+    );
+    if (friendRecv) {
+      const updatedFriend = await this.prisma.friends.update({
+        where: { id: friendRecv.id },
+        data: { status: 'BLOCKED' },
+      });
+      this.server.emit('block_user', updatedFriend);
+    } else {
+      const createdFriendShip = await this.friendService.create({
+        user_id: parseInt(body[1]),
+        friend_id: parseInt(body[0]),
+        sender_id: parseInt(body[1]),
+        chat_id: 0,
+      });
+      const updatedFriend = await this.prisma.friends.update({
+        where: { id: createdFriendShip.id },
+        data: { status: 'BLOCKED' },
+      });
+      this.server.emit('block_user', updatedFriend);
+    }
   }
 
   @SubscribeMessage('friend_request')
@@ -329,7 +642,12 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect, OnG
       friendship = await this.friendService.findOne(update.id);
       const chat = await this.prisma.chatChannel.findUnique({
         where: { id: friendship.chat_id },
-        include: { friendship: true, messages: true, participants: true },
+        include: {
+          owner: true,
+          admins: true,
+          messages: { include: { sender: true } },
+          participants: true,
+        },
       });
       const friendplayer = this.playerService.getPlayerById(friend_id);
       const friend_socket = friendplayer ? friendplayer.socket : undefined;

@@ -14,6 +14,12 @@ export class ChatChannelsController {
     return this.chatChannelsService.create(createChatChannelDto);
   }
 
+  @Post(':id')
+  checkPassword(@Param('id') id: string, @Body() body){
+    return this.chatChannelsService.checkPassword(+id, body.password);
+  }
+
+
   @Get()
   findAll() {
     return this.chatChannelsService.findAll();

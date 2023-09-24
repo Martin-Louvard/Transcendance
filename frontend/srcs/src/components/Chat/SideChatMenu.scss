@@ -20,7 +20,11 @@ $chat-menu-icon-open: 15vw;
   border-top-left-radius: 20px;
   border-left: solid 1px white;
   border-top: solid 1px white;
+}
 
+.search-chat-input {
+	display: flex;
+	justify-content: space-evenly;
 }
 
 .inner-chat-menu-wrapper {
@@ -31,11 +35,19 @@ $chat-menu-icon-open: 15vw;
 	justify-content: space-evenly;
 	width: auto;
 	right: 0;
+  overflow: hidden;
+  width:100%;
 }
 
 .channel-type-wrapper {
 	display: flex;
-	justify-content: space-between;
+	justify-content: space-around;
+}
+
+.chat-menu-header {
+	display: flex;
+	justify-content: space-evenly;
+  width: 100%;
 }
 
 .chat-exit-button {
@@ -120,7 +132,16 @@ $chat-menu-icon-open: 15vw;
 }
 .chat-name-in-menu {
 	display:flex;
-	width: 70%;
+	width: 50%;
+  overflow: hidden ;
+	justify-content: space-between;
+	flex-direction: row;
+	font-size: 12px;
+}
+.chat-participants{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .chat-item:hover {

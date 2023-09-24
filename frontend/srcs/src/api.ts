@@ -35,6 +35,17 @@ export async function fetchFriendshipsApi(userId: string): Promise<Friendships[]
     throw error;
   }
 }
+
+export async function fetchChatChannelsApi(): Promise<ChatChannels[] | undefined> {
+  try {
+    const response = await fetch(`http://localhost:3001/chat-channels`);
+    const data: ChatChannels[] | undefined = await response.json();
+    return data;
+  }
+  catch (error) {
+    throw error;
+  }
+}
   
 export async function login (username: string, password: string): Promise<User> {
   const requestOptions = {

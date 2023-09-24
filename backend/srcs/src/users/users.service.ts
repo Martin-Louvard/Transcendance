@@ -14,6 +14,7 @@ import { authenticator } from 'otplib';
 import * as bcrypt from 'bcrypt';
 import { toDataURL } from 'qrcode';
 import { FriendsService } from 'src/friends/friends.service';
+import { ChatChannelsService } from 'src/chat-channels/chat-channels.service';
 
 export const roundsOfHashing = 10;
 
@@ -22,6 +23,7 @@ export class UsersService {
   constructor(
     private prisma: PrismaService,
     private friendsService: FriendsService,
+    private chatChannelService : ChatChannelsService
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -32,19 +34,7 @@ export class UsersService {
     createUserDto.password = hashedPassword;
     const newUser = await this.prisma.user.create({ data: createUserDto });
 
-    const chatGeneral = await this.prisma.chatChannel.findFirst({
-      where: { channelType: 'general' },
-    });
-    const chatGeneralId = chatGeneral.id;
-
-    await this.prisma.chatChannel.update({
-      where: { id: chatGeneralId },
-      data: {
-        participants: {
-          connect: [{ id: newUser.id }],
-        },
-      },
-    });
+    await this.chatChannelService.addUserToGeneralChat(newUser);
 
     return newUser;
   }
@@ -94,7 +84,14 @@ export class UsersService {
       include: {
         games: true,
         JoinedChatChannels: {
-          include: { messages: true, friendship: true, participants: true },
+          include: {
+            owner: true,
+            messages: {include: {sender: true}},
+            friendship: true,
+            participants: true,
+            admins: true,
+            bannedUsers: true,
+          },
         },
         OwnedChatChannels: { include: { messages: true } },
         BannedFromChatChannels: { include: { messages: true } },
@@ -300,5 +297,23 @@ export class UsersService {
       token: twoFactorAuthenticationCode,
       secret: user.twoFASecret,
     });
+  }
+
+  async createOrLogin42(userInfo)
+  {
+    let dbUser;
+    try{
+
+      dbUser = await this.findBy42Email(userInfo.email)
+    }
+    catch(err){
+
+        const usernametaken = await this.prisma.user.findUnique({where:{username: userInfo.login}});
+        while (usernametaken && usernametaken.username == userInfo.login)
+            userInfo.login = userInfo.login + Math.floor(Math.random() * (10000));
+        dbUser = await this.prisma.user.create({data: {username: userInfo.login, email42: userInfo.email, email: userInfo.email}});
+        await this.chatChannelService.addUserToGeneralChat(dbUser);
+    }
+    return dbUser;
   }
 }

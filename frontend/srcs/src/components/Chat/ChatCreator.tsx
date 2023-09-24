@@ -68,27 +68,27 @@ const ChatCreator: React.FC = () => {
           onChange={handleChange}
         />
         <label htmlFor="type">Type</label>
-        <select id="type" value={channelType} onChange={handleChange}>
-          <option value="Private">Private</option>
-          <option value="Public">Public</option>
-          <option value="Password">Password protected</option>
-        </select>
-        {channelType === "Password" ? (
-          <>
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={handleChange}
-            />
-          </>
-        ) : null}
-        {friends ? (
-          <fieldset id="participants">
-            <legend>Participants</legend>
-            {friends.map((f: Friend) => (
-              <label key={f.id}>
+          <select id="type" value={channelType} onChange={handleChange}>
+            <option value="Private">Private</option>
+            <option value="public">Public</option>
+            <option value="Password">Password protected</option>
+          </select>
+          {channelType === "Password" ? (
+            <>
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={handleChange}
+              />
+            </>
+          ) : null}
+          {friends ? (
+            <fieldset id="participants">
+              <legend>Participants</legend>
+              {friends.map((f: Friend) => (
+                <label key={f.id}>
                 <input
                   type="checkbox"
                   value={f.id}

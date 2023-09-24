@@ -70,17 +70,17 @@ model Friends {
 }
 
 model ChatChannel {
-  id           Int           @id @default(autoincrement())
-  ownerId      Int
-  owner        User          @relation("OwnedChannels", fields: [ownerId], references: [id])
-  password     String?
-  channelType  String?
-  name         String?
-  friendship   Friends?
-  admins       User[]        @relation("AdminOnChannels")
-  participants User[]        @relation("JoinedChannels")
-  bannedUsers  User[]        @relation("BannedFromChannels")
-  messages     ChatMessage[]
+  id                      Int           @id @default(autoincrement())
+  ownerId                 Int
+  owner                   User          @relation("OwnedChannels", fields: [ownerId], references: [id])
+  password                String?
+  channelType             String?
+  name                    String?
+  friendship              Friends?
+  admins		          User[]	    @relation("AdminOnChannels")
+  participants            User[]        @relation("JoinedChannels")
+  bannedUsers             User[]        @relation("BannedFromChannels")
+  messages                ChatMessage[]
 }
 
 model ChatMessage {
