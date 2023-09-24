@@ -19,13 +19,19 @@ const FriendsListCard: React.FC = () =>{
     const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
     const gameRequest= useAppSelector((state) => state.websocket.invitedGames)
     const contentToShow = useAppSelector((state) => state.session.contentToShow)
+    
+    
+  const getAccepted = ()=>{
+    if (friendships){
+      setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
+    }
+    const accepted = friendships?.filter(f => f.status === Status.ACCEPTED)
+    if (accepted)
+      setFriendshipsAccepted(accepted)
+  }
+
     useEffect(()=>{
-      if (friendships){
-        setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
-      }
-      const accepted = friendships?.filter(f => f.status === Status.ACCEPTED)
-      if (accepted)
-        setFriendshipsAccepted(accepted)
+      getAccepted()
     },[friendships])
 
 
@@ -118,23 +124,11 @@ const FriendsListCard: React.FC = () =>{
     dispatch(setParams(request.lobby.params));
   }
 
-    const friendList = () =>{
-      return (
-      <div className="card-wrapper">
-        <Form onSubmit={sendFriendRequest} title="Add a new friend" buttonText="Add">
-          <div>
-            <input 
-            type="FriendUsername" 
-            id="FriendUsername" 
-            placeholder="Friend's username" 
-            value={newFriendUsername} 
-            onChange={handleChange}
-            />
-          </div>
-        </Form>
-        {friendRequests?.length ? renderNotifications() : ""}
-        {gameRequest?.length  ? renderGameRequests() : ""}
-        <h2>My Friends</h2>
+  const displayFriendships = () =>{
+
+return (
+  <>
+  <h2>My Friends</h2>
         <ul className="list">
           {friendshipsAccepted
             ? friendshipsAccepted.map((friendship, index) => (
@@ -152,6 +146,28 @@ const FriendsListCard: React.FC = () =>{
             )) 
           : null}
         </ul>
+        </>
+      )
+  }
+
+    const friendList = () =>{
+      return (
+      <div className="card-wrapper">
+        <Form onSubmit={sendFriendRequest} title="Add a new friend" buttonText="Add">
+          <div>
+            <input 
+            type="FriendUsername" 
+            id="FriendUsername" 
+            placeholder="Friend's username" 
+            value={newFriendUsername} 
+            onChange={handleChange}
+            />
+          </div>
+        </Form>
+        {friendRequests?.length ? renderNotifications() : ""}
+        {gameRequest?.length  ? renderGameRequests() : ""}
+        {displayFriendships()}
+        
       </div>
       )
     }

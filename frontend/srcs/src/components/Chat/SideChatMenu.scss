@@ -132,7 +132,8 @@ $chat-menu-icon-open: 15vw;
 }
 .chat-name-in-menu {
 	display:flex;
-	width: 80%;
+	width: 50%;
+  overflow: hidden ;
 	justify-content: space-between;
 	flex-direction: row;
 	font-size: 12px;

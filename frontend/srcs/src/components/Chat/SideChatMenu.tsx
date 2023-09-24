@@ -101,13 +101,13 @@ const SideChatMenu = () => {
             </div>
             <div className="chat-name-in-menu">
               <div>{getName(chat, userName)}</div>
+              </div>
               <div className="chat-participants">
                 <div>{`${chat?.participants?.length}`}</div>
                 <div>
                   <BsFillPersonFill />
                 </div>
               </div>
-            </div>
           </li>
         ))}{" "}
       </div>
