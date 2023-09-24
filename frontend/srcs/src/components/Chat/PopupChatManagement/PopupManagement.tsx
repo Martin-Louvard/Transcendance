@@ -6,6 +6,7 @@ import UserListItem from "./userItemManagement.tsx";
 import ChatSettings from "./chatSettings.tsx";
 import React, { useState, useEffect } from 'react';
 import LeaveChatButton from "./leaveChatButton.tsx";
+import AddParticipants from "./addParticipants.tsx";
 
 const contentStyle = { background: '#000' };
 const arrowStyle = { color: '#000' }; 
@@ -43,6 +44,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
           return null;
       })}
     </ul>
+    <AddParticipants chat={currentOpenedChat!} />
     <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
     </Popup>
   );
