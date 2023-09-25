@@ -10,7 +10,7 @@ const KickUserButton = ({ user, chat }:{user: User; chat: ChatChannels}) => {
   };
 
   return (
-    <div className="management-kick-button" onClick={() => handleKickButton()}>
+    <div className="management-button" onClick={() => handleKickButton()}>
       <GiBootKick />
     </div>
   );

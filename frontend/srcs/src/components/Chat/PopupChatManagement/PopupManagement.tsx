@@ -33,8 +33,12 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         {...{ contentStyle, arrowStyle }}  
     >
       <div className=' chat-popup'>
-      <div className="management-currentOpenedChat-popup">
-        {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
+        <div className='popup-top'>
+        <div className="management-currentOpenedChat-popup">
+            {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
+          </div>
+          <AddParticipants chat={currentOpenedChat!} />
+          <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
       </div>
       <ul>
         {currentOpenedChat?.participants.map((user)=>{
@@ -43,8 +47,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
           return null;
       })}
     </ul>
-    <AddParticipants chat={currentOpenedChat!} />
-    <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
+
     </div>
     </Popup>
   );
