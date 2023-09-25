@@ -120,6 +120,13 @@
     border: 1px solid black;
     border-radius: 15px;
     padding: 20px;
+    position: relative;
+  }
+
+  .close-popup{
+    position: absolute;
+    right: -25px;
+    top: -25px;
   }
 
   .popup-mdp{
@@ -133,8 +140,7 @@
   .popup-top{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-  }
+   }
   
   .add-participants-search-bar-wrapper{
     display: flex;
@@ -152,9 +158,13 @@
   .management-leave-button{
     display: flex;
     flex-direction: row;
+    align-items: center;
     cursor: pointer;
-    margin-left: 15px;
     justify-content: center;
+
+    p{
+        margin-right: 10px;
+    }
   }
   
 .popup-user-list-item{
