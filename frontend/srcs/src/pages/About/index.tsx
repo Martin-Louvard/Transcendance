@@ -2,7 +2,8 @@ import Footer from "../../components/Footer/Footer";
 const About = () => {
 
     return <>
-    <h1>About page</h1> 
+    <div className="about-wrapper">
+        <h1>About page</h1> 
     <h2>Website by </h2>
     <ul  className="authors">
     <div className="row">
@@ -35,6 +36,7 @@ const About = () => {
         </div>
 
     </ul>
+    </div>
     <Footer/>
     </>
 }

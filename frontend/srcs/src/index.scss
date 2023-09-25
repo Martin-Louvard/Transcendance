@@ -3,7 +3,7 @@ $primary-color: #646cff;
 $secondary-color: #535bf2;
 $background-color: #18191A;
 $light-color: #f9f9f9;
-$dark-color: #1a1a1a;
+$dark-color: #131313;
 $secondary-bg-color: #4d4848;
 
 @font-face {
@@ -152,4 +152,13 @@ ul{
   button {
     background-color: $light-color;
   }
+}
+.about-wrapper{
+  margin: 80px 60px 0px 60px;
+  height: 100%;
+  //border: 2px solid white;
+  //border-radius: 25%;
+  max-width: 1500px;
+  width: 40vw;
+  align-items: center;
 }

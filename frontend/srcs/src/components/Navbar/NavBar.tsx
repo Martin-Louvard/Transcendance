@@ -3,11 +3,22 @@ import './NavBar.scss'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { cleanSession } from '../../redux/sessionSlice';
-
+import Notification from '../UserProfileCards/Notification.tsx';
+import { setContentToShow } from '../../redux/sessionSlice.ts';
+import { Friendships, Status, ContentOptions } from '../../Types';
+import { useState, useEffect } from 'react';
 const Navbar: React.FC = () => {
   const logo = '/marvin.png'
   const user = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
+  const friendships = useAppSelector((state) => state.session.friendships);
+  const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
+
+  useEffect(() =>{
+    if (friendships){
+      setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
+    }
+  },[friendships])
 
   const logout = () =>{
     window.location.href="http://localhost:3000/"
@@ -15,12 +26,42 @@ const Navbar: React.FC = () => {
     localStorage.removeItem('persist:root')
   }
 
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLImageElement>) => {
+    event.preventDefault();
+    const targetId = event.currentTarget.id;
+    if (targetId === "profile") dispatch(setContentToShow(ContentOptions.PROFILE));
+    else if (targetId === "friends") dispatch(setContentToShow(ContentOptions.FRIENDS));
+    else if (targetId === "history") dispatch(setContentToShow(ContentOptions.HISTORY));
+    else if (targetId === "play") dispatch(setContentToShow(ContentOptions.PLAY));
+  };
+
+  const renderMenuButtons = () => (
+    user?.id && user.id != 0 ? 
+    <div className='menu-middle'>
+      <button id="friends" onClick={handleClick}>
+        Friends
+        <Notification number={friendRequests?.length}/>
+      </button>
+      <button id="history" onClick={handleClick}>
+        LeaderBoard
+      </button>
+      <button id="profile" onClick={handleClick}>
+        My Profile
+      </button>
+      <button id="play" onClick={handleClick}>
+        Play
+      </button>
+    </div>
+    :""
+  );
+
   return (
     <nav className="navbar">
         <Link  to="/" className="nav-elem-wrapper">
           <img src={logo} className="logo-nav" alt="PONGƎD logo" />
           <div className="navbar-brand">PONGƎD</div>
         </Link>
+        { renderMenuButtons()}
         <ul className="nav-elem-wrapper">
           <li className="nav-item">
             <Link className="nav-link" to="/about">About</Link>

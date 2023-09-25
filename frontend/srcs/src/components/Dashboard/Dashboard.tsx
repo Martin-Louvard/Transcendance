@@ -68,7 +68,6 @@ const Dashboard: React.FC = () => {
      
   return (
     <div className="dashboard-wrapper">
-      {renderMenuButtons()}
       <SideChatMenu />
       <div className="canvas-wrapper">
         {renderContent()}
