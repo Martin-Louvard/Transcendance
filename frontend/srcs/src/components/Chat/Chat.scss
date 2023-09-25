@@ -115,6 +115,13 @@
     align-self: center;
 }
 
+.chat-popup{
+    background: #242526;
+    border: 1px solid black;
+    border-radius: 15px;
+    padding: 20px;
+  }
+
 .popup-user-list-item{
     display: flex;
     flex-direction: row;
@@ -122,12 +129,13 @@
     width:100%;
     margin:5px;
     overflow: hidden;
+    padding-right: 5px;
 }
 
 
 .link-to-user{
     cursor: pointer;
-    border-radius: 15%;
+    border-radius: 15px 0 0 15px;
     padding-right: 10px;
 
     .div{
@@ -159,3 +167,4 @@
 .management-currentOpenedChat-popup{
     overflow: scroll;
 }
+
