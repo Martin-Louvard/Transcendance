@@ -118,7 +118,6 @@ export class LobbyService {
 	getJoinableLobbies() {
 		let lobbies:LobbyCli[] = [];
 		this.lobbies.forEach((e) => {
-			console.log("automatch: ", e.instance.automatch, e.isOnlineSlot, 'mode: ', e.mode);
 			if (e.instance && !e.instance.hasStarted && !e.instance.automatch && e.isOnlineSlot())
 				lobbies.push({id: e.id, slots: e.mode == LobbyMode.duel ? e.slots.slice(0, 2) : e.slots, creator: e.owner.infos, size: e.mode == LobbyMode.duel ? 2 : 4});
 		})
@@ -127,7 +126,6 @@ export class LobbyService {
 
 	createLobbyByParameters(params: GameParameters, server: Server, creator: Player) {
 		try {
-			console.log(params);
 			if (params.classic) {
 				// TODO: create classic lobby
 				return ;
@@ -184,15 +182,12 @@ export class LobbyService {
 	}
 
 	joinLobby(player: Player, data: {lobbyId: string, info: PlayerInfo}) {
-		console.log("join lobby");
 		const lobby = this.findLobbyById(data.lobbyId);
 		if (!lobby) {
-			console.log("lobby not found");
 			return 'lobby not found';
 		}
 		if (player.lobby)
 			player.lobby.removePlayer(player);
-		console.log("on connecger le player");
 		lobby.connectPlayer(player);
 		this.dispatchEvent();
 		return ;
@@ -301,8 +296,6 @@ export class LobbyService {
 			return ;
 		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance;
 		const players = [...lobby.players.values()];
-		console.log(players);
-		console.log("duel: ", duel, "lobbymode: ", lobby.mode, "lobby instance of classic: ", lobby.instance instanceof ClassicInstance);
 		const users = await this.prismaService.user.findMany({
 			where: {
 				id: {in: duel ? [players[0].id, players[1].id] : [players[0].id, players[1].id, players[2].id, players[3].id]},
@@ -320,7 +313,6 @@ export class LobbyService {
 				id: {in: duel ? [homeInfos[0].id] : [homeInfos[0].id, homeInfos[1].id]},
 			}
 		})
-		console.log("players: ", users.map((user) => ({ id: user.id })));
 		const gameData = {
 			scoreHome: lobby.instance.data.score.home,
 			scoreVisitor: lobby.instance.data.score.visitor,
@@ -339,8 +331,7 @@ export class LobbyService {
 			const game = await this.prismaService.game.create({
 			  data: gameData,
 			});
-		
-			console.log("Game created:", game);
+
 		  } catch (error) {
 			console.error("Error creating a game:", error);
 		  }

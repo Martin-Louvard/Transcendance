@@ -58,16 +58,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 		})
 	}, [game.sentInvites])
 
-	//useEffect(() => {
-	//  if (user && game.owner == user.username ) {
-	//	dispatch({
-	//	  type: 'WEBSOCKET_SEND_LOBBY_SLOTS',
-	//	  payload: game.lobbySlots,
-	//	});
-	//  }
-	////  console.log("salut");
-	//}, [game.lobbySlots])
-
 	function createRenderSlots() {
 		if (!game.lobbySlots)
 		  return;
@@ -94,11 +84,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 	  }
 
 	  function isFriend(id) {
-		console.log(friendships)
 		if (user?.id == id)
 			return true;
-		console.log('id: ', id);
-		console.log(friendships)
 		if (friendships?.find(f => f.status === "ACCEPTED" && (id == f.user_id || id == f.friend_id)))
 			return true;
 		if (friendships?.find((fs) =>( (fs.user_id == id || fs.friend_id == id) && (fs.status == "ACCEPTED" || fs.status == "PENDING"))))
@@ -295,7 +282,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 	  }
 	  
 	  function handleCancelInviteClick(slot: LobbySlotCli) {
-		console.log(slot);
 		if (!slot.player)
 			return;
 		const request = game.sentInvites.find((e) => e.receiver.id == slot.player.id);
@@ -305,7 +291,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 					type: "WEBSOCKET_SEND_DELETE_GAME_INVITATION",
 					payload: slot.player.id,
 				});
-				console.log(slot.player.id);
 			}
 			return;
 		}

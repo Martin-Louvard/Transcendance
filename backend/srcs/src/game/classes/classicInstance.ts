@@ -131,7 +131,7 @@ export class ClassicInstance {
 	}
 
 
-	setParams(params: GameParameters) {console.log(params); this.params = params; this.automatch = false };
+	setParams(params: GameParameters) {this.params = params; this.automatch = false };
 	getParams(): GameParameters {return this.params};
 	isInstanceOfInputPacket(object: any): boolean {
 		return ('code' in object && 'timestamp' in object);

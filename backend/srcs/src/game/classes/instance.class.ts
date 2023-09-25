@@ -136,7 +136,7 @@ export class Instance {
 	public currentCurveForce = new CANNON.Vec3(0, 0, 0)
 	private isRestarting: boolean = false;
 
-	setParams(params: GameParameters) {console.log(params); this.params = params; this.automatch = false };
+	setParams(params: GameParameters) {this.params = params; this.automatch = false };
 	getParams(): GameParameters {return this.params};
 	isInstanceOfInputPacket(object: any): boolean {
 		return ('code' in object && 'timestamp' in object);
@@ -363,7 +363,6 @@ export class Instance {
 					const ballX = ball.body.position.x;
 					if (ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2) {
 				if (wall.id == 99) {
-					console.log(bi, bj);
 					console.log('HOME score 1 point');
 					this.data.score.home += 1;
 					this.restartRound();

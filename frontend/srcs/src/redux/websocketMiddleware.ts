@@ -56,7 +56,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           //  store.dispatch(setLobbyType(LobbyType.wait))
           store.dispatch(setLobbySlots(data))
         })
-        socket.on(ServerEvents.GameRequest, (data: GameRequest) => {console.log("yooo, requests: ", data); store.dispatch(setGameRequests(data))})
+        socket.on(ServerEvents.GameRequest, (data: GameRequest) => {store.dispatch(setGameRequests(data))})
         socket.on(ServerEvents.SuccessfulInvited, (data: GameRequest) => {store.dispatch(addSentInvte(data));
           setTimeout(() => {
             store.dispatch({
@@ -69,7 +69,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on(ServerEvents.DeleteGameRequest, (data: GameRequest) => {data && data.id && store.dispatch(deleteInvitedGameById(data.id))})
         socket.on(ServerEvents.LobbyFull, (data: boolean) => {store.dispatch(setLobbyFull(data))});
         socket.on(ServerEvents.ListLobbies, (data: any) => {store.dispatch(setLobbies(data))});
-        socket.on(ServerEvents.ParametersState, (data: any) => { console.log("params received: ", data); store.dispatch(setParamsReceived(!store.getState().websocket.paramsReceived)); store.dispatch(setParams(data))});
+        socket.on(ServerEvents.ParametersState, (data: any) => {  store.dispatch(setParamsReceived(!store.getState().websocket.paramsReceived)); store.dispatch(setParams(data))});
         break;
 
       case 'WEBSOCKET_SEND_MESSAGE':

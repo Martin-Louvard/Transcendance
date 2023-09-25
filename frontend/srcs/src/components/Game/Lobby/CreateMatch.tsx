@@ -47,7 +47,6 @@ import { User } from "../../../Types";
 	  time: 180,
 	})
 	const [sliderSize, setSliderSize] = useState((size.width / 100));
-	console.log(sliderSize);
 	const sliderStyle = {
 	  width: `${sliderSize}px`,
 	  '& .MuiSlider-valueLabel': {
@@ -107,7 +106,6 @@ import { User } from "../../../Types";
 	}
 
 	useEffect(() => {
-		console.log("received :", params);
 		setMapParam(params.map);
 		setBallParam(params.ball);
 		setPlayersParam(params.players);

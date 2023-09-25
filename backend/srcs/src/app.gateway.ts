@@ -150,7 +150,6 @@ export class AppGateway
         if (!lobby) {
           return false ;
         }
-        console.log("before: ", lobby.slots);
         const index = lobby.slots.findIndex((slot) => slot.player.id == data);
         lobby.slots[index].full = false;
         lobby.slots[index].type = LobbySlotType.friend;
@@ -270,7 +269,6 @@ export class AppGateway
     @MessageBody() data: { lobbyId: string; info: PlayerInfo },
   ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    console.log(data);
     if (!player){ console.log("player not found"); return 'player not found';}
     if (!this.lobbyService.joinLobby(player, data)) return 'cant join lobby';
     this.lobbyService.dispatchEvent();
@@ -278,11 +276,9 @@ export class AppGateway
 
   @SubscribeMessage(ClientEvents.CreateLobby)
   createLobby(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.CreateLobby]) {
-    console.log("bonjour");
     const player = this.playerService.getPlayer(data.id);
     if (!player || player.lobby) 
       return ;
-    console.log("ici");
     this.lobbyService.createLobby(undefined, this.server, player);
     this.lobbyService.dispatchEvent();
   }
@@ -301,7 +297,7 @@ export class AppGateway
       dispatch = true;
     player.lobby.setParams(data.params);
     
-    if (dispatch){ this.lobbyService.dispatchEvent(); console.log("dispatchol")}
+    if (dispatch){ this.lobbyService.dispatchEvent()}
     //this.lobbyService.createLobbyByParameters(data.params, this.server, player);
   }
 

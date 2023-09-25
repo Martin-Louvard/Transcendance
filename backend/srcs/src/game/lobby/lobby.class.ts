@@ -66,9 +66,7 @@ export class Lobby {
 
 	public dispatchParametersState() {
 		this.players.forEach((pl) => {
-			console.log(pl.id)
 			if (pl.id != this.owner.id) {
-				console.log('emited');
 				pl.emit<ServerPayloads[ServerEvents.ParametersState]>(ServerEvents.ParametersState, this.instance.getParams());
 			}
 		})
