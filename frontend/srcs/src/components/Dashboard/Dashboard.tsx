@@ -13,6 +13,7 @@ import { Friendships, Status, ContentOptions } from '../../Types';
 import Notification from '../UserProfileCards/Notification.tsx';
 import { setContentToShow } from '../../redux/sessionSlice.ts';
 import FriendCard from '../UserProfileCards/FriendCard.tsx';
+import { LobbyType } from '@shared/class.ts';
 
 const Dashboard: React.FC = () => {
   const contentToShow = useAppSelector((state) => state.session.contentToShow);
@@ -21,6 +22,7 @@ const Dashboard: React.FC = () => {
   const friendships = useAppSelector((state) => state.session.friendships);
   const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
   const dispatch = useAppDispatch();
+  const lobbyType = useAppSelector(state => state.websocket.LobbyType);
 
   useEffect(()=>{
     if (friendships){
@@ -67,7 +69,7 @@ const Dashboard: React.FC = () => {
 
      
   return (
-    <div className="dashboard-wrapper">
+    <div className={contentToShow === ContentOptions.PLAY ?"dashboard-wrapper-game" :  "dashboard-wrapper"}>
       <SideChatMenu />
       <div className="canvas-wrapper">
         {renderContent()}

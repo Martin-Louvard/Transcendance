@@ -81,7 +81,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
   
 	function renderPlayerSlot(slot, index) {
 		return (
-		<div key={index} style={{height:'250px'}}>
+		<div key={index} style={{height:'130px'}}>
 			{game.params ?
 			slot.full && slot.player != null ?
 				renderFilledSlot(slot, index) :
@@ -283,8 +283,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 
 	  function renderInvitedSlot(slot, index) {
 		return (
-		  <div  style={{ height:"200px" }}>
-			<div style={{display:"flex", flexDirection:"column"}}/>
+			<div style={{display:"flex", flexDirection:"column"}}>
 			<Button key={index} variant="contained" sx={{ width: 100, height:100}} disabled disableElevation disableTouchRipple>
 			  <p> Waiting for : {slot.player && slot.player.username ? slot.player.username : ""}... </p>
 			</Button>
@@ -323,10 +322,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 		{/*<div style={{height:"100vh"}}/>*/}
 	{
 		game && game.params &&
-		<div style={{width: "50%", height: size.height / 2, position:"relative"}}>
-		<Stack sx={{position:'relative', flexDirection:"row", gap:"30px", justifyContent:'center', alignContent:'center'}}>
-		{renderSlots}
-		</Stack>
+		<div style={{width: "100%", height: size.height / 2, position:"relative"}}>
 		{user && game.owner == user.username &&
 			game.full ?
 			<Button onClick={() => {
@@ -338,11 +334,14 @@ import LogoutIcon from '@mui/icons-material/Logout';
 			<Button disabled>Start Game</Button>
 		}
 		<Button color='error' onClick={() => {leaveLobby()}}>Leave</Button>
+			<Stack sx={{position:'relative', height:"100%", flexDirection:"row", gap:"30px", justifyContent:'center', alignContent:'center', width: "300px", flexWrap:"wrap"}}>
+				{renderSlots}
+			</Stack>
 		</div>
 	}	
 	{
 		game.LobbyType != LobbyType.auto && game.LobbyType != LobbyType.classic &&
-		<div style={{width:"100%"}}>
+		<div style={{width:"100%", minWidth:"600px", maxWidth:"1000px"}}>
 			<CreateMatch/>
 		</div>}
 	</div>

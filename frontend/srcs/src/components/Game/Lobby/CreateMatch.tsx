@@ -46,9 +46,10 @@ import { User } from "../../../Types";
 	const [generalParam, setGeneralParam] = useState({
 	  time: 180,
 	})
-	const [sliderSize, setSliderSize] = useState((size.width / 100) * 10);
+	const [sliderSize, setSliderSize] = useState((size.width / 100));
+	console.log(sliderSize);
 	const sliderStyle = {
-	  width: sliderSize,
+	  width: `${sliderSize}px`,
 	  '& .MuiSlider-valueLabel': {
 		lineHeight: 1.2,
 		fontSize: 12,
@@ -57,7 +58,8 @@ import { User } from "../../../Types";
 		width: 32,
 		height: 32,
 		borderRadius: '50% 50% 50% 0',
-		backgroundColor: "#90caf9",
+		color: '#000000',
+		backgroundColor: "#FFFFFF",
 		transformOrigin: 'bottom left',
 		transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
 		'&:before': { display: 'none' },
@@ -72,7 +74,7 @@ import { User } from "../../../Types";
   
   
 	useEffect(() => {
-	  setSliderSize((size.width / 100) * 10)
+	  setSliderSize((size.width / 100) * 7)
 	}, [size])
   
 	function storeParams(): void {
@@ -104,21 +106,6 @@ import { User } from "../../../Types";
 		  }
 	}
 
-
-	//useEffect(() => {
-		//if (params.map.goalSize !== mapParam.goalSize || params.map.medianOffset !== mapParam.medianOffset || params.map.size !== mapParam.size)
-		//	console.log(params.map, mapParam);
-		//	setMapParam(params.map);
-		//if (params.ball != ballParam)
-		//	setBallParam(params.ball);
-		//if (params.players != playersParam)	
-		//	setPlayersParam(params.players);
-		//if (params.general != generalParam)
-		//	setGeneralParam(params.general);
-		//if (duel != params.duel)
-		//	setDuel(params.duel);
-	//}, [params])
-
 	useEffect(() => {
 		console.log("received :", params);
 		setMapParam(params.map);
@@ -143,7 +130,7 @@ import { User } from "../../../Types";
 	}, [duel, mapParam, ballParam, playersParam, generalParam])
   
 	return (
-		<Stack id="ultimate-params" sx={{backgroundColor: 'transparent',width:'100%', maxHeight: size.height - 200, overflow: 'auto', fontFamily:'avenir', display: 'flex', flexDirection:'column'}}>
+		<Stack id="ultimate-params" sx={{backgroundColor: 'transparent',width:'100%', maxHeight: size.height - 200, overflow: 'auto', fontSize:'0.8rem',fontFamily:'avenir', display: 'flex', flexDirection:'column'}}>
 			<div style={{display:'flex', flexDirection:'column', color:'white'}}>
 				<p>Mode: </p>
 				<ButtonGroup size="large" variant="contained" sx={{boxShadow:'0' ,margin:4, display:'flex', justifyContent:'center', color:'white'}}>
