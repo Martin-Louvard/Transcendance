@@ -43,7 +43,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
       <ul>
         {currentOpenedChat?.participants.map((user)=>{
           if (currentUser?.id !== user?.id)
-            return (<UserListItem key={user.id} user={user} chat={currentOpenedChat} />);
+            return (<UserListItem key={user.id} user={user} chat={currentOpenedChat} setIsOpen={setIsOpen} />);
           return null;
       })}
     </ul>
