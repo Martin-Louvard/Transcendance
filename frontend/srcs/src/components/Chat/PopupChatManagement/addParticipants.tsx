@@ -2,7 +2,6 @@ import { ChatChannels } from "../../../Types.ts";
 import { useAppSelector } from "../../../redux/hooks";
 import React, { useState, useEffect } from 'react';
 import AddParticipantsSearchBar from "./addParticipantsSearchBar.tsx";
-import {IoMdPersonAdd} from "react-icons/io";
 
 const AddParticipants = ({chat} : {chat: ChatChannels}) => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -17,7 +16,6 @@ const AddParticipants = ({chat} : {chat: ChatChannels}) => {
   return (
     <div className="popup-add-new-people">
       { isAllowed ? <AddParticipantsSearchBar chat={chat} /> : "" }
-      <div className="popup-button"><IoMdPersonAdd /></div>
     </div>
   );
 };

@@ -35,6 +35,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('update_chat', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
         socket.on('add_admin', (data: any) => {store.dispatch(updateOneChat(data))});
+        socket.on('add_user_chat', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('kick_user', (data: any) => {store.dispatch(beenKicked(data))});
         socket.on('remove_admin', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('read', (data: any) => {store.dispatch(addReaderId(data))});
@@ -214,6 +215,11 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       case 'KICK_USER':
         if (socket && socket.connected) {
           socket.emit('kick_user', action.payload);
+        }
+        break;
+      case 'ADD_USER_CHAT':
+        if (socket && socket.connected) {
+          socket.emit('add_user_chat', action.payload);
         }
         break;
 

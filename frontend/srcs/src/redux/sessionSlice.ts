@@ -158,7 +158,17 @@ export const sessionSlice = createSlice({
     },
     updateOneChat: (state, action) => {
       const updatedChat: ChatChannels = action.payload;
+      if (!state.JoinedChatChannels?.filter(
+        (chann) => chann.id === updatedChat.id).length){
+        state.JoinedChatChannels?.push(updatedChat);
+      }
       state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
+        if (updatedChat.id === chat.id){
+          return updatedChat;
+        }
+        return chat;
+      })
+      state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) => {
         if (updatedChat.id === chat.id){
           return updatedChat;
         }

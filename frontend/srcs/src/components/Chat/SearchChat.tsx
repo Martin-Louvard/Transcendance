@@ -36,7 +36,6 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
   const handleSearch = () => {
     if (fetchedChannels && currentUser){
       const foundChannels: ChatChannels[] | undefined = fetchedChannels.filter((chan) => {
-        console.log(chan.channelType);
         if (getName(chan, currentUser.username).toLowerCase().includes(searchTerm.toLowerCase()) 
           && (chan.channelType !== "Private" && !chan.participants.includes(currentUser))){
           return chan;
