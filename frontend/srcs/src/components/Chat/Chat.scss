@@ -2,19 +2,19 @@
 	display: flex;
     width: 90%;
     height: 70%;
-    border-radius: 4px;
     font-size: 8px;
     resize: none;
+    margin: 5px;
 }
 
 .chat-input {
 	display:flex;
-	background-color: rgba(79, 81, 93, 1);
+	background-color: #242526;
 	justify-content: space-between;
 	align-items: center;
 	height: 35px;
-	border: 1px;
-	border-color: black;
+    padding: 5px;
+
 }
 
 .message-wrapper{
@@ -27,11 +27,13 @@
 .chat-messages{
     text-align: left;
     font-size: small;
-    width: 100%;
+    width: auto;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
 	flex: 1;
+    background-color: #242526;
+    padding: 5px 5px 0px 5px;
 }
 
 .chat-message{
@@ -39,7 +41,7 @@
     margin: 3px;
     font-size: 10px;
     min-width: 10%;
-    padding: 5px;
+    padding: 10px;
 }
 
 .left{
@@ -55,8 +57,8 @@
 }
 
 .user1{
-    background-color: rgb(145, 137, 63);
-    border-radius: 20px 20px 8px 20px;
+    background-color: #646cffaa;;
+    border-radius: 10px 10px 3px 10px;
     max-width: 80%;
     width: fit-content;
     align-self: flex-end;
@@ -64,8 +66,8 @@
 }
 
 .user2{
-    background-color: rgb(108, 135, 66);
-    border-radius: 20px 20px 20px 8px;
+    background-color: #3E4042;
+    border-radius: 10px 10px 10px 10px;
     max-width: 80%;
     width: fit-content;
     align-self: flex-start;
@@ -107,11 +109,17 @@
     margin-left: 5px;
 }
 
+.message-date{
+    font-size: smaller;
+    margin-left: 5px;
+    align-self: center;
+}
+
 .popup-user-list-item{
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-around;
+    width:100%;
     margin:5px;
     overflow: hidden;
 }
@@ -121,6 +129,7 @@
     cursor: pointer;
     border-radius: 15%;
     padding-right: 10px;
+
     .div{
         margin: 5px;
     }
@@ -129,7 +138,6 @@
         background-color: grey;
     }
 }
-
 .popup-profile-pic{
     border-radius: 50%;
     overflow: hidden;
@@ -138,6 +146,7 @@
     margin:10px;
 }
 
+
 .management-button{
     cursor: pointer;
     border-radius: 15%;
@@ -145,4 +154,8 @@
     &:hover{
         background-color: grey;
     }
+}
+
+.management-currentOpenedChat-popup{
+    overflow: scroll;
 }

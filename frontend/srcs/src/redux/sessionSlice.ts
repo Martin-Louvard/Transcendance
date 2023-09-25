@@ -33,7 +33,7 @@ const initialState: sessionState = {
   OpenedChatChannels: [],
   loading: false,
   error: undefined,
-  contentToShow: "lobby",
+  contentToShow: "friends",
   friendProfile: undefined,
 
 };

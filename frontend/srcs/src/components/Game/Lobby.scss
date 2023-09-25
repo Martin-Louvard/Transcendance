@@ -1,21 +1,6 @@
 
 .logo{
-    width: 40%;
+    height: 200px;
+    width: 200px;
     align-self: center;
-    margin-right: 10%;
-}
-.play-buttons{
-    width: 50%;
-    align-self: center;
-    border-left: 5px solid white;
-    height: auto;
-   display: flex;
-   flex-direction: column;
-}
-.play-buttons > button
-{
-    font-size: 2rem;
-    background-color: transparent;
-    justify-content: left;
-   
 }

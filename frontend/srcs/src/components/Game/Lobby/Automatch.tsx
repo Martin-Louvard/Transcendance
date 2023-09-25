@@ -45,12 +45,13 @@ export const AutoMatch: React.FC = (props) => {
 	}
   
 	  return (
-		  <div>
-			 <ButtonGroup size="large" variant="contained">
-				<Button onClick={() => {findClassicGame()}}>Classic</Button>
-				<Button onClick={() => {setGameState({isDuel: true, isDouble: false});}}>Duel</Button>
-				<Button onClick={() => {setGameState({isDuel: false, isDouble: true });}}>Double</Button>
-			</ButtonGroup>
+		  <div  style={{width:'100%'}}>
+          <div className='play-buttons light-purple' style={{width:'100%'}}>
+				<button onClick={() => {findClassicGame()}}>Classic</button>
+				<button onClick={() => {setGameState({isDuel: true, isDouble: false});}}>Duel</button>
+				<button onClick={() => {setGameState({isDuel: false, isDouble: true });}}>Double</button>
+			</div>
+			<h2>Choose Mode</h2>
 		  </div>
 	  );
   }
