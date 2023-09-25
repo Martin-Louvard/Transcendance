@@ -119,7 +119,7 @@ $chat-menu-icon-open: 15vw;
 .notification-some {
 	display:flex;
 	background-color: rgb(211, 18, 69);
-	border-radius: $chat-exit-button-radius;
+	border-radius: 0 $chat-exit-button-radius $chat-exit-button-radius 0;
 	width: 15%;
 	height: 90%;
 	justify-content: center;
@@ -140,6 +140,7 @@ $chat-menu-icon-open: 15vw;
   overflow: hidden ;
 	justify-content: space-between;
 	flex-direction: row;
+  align-items: center;
 	font-size: 12px;
 }
 .chat-participants{

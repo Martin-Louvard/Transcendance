@@ -22,7 +22,7 @@
 .chat-box {
 	background-color: rgba(96, 98, 112, 1);
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 1);
-	min-width: 250px;
+	min-width: 300px;
 	width: 15vw;
 	transition: width 0.3s ease-in-out;
 	height: 100%;
@@ -31,7 +31,7 @@
 
 	&.minimized {
 		height: 45px;
-		min-width: 50px;
+		min-width: 250px;
 		overflow: hidden;
 	}
 
