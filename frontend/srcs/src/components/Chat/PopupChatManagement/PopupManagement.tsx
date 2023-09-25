@@ -28,11 +28,11 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
   return (
     <Popup
         open={isOpen}
-        closeOnDocumentClick={true}
+        closeOnDocumentClick={false}
         onClose={() => setIsOpen(false)}
         {...{ contentStyle, arrowStyle }}  
     >
-      <div className=' chat-popup'>
+      <div className='chat-popup'>
         <div className='popup-top'>
         <div className="management-currentOpenedChat-popup">
             {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
