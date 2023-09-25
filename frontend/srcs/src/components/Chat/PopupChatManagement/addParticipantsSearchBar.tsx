@@ -1,8 +1,26 @@
-import { ChatChannels } from "../../../Types.ts";
+import { ChatChannels, User, Friendships } from "../../../Types.ts";
 import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
 import React, { useState, useEffect, KeyboardEvent } from 'react';
 import toast from 'react-hot-toast';
 import {IoMdPersonAdd} from "react-icons/io";
+
+function  WhatsMyName(currentUser: User, friendShip: Friendships) {
+  if (currentUser.id === friendShip.friend_id) {
+    return (friendShip.user.username);
+  }
+  else {
+    return (friendShip.friend.username);
+  }
+}
+
+function  WhatsMyId(currentUser: User, friendShip: Friendships) {
+  if (currentUser.id === friendShip.friend_id) {
+    return (friendShip.user.id);
+  }
+  else {
+    return (friendShip.friend.id);
+  }
+}
 
 const AddParticipantsSearchBar = ({chat} : {chat: ChatChannels}) => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -10,25 +28,16 @@ const AddParticipantsSearchBar = ({chat} : {chat: ChatChannels}) => {
   const currentRelations = useAppSelector(
     (state) => state.session.friendships)?.filter(
       (relations) => relations.status === 'ACCEPTED');
-  const currentFriends = useAppSelector(
-    (state) => state.session.friends)?.filter(
-      (friend) => {
-        if (currentRelations 
-          && currentRelations.filter(
-            (relation) => relation.friend_id === friend.id).length > 0){
-          return friend;
-        }
-      });
   const dispatch = useAppDispatch();
   
 
   const handleSearch = () => {
-    if (currentFriends && currentFriends?.filter(
-      (friend) => friend.username === searchInput).length > 0){
-      const friend = currentFriends.filter(
-        (friend) => friend.username === searchInput)[0];
-      dispatch({type: 'ADD_USER_CHAT', payload:[chat.id, friend.id]})
-      toast.success(`${friend.username} has been add to the chat`);
+    if (currentRelations && currentRelations?.filter(
+      (friend) => WhatsMyName(currentUser!, friend) === searchInput).length > 0){
+      const friend = currentRelations.filter(
+        (friend) => WhatsMyName(currentUser!, friend) === searchInput)[0];
+      dispatch({type: 'ADD_USER_CHAT', payload:[chat.id, WhatsMyId(currentUser!, friend)]})
+      toast.success(`${WhatsMyName(currentUser!, friend)} has been add to the chat`);
     }
     else {
       toast.error("User not found");
