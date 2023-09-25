@@ -44,6 +44,7 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
+      if (user_id){
       this.connected_clients.set(user_id, client);
       this.server.emit('update_friend_connection_state', {
         user_id: user_id,
@@ -53,6 +54,7 @@ export class AppGateway
         where: { id: user_id },
         data: { status: 'ONLINE' },
       });
+    }
     }
     this.appService.auth(client);
   }
@@ -65,6 +67,7 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
+      if (user_id){
       this.connected_clients.delete(user_id);
       this.server.emit('update_friend_connection_state', {
         user_id: user_id,
@@ -74,8 +77,8 @@ export class AppGateway
         where: { id: user_id },
         data: { status: 'OFFLINE' },
       });
+      }
     }
-
     const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player) return;
     return this.playerService.disconnectPlayer(player);

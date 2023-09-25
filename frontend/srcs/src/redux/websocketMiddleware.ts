@@ -12,7 +12,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
   return (next: Dispatch<AnyAction>) => (action: AnyAction) => {
     switch (action.type) {
       case 'WEBSOCKET_CONNECT':
-        if (!action.payload || action.payload.lenght == 0)
+        if (!action.payload || action.payload.length == 0)
           return ;
         socket = io("http://localhost:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
 
