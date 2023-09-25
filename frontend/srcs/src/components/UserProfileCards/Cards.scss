@@ -32,14 +32,14 @@ $friend-picture-size: 50px;
 
   .profile-picture,
   .form-picture {
-    height: auto;
+    height: $picture-size;
     width: $picture-size;
     border-radius: 50%;
     overflow: hidden;
     margin-bottom: 10px;
 
     img {
-      height: auto;
+      height: $picture-size;
       width: $picture-size;
       object-fit: cover;
     }

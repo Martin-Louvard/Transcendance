@@ -26,7 +26,7 @@ export function App() {
 
   return (
     <Router>
-      <Toaster   position="bottom-left"/>
+      <Toaster   position="bottom-right"/>
       <Navbar/>
         <Routes>
           <Route path="/" element={user && isConnected ? <Dashboard /> : <Authentication/>} />
