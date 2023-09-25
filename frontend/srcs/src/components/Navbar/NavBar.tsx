@@ -7,13 +7,16 @@ import Notification from '../UserProfileCards/Notification.tsx';
 import { setContentToShow } from '../../redux/sessionSlice.ts';
 import { Friendships, Status, ContentOptions } from '../../Types';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const Navbar: React.FC = () => {
   const logo = '/marvin.png'
   const user = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
   const friendships = useAppSelector((state) => state.session.friendships);
   const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
-
+  const navigate = useNavigate()
+  
   useEffect(() =>{
     if (friendships){
       setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
@@ -28,6 +31,7 @@ const Navbar: React.FC = () => {
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLImageElement>) => {
     event.preventDefault();
+    navigate('/');
     const targetId = event.currentTarget.id;
     if (targetId === "profile") dispatch(setContentToShow(ContentOptions.PROFILE));
     else if (targetId === "friends") dispatch(setContentToShow(ContentOptions.FRIENDS));
@@ -38,19 +42,20 @@ const Navbar: React.FC = () => {
   const renderMenuButtons = () => (
     user?.id && user.id != 0 ? 
     <div className='menu-middle'>
+      <button id="play" onClick={handleClick}>
+        Play
+      </button>
       <button id="friends" onClick={handleClick}>
         Friends
         <Notification number={friendRequests?.length}/>
       </button>
-      <button id="history" onClick={handleClick}>
-        LeaderBoard
-      </button>
       <button id="profile" onClick={handleClick}>
         My Profile
       </button>
-      <button id="play" onClick={handleClick}>
-        Play
+      <button id="history" onClick={handleClick}>
+        LeaderBoard
       </button>
+
     </div>
     :""
   );

@@ -48,7 +48,7 @@ const Dashboard: React.FC = () => {
   const renderMenuButtons = () => (
     <div className='menu-bottom'>
       
-      <button id="friends" onClick={handleClick}>
+      <button id="friends" onClick={handleClick}>Dashboard
         Friends
         <Notification number={friendRequests?.length}/>
       </button>
