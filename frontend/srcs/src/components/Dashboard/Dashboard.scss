@@ -7,6 +7,7 @@
   max-width: 1500px;
   width: 60vw;
   align-items: center;
+  overflow-x:scroll ;
 }
 
 .canvas-wrapper{
@@ -14,6 +15,7 @@
   //border-radius: 25%;
   display: flex;
   flex-direction: row;
+
 }
 
 .menu-bottom{
