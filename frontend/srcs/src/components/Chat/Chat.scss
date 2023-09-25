@@ -122,6 +122,14 @@
     padding: 20px;
   }
 
+  .popup-mdp{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+
+  }
+
   .popup-top{
     display: flex;
     flex-direction: row;
@@ -195,3 +203,14 @@
     overflow: scroll;
 }
 
+.popup-ban
+{
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    align-self: flex-end;
+}
+
+.chrono-for-action{
+    font-size: small;
+}
