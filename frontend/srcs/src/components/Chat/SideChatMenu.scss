@@ -143,11 +143,19 @@ $chat-menu-icon-open: 15vw;
   align-items: center;
 	font-size: 12px;
 }
+
 .chat-participants{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+  
+  div{
+    padding-top: 5px;
+  }
 }
+
+
 
 .chat-item:hover {
   background-color: #e0e0e0;
