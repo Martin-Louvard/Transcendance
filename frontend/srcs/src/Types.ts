@@ -1,3 +1,5 @@
+import { ConeTwistConstraint } from "cannon-es";
+
 export enum Status {
   PENDING = "PENDING",
   ACCEPTED = "ACCEPTED",
@@ -11,6 +13,15 @@ export enum UserStatus {
   ONLINE = "ONLINE",
   INGAME = "INGAME"
 }
+
+export enum ContentOptions{
+  PROFILE = "profile",
+  FRIENDS = "friends",
+  HISTORY= "games",
+  PLAY = "lobby",
+  FRIENDPROFILE = "friendProfile"
+}
+
 
 export interface User {
   id: number;
@@ -60,20 +71,25 @@ export interface Message {
   id: number;
   channelId: number;
   senderId: number;
+  sender: User;
   content: string;
   readersId: number[] | undefined;
+  createdAt: string;
 }
 
 export interface ChatChannels {
   id: number;
-  Owner: User;
-  Admins: User[];
+  owner: User;
+  admins: User[];
   name?: string;
   friendship? : Friendships;
   password?: string;
   channelType?: string;
   messages: Message[];
   participants: User[];
+  bannedUsers: User[];
   isOpen: boolean;
   notifications: number ;
 }
+
+

@@ -6,7 +6,7 @@ import {
   setChatOpen,
   resetNotification,
 } from "../../redux/sessionSlice";
-import { VscFoldDown, VscFoldUp } from "react-icons/vsc";
+import { VscTriangleDown, VscTriangleLeft } from "react-icons/vsc";
 import { IoIosChatboxes } from "react-icons/io";
 import "./SideChatMenu.scss";
 import { getName } from "./functions.ts";
@@ -43,7 +43,7 @@ const SideChatMenu = () => {
   const generalChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => chat.channelType === "general");
   const privateChannels: ChatChannels[] | undefined =
-    storedJoinedChannels?.filter((chat) => chat.channelType === "private");
+    storedJoinedChannels?.filter((chat) => chat.channelType === "Private");
   const joinedGroupChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => {
       if (chat.channelType === "created" || chat.channelType === "Password")
@@ -101,11 +101,13 @@ const SideChatMenu = () => {
             </div>
             <div className="chat-name-in-menu">
               <div>{getName(chat, userName)}</div>
-              <div>{`${chat?.participants?.length}`}</div>
-              <div>
-                <BsFillPersonFill />
               </div>
-            </div>
+              <div className="chat-participants">
+                <div>{`${chat?.participants?.length}`}</div>
+                <div>
+                  <BsFillPersonFill />
+                </div>
+              </div>
           </li>
         ))}{" "}
       </div>
@@ -124,9 +126,7 @@ const SideChatMenu = () => {
             onClick={() => handleChatTypeListClick(_type)}
           >
             <div className="channel-type-name"> {`${_type}`} </div>
-            <div>
-              {minimizedList?.includes(_type) ? <VscFoldUp /> : <VscFoldDown />}
-            </div>
+              {minimizedList?.includes(_type) ? <VscTriangleLeft /> : <VscTriangleDown />}
           </div>
           <div>{minimizedList?.includes(_type) ? "" : channelsList(list)}</div>
         </ul>
@@ -190,7 +190,7 @@ const SideChatMenu = () => {
       <ChatBoxes />
       <img
         className={`logo-nav chat-menu-icon`}
-        src={"/comments.svg"}
+        src={"/chat-icon.svg"}
         alt="Chat Menu"
         onClick={toggleMenu}
       />

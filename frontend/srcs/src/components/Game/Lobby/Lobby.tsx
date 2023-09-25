@@ -16,6 +16,7 @@ import { CreateMatch, useWindowSize } from './CreateMatch';
 import { CreateMatchLobby } from './CreateMatchLobby';
 import { AutoMatch } from './Automatch';
 import { JoinMatch } from './JoinMatch';
+import "../Lobby.scss";
 
 export const LobbyDisplayScore: React.FC = (props) => {
   const game = useAppSelector((state) => state.websocket);
@@ -62,14 +63,18 @@ export const Lobby: React.FC = (props) => {
 
   return (
     <div style={{position: "relative", width: "100%", height:"100%"}}>
-      <div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"row"}}>
+       <div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "space-around", flexDirection:"column"}}>
+      <div style={{ width: "100%"}} >
+        <img className='logo' src="/duel.svg" />
+      <h1>Let's Play!</h1>
+
         {
           lobbyType != LobbyType.none &&
             <Button color={'primary'} onClick={() => {dispatch(setLobbyType(LobbyType.none))}}>
               <ArrowCircleLeftIcon />
             </Button>
         }
-        <div style={{display: 'flex', }}>
+        <div style={{display: 'flex' }}>
         {
           !game.lobbyId && lobbyType == LobbyType.auto ?
           <AutoMatch user={user} game={game}/>
@@ -81,18 +86,17 @@ export const Lobby: React.FC = (props) => {
           <JoinMatch/>
           :
           !game.lobbyId && !game.isPlaying  && lobbyType == LobbyType.none?
-          <div className='play-buttons' style={{width:'100%'}}>
-          <ButtonGroup size="large" variant="contained">
-            <Button className="auto-button" onClick={() => {dispatch(setLobbyType(LobbyType.auto))}}>Auto Match</Button>
-            <Button className="create-button" onClick={() => {dispatch(setLobbyType(LobbyType.create))}}>Create game</Button>
-            <Button className="join-button" onClick={() => {dispatch(setLobbyType(LobbyType.find))}}>Join Game</Button>
-          </ButtonGroup>
+         
+          <div className='play-buttons light-purple' style={{width:'100%'}}>
+            <button className="auto-button" onClick={() => {dispatch(setLobbyType(LobbyType.auto))}}>Auto Match</button>
+            <button className="create-button" onClick={() => {dispatch(setLobbyType(LobbyType.create))}}>Create game</button>
+            <button className="join-button" onClick={() => {dispatch(setLobbyType(LobbyType.find))}}>Join Game</button>
         </div>
         :
         game.isPlaying && game.lobbyId ? 
         <div className='current-game-block' style={{width:'100%'}}>
           <p>You are currently in a game : </p>
-          <Button variant="contained" className="join-current-game" onClick={() => {navigate('/game/' + game.lobbyId)}}>Join Game</Button>
+          <button className="join-current-game" onClick={() => {navigate('/game/' + game.lobbyId)}}>Join Game</button>
         </div>
         :
         lobbyType != LobbyType.none && lobbyType != LobbyType.score ?
@@ -103,5 +107,7 @@ export const Lobby: React.FC = (props) => {
         </div>
       </div>
     </div>
+    </div>
+
   );
 }

@@ -9,7 +9,7 @@ const AdminAddButton = ({user, chat}: {user:User; chat:ChatChannels}) => {
 
   const handleAddAdmin = () => {
     if (currentUser && user){
-      if (!chat.Admins.includes(user)){
+      if (!chat.admins.includes(user)){
         dispatch({type: 'ADD_ADMIN', payload:[chat.id, user.id]})
       }
       else {
@@ -19,8 +19,8 @@ const AdminAddButton = ({user, chat}: {user:User; chat:ChatChannels}) => {
   };
 
   return (
-    <div className="management-add-admin-button" onClick={()=> handleAddAdmin()}>
-      {chat?.Admins.includes(user) ? <TbCrownOff /> : <TbCrown />}
+    <div className="management-button" onClick={()=> handleAddAdmin()}>
+      {chat?.admins.includes(user) ? <TbCrownOff /> : <TbCrown />}
     </div>
   );
 };

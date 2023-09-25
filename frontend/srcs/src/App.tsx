@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar/NavBar.tsx'
-import About from './pages/About/index.tsx';
+import AboutPage from './pages/About/index.tsx';
 import { usePlayerStore } from './components/Game/PlayerStore.ts';
 import { useEffect } from 'react';
 import { Game } from './components/Game/Game.tsx';
@@ -13,13 +13,14 @@ import { websocketDisconnected } from './redux/websocketSlice.ts';
 
 export function App() {
   const user = useAppSelector((state) => state.session.user);
+  const access_token = useAppSelector((state) => state.session.access_token);
   const isConnected = useAppSelector((state) => state.websocket.isConnected);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(websocketDisconnected());
     if (user) {
-      dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, user.access_token] });
+      dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, access_token] });
     }
   }, [user]);
 
@@ -29,7 +30,7 @@ export function App() {
       <Navbar/>
         <Routes>
           <Route path="/" element={user && isConnected ? <Dashboard /> : <Authentication/>} />
-          <Route path="/about" element={<About />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/game/:id" element={<Game />} />
         </Routes>
     </Router>

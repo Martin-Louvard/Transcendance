@@ -8,15 +8,16 @@ enum colors{
 
 interface StatusDotProps{
     status: string
+    style: string
 }
 
-const StatusDot: React.FC<StatusDotProps> = (user) => {
-    const color = colors[user.status as keyof typeof colors]
+const StatusDot: React.FC<StatusDotProps> = (props) => {
+    const color = colors[props.status as keyof typeof colors]
     const styles = { backgroundColor: color };
   
     return color ? (
       <>
-        <span className="status-indicator" style={styles} />
+        <span className={`status-indicator ${props.style}`} style={styles} />
       </>
     ) : null;
   };

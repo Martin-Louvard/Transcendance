@@ -29,9 +29,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ handleSendMessage }) => {
           setCurrentMessage("");
         }}
       >
-        <div>
           <AiOutlineSend />
-        </div>
       </button>
     </div>
   );

@@ -12,10 +12,11 @@ $react-color: #61dafbaa;
   top: 0;
   left: 0;
   right: 0;
-  background-color: transparent;
+  background-color: #242526;
   padding: 0 20px;
   position: fixed;
   z-index: 5;
+  border-bottom: 1px solid #2F3031;
 }
 
 // Elem Wrapper
