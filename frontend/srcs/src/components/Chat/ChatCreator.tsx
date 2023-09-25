@@ -86,7 +86,7 @@ const ChatCreator: React.FC = () => {
             </>
           ) : null}
           {friends ? (
-            <fieldset id="participants">
+            <div id="participants">
               <legend>Participants</legend>
               {friends.map((f: Friend) => (
                 <label key={f.id}>
@@ -99,7 +99,7 @@ const ChatCreator: React.FC = () => {
                 {f.username}
               </label>
             ))}
-          </fieldset>
+          </div>
         ) : null}
       </Form>
     </div>
