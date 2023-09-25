@@ -4,6 +4,9 @@ import { GiBootKick } from "react-icons/gi";
 import { useState } from "react";
 import { Popup } from 'reactjs-popup';
 
+
+let contentStyle = { width:"fit-content", background: 'transparent', border: "none"};
+
 const KickUserButton = ({ user, chat }:{
   user: User; 
   chat: ChatChannels;
@@ -40,13 +43,15 @@ const KickUserButton = ({ user, chat }:{
     position="top center"
     closeOnDocumentClick={true}
     onClose={() => setIsClicked(false)}
-    nested>
-    <div className="chrono-for-action" onClick={() => handleKick(5)}>{"5min"}</div>
-    <div className="chrono-for-action" onClick={() => handleKick(10)}>{"10min"}</div>
-    <div className="chrono-for-action" onClick={() => handleKick(20)}>{"20min"}</div>
-    <div className="chrono-for-action" onClick={() => handleKick(30)}>{"30min"}</div>
-    <div className="chrono-for-action" onClick={() => handleBan()}>{"Ban"}</div>
-
+    nested
+    {...{contentStyle}}>
+      <div className="chat-popup popup-ban" >
+    <button className="chrono-for-action" onClick={() => handleKick(5)}>{"5min"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick(10)}>{"10min"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick(20)}>{"20min"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick(30)}>{"30min"}</button>
+    <button className="chrono-for-action" onClick={() => handleBan()}>{"Ban"}</button>
+    </div>
   </Popup>
   );
 
