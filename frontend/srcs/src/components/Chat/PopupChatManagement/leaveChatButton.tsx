@@ -32,7 +32,7 @@ const LeaveChatButton = ({chat, setIsOpen}: {chat: ChatChannels; setIsOpen:React
 
   return (
     <div className="management-leave-button" onClick={()=> handleLeaveButton()}>
-      {"LEAVE"}<GiExitDoor />
+      <p>LEAVE CHAT</p><GiExitDoor />
   </div>);
 };
 export default LeaveChatButton;
