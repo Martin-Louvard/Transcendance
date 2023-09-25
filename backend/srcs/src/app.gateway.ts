@@ -384,6 +384,27 @@ export class AppGateway
     this.server.emit('add_admin', updatedChats);
   }
 
+  @SubscribeMessage('add_user_chat')
+  async handleAddUserChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const newUser = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const updatedChats = await this.prisma.chatChannel.update({
+      where: { id: parseInt(body[0]) },
+      data: { participants: { connect: { id: newUser.id } } },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    this.server.emit('add_user_chat', updatedChats);
+  }
+
   @SubscribeMessage('leave_chat')
   async handleLeaveChat(
     @ConnectedSocket() client: Socket,

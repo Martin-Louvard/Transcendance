@@ -5,6 +5,7 @@ import AdminAddButton from "./addAdminButton.tsx";
 import { GiImperialCrown } from "react-icons/gi";
 import KickUserButton from "./kickUserButton.tsx"
 import StatusDot from "../../UserProfileCards/StatusDot.tsx";
+import BlockUserButton from "./blockUserButton.tsx";
 import { useAppDispatch } from "../../../redux/hooks";
 import { setContentToShow, setFriendProfile } from "../../../redux/sessionSlice.ts";
 
@@ -38,6 +39,7 @@ const UserListItem = ({user, chat}: {user: User; chat: ChatChannels}) => {
       </div><AddUserButton user={user}/>
       <div>{chat?.owner.id === currentUser?.id ? <AdminAddButton user={user} chat={chat} /> : ""}</div>
       <div>{isKickable() ? <KickUserButton user={user} chat={chat}/> : "" } </div>
+      <div><BlockUserButton user={user} /></div>
     </div>
   );
 };
