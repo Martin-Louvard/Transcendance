@@ -313,7 +313,20 @@ export class AppGateway
       data: { channelId: body[0], senderId: body[1], content: body[2] },
       include: { sender: true },
     });
-    this.server.emit('message', message);
+    const chat = await this.prisma.chatChannel.findUnique({where: {id: body[0]}, include: {participants: true}})
+    const participants = chat.participants;
+    // Filter connected_clients to get clients who are also participants
+    const participantsInConnectedClients = new Map<number, Socket>();
+
+    participants.forEach(participant => {
+      const client = this.connected_clients.get(participant.id);
+      if (client) {
+        participantsInConnectedClients.set(participant.id, client);
+      }
+    });
+    participantsInConnectedClients.forEach((p)=>{
+      p.emit('message', message);
+    })
   }
 
   @SubscribeMessage('read')

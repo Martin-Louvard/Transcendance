@@ -1,5 +1,4 @@
 import { Popup } from 'reactjs-popup';
-import "reactjs-popup/dist/index.css";
 import { ChatChannels } from "../../../Types.ts";
 import { useAppSelector } from "../../../redux/hooks";
 import UserListItem from "./userItemManagement.tsx";
@@ -8,14 +7,13 @@ import React, { useState, useEffect } from 'react';
 import LeaveChatButton from "./leaveChatButton.tsx";
 import AddParticipants from "./addParticipants.tsx";
 
-const contentStyle = { background: '#242526' };
+let contentStyle = { background: 'transparent', border: "none"};
 const arrowStyle = { color: '#000' }; 
 const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefined; isOpen: boolean; setIsOpen:React.Dispatch<React.SetStateAction<boolean>>} ) => {
   const currentUser = useAppSelector((state) => state.session.user);
   const [isDefine, setIsDefine] = useState<boolean>(false);
   const currentOpenedChat = useAppSelector((state) => state.session.OpenedChatChannels.find(
     (chann) => chann.id === chat?.id));
-
   useEffect(() => {
     if (currentOpenedChat !== undefined && currentUser !== undefined) {
       setIsDefine(currentOpenedChat.owner.id === currentUser.id);
@@ -32,10 +30,15 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         open={isOpen}
         closeOnDocumentClick={true}
         onClose={() => setIsOpen(false)}
-        {...{contentStyle, arrowStyle }}  
+        {...{ contentStyle, arrowStyle }}  
     >
-      <div className="management-currentOpenedChat-popup">
-        {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
+      <div className=' chat-popup'>
+        <div className='popup-top'>
+        <div className="management-currentOpenedChat-popup">
+            {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
+          </div>
+          <AddParticipants chat={currentOpenedChat!} />
+          <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
       </div>
       <ul>
         {currentOpenedChat?.participants.map((user)=>{
@@ -44,8 +47,8 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
           return null;
       })}
     </ul>
-    <AddParticipants chat={currentOpenedChat!} />
-    <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
+
+    </div>
     </Popup>
   );
 };
