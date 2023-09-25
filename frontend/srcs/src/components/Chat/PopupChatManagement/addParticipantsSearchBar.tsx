@@ -1,6 +1,6 @@
 import { ChatChannels, User, Friendships } from "../../../Types.ts";
 import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
-import React, { useState, useEffect, KeyboardEvent } from 'react';
+import React, { useState,  KeyboardEvent } from 'react';
 import toast from 'react-hot-toast';
 import {IoMdPersonAdd} from "react-icons/io";
 
