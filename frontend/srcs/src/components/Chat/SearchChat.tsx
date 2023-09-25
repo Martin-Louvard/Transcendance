@@ -18,7 +18,7 @@ import toast from 'react-hot-toast';
 interface searchBarChatProps {
   fetchedChannels: ChatChannels[] | undefined;
 }
-
+let contentStyle = { background: 'transparent', border: "none"};
 const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
 
   const currentUser = useAppSelector((state) => state.session.user);
@@ -165,10 +165,11 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
       <div>{searchResult ? resultList(searchResult) : ""}</div>
       <Popup
         open={!!selectedChat}
-        closeOnDocumentClick={false}
+        closeOnDocumentClick={true}
         onClose={() => setSelectedChat(null)}
+        {...{contentStyle}}
       >
-        <div className="modal">
+        <div className="chat-popup popup-mdp">
           <h2>Enter password to join</h2>
           <input
             type="password"
