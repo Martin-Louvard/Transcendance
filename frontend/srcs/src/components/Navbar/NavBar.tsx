@@ -62,7 +62,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="navbar">
-        <Link  to="/" className="nav-elem-wrapper">
+        <Link  to="/" className="nav-elem-wrapper" onClick={()=>{dispatch(setContentToShow(ContentOptions.PLAY))}}>
           <img src={logo} className="logo-nav" alt="PONGƎD logo" />
           <div className="navbar-brand">PONGƎD</div>
         </Link>
