@@ -1,12 +1,15 @@
 import { Avatar, Button, ButtonGroup, Card, CardContent, Dialog, DialogTitle, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Slider, Stack } from "@mui/material";
 import { ClientEvents, ClientPayloads, LobbySlotCli, LobbySlotType, LobbyType } from "@shared/class";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { Friend, Friendships } from "src/Types";
+import { Friend, Friendships, Status } from "/src/Types";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParams } from "../../../redux//websocketSlice";
+import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParams } from "../../../redux/websocketSlice";
 import LoopIcon from '@mui/icons-material/Loop';
 import './Lobby.scss'
 import { CreateMatch } from "./CreateMatch";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import toast from "react-hot-toast";
+import LogoutIcon from '@mui/icons-material/Logout';
 
   export const CreateMatchLobby: React.FC = (props) => {
 	const size = props.size;
@@ -89,8 +92,30 @@ import { CreateMatch } from "./CreateMatch";
 		</div>
 		);
 	  }
+
+	  function isFriend(id) {
+		console.log(friendships)
+		if (user?.id == id)
+			return true;
+		console.log('id: ', id);
+		console.log(friendships)
+		if (friendships?.find(f => f.status === "ACCEPTED" && (id == f.user_id || id == f.friend_id)))
+			return true;
+		if (friendships?.find((fs) =>( (fs.user_id == id || fs.friend_id == id) && (fs.status == "ACCEPTED" || fs.status == "PENDING"))))
+			return true;
+		return false;
+	  }
+
+	  function addFriend(username) {
+		dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [user?.id, username]})
+		toast.success("Request Sent")
+	  }
+
+	  function handleKick(id) {
+		dispatch({ type: 'WEBSOCKET_SEND_KICK_LOBBY', payload: id})
+	  }
 	  
-	  function renderFilledSlot(slot, index) {
+	  function renderFilledSlot(slot: LobbySlotCli, index) {
 		return (
 		  <div>
 			{slot.player.username == game.owner && game.LobbyType != LobbyType.auto && game.LobbyType != LobbyType.classic?
@@ -102,6 +127,20 @@ import { CreateMatch } from "./CreateMatch";
 			  <Avatar src={slot.player.avatar} alt={slot.player.username + " avatar"} sx={{marginTop: "20px", width: 56, height: 56 }} />
 			  <p className="username-text"> {getPlayerName(slot)} </p>
 			</Button>
+			<div style={{display:'flex', flexDirection:'row'}}>
+
+				{!isFriend(slot.player?.id) &&
+					<Button onClick={() => {addFriend(slot.player?.username)}}>
+						<PersonAddIcon/>
+					</Button>
+				}
+			{
+				game.owner == user?.username && slot.player.id != user?.id&&
+				<Button onClick={() => {handleKick(slot.player?.id)}}>
+				<LogoutIcon/>
+			</Button>
+			}
+			</div>
 		  </div>
 		);
 	  }

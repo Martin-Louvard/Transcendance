@@ -157,8 +157,8 @@ import { User } from "../../../Types";
 				<PlayersParam sliderStyle={sliderStyle} playersParam={playersParam} setPlayersParam={setPlayersParam} size={size} sliderSize={sliderSize}/>
 				<GeneralParam sliderStyle={sliderStyle} generalParam={generalParam} setGeneralParam={setGeneralParam}  size={size} sliderSize={sliderSize}/>
 			</Stack>
+				{!game.lobbyId &&
 			<div style={{display:"flex", justifyContent:"center"}}>
-
 				<Button size="small" fullWidth={false} variant="contained" sx={{
 					margin: 4,
 					width:"100px",
@@ -169,6 +169,7 @@ import { User } from "../../../Types";
 					GO
 				</Button>
 				</div>
+				}
 		</Stack>
 	);
   }

@@ -23,7 +23,7 @@ export class AppService {
       const payload = this.jwtService.verify(
         client.handshake.auth.token,
       );
-        const user = await this.usersService.findById(payload.sub);
+        const user = await this.usersService.findById(client.handshake.auth.user_id);
         if (!user) 
           throw "user not registered";
         this.playerService.connectPlayer({id: user.id, username: user.username, avatar: user.avatar, socket: client});

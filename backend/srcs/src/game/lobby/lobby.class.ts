@@ -40,6 +40,7 @@ export class Lobby {
 
 	public setParams(params: GameParameters) {
 		this.instance.setParams(params);
+		this.setMode(params.duel ? LobbyMode.duel : LobbyMode.double)
 		this.mode = params.duel ? LobbyMode.duel : LobbyMode.double;
 		this.checkIfLobbyFull();
 		this.dispatchLobbySlots();
@@ -96,6 +97,7 @@ export class Lobby {
 		}
 		else {
 			this.emit<boolean>(ServerEvents.LobbyFull, false);
+			this.full = false;
 		}
 	}
 

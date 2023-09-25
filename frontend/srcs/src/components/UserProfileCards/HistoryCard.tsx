@@ -1,28 +1,51 @@
+import { useAppSelector } from '/src/redux/hooks';
 import './Cards.scss'
+import { useEffect, useState } from 'react';
+import { Game } from '@shared/class';
 
 const HistoryCard = () => {
-  const gameScores = [
-    { score: 150, date: new Date("2023-06-15") },
-    { score: 200, date: new Date("2023-06-18") },
-    { score: 180, date: new Date("2023-06-22") },
-    { score: 220, date: new Date("2023-06-25") },
-    { score: 190, date: new Date("2023-06-28") },
-    { score: 150, date: new Date("2023-06-15") },
-    { score: 200, date: new Date("2023-06-18") },
-    { score: 180, date: new Date("2023-06-22") },
-    { score: 220, date: new Date("2023-06-25") },
-    { score: 190, date: new Date("2023-06-28") },
-  ];
+  const [games, setGames] = useState<Game[]>([]);
+  const user = useAppSelector(state => state.session.user);
+
+  useEffect(() => {
+    async function fetchGames() {
+        const requestOptions = {
+          method: 'GET',
+      };
+    
+      try{
+          const response = await fetch(`http://localhost:3001/users/{id}/games?id=${user.id}`, requestOptions)
+          const data = await response.json();
+          setGames(data);
+          console.log(games);
+    
+      }catch(err) {
+        console.log(err);
+      }
+
+    }
+    fetchGames();
+  }, [])
 
   return (
     <>
       <div className="card-wrapper">
         <h2>Game History</h2>
         <ul className="list">
-          {gameScores.map((game, index) => (
+          {games.map((game, index) => (
             <li className="item" key={index}>
-                <p>Date: {game.date.toDateString()}</p>
-                <p>Score: {game.score}</p>
+                <p>Date: {new Date(game.createdAt).toDateString()}</p>
+                <p>|</p>
+                <div>
+
+                <p>{
+                  game.visitor.find((v) => v.id == user.id) ?
+                  `Visitor (you) - Home` :  `Visitor - Home (you)`
+                }
+                </p>
+                <p> {`${game.scoreVisitor} - ${game.scoreHome} `}</p>
+                </div>
+                {/*<p>Score: {game.score}</p>*/}
             </li>
           ))}
         </ul>

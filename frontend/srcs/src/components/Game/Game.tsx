@@ -87,33 +87,16 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player }) =
 
 const Camera: React.FC = (props) => {
 	let player = props.player;
-	let cameraOffset: Vector3 = new Vector3(0, 3, -10);
-	let classic: boolean = props.classic;
-
-	if (player && player.team == 'visitor')
-		cameraOffset.z *= -1;
 
 	const { camera } = useThree();
-	let camRotationStart: THREE.Euler | null = null;
-
-	useEffect(() => {
-		camRotationStart = camera.rotation.clone();
-	}, [])
 
 	useFrame(() => {
 		if (!player)
 			return ;
-		if (classic) {
-			camera.position.set(0, 150, 0)
-			camera.lookAt(0,0, 0);
-			if (player.team == 'home')
-				camera.rotation.z = Math.PI;
-		} else {
-			camera.position.set(player.position[0], player.position[1], player.position[2]).add(cameraOffset);
-			camera.lookAt(player.position[0], player.position[1], player.position[2]);
-		}
-		if (camRotationStart)
-			camera.rotation.set(camRotationStart.x, camRotationStart.y, camRotationStart.z);
+		camera.position.set(0, 150, 0)
+		camera.lookAt(0,0, 0);
+		if (player.team == 'home')
+			camera.rotation.z = Math.PI;
 	}, [])
 }
 
@@ -195,6 +178,56 @@ export const Game: React.FC = () => {
 		: 
 		<></>
 	)
+}
+
+const Cage: React.FC = (props) => {
+	const goalSize = props.goalSize
+	const mapSize = props.mapSize;
+	const team = props.team;
+	if (team) {
+		return (
+			<mesh >
+				<Box args={[goalSize, 2, 0.1]} position={[0, 10, mapSize[1] / 2 - 1]}  >
+					<meshPhongMaterial color="white"  />
+				</Box>
+				<Box args={[2, 10, 0.1]} position={[goalSize / 2 - 1, 5, mapSize[1] / 2 - 1]}  >
+					<meshPhongMaterial color="white"  />
+				</Box>
+				<Box args={[2, 10, 0.1]} position={[-(goalSize / 2 - 1), 5, mapSize[1] / 2 - 1]}  >
+					<meshPhongMaterial color="white"  />
+				</Box>
+			</mesh>
+		);
+	} else {
+		return (
+			<mesh >
+				<Box args={[goalSize, 2, 0.1]} position={[0, 10, -(mapSize[1] / 2 - 1)]}  >
+					<meshPhongMaterial color="white"  />
+				</Box>
+				<Box args={[2, 10, 0.1]} position={[goalSize / 2 - 1, 5, -(mapSize[1] / 2 - 1)]}  >
+					<meshPhongMaterial color="white"  />
+				</Box>
+				<Box args={[2, 10, 0.1]} position={[-(goalSize / 2 - 1), 5, -(mapSize[1] / 2 - 1)]}  >
+					<meshPhongMaterial color="white"  />
+				</Box>
+			</mesh>
+		);
+	}
+}
+
+export const Goals: React.FC = (props) => {
+	const game = useAppSelector((state) => state.websocket);
+
+	useEffect(() => {
+		console.log(game.params);
+	}, [])
+
+	return (
+		<>
+			<Cage goalSize={game.params.map.goalSize} mapSize={game.params.map.size} team={false} />
+			<Cage goalSize={game.params.map.goalSize} mapSize={game.params.map.size} team={true} />
+		</>
+	);
 }
 
 export const Render: React.FC = (props) => {
@@ -446,11 +479,12 @@ export const Render: React.FC = (props) => {
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
 					<GrassField position={[0, 0, 0]} width={game.mapHeight} height={game.mapWidth}/>
-					<Camera player={me} classic={game.params.classic}/>
-					<Wall size={[game.mapWidth, 10, 2]} position={[0, 5, game.mapHeight / 2]} />
-					<Wall size={[game.mapWidth, 10, 2]} position={[0, 5, -game.mapHeight / 2]}/>
-					<Wall size={[2, 10, game.mapHeight]} position={[game.mapWidth / 2, 5, 0]} />
-					<Wall size={[2, 10, game.mapHeight]} position={[-game.mapWidth / 2, 5, 0]} />
+					{/*<Camera player={me} classic={game.params.classic}/>*/}
+					<Goals/>
+					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, game.mapHeight / 2]} />
+					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, -game.mapHeight / 2]}/>
+					<Wall size={[2, 25, game.mapHeight]} position={[game.mapWidth / 2, 5, 0]} />
+					<Wall size={[2, 25, game.mapHeight]} position={[-game.mapWidth / 2, 5, 0]} />
 					<mesh>
 						<boxBufferGeometry args={[game.mapWidth, 1.5, 2]}/>
 						<meshBasicMaterial color={"white"}/>

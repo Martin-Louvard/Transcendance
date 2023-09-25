@@ -21,6 +21,7 @@ export class LobbyService {
 	private lobbies: Map<string, Lobby> = new Map<string, Lobby>();
 	server: Server;
 	requests: Map<string, GameRequest> = new Map<string, GameRequest>();
+	listeners: Map<number, Player> = new Map<number, Player>();
 
 
 	setServer(server: Server) {
@@ -41,8 +42,10 @@ export class LobbyService {
 	}
 
 	addLobby(lobby: Lobby) {
-		if (lobby)
+		if (lobby) {
 			this.lobbies.set(lobby.id, lobby);
+			this.dispatchEvent();
+		}
 	}
 
 	leaveLobby(player: Player) {
@@ -63,7 +66,33 @@ export class LobbyService {
 			owner: null,
 		}
 		player.emit<ServerPayloads[ServerEvents.AuthState]>(ServerEvents.AuthState, payload);
+		this.dispatchEvent();
 		return (true);
+	}
+
+	dispatchEvent() {
+		console.log("dispatching event");
+		this.listeners.forEach((e) => {
+			e.emit(
+				ServerEvents.ListLobbies,
+				this.getJoinableLobbies(),
+			  );
+		})
+	}
+
+	addListener(id: number) {
+		const player = this.playerService.getPlayer(id);
+		if (!player)
+			return ;
+		this.logger.log(`${id} is now listening to lobbies`);
+		this.listeners.set(id, player);
+	}
+
+	removeListener(id: number) {
+		const player = this.playerService.getPlayer(id);
+		if (!player)
+			return ;
+		this.listeners.delete(id);
 	}
 
 	createLobby(mode: LobbyMode, server: Server, creator: Player) {
@@ -76,6 +105,7 @@ export class LobbyService {
 			this.logger.log(`creator ${creator.id} joined ${lobby.id}`);
 			this.lobbies.set(lobby.id, lobby);
 			lobby.dispatchLobbyState();
+			this.dispatchEvent();
 		} catch (error) {
 			return error
 		}
@@ -88,9 +118,9 @@ export class LobbyService {
 	getJoinableLobbies() {
 		let lobbies:LobbyCli[] = [];
 		this.lobbies.forEach((e) => {
-			console.log("automatch: ", e.instance.automatch, e.isOnlineSlot);
+			console.log("automatch: ", e.instance.automatch, e.isOnlineSlot, 'mode: ', e.mode);
 			if (e.instance && !e.instance.hasStarted && !e.instance.automatch && e.isOnlineSlot())
-				lobbies.push({id: e.id, slots: e.slots, creator: e.owner.infos});
+				lobbies.push({id: e.id, slots: e.mode == LobbyMode.duel ? e.slots.slice(0, 2) : e.slots, creator: e.owner.infos, size: e.mode == LobbyMode.duel ? 2 : 4});
 		})
 		return (lobbies);
 	}
@@ -110,6 +140,7 @@ export class LobbyService {
 				this.logger.log(`creator ${creator.id} joined ${lobby.id}`);
 				this.lobbies.set(lobby.id, lobby);
 				lobby.dispatchLobbyState();
+				this.dispatchEvent();
 			} else {
 				const lobby = Lobby.fromGameParameter(params, server, creator);
 				if (!lobby)
@@ -119,6 +150,7 @@ export class LobbyService {
 				this.logger.log(`creator ${creator.id} joined ${lobby.id}`);
 				this.lobbies.set(lobby.id, lobby);
 				lobby.dispatchLobbyState();
+				this.dispatchEvent();
 			}
 		} catch (error) {
 			console.log(error);
@@ -138,11 +170,13 @@ export class LobbyService {
 
 	removeLobbyById(id: string) {
 		this.lobbies.delete(id);
+		this.dispatchEvent();
 	}
 
 	removeLobby(lobby: Lobby) {
 		try {
 			this.lobbies.delete(lobby.id)
+			this.dispatchEvent();
 			this.logger.log(`lobby ${lobby.id} removed`);
 		} catch (error) {
 			return error
@@ -150,12 +184,18 @@ export class LobbyService {
 	}
 
 	joinLobby(player: Player, data: {lobbyId: string, info: PlayerInfo}) {
+		console.log("join lobby");
 		const lobby = this.findLobbyById(data.lobbyId);
-		if (!lobby)
+		if (!lobby) {
+			console.log("lobby not found");
 			return 'lobby not found';
+		}
 		if (player.lobby)
 			player.lobby.removePlayer(player);
-		return (lobby.connectPlayer(player))
+		console.log("on connecger le player");
+		lobby.connectPlayer(player);
+		this.dispatchEvent();
+		return ;
 	}
 
 	automatch(player: Player, data: {mode: LobbyMode, info: PlayerInfo}, server: Server):boolean {
@@ -169,6 +209,7 @@ export class LobbyService {
 					lobby.connectPlayer(player);
 					lobbyFinded = true;
 					lobby.dispatchLobbyState();
+					this.dispatchEvent();
 					return ;
 				}
 			});
@@ -192,6 +233,7 @@ export class LobbyService {
 					lobby.connectPlayer(player);
 					lobbyFinded = true;
 					lobby.dispatchLobbyState();
+					this.dispatchEvent();
 					return ;
 				}
 			});
@@ -260,6 +302,7 @@ export class LobbyService {
 		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance;
 		const players = [...lobby.players.values()];
 		console.log(players);
+		console.log("duel: ", duel, "lobbymode: ", lobby.mode, "lobby instance of classic: ", lobby.instance instanceof ClassicInstance);
 		const users = await this.prismaService.user.findMany({
 			where: {
 				id: {in: duel ? [players[0].id, players[1].id] : [players[0].id, players[1].id, players[2].id, players[3].id]},
@@ -277,30 +320,49 @@ export class LobbyService {
 				id: {in: duel ? [homeInfos[0].id] : [homeInfos[0].id, homeInfos[1].id]},
 			}
 		})
-		console.log(lobby.instance);
-		const game = await this.prismaService.game.create({
-			data: {
-			  scoreHome: lobby.instance.data.score.home,
-			  scoreVisitor: lobby.instance.data.score.visitor,
+		console.log("players: ", users.map((user) => ({ id: user.id })));
+		const gameData = {
+			scoreHome: lobby.instance.data.score.home,
+			scoreVisitor: lobby.instance.data.score.visitor,
+			players: {
+			  connect: users.map((user) => ({ id: user.id })),
+			},
+			home: {
+			  connect: home.map((user) => ({ id: user.id })),
+			},
+			visitor: {
+			  connect: visitor.map((user) => ({ id: user.id })),
+			},
+		  };
+		
+		  try {
+			const game = await this.prismaService.game.create({
+			  data: gameData,
+			});
+		
+			console.log("Game created:", game);
+		  } catch (error) {
+			console.error("Error creating a game:", error);
+		  }
+		}
+		//console.log(res);
+
+	async getGames(playerId: number) {
+		const gamesForPlayer = await this.prismaService.game.findMany({
+			where: {
 			  players: {
-				connect: users.map((user) => ({ id: user.id })),
-			  },
-			  home: {
-				connect: home.map((user) => ({ id: user.id })),
-			  },
-			  visitor: {
-				connect: visitor.map((user) => ({ id: user.id })),
+				some: {
+				  id: playerId,
+				},
 			  },
 			},
 		  });
-		this.prismaService.game.create({data: game});
-		//console.log(res);
+		return (gamesForPlayer);
 	}
-
 
 	// TODO: Pour le moment on clear tout toues les 5 minutes, une fois le jeu codé il faudra
 	// TODO... clear que les games terminé toutes les 5 minutes
-	@Cron(CronExpression.EVERY_30_SECONDS,
+	@Cron(CronExpression.EVERY_5_SECONDS,
 		{name: 'lobby_cleaner'})
 	clearLobbies() {
 		this.lobbies.forEach(async (lobby: Lobby) => {
@@ -309,6 +371,7 @@ export class LobbyService {
 				this.logger.log(`Lobby ${lobby.id} deleted`);
 				lobby.clear();
 				this.lobbies.delete(lobby.id);
+				this.dispatchEvent();
 			}
 		})
 		//this.logger.log("Lobbies cleaned");
