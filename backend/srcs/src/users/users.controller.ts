@@ -40,7 +40,8 @@ export class UsersController {
 
   @Get(':id/games')
 	async getGames(@Query('id') id: string) {
-		return (await this.usersService.findById(+id)).games
+    return (await this.usersService.getGames(+id));
+		//return (await this.usersService.findById(+id)).games
 	}
 
   @Get('id/:id')

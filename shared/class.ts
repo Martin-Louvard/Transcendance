@@ -43,6 +43,8 @@ export enum ServerEvents
   GetLobbies = 'server.get.lobbies',
 
   ParametersState = 'server.parameters.state',
+
+  ListLobbies = 'server.list.lobbies',
 }
 
 export enum ClientEvents
@@ -67,17 +69,22 @@ export enum ClientEvents
 
   StartGame = 'client.start.game',
 
-  GetLobbies = 'client.get.lobbies',
+  ListenLobbies = 'client.listen.lobbies',
+
+  StopListenLobbies = 'client.stop.listen.lobbies',
 
   AddGame = 'client.add.game',
 
   CreateLobby = 'client.create.lobby',
+
+  KickLobby = 'client.kick.lobby',
 }
 
 export interface LobbyCli {
 	id: string,
 	slots: LobbySlotCli[],
 	creator: PlayerInfo,
+	size: number,
 }
 
 export interface PlayerInfo {
@@ -271,6 +278,8 @@ export interface GameParameters {
 	//  }
 
 export interface Game {
+	id: number;
+	createdAt: string;
 	scoreHome: number;
 	scoreVisitor: number;
 	players: User[];

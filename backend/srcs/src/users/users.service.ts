@@ -117,6 +117,19 @@ export class UsersService {
     return user;
   }
 
+  async getGames(id: number) {
+    return (await this.prisma.game.findMany({
+			where: {
+			  players: {
+				some: {
+				  id: id,
+				},
+			  },
+			},
+      include:{visitor: true, home: true, players: true}
+		  }));
+  }
+
   async findBy42Email(email42: string) {
     const userRaw = await this.prisma.user.findUnique({ where: { email42 } });
     if (!userRaw)

@@ -45,7 +45,6 @@ export class AppGateway
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
       this.connected_clients.set(user_id, client);
-      console.log(user_id)
       this.server.emit('update_friend_connection_state', {
         user_id: user_id,
         status: 'ONLINE',
@@ -82,6 +81,16 @@ export class AppGateway
     return this.playerService.disconnectPlayer(player);
   }
 
+  @SubscribeMessage(ClientEvents.KickLobby)
+  KickPlayerLobby(@ConnectedSocket() client: Socket, @MessageBody() id: number) {
+    const player = this.playerService.getPlayer(id);
+    const kicker = this.playerService.getPlayerBySocketId(client.id);
+    if (!kicker || !player || !kicker.lobby || !player.lobby || kicker.lobby.owner.id != kicker.id)
+      return false;
+    const lobby = kicker.lobby;
+    lobby.removePlayer(player);
+  }
+
   @SubscribeMessage('automatch')
   autoMatch(
     @ConnectedSocket() client: Socket,
@@ -100,6 +109,7 @@ export class AppGateway
       return;
     }
     this.lobbyService.automatch(player, data, this.server);
+    this.lobbyService.dispatchEvent();
   }
 
   @SubscribeMessage('automatchClassic')
@@ -120,28 +130,24 @@ export class AppGateway
       return;
     }
     this.lobbyService.automatchClassic(player, data, this.server);
+    this.lobbyService.dispatchEvent();
   }
 
   @SubscribeMessage(ClientEvents.DeleteGameRequest)
   deleteGameRequest(@ConnectedSocket() client: Socket, @MessageBody() data: GameRequest | number) {
     try {
-      console.log("delete game request: ", data);
       if (typeof data === "number") {
         this.playerService.deleteRequests(undefined, data);
         const player = this.playerService.getPlayer(data);
         if (player.lobby) {
-          console.log("player already has a lobby");
           return true;
         }
         const sender = this.playerService.getPlayerBySocketId(client.id);
         if (!sender) {
-          console.log("player not found")
           return false;
         }
-        console.log(sender.id);
         const lobby = sender.lobby;
         if (!lobby) {
-          console.log("lobby not found");
           return false ;
         }
         console.log("before: ", lobby.slots);
@@ -150,7 +156,6 @@ export class AppGateway
         lobby.slots[index].type = LobbySlotType.friend;
         lobby.slots[index].player = undefined;
         lobby.dispatchLobbySlots();
-        console.log("after: ", lobby.slots);
       } else {
         if (!data || !data.sender || !data.sender.id || !data.receiver || !data.receiver.id) {
           return false;
@@ -185,12 +190,21 @@ export class AppGateway
   }
   }
 
-  @SubscribeMessage(ClientEvents.GetLobbies)
-  getLobbies(@ConnectedSocket() client: Socket) {
-    client.emit(
-      ServerEvents.GetLobbies,
-      this.lobbyService.getJoinableLobbies(),
-    );
+  @SubscribeMessage(ClientEvents.ListenLobbies)
+  AddLobbiesListener(@ConnectedSocket() client: Socket) {
+    const player= this.playerService.getPlayerBySocketId(client.id);
+    if (!player)
+      return ;
+    this.lobbyService.addListener(player.id);
+    this.lobbyService.dispatchEvent();
+  }
+
+  @SubscribeMessage(ClientEvents.StopListenLobbies)
+  RemoveLobbiesListener(@ConnectedSocket() client: Socket) {
+    const player= this.playerService.getPlayerBySocketId(client.id);
+    if (!player)
+      return ;
+    this.lobbyService.removeListener(player.id);
   }
 
   @SubscribeMessage(ClientEvents.StartGame)
@@ -204,6 +218,7 @@ export class AppGateway
     if (lobby.instance.hasStarted || lobby.instance.hasFinished)
       return 'game cannot be restarted';
     lobby.instance.triggerStart();
+    this.lobbyService.dispatchEvent();
   }
 
   @SubscribeMessage(ClientEvents.InputState)
@@ -255,21 +270,25 @@ export class AppGateway
     @MessageBody() data: { lobbyId: string; info: PlayerInfo },
   ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player) return 'player not found';
+    console.log(data);
+    if (!player){ console.log("player not found"); return 'player not found';}
     if (!this.lobbyService.joinLobby(player, data)) return 'cant join lobby';
+    this.lobbyService.dispatchEvent();
   }
 
   @SubscribeMessage(ClientEvents.CreateLobby)
   createLobby(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.CreateLobby]) {
-    console.log(data);
+    console.log("bonjour");
     const player = this.playerService.getPlayer(data.id);
-    if (!player || player.lobby)
+    if (!player || player.lobby) 
       return ;
+    console.log("ici");
     this.lobbyService.createLobby(undefined, this.server, player);
+    this.lobbyService.dispatchEvent();
   }
 
   @SubscribeMessage(ClientEvents.ParameterState)
-  createMatch(
+  SetParameter(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { params: GameParameters; info: PlayerInfo },
   ) {
@@ -277,7 +296,12 @@ export class AppGateway
     if (!player || !player.lobby || player.lobby.owner.id != player.id) // si il est deja dans un lobby on l'autorise pas
       return ;
     player.infos = data.info;
+    let dispatch = false;
+    if ((data.params.duel && player.lobby.mode == LobbyMode.double )|| (!data.params.duel && player.lobby.mode == LobbyMode.duel) || !player.lobby.mode )
+      dispatch = true;
     player.lobby.setParams(data.params);
+    
+    if (dispatch){ this.lobbyService.dispatchEvent(); console.log("dispatchol")}
     //this.lobbyService.createLobbyByParameters(data.params, this.server, player);
   }
 

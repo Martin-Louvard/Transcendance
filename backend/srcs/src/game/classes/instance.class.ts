@@ -129,7 +129,12 @@ export class Instance {
 		balls: null,
 		walls: null,
 	}
-
+	public contactData = null; // Store the contact data when a collision occurs
+	public framesToSmoothCurve = 60 * 180; // Number of frames for the curve effect
+	public currentFrame = 0;
+	public targetCurveForce = new CANNON.Vec3(0, 0, 0); // Initialize target curve force
+	public currentCurveForce = new CANNON.Vec3(0, 0, 0)
+	private isRestarting: boolean = false;
 
 	setParams(params: GameParameters) {console.log(params); this.params = params; this.automatch = false };
 	getParams(): GameParameters {return this.params};
@@ -282,16 +287,22 @@ export class Instance {
 	}
 
 	ballPhysics() {
+		const minVelocityThreshold = this.params.ball.globalSpeed;
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
-			//e.body.velocity.x *= (this.params.ball.globalSpeed / 10);
-			//e.body.velocity.z *= (this.params.ball.globalSpeed / 10);
-			//const coef = new CANNON.Vec3(0.005, 0.005, 0.005);
-			//const velo = e.body.velocity.vmul(coef);
-			//e.body.velocity.vadd(velo);
-			//e.body.angularVelocity.scale(0.5)
-			//e.body.velocity.vadd(e.contactVelocity, e.body.velocity);
+			if (!this.isRestarting) {
+
+				const accelerationVector = e.body.velocity.clone().unit().scale(this.params.ball.ballAcceleration);
+				e.body.velocity.vadd(accelerationVector);
+				
+				const velocityMagnitude = e.body.velocity.length();
+				if (velocityMagnitude < minVelocityThreshold) {
+				const velocityDirection = e.body.velocity.unit();
+				e.body.velocity.copy(velocityDirection.scale(minVelocityThreshold));
+			}
+		}
+	
 		})
 	}
 
@@ -332,7 +343,6 @@ export class Instance {
 						const impulseForce = impulseDirection.scale(impulseStrength);
 						bl.body.applyImpulse(impulseForce, bl.body.position);
 			  
-
 					}
 				})
 			}
@@ -350,7 +360,10 @@ export class Instance {
 				(this.world.balls.find(ball => ball.body === bj) && this.world.walls.includes(bi))) {
 					const ball = this.world.balls.find(ball => ball.body === bi || ball.body === bj);
 					const wall = this.world.walls.find(wall => wall == bj || wall == bi);
+					const ballX = ball.body.position.x;
+					if (ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2) {
 				if (wall.id == 99) {
+					console.log(bi, bj);
 					console.log('HOME score 1 point');
 					this.data.score.home += 1;
 					this.restartRound();
@@ -359,6 +372,7 @@ export class Instance {
 					this.data.score.visitor += 1;
 					this.restartRound();
 				}
+			}
 				if (ball && wall) {
 					const impactDirection: CANNON.Vec3 = contact.ri.clone();
 					const angle = Math.atan2(impactDirection.z, impactDirection.x);
@@ -376,7 +390,9 @@ export class Instance {
 	}
 
 	async timeoutAction(ms, callback) {
+		this.isRestarting = true;
 		await new Promise(resolve => setTimeout(resolve, ms));
+		this.isRestarting = false;
 		callback();
 	}
 
@@ -603,7 +619,7 @@ export class Instance {
 			this.playerLogic();
 			this.ballPhysics();
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
-			if (this.data.elapsedTime > 10 /*this.params.general.time*/) {
+			if (this.data.elapsedTime > this.params.general.time) {
 				this.triggerFinish();
 			}
 	}, 1000/ 120));

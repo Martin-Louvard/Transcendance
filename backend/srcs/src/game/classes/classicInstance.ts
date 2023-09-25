@@ -214,7 +214,6 @@ export class ClassicInstance {
 				score: this.data.score,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
-			
 		})
 	}
 

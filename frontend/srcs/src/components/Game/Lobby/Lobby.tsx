@@ -13,7 +13,7 @@ import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import { createTheme, useTheme } from '@mui/material/styles';
 import { purple } from '@mui/material/colors';
 import { CreateMatch, useWindowSize } from './CreateMatch';
-import { CreateMatchLobby } from './CreateMatchLobby';
+import { CreateMatchLobby } from './WaitingLobby';
 import { AutoMatch } from './Automatch';
 import { JoinMatch } from './JoinMatch';
 
@@ -59,13 +59,23 @@ export const Lobby: React.FC = (props) => {
   //useEffect(() => {
   //  console.log(game.LobbyType);
   //}, [lobbyType])
+  
+  function handleReturnButton () {
+
+    if (game.LobbyType == LobbyType.find) {
+      dispatch({
+        type: 'WEBSOCKET_SEND_LISTEN_LOBBIES',
+      });
+    }
+    dispatch(setLobbyType(LobbyType.none))
+  }
 
   return (
     <div style={{position: "relative", width: "100%", height:"100%"}}>
       <div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"row"}}>
         {
           lobbyType != LobbyType.none && !game.lobbyId &&
-            <Button color={'primary'} onClick={() => {dispatch(setLobbyType(LobbyType.none))}}>
+            <Button color={'primary'} onClick={() => {handleReturnButton()}}>
               <ArrowCircleLeftIcon />
             </Button>
         }

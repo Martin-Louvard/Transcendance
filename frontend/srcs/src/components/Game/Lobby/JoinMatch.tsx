@@ -1,5 +1,5 @@
 import { Avatar, Button, Grid, List, ListItem, ListItemAvatar, ListItemText, Typography, styled } from "@mui/material";
-import { LobbyType } from "@shared/class";
+import { LobbySlotCli, LobbyType } from "@shared/class";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setLobbyType } from "../../../redux/websocketSlice";
@@ -18,7 +18,7 @@ export const JoinMatch: React.FC = () => {
   
 	useEffect(() => {
 		  dispatch({
-			  type: 'WEBSOCKET_SEND_GET_LOBBIES',
+			  type: 'WEBSOCKET_SEND_LISTEN_LOBBIES',
 		  });
 	}, [])
   
@@ -29,6 +29,15 @@ export const JoinMatch: React.FC = () => {
 		payload: {lobbyId: id, info: {username: user?.username, avatar: user?.avatar, id: user?.id}},
 	  })
   
+	}
+
+	function getRemainingSlot(slots: LobbySlotCli[]) {
+		let nb = 0;
+		slots.forEach((e) => {
+			if (e.full)
+				nb++;
+		})
+		return (nb);
 	}
   
 	useEffect(() => {
@@ -44,9 +53,10 @@ export const JoinMatch: React.FC = () => {
 			<ListItemAvatar>
 				<Avatar src={lobby.creator.avatar}/>
 			</ListItemAvatar>
-			<ListItemText
+			<ListItemText sx={{color:'white'}}
 				primary={`${lobby.creator.username}'s lobby`}
-				secondary={secondary ? 'Secondary text' : ""}
+				secondary={`${getRemainingSlot(lobby.slots)} / ${lobby.size}`}
+				secondaryTypographyProps={{color:"white"}}
 				/>
 			</ListItem>
 		</div>
