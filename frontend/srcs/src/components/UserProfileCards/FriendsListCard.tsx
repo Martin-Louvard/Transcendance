@@ -13,7 +13,7 @@ import { setContentToShow, setFriendProfile } from "../../redux/sessionSlice";
 const FriendsListCard: React.FC = (props) =>{
     const user = useAppSelector((state) => state.session.user);
     const friendships = useAppSelector((state) => state.session.friendships);
-    const [friendshipsAccepted, setFriendshipsAccepted] = useState(friendships)
+    const [friendshipsAccepted, setFriendshipsAccepted] = useState<Friendships[] | undefined>()
     const [newFriendUsername, setNewFriendUsername] = useState('');
     const dispatch = useAppDispatch();
     const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>();
