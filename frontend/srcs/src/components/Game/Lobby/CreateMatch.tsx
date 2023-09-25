@@ -21,12 +21,12 @@ import { User } from "../../../Types";
   }
   
   export const CreateMatch: React.FC = (props) => {
-	const user: User | undefined = props.user;
-	const game: WebSocketState = props.game;
+	const user = useAppSelector((state) => state.session.user);
+	const game: WebSocketState = useAppSelector((state) => state.websocket);
 	const dispatch = useAppDispatch();
-	const size = props.size;
-	const [classic, setClassic] = useState(true);
+	const size = useWindowSize();
 	const [duel, setDuel] = useState(false);
+	const params = useAppSelector((state) => state.websocket.params)
 	const [mapParam, setMapParam] = useState({
 	  size: [200, 100],
 	  goalSize: 20,
@@ -46,9 +46,9 @@ import { User } from "../../../Types";
 	const [generalParam, setGeneralParam] = useState({
 	  time: 180,
 	})
-	const [sliderSize, setSliderSize] = useState((size.width / 100) * 10);
+	const [sliderSize, setSliderSize] = useState((size.width / 100));
 	const sliderStyle = {
-	  width: sliderSize,
+	  width: `${sliderSize}px`,
 	  '& .MuiSlider-valueLabel': {
 		lineHeight: 1.2,
 		fontSize: 12,
@@ -57,7 +57,8 @@ import { User } from "../../../Types";
 		width: 32,
 		height: 32,
 		borderRadius: '50% 50% 50% 0',
-		backgroundColor: "#90caf9",
+		color: '#000000',
+		backgroundColor: "#FFFFFF",
 		transformOrigin: 'bottom left',
 		transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
 		'&:before': { display: 'none' },
@@ -72,12 +73,12 @@ import { User } from "../../../Types";
   
   
 	useEffect(() => {
-	  setSliderSize((size.width / 100) * 10)
+	  setSliderSize((size.width / 100) * 7)
 	}, [size])
   
 	function storeParams(): void {
 	  const params: GameParameters = {
-		classic: classic,
+		classic: 'false',
 		duel: duel,
 		map: mapParam,
 		ball: ballParam,
@@ -94,55 +95,66 @@ import { User } from "../../../Types";
 		dispatch(setLobbyType(LobbyType.create));
 	  }
 	}
-  
+
+	function createLobby() {
+		if (user) {
+			dispatch({
+			  type: 'WEBSOCKET_SEND_CREATE_LOBBY',
+			  payload: {id: user.id},
+			});
+		  }
+	}
+
+	useEffect(() => {
+		setMapParam(params.map);
+		setBallParam(params.ball);
+		setPlayersParam(params.players);
+		setGeneralParam(params.general);
+		setDuel(params.duel);
+	}, [game.paramsReceived])
+
+	useEffect(() => {
+		if ((game.lobbyId && game.owner == user?.username) || !game.lobbyId) {
+			storeParams();
+		} else if (params) {
+			setMapParam(params.map);
+			setBallParam(params.ball);
+			setPlayersParam(params.players);
+			setGeneralParam(params.general);
+			setDuel(params.duel);
+		} else {
+			// reinitialiser
+		}
+	}, [duel, mapParam, ballParam, playersParam, generalParam])
   
 	return (
-	  game.LobbyType == LobbyType.create &&
-	  <Card sx={{backgroundColor: 'transparent', color:'white', fontFamily:'Avenir', width:'100%', height:'100%'}}>
-		<div style={{display:'flex', justifyContent:'center', bottom:100, flexDirection:'column'}}>
-			<p>Type: </p>
-		  <ButtonGroup size="large" variant="contained" sx={{margin: 4, display: 'flex', justifyContent:'center', flexDirection:'columns'}}>
-			<Button onClick={() => {setClassic(true)}} disabled={classic}>Basic</Button>
-			<Button onClick={() => {setClassic(false)}} disabled={!classic}>Ultimate</Button>
-		  </ButtonGroup>
-		  </div>
-		   {
-		   classic ?
-			<Button variant="contained" sx={{
-			  margin: 4,
-			}}
-			onClick={() => {
-			  storeParams();
-			}}> GO </Button>
-		  :
-			<Card id="ultimate-params" sx={{backgroundColor: 'transparent',width:'100%', maxHeight: size.height - 200, overflow: 'auto', fontFamily:'avenir', display: 'flex', flexDirection:'column'}}>
-				<div style={{display:'flex', flexDirection:'column', color:'white'}}>
-					<p>Mode: </p>
-					<ButtonGroup size="large" variant="contained" sx={{margin:4, display:'flex', justifyContent:'center', color:'white'}}>
+		<Stack id="ultimate-params" sx={{backgroundColor: 'transparent',width:'100%', maxHeight: size.height - 200, overflow: 'auto', fontSize:'0.8rem',fontFamily:'avenir', display: 'flex', flexDirection:'column'}}>
+			<div style={{display:'flex', flexDirection:'column', color:'white'}}>
+				<p>Mode: </p>
+				<ButtonGroup size="large" variant="contained" sx={{boxShadow:'0' ,margin:4, display:'flex', justifyContent:'center', color:'white'}}>
 					<Button onClick={() => {setDuel(true)}} disabled={duel}>Duel</Button>
 					<Button onClick={() => {setDuel(false)}} disabled={!duel}>Double</Button>
-					</ButtonGroup>
+				</ButtonGroup>
+			</div>
+			<Stack spacing={2} sx={{boxShadow:'0', display:'flex', flexDirection:'column'}}>
+				<MapParams sliderStyle={sliderStyle} mapParam={mapParam} setMapParam={setMapParam} size={size} sliderSize={sliderSize}/>
+				<BallParam sliderStyle={sliderStyle} ballParam={ballParam} setBallParam={setBallParam} size={size} sliderSize={sliderSize}/>
+				<PlayersParam sliderStyle={sliderStyle} playersParam={playersParam} setPlayersParam={setPlayersParam} size={size} sliderSize={sliderSize}/>
+				<GeneralParam sliderStyle={sliderStyle} generalParam={generalParam} setGeneralParam={setGeneralParam}  size={size} sliderSize={sliderSize}/>
+			</Stack>
+				{!game.lobbyId &&
+			<div style={{display:"flex", justifyContent:"center"}}>
+				<Button size="small" fullWidth={false} variant="contained" sx={{
+					margin: 4,
+					width:"100px",
+					display:'flex',
+					justifyContent:'center',
+					marginBottom:'100px'
+				}}onClick={() => {	createLobby(); storeParams();	}}>
+					GO
+				</Button>
 				</div>
-				<Stack spacing={2} sx={{display:'flex', flexDirection:'column'}}>
-				  <MapParams sliderStyle={sliderStyle} mapParam={mapParam} setMapParam={setMapParam} size={size} sliderSize={sliderSize}/>
-				  <BallParam sliderStyle={sliderStyle} ballParam={ballParam} setBallParam={setBallParam} size={size} sliderSize={sliderSize}/>
-				  <PlayersParam sliderStyle={sliderStyle} playersParam={playersParam} setPlayersParam={setPlayersParam} size={size} sliderSize={sliderSize}/>
-				  <GeneralParam sliderStyle={sliderStyle} generalParam={generalParam} setGeneralParam={setGeneralParam}  size={size} sliderSize={sliderSize}/>
-				</Stack>
-				<div style={{display:"flex", justifyContent:"center"}}>
-
-					<Button size="small" fullWidth={false} variant="contained" sx={{
-						margin: 4,
-						width:"100px",
-						display:'flex',
-						justifyContent:'center',
-						marginBottom:'100px'
-					}}onClick={() => {	storeParams();	}}>
-						GO
-					</Button>
-					</div>
-			</Card>
-			}
-		  </Card>
+				}
+		</Stack>
 	);
   }

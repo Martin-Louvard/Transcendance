@@ -74,6 +74,7 @@ export interface Message {
   sender: User;
   content: string;
   readersId: number[] | undefined;
+  createdAt: string;
 }
 
 export interface ChatChannels {

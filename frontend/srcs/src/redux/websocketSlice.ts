@@ -22,6 +22,7 @@ export interface WebSocketState {
   lobbies: LobbyCli[];
   lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor', team: 'home' | 'visitor', timestamp: number} | null,
   isWaitingToConnect: boolean;
+  paramsReceived: boolean;
 }
 
 const initialState: WebSocketState = {
@@ -68,6 +69,7 @@ const initialState: WebSocketState = {
   lobbies: [],
   lastGame: null,
   isWaitingToConnect: false,
+  paramsReceived: false,
 };
 
 const websocketSlice = createSlice({
@@ -87,6 +89,10 @@ const websocketSlice = createSlice({
     },
     setLobbyType: (state, action) => {
       state.LobbyType = action.payload;
+      if (action.payload == LobbyType.classic)
+        state.params.classic = true;
+      else if (action.payload == LobbyType.auto)
+        state.params.classic = false;
     },
     setParams: (state, action) => {
       state.params = JSON.parse(JSON.stringify(action.payload)); 
@@ -103,6 +109,9 @@ const websocketSlice = createSlice({
         state.invitedGames = [action.payload];
       else
         state.invitedGames = [...state.invitedGames, action.payload];
+    },
+    setParamsReceived: (state, action) => {
+      state.paramsReceived = action.payload;
     },
     deleteInvitedGame: (state, action) => {
       if (!state.invitedGames)
@@ -281,6 +290,6 @@ const websocketSlice = createSlice({
   },
 });
 
-export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect, resetLobbyData} = websocketSlice.actions;
+export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect, resetLobbyData, setParamsReceived} = websocketSlice.actions;
 
 export default websocketSlice.reducer;

@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar/NavBar.tsx'
-import About from './pages/About/index.tsx';
+import AboutPage from './pages/About/index.tsx';
 import { usePlayerStore } from './components/Game/PlayerStore.ts';
 import { useEffect } from 'react';
 import { Game } from './components/Game/Game.tsx';
@@ -18,19 +18,20 @@ export function App() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+
     dispatch(websocketDisconnected());
     if (user) {
       dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, access_token] });
     }
-  }, [user]);
+  }, [user?.id]);
 
   return (
     <Router>
-      <Toaster/>
+      <Toaster   position="bottom-right"/>
       <Navbar/>
         <Routes>
           <Route path="/" element={user && isConnected ? <Dashboard /> : <Authentication/>} />
-          <Route path="/about" element={<About />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/game/:id" element={<Game />} />
         </Routes>
     </Router>

@@ -7,11 +7,13 @@ import { Instance } from "../classes/instance.class";
 import { Injectable } from '@nestjs/common';
 import { LobbySlot } from "src/Types";
 import { ClassicInstance } from "../classes/classicInstance";
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable()
 export class Lobby {
-	constructor(mode: LobbyMode, private readonly server: Server, creator: Player) {
-		this.mode = mode;
+	constructor(mode: LobbyMode | undefined, private readonly server: Server, creator: Player) {
+		if (mode)
+			this.mode = mode;
 		this.id = uuidv4();
 		if (mode == LobbyMode.classic)
 			this.instance = new ClassicInstance(this);
@@ -36,18 +38,65 @@ export class Lobby {
 		return (lobby);
 	}
 
-	public setSlots(slots: LobbySlotCli[]) { this.slots = JSON.parse(JSON.stringify(slots))}
+	public setParams(params: GameParameters) {
+		this.instance.setParams(params);
+		this.setMode(params.duel ? LobbyMode.duel : LobbyMode.double)
+		this.mode = params.duel ? LobbyMode.duel : LobbyMode.double;
+		this.checkIfLobbyFull();
+		this.dispatchLobbySlots();
+		this.dispatchAuthState();
+		this.dispatchParametersState();
+	}
+	public setMode(mode: LobbyMode) {
+		this.dispatchLobbySlots();
+		this.mode = mode;
+	}
+	public setSlots(slots: LobbySlotCli[]) {
+		this.checkIfLobbyFull();
+		slots.forEach((slot, i) => {
+			this.slots[i] = slot;
+		})
+	}
 
 	public dispatchLobbySlots() {
-		this.emit<ServerPayloads[ServerEvents.LobbySlotsState]>(ServerEvents.LobbySlotsState, this.slots);
+		let slots = [...this.slots];
+		slots = slots.slice(0, this.mode == LobbyMode.duel || this.instance instanceof ClassicInstance ? 2 : 4);
+		this.emit<ServerPayloads[ServerEvents.LobbySlotsState]>(ServerEvents.LobbySlotsState, slots);
+		}
+
+	public dispatchParametersState() {
+		this.players.forEach((pl) => {
+			if (pl.id != this.owner.id) {
+				pl.emit<ServerPayloads[ServerEvents.ParametersState]>(ServerEvents.ParametersState, this.instance.getParams());
+			}
+		})
 	}
+
 	public isOnlineSlot(): boolean {
 		let isOnlineSlot = false;
 		this.slots.forEach((e) => {
-			if (!e.full && e.type == LobbySlotType.online)
+			if (!e.full)
 				isOnlineSlot = true;
 		})
 		return (isOnlineSlot);
+	}
+
+	checkIfLobbyFull() {
+		if (this.players.size == this.mode && this.instance instanceof Instance) {
+			this.full = true;
+			if (this.instance.automatch)
+				this.instance.triggerStart();
+			else
+				this.emit<boolean>(ServerEvents.LobbyFull, true);
+			return ;
+		} else if (this.nbPlayers == 2 && this.instance instanceof ClassicInstance) {
+			this.full = true;
+			this.instance.triggerStart();
+		}
+		else {
+			this.emit<boolean>(ServerEvents.LobbyFull, false);
+			this.full = false;
+		}
 	}
 
  	connectPlayer(player: Player):boolean {
@@ -62,14 +111,11 @@ export class Lobby {
 			this.slots[this.players.size - 1] = {full: true, type: 0, player: player.infos};
 			this.dispatchLobbySlots();
 		}
-		if (this.nbPlayers == 2) {
-			this.full = true;
-				this.instance.triggerStart();
-			return ;
-		}
+		this.checkIfLobbyFull();
 		this.dispatchAuthState();
 		return true;
 	}
+
 	deletePlayerFromSlot(player: Player) {
 		if (!this.slots || this.slots.length < 1)
 			return ;
@@ -213,8 +259,8 @@ export class Lobby {
 	clear() {
 		this.players.forEach((player) => {
 			this.removePlayer(player);
-			this.players.delete(player.socket.id);
 		})
+		this.players.clear();
 		this.instance.clear();
 		delete this.instance;
 		return null;

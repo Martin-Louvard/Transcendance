@@ -112,7 +112,7 @@ export class ClassicInstance {
 	};
 
 	// un player quitte pendant le temps d'attente du demarage
-	private data: GameData = {
+	public data: GameData = {
 		mapHeight:  200,
 		mapWidth: 100,
 		balls: null,
@@ -131,7 +131,7 @@ export class ClassicInstance {
 	}
 
 
-	setParams(params: GameParameters) {console.log(params); this.params = params; this.automatch = false };
+	setParams(params: GameParameters) {this.params = params; this.automatch = false };
 	getParams(): GameParameters {return this.params};
 	isInstanceOfInputPacket(object: any): boolean {
 		return ('code' in object && 'timestamp' in object);
@@ -197,6 +197,9 @@ export class ClassicInstance {
 
 	triggerFinish() {
 		this.hasFinished = true;
+		this.interval.forEach((e) => {
+			clearInterval(e);
+		})
 		this.lobby.players.forEach((e) => {
 			const payload: ServerPayloads[ServerEvents.LobbyState] = {
 				lobbyId: this.lobby.id,
@@ -211,7 +214,6 @@ export class ClassicInstance {
 				score: this.data.score,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
-			
 		})
 	}
 
@@ -560,7 +562,6 @@ export class ClassicInstance {
 			this.data.elapsedTime = Date.now() / 1000 - this.startTime;
 			if (this.data.elapsedTime > 100 /*this.params.general.time*/) {
 				this.triggerFinish();
-				this.lobby.clear()
 			}
 	}, 1000/ 120));
 }

@@ -7,9 +7,6 @@
     height: 100%;
     width: 90%;
     max-width: 2500px;
-    border: 2px solid white;
-    border-radius: 25%;
-    background-color: #4d4848;
 }
 
 .auth-card-block {
@@ -17,13 +14,18 @@
     flex-direction: row;
     align-items: center;
     margin: 40px;
-    width: 40%;
+    width: 50%;
     justify-content: center;
 }
 
 .auth-card {
     margin-right: 20px;
+    a{
+    display: flex;
+    flex-direction: column;
+    }
 }
 
-  
-  
+  .logo-42{
+    height: 80px;
+  }

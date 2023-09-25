@@ -10,17 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Server, Socket } from 'socket.io';
-import {
-  ClientEvents,
-  ClientPayloads,
-  LobbyMode,
-  ServerEvents,
-  ServerPayloads,
-  InputPacket,
-  GameParameters,
-  PlayerInfo,
-  GameRequest,
-} from '@shared/class';
+import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket, GameParameters, PlayerInfo, GameRequest, LobbySlotType } from '@shared/class';
 import { JwtService } from '@nestjs/jwt';
 import { AppService } from './app.service';
 import { LobbyService } from './game/lobby/lobby.service';
@@ -30,6 +20,7 @@ import * as bcrypt from 'bcrypt';
 export const roundsOfHashing = 10;
 import { Player } from './game/player/player.class';
 import { Logger } from '@nestjs/common';
+import { Lobby } from './game/lobby/lobby.class';
 
 @WebSocketGateway({ cors: '*' })
 export class AppGateway
@@ -43,12 +34,28 @@ export class AppGateway
     private readonly playerService: PlayerService,
   ) {}
 
+  connected_clients = new Map<number, Socket>();
   private readonly logger = new Logger('AppGateway');
 
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
+    if (client.handshake.auth.user_id) {
+      const user_id_string = client.handshake.auth.user_id;
+      const user_id = parseInt(user_id_string);
+      if (user_id){
+      this.connected_clients.set(user_id, client);
+      this.server.emit('update_friend_connection_state', {
+        user_id: user_id,
+        status: 'ONLINE',
+      });
+      await this.prisma.user.update({
+        where: { id: user_id },
+        data: { status: 'ONLINE' },
+      });
+    }
+    }
     this.appService.auth(client);
   }
 
@@ -56,10 +63,35 @@ export class AppGateway
     return this.lobbyService.setServer(server);
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
+    if (client.handshake.auth.user_id) {
+      const user_id_string = client.handshake.auth.user_id;
+      const user_id = parseInt(user_id_string);
+      if (user_id){
+      this.connected_clients.delete(user_id);
+      this.server.emit('update_friend_connection_state', {
+        user_id: user_id,
+        status: 'OFFLINE',
+      });
+      await this.prisma.user.update({
+        where: { id: user_id },
+        data: { status: 'OFFLINE' },
+      });
+      }
+    }
     const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player) return;
     return this.playerService.disconnectPlayer(player);
+  }
+
+  @SubscribeMessage(ClientEvents.KickLobby)
+  KickPlayerLobby(@ConnectedSocket() client: Socket, @MessageBody() id: number) {
+    const player = this.playerService.getPlayer(id);
+    const kicker = this.playerService.getPlayerBySocketId(client.id);
+    if (!kicker || !player || !kicker.lobby || !player.lobby || kicker.lobby.owner.id != kicker.id)
+      return false;
+    const lobby = kicker.lobby;
+    lobby.removePlayer(player);
   }
 
   @SubscribeMessage('automatch')
@@ -80,6 +112,7 @@ export class AppGateway
       return;
     }
     this.lobbyService.automatch(player, data, this.server);
+    this.lobbyService.dispatchEvent();
   }
 
   @SubscribeMessage('automatchClassic')
@@ -100,46 +133,80 @@ export class AppGateway
       return;
     }
     this.lobbyService.automatchClassic(player, data, this.server);
+    this.lobbyService.dispatchEvent();
   }
 
   @SubscribeMessage(ClientEvents.DeleteGameRequest)
-  deleteGameRequest(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: GameRequest,
-  ) {
+  deleteGameRequest(@ConnectedSocket() client: Socket, @MessageBody() data: GameRequest | number) {
     try {
-      if (
-        !data ||
-        !data.sender ||
-        !data.sender.id ||
-        !data.receiver ||
-        !data.receiver.id
-      ) {
-        return false;
-      }
+      if (typeof data === "number") {
+        this.playerService.deleteRequests(undefined, data);
+        const player = this.playerService.getPlayer(data);
+        if (player.lobby) {
+          return true;
+        }
+        const sender = this.playerService.getPlayerBySocketId(client.id);
+        if (!sender) {
+          return false;
+        }
+        const lobby = sender.lobby;
+        if (!lobby) {
+          return false ;
+        }
+        const index = lobby.slots.findIndex((slot) => slot.player.id == data);
+        lobby.slots[index].full = false;
+        lobby.slots[index].type = LobbySlotType.friend;
+        lobby.slots[index].player = undefined;
+        lobby.dispatchLobbySlots();
+      } else {
+        if (!data || !data.sender || !data.sender.id || !data.receiver || !data.receiver.id) {
+          return false;
+        }
       const receiver = this.playerService.getPlayerById(data.receiver.id);
       const sender = this.playerService.getPlayerById(data.sender.id);
-      const current = this.playerService.getPlayerBySocketId(client.id);
+      const current = this.playerService.getPlayerBySocketId(client.id)
       if (!receiver || !sender || !current) {
         return false;
       }
-      this.playerService.deleteRequests(
-        undefined,
-        undefined,
-        undefined,
-        data.id,
-      );
-    } catch (err) {
+      this.playerService.deleteRequests(undefined, undefined, undefined, data.id);
+      const lobby = this.lobbyService.getLobby(data.lobby.id);
+      if (!lobby)
+        return false;
+      let isInLobby = false;
+      lobby.players.forEach((e) => {
+        if (e.id == receiver.id) {
+          isInLobby = true ;
+          return ;
+        }
+      })
+      if (!lobby || isInLobby)
+        return false;
+      const index = lobby.slots.findIndex((slot) => slot.player.id == data.receiver.id);
+      lobby.slots[index].full = false;
+      lobby.slots[index].type = LobbySlotType.friend;
+      lobby.slots[index].player = undefined;
+      lobby.dispatchLobbySlots();
+      }
+    } catch(err) {
       console.log(err);
-    }
+  }
   }
 
-  @SubscribeMessage(ClientEvents.GetLobbies)
-  getLobbies(@ConnectedSocket() client: Socket) {
-    client.emit(
-      ServerEvents.GetLobbies,
-      this.lobbyService.getJoinableLobbies(),
-    );
+  @SubscribeMessage(ClientEvents.ListenLobbies)
+  AddLobbiesListener(@ConnectedSocket() client: Socket) {
+    const player= this.playerService.getPlayerBySocketId(client.id);
+    if (!player)
+      return ;
+    this.lobbyService.addListener(player.id);
+    this.lobbyService.dispatchEvent();
+  }
+
+  @SubscribeMessage(ClientEvents.StopListenLobbies)
+  RemoveLobbiesListener(@ConnectedSocket() client: Socket) {
+    const player= this.playerService.getPlayerBySocketId(client.id);
+    if (!player)
+      return ;
+    this.lobbyService.removeListener(player.id);
   }
 
   @SubscribeMessage(ClientEvents.StartGame)
@@ -153,6 +220,7 @@ export class AppGateway
     if (lobby.instance.hasStarted || lobby.instance.hasFinished)
       return 'game cannot be restarted';
     lobby.instance.triggerStart();
+    this.lobbyService.dispatchEvent();
   }
 
   @SubscribeMessage(ClientEvents.InputState)
@@ -184,13 +252,7 @@ export class AppGateway
     const lobby = this.playerService.getLobby(client.id);
     if (lobby) {
       lobby.setSlots(data);
-      lobby.players.forEach((e) => {
-        if (e.socket.id != client.id)
-          e.emit<ServerPayloads[ServerEvents.LobbySlotsState]>(
-            ServerEvents.LobbySlotsState,
-            lobby.slots,
-          );
-      });
+      lobby.dispatchLobbySlots();
     }
   }
 
@@ -210,21 +272,36 @@ export class AppGateway
     @MessageBody() data: { lobbyId: string; info: PlayerInfo },
   ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player) return 'player not found';
+    if (!player){ console.log("player not found"); return 'player not found';}
     if (!this.lobbyService.joinLobby(player, data)) return 'cant join lobby';
+    this.lobbyService.dispatchEvent();
+  }
+
+  @SubscribeMessage(ClientEvents.CreateLobby)
+  createLobby(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.CreateLobby]) {
+    const player = this.playerService.getPlayer(data.id);
+    if (!player || player.lobby) 
+      return ;
+    this.lobbyService.createLobby(undefined, this.server, player);
+    this.lobbyService.dispatchEvent();
   }
 
   @SubscribeMessage(ClientEvents.ParameterState)
-  createMatch(
+  SetParameter(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { params: GameParameters; info: PlayerInfo },
   ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player || player.lobby)
-      // si il est deja dans un lobby on l'autorise pas
-      return;
+    if (!player || !player.lobby || player.lobby.owner.id != player.id) // si il est deja dans un lobby on l'autorise pas
+      return ;
     player.infos = data.info;
-    this.lobbyService.createLobbyByParameters(data.params, this.server, player);
+    let dispatch = false;
+    if ((data.params.duel && player.lobby.mode == LobbyMode.double )|| (!data.params.duel && player.lobby.mode == LobbyMode.duel) || !player.lobby.mode )
+      dispatch = true;
+    player.lobby.setParams(data.params);
+    
+    if (dispatch){ this.lobbyService.dispatchEvent()}
+    //this.lobbyService.createLobbyByParameters(data.params, this.server, player);
   }
 
   @SubscribeMessage('message')

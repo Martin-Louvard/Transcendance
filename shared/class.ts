@@ -1,4 +1,5 @@
 import * as CANNON from 'cannon-es'
+import { User } from 'src/users/entities/user.entity';
 
 export enum LobbyMode {
 	classic = 0,
@@ -40,6 +41,10 @@ export enum ServerEvents
   LobbyFull = 'server.lobby.full',
 
   GetLobbies = 'server.get.lobbies',
+
+  ParametersState = 'server.parameters.state',
+
+  ListLobbies = 'server.list.lobbies',
 }
 
 export enum ClientEvents
@@ -64,13 +69,22 @@ export enum ClientEvents
 
   StartGame = 'client.start.game',
 
-  GetLobbies = 'client.get.lobbies',
+  ListenLobbies = 'client.listen.lobbies',
+
+  StopListenLobbies = 'client.stop.listen.lobbies',
+
+  AddGame = 'client.add.game',
+
+  CreateLobby = 'client.create.lobby',
+
+  KickLobby = 'client.kick.lobby',
 }
 
 export interface LobbyCli {
 	id: string,
 	slots: LobbySlotCli[],
 	creator: PlayerInfo,
+	size: number,
 }
 
 export interface PlayerInfo {
@@ -126,9 +140,10 @@ export type ServerPayloads = {
 		owner: string,
 	},
 	[ServerEvents.LobbySlotsState]: LobbySlotCli[],
-	[ServerEvents.GameRequest]: {sent: GameRequest[], received: GameRequest[]};
-	[ServerEvents.DeleteSentGameRequest]: GameRequest;
-	[ServerEvents.DeleteGameRequest]: GameRequest;
+	[ServerEvents.GameRequest]: {sent: GameRequest[], received: GameRequest[]},
+	[ServerEvents.DeleteSentGameRequest]: GameRequest,
+	[ServerEvents.DeleteGameRequest]: GameRequest,
+	[ServerEvents.ParametersState]: GameParameters,
 };
 
 export type ClientPayloads = {
@@ -150,6 +165,16 @@ export type ClientPayloads = {
 		senderId: number,
 		receiverId: number,
 		lobbyId: string,
+	},
+	[ClientEvents.AddGame]: {
+		players: PlayerInfo[],
+		score: {'home': number, 'visitor': number},
+		home: PlayerInfo[],
+		visitor: PlayerInfo[],
+		winner: PlayerInfo,
+	}
+	[ClientEvents.CreateLobby]: {
+		id: number,
 	}
 };
 
@@ -240,4 +265,24 @@ export interface GameParameters {
 	general : {
 		time: number, // temps d'une game
 	}
+}
+
+	//  model Game {
+	//	id        Int      @id @default(autoincrement())
+	//	scoreHome     Int
+	//	scoreVisitor  Int
+	//	players   User[]   @relation("PlayersInGame")
+	//	home      User[]   @relation("HomeTeam")
+	//	visitor   User[]   @relation("VisitorTeam")
+	//	createdAt DateTime @default(now())
+	//  }
+
+export interface Game {
+	id: number;
+	createdAt: string;
+	scoreHome: number;
+	scoreVisitor: number;
+	players: User[];
+	home: User[];
+	visitor: User[];
 }

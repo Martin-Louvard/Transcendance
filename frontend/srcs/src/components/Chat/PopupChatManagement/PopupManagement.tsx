@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 import LeaveChatButton from "./leaveChatButton.tsx";
 import AddParticipants from "./addParticipants.tsx";
 
-const contentStyle = { background: '#000' };
+const contentStyle = { background: '#242526' };
 const arrowStyle = { color: '#000' }; 
 const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefined; isOpen: boolean; setIsOpen:React.Dispatch<React.SetStateAction<boolean>>} ) => {
   const currentUser = useAppSelector((state) => state.session.user);

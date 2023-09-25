@@ -13,6 +13,7 @@ import { AppGateway } from './app.gateway';
 
 import { LobbyModule } from './game/lobby/lobby.module';
 import { PlayerModule } from './game/player/player.module';
+import { Instance } from './game/classes/instance.class';
 
 @Module({
   imports: [PrismaModule, UsersModule, ChatChannelsModule, ChatMessagesModule, AuthModule, FriendsModule, LobbyModule, PlayerModule],

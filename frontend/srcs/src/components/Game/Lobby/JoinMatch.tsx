@@ -1,5 +1,5 @@
 import { Avatar, Button, Grid, List, ListItem, ListItemAvatar, ListItemText, Typography, styled } from "@mui/material";
-import { LobbyType } from "@shared/class";
+import { LobbySlotCli, LobbyType } from "@shared/class";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setLobbyType } from "../../../redux/websocketSlice";
@@ -18,7 +18,7 @@ export const JoinMatch: React.FC = () => {
   
 	useEffect(() => {
 		  dispatch({
-			  type: 'WEBSOCKET_SEND_GET_LOBBIES',
+			  type: 'WEBSOCKET_SEND_LISTEN_LOBBIES',
 		  });
 	}, [])
   
@@ -30,24 +30,36 @@ export const JoinMatch: React.FC = () => {
 	  })
   
 	}
+
+	function getRemainingSlot(slots: LobbySlotCli[]) {
+		let nb = 0;
+		slots.forEach((e) => {
+			if (e.full)
+				nb++;
+		})
+		return (nb);
+	}
   
 	useEffect(() => {
 	  if (!game.lobbies)
 		  return ;
 	  setRenderLobbies(game.lobbies.map((lobby, key) => (
-		<ListItem key={key}
-		secondaryAction={
-		  <Button onClick={() => {joinLobby(lobby.id)}}>JOIN</Button>
-		}
-		>
-		  <ListItemAvatar>
-			<Avatar src={lobby.creator.avatar}/>
-		  </ListItemAvatar>
-		  <ListItemText
-			primary={`${lobby.creator.username}'s lobby`}
-			secondary={secondary ? 'Secondary text' : ""}
-			/>
-		</ListItem>
+		<div style={{width:"500px", backgroundColor:"transparent", borderColor:"white", border:"3px solid", borderRadius:"15px"}}>
+			<ListItem key={key}
+			secondaryAction={
+				<Button onClick={() => {joinLobby(lobby.id)}}>JOIN</Button>
+			}
+			>
+			<ListItemAvatar>
+				<Avatar src={lobby.creator.avatar}/>
+			</ListItemAvatar>
+			<ListItemText sx={{color:'white'}}
+				primary={`${lobby.creator.username}'s lobby`}
+				secondary={`${getRemainingSlot(lobby.slots)} / ${lobby.size}`}
+				secondaryTypographyProps={{color:"white"}}
+				/>
+			</ListItem>
+		</div>
 	  )))
   
 	}, [game.lobbies])
@@ -59,9 +71,7 @@ export const JoinMatch: React.FC = () => {
 			<Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
 			  Avalaible Lobbies
 			</Typography>
-			<Demo>
-				{renderLobbies}
-			</Demo>
+			{renderLobbies}
 		</Grid>
 	  </div>
 	);
