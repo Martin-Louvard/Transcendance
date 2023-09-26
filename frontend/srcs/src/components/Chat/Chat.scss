@@ -120,13 +120,17 @@
     border: 1px solid black;
     border-radius: 15px;
     padding: 20px;
+    max-height: 60vh;
     position: relative;
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
 
   .close-popup{
     position: absolute;
-    right: -25px;
-    top: -25px;
+    right: 0px;
+    top: 0px;
+    z-index: 999;
   }
 
   .popup-mdp{

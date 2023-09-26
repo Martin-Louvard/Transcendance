@@ -37,7 +37,7 @@ const AddParticipantsSearchBar = ({chat} : {chat: ChatChannels}) => {
       const friend = currentRelations.filter(
         (friend) => WhatsMyName(currentUser!, friend) === searchInput)[0];
       dispatch({type: 'ADD_USER_CHAT', payload:[chat.id, WhatsMyId(currentUser!, friend)]})
-      toast.success(`${WhatsMyName(currentUser!, friend)} has been add to the chat`);
+      toast.success(`${WhatsMyName(currentUser!, friend)} has been added to the chat`);
     }
     else {
       toast.error("User not found");
