@@ -115,6 +115,58 @@
     align-self: center;
 }
 
+.chat-popup{
+    background: #242526;
+    border: 1px solid black;
+    border-radius: 15px;
+    padding: 20px;
+    position: relative;
+  }
+
+  .close-popup{
+    position: absolute;
+    right: -25px;
+    top: -25px;
+  }
+
+  .popup-mdp{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+
+  }
+
+  .popup-top{
+    display: flex;
+    flex-direction: row;
+   }
+  
+  .add-participants-search-bar-wrapper{
+    display: flex;
+    flex-direction: row;
+
+  }
+  .popup-button-add-people{
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    margin-left: 15px;
+    justify-content: center;
+  }
+
+  .management-leave-button{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    justify-content: center;
+
+    p{
+        margin-right: 10px;
+    }
+  }
+  
 .popup-user-list-item{
     display: flex;
     flex-direction: row;
@@ -122,12 +174,13 @@
     width:100%;
     margin:5px;
     overflow: hidden;
+    padding-right: 5px;
 }
 
 
 .link-to-user{
     cursor: pointer;
-    border-radius: 15%;
+    border-radius: 15px 0 0 15px;
     padding-right: 10px;
 
     .div{
@@ -158,4 +211,16 @@
 
 .management-currentOpenedChat-popup{
     overflow: scroll;
+}
+
+.popup-ban
+{
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    align-self: flex-end;
+}
+
+.chrono-for-action{
+    font-size: small;
 }

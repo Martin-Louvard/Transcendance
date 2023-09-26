@@ -125,6 +125,14 @@ $chat-menu-icon-open: 15vw;
 	justify-content: center;
 }
 
+.chat-creator{
+    width: 100%;
+    overflow: hidden;
+    .form{
+      align-items: center;
+    }
+}
+
 .chat-item {
 	display:flex;
 	padding: 10px 0;
@@ -136,18 +144,27 @@ $chat-menu-icon-open: 15vw;
 }
 .chat-name-in-menu {
 	display:flex;
-	width: 50%;
+	width: 100%;
   overflow: hidden ;
 	justify-content: space-between;
 	flex-direction: row;
   align-items: center;
 	font-size: 12px;
+  padding: 5px;
 }
+
 .chat-participants{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+  
+  div{
+    padding-top: 5px;
+  }
 }
+
+
 
 .chat-item:hover {
   background-color: #e0e0e0;

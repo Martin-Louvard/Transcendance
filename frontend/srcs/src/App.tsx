@@ -18,11 +18,12 @@ export function App() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+
     dispatch(websocketDisconnected());
     if (user) {
       dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, access_token] });
     }
-  }, [user]);
+  }, [user?.id]);
 
   return (
     <Router>

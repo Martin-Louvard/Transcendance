@@ -3,6 +3,7 @@ import { useAppSelector } from "../../redux/hooks";
 import Form from "../Forms/Form";
 import { useAppDispatch } from "../../redux/hooks";
 import { Friend } from "../../Types";
+import './SideChatMenu.scss'
 
 const ChatCreator: React.FC = () => {
   const user = useAppSelector((state) => state.session.user);
@@ -58,7 +59,7 @@ const ChatCreator: React.FC = () => {
   
 
   return (
-    <div className="card-wrapper">
+    <div className="chat-creator">
       <Form title="Chat Creator" buttonText="Create" onSubmit={handleSubmit}>
         <label htmlFor="name">Name</label>
         <input
@@ -85,7 +86,7 @@ const ChatCreator: React.FC = () => {
             </>
           ) : null}
           {friends ? (
-            <fieldset id="participants">
+            <div id="participants">
               <legend>Participants</legend>
               {friends.map((f: Friend) => (
                 <label key={f.id}>
@@ -98,7 +99,7 @@ const ChatCreator: React.FC = () => {
                 {f.username}
               </label>
             ))}
-          </fieldset>
+          </div>
         ) : null}
       </Form>
     </div>

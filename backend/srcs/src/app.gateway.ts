@@ -44,6 +44,7 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
+      if (user_id){
       this.connected_clients.set(user_id, client);
       this.server.emit('update_friend_connection_state', {
         user_id: user_id,
@@ -53,6 +54,7 @@ export class AppGateway
         where: { id: user_id },
         data: { status: 'ONLINE' },
       });
+    }
     }
     this.appService.auth(client);
   }
@@ -65,6 +67,7 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
+      if (user_id){
       this.connected_clients.delete(user_id);
       this.server.emit('update_friend_connection_state', {
         user_id: user_id,
@@ -74,8 +77,8 @@ export class AppGateway
         where: { id: user_id },
         data: { status: 'OFFLINE' },
       });
+      }
     }
-
     const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player) return;
     return this.playerService.disconnectPlayer(player);
@@ -310,7 +313,20 @@ export class AppGateway
       data: { channelId: body[0], senderId: body[1], content: body[2] },
       include: { sender: true },
     });
-    this.server.emit('message', message);
+    const chat = await this.prisma.chatChannel.findUnique({where: {id: body[0]}, include: {participants: true}})
+    const participants = chat.participants;
+    // Filter connected_clients to get clients who are also participants
+    const participantsInConnectedClients = new Map<number, Socket>();
+
+    participants.forEach(participant => {
+      const client = this.connected_clients.get(participant.id);
+      if (client) {
+        participantsInConnectedClients.set(participant.id, client);
+      }
+    });
+    participantsInConnectedClients.forEach((p)=>{
+      p.emit('message', message);
+    })
   }
 
   @SubscribeMessage('read')
@@ -368,6 +384,27 @@ export class AppGateway
     this.server.emit('add_admin', updatedChats);
   }
 
+  @SubscribeMessage('add_user_chat')
+  async handleAddUserChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const newUser = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const updatedChats = await this.prisma.chatChannel.update({
+      where: { id: parseInt(body[0]) },
+      data: { participants: { connect: { id: newUser.id } } },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+      },
+    });
+    this.server.emit('add_user_chat', updatedChats);
+  }
+
   @SubscribeMessage('leave_chat')
   async handleLeaveChat(
     @ConnectedSocket() client: Socket,
@@ -396,7 +433,7 @@ export class AppGateway
         participants: true,
       },
     });
-    this.server.emit('leave_chat', updatedChat);
+    this.server.emit('leave_chat', [updatedChat, parseInt(body[1])]);
   }
 
   @SubscribeMessage('remove_admin')
@@ -443,15 +480,7 @@ export class AppGateway
     await this.prisma.chatChannel.delete({
       where: { id: parseInt(body[0]) },
     });
-    const updatedChats = await this.prisma.chatChannel.findMany({
-      include: {
-        participants: true,
-        bannedUsers: true,
-        admins: true,
-        messages: { include: { sender: true } },
-      },
-    });
-    this.server.emit('delete_chat', updatedChats);
+    this.server.emit('delete_chat', parseInt(body[0]));
   }
 
   @SubscribeMessage('change_owner')
@@ -532,7 +561,7 @@ export class AppGateway
         participants: true,
       },
     });
-    this.server.emit('kick_user', updatedChat);
+    this.server.emit('kick_user', [updatedChat, userToKick.id]);
   }
 
   @SubscribeMessage('create_chat')

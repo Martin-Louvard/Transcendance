@@ -13,10 +13,10 @@ import { setContentToShow, setFriendProfile } from "../../redux/sessionSlice";
 const FriendsListCard: React.FC = (props) =>{
     const user = useAppSelector((state) => state.session.user);
     const friendships = useAppSelector((state) => state.session.friendships);
-    const [friendshipsAccepted, setFriendshipsAccepted] = useState(friendships)
+    const [friendshipsAccepted, setFriendshipsAccepted] = useState<Friendships[] | undefined>()
     const [newFriendUsername, setNewFriendUsername] = useState('');
     const dispatch = useAppDispatch();
-    const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
+    const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>();
     const gameRequest= useAppSelector((state) => state.websocket.invitedGames)
     const contentToShow = useAppSelector((state) => state.session.contentToShow)
     
@@ -29,10 +29,6 @@ const FriendsListCard: React.FC = (props) =>{
     if (accepted)
       setFriendshipsAccepted(accepted)
   }
-
-    useEffect(()=>{
-      getAccepted()
-    },[friendships])
 
 
     const sendFriendRequest = async (event: React.FormEvent<HTMLFormElement>) =>{
@@ -59,7 +55,7 @@ const FriendsListCard: React.FC = (props) =>{
               {friendRequests ? friendRequests.map((friendship, index) => (
                 <li className="item" key={index}>
                   <Avatar onClick={()=>{displayFriendProfile(friendship)}} sx={{width:'60px', height:"60px"}} src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
-                <div>
+                <div className="notif-content">
                   <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
                   <div className='accept-deny'>
                     <button onClick={()=>{ dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username, Status.ACCEPTED] }) }}>Add Friend ✅</button>
@@ -98,7 +94,10 @@ const FriendsListCard: React.FC = (props) =>{
     
 
         useEffect(()=>{
+          
     if (friendships){
+      getAccepted()
+
       let friendshipstmp: Friendships[] = [];
       friendships.forEach((e) => {
         if (e.status === Status.PENDING && e.sender_id != user?.id)
@@ -151,7 +150,7 @@ return (
       )
   }
 
-    const friendList = () =>{
+  const friendList = () =>{
       return (
       <div className="card-wrapper">
         <Form onSubmit={sendFriendRequest} title="Add a new friend" buttonText="Add">
@@ -165,17 +164,20 @@ return (
             />
           </div>
         </Form>
-        {friendRequests?.length ? renderNotifications() : ""}
+        { friendRequests?.length ? renderNotifications() : ""}
         {gameRequest?.length  ? renderGameRequests() : ""}
         {displayFriendships()}
         
       </div>
       )
     }
+
+
+
   return (
     <>
         {
-          friendList()
+         friendList()
         }
     </>
   );

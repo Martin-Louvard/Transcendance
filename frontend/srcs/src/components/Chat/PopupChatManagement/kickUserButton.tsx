@@ -1,18 +1,58 @@
 import { useAppDispatch } from "../../../redux/hooks";
 import { User, ChatChannels } from "../../../Types.ts";
 import { GiBootKick } from "react-icons/gi";
+import { useState } from "react";
+import { Popup } from 'reactjs-popup';
 
-const KickUserButton = ({ user, chat }:{user: User; chat: ChatChannels}) => {
-  const dispatch = useAppDispatch();
 
-  const handleKickButton = () => {
-    dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
-  };
+let contentStyle = { width:"fit-content", background: 'transparent', border: "none"};
+
+const KickUserButton = ({ user, chat }:{
+  user: User; 
+  chat: ChatChannels;
+  }) => {
+    const dispatch = useAppDispatch();
+    const [isClicked, setIsClicked] = useState<boolean>(false);
+
+
+    const handleKickButton = () => {
+      if (isClicked) {
+        setIsClicked(false);
+      }
+      else {
+        setIsClicked(true);
+      }
+    };
+
+    const handleKick = (time: number) => {
+      dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
+    }
+
+    const handleBan = () => {
+      dispatch({type:'BAN_USER', payload:[chat.id, user.id]});
+    }
+
 
   return (
-    <div className="management-kick-button" onClick={() => handleKickButton()}>
-      <GiBootKick />
+  <Popup 
+    trigger={
+      <div className="management-button" onClick={() => handleKickButton()}>
+        <GiBootKick />
+      </div>
+    }
+    position="top center"
+    closeOnDocumentClick={true}
+    onClose={() => setIsClicked(false)}
+    nested
+    {...{contentStyle}}>
+      <div className="chat-popup popup-ban" >
+    <button className="chrono-for-action" onClick={() => handleKick(5)}>{"5min"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick(10)}>{"10min"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick(20)}>{"20min"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick(30)}>{"30min"}</button>
+    <button className="chrono-for-action" onClick={() => handleBan()}>{"Ban"}</button>
     </div>
+  </Popup>
   );
 
 };
