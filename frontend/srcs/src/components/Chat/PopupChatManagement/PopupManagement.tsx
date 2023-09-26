@@ -16,12 +16,12 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
     (chann) => chann.id === chat?.id));
   useEffect(() => {
     if (currentOpenedChat !== undefined && currentUser !== undefined) {
-      setIsDefine(currentOpenedChat.owner.id === currentUser.id);
+      setIsDefine(currentOpenedChat?.owner?.id === currentUser.id);
     }
   }, [currentOpenedChat, currentUser]);
 
   useEffect(() => {
-    if (!currentOpenedChat?.participants.filter((user) => user.id === currentUser?.id).length)
+    if (!currentOpenedChat?.participants?.filter((user) => user.id === currentUser?.id).length)
       setIsOpen(false);
   }, [currentOpenedChat]);
 
@@ -33,20 +33,21 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         {...{ contentStyle, arrowStyle }}  
     >
       <div className='chat-popup'>
+        <button className='close-popup' onClick={() =>{setIsOpen(false)}}>x</button>
         <div className='popup-top'>
         <div className="management-currentOpenedChat-popup">
             {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
           </div>
           <AddParticipants chat={currentOpenedChat!} />
-          <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
       </div>
       <ul>
-        {currentOpenedChat?.participants.map((user)=>{
+        {currentOpenedChat?.participants?.map((user)=>{
           if (currentUser?.id !== user?.id)
-            return (<UserListItem key={user.id} user={user} chat={currentOpenedChat} />);
+            return (<UserListItem key={user.id} user={user} chat={currentOpenedChat} setIsOpen={setIsOpen} />);
           return null;
       })}
     </ul>
+    <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
 
     </div>
     </Popup>

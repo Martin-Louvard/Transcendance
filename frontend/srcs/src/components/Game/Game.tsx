@@ -31,7 +31,7 @@ export const Ball: React.FC = (props) => {
 
 	useFrame(() => {
 		ballRef.current.position.set(props.position[0], props.position[1], props.position[2]);
-		ballRef.current.quaternion.copy(props.quaternion);
+		ballRef.current.quaternion.set(props.quaternion.x, props.quaternion.y, props.quaternion.z, props.quaternion.w);
 	  }, [])
 	return (
 		<mesh position={[0, 0, 0]} ref={ballRef}>

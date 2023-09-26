@@ -120,6 +120,17 @@
     border: 1px solid black;
     border-radius: 15px;
     padding: 20px;
+    max-height: 60vh;
+    position: relative;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+
+  .close-popup{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    z-index: 999;
   }
 
   .popup-mdp{
@@ -133,8 +144,7 @@
   .popup-top{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-  }
+   }
   
   .add-participants-search-bar-wrapper{
     display: flex;
@@ -152,9 +162,13 @@
   .management-leave-button{
     display: flex;
     flex-direction: row;
+    align-items: center;
     cursor: pointer;
-    margin-left: 15px;
     justify-content: center;
+
+    p{
+        margin-right: 10px;
+    }
   }
   
 .popup-user-list-item{

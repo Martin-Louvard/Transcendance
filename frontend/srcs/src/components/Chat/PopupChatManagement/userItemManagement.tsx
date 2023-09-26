@@ -12,7 +12,7 @@ import {
   setFriendProfile,
 } from "../../../redux/sessionSlice.ts";
 
-const UserListItem = ({ user, chat }: { user: User; chat: ChatChannels }) => {
+const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannels, setIsOpen:React.Dispatch<React.SetStateAction<boolean>> }) => {
   const currentUser = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
 
@@ -36,6 +36,7 @@ const UserListItem = ({ user, chat }: { user: User; chat: ChatChannels }) => {
         className="popup-user-list-item link-to-user"
         onClick={() => {
           goToUserProfile(user);
+          setIsOpen(false);
         }}
       >
         <div className="picture-indicator">

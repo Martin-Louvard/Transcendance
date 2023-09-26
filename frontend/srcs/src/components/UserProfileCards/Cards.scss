@@ -34,13 +34,18 @@ $friend-picture-size: 50px;
   .form-picture {
     height: $picture-size;
     width: $picture-size;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 50%;
     overflow: hidden;
     margin-bottom: 10px;
 
     img {
-      height: $picture-size;
-      width: $picture-size;
+      max-width: 100%;
+      max-height: 100%;
+      height: auto;
+      width: auto;
       object-fit: cover;
     }
   }
@@ -115,7 +120,7 @@ $friend-picture-size: 50px;
 .list {
   display: flex;
   flex-direction: column;
-  width: 90%;
+  width: 100%;
   max-width: 600px;
   align-items: center;
 
@@ -126,7 +131,7 @@ $friend-picture-size: 50px;
   display: flex;
   flex-direction: row;
   justify-content:space-between;
-  align-items: center;
+  align-items:center;
   cursor: pointer;
   border-radius: 5px;
   margin-bottom: 10px;
@@ -136,13 +141,20 @@ $friend-picture-size: 50px;
   max-width: 70%;
 
   h3,
-  p {
-    width: 70%;
+  p
+  {
+    width: 100%;
     margin: 5px 0;
     overflow: hidden;
-    text-align: end;
+    text-align: center;
   }
 
+  .notif-content{
+    width: 100%;
+    align-items: center;
+    align-self: center;
+    overflow: hidden;
+  }
 
   .accept-deny{
     button{

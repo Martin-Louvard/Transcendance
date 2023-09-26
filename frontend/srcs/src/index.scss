@@ -17,8 +17,8 @@ $secondary-bg-color: #4d4848;
 @mixin button-style {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+  padding: 1.4vh 1.2vw;
+  font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
   background-color: $dark-color;
@@ -30,7 +30,7 @@ $secondary-bg-color: #4d4848;
 // Base Styles
 html {
   font-family: 'f25', "Avenir", system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 20px;
+  font-size: 15px;
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light dark;
@@ -43,6 +43,7 @@ html {
 }
 
 body {
+  font-size: 20px;
   margin: 0;
   display: flex;
   height: 100%;
@@ -115,16 +116,17 @@ ul{
   display: flex;
   flex-direction: column;
   justify-content:space-between;
-  align-items: center;
+  align-items: left;
   cursor: pointer;
   border-radius: 10px;
   margin: 10px;
   padding: 10px;
   width: 20rem;
-
+  
   h3,
   p {
     margin: 5px 0;
+    overflow: hidden;
   }
 
 
@@ -150,6 +152,7 @@ ul{
   }
 
   button {
+    @include button-style;
     background-color: $light-color;
   }
 }
@@ -167,4 +170,26 @@ ul{
   button{
     background-color: #131313;
   }
+}
+
+
+/* Target the entire scrollbar */
+::-webkit-scrollbar {
+  width: 10px; /* Width of the scrollbar */
+}
+
+/* Style the track of the scrollbar */
+::-webkit-scrollbar-track {
+  background-color: transparent; /* Track background color */
+}
+
+/* Style the thumb of the scrollbar */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Thumb color */
+  border-radius: 6px; /* Rounded corners for the thumb */
+}
+
+/* Style the thumb when hovered */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
 }

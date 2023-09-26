@@ -16,12 +16,21 @@ const Navbar: React.FC = () => {
   const friendships = useAppSelector((state) => state.session.friendships);
   const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
   const navigate = useNavigate()
-  
+  const [isMenuOpen, setIsMenuOpen] = useState("open-menu")
   useEffect(() =>{
     if (friendships){
       setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
     }
   },[friendships])
+
+  const toggleMenu = () => {
+    console.log(isMenuOpen)
+    if (isMenuOpen=== "open-menu")
+      setIsMenuOpen("close-menu")
+    else 
+      setIsMenuOpen("open-menu");
+  };
+
 
   const logout = () =>{
     window.location.href="http://localhost:3000/"
@@ -41,7 +50,7 @@ const Navbar: React.FC = () => {
 
   const renderMenuButtons = () => (
     user?.id && user.id != 0 ? 
-    <div className='menu-middle'>
+    <div className={`menu-middle ${isMenuOpen}`}>
       <button id="play" onClick={handleClick}>
         Play
       </button>
@@ -55,7 +64,6 @@ const Navbar: React.FC = () => {
       <button id="history" onClick={handleClick}>
         LeaderBoard
       </button>
-
     </div>
     :""
   );
@@ -66,15 +74,21 @@ const Navbar: React.FC = () => {
           <img src={logo} className="logo-nav" alt="PONGƎD logo" />
           <div className="navbar-brand">PONGƎD</div>
         </Link>
-        { renderMenuButtons()}
-        <ul className="nav-elem-wrapper">
+        <button className="menu-toggle" onClick={toggleMenu}>
+            ☰
+            </button>
+          {renderMenuButtons()}
+      <ul className="nav-elem-wrapper">
           <li className="nav-item">
             <Link className="nav-link" to="/about">About</Link>
           </li>
           <li className="nav-item">
-          {  user?.id && user.id != 0 ? <button className="nav-link" onClick={logout}>Logout</button> : null }
+            {  user?.id && user.id != 0 ? <button className="nav-link" onClick={logout}>Logout</button> : null }
           </li>
+
         </ul>
+
+       
     </nav>
   );
 }

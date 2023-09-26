@@ -118,7 +118,7 @@ const SideChatMenu = () => {
   ) => {
     if (list !== undefined && list.length > 0) {
       return (
-        <ul className="inner-chat-list-wrapper">
+        <ul >
           <div
             className="channel-type-wrapper"
             onClick={() => handleChatTypeListClick(_type)}
@@ -134,7 +134,7 @@ const SideChatMenu = () => {
 
   const displayList = () => {
     return (
-      <div>
+      <div className="inner-chat-list-wrapper">
         {channelsTypeList(privateChannels, "private")}
         {channelsTypeList(generalChannels, "general")}
         {channelsTypeList(joinedGroupChannels, "created")}
@@ -207,7 +207,7 @@ const SideChatMenu = () => {
             <BsSearch />
           </div>
         </div>
-        <div>{displayChoice()}</div>
+        {displayChoice()}
       </div>
     </div>
   );
