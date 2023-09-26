@@ -2,12 +2,17 @@ import { useAppSelector } from '/src/redux/hooks';
 import './Cards.scss'
 import { useEffect, useState } from 'react';
 import { Game } from '@shared/class';
+import { User} from '../../Types';
+interface HistoryProps {
+  user: User;
+}
 
-const HistoryCard = () => {
+
+const HistoryCard: React.FC<HistoryProps> = ({user}) => {
   const [games, setGames] = useState<Game[]>([]);
-  const user = useAppSelector(state => state.session.user);
 
   useEffect(() => {
+    console.log(user)
     async function fetchGames() {
         const requestOptions = {
           method: 'GET',

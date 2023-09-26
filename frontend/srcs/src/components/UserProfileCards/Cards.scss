@@ -3,7 +3,7 @@ $main-bg-color: #131313;
 $secondary-bg-color: #FFFFFFFF;
 $overlay-bg-color: rgba(0, 0, 0, 0.7);
 $font-color: wheat;
-$picture-size: 150px;
+$picture-size: 13vh;
 $friend-picture-size: 50px;
 
 .card-wrapper {
@@ -14,6 +14,11 @@ $friend-picture-size: 50px;
   width: 100%;
   border-radius: 25%;
   padding: 15px;
+
+  .list{
+    overflow-y: scroll;
+  }
+
   h2 {
     margin-bottom: 10px;
   }
@@ -33,7 +38,8 @@ $friend-picture-size: 50px;
   .profile-picture,
   .form-picture {
     height: $picture-size;
-    width: $picture-size;
+    min-height: 61px;
+    width: auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -42,15 +48,17 @@ $friend-picture-size: 50px;
     margin-bottom: 10px;
 
     img {
+      min-height: 61px;
       max-width: 100%;
       max-height: 100%;
-      height: auto;
-      width: auto;
+      //height: auto;
+      //width: auto;
       object-fit: cover;
     }
   }
 
   .form-picture {
+    align-content: center;
     border: 1px solid grey;
     position: relative;
   }
@@ -84,7 +92,7 @@ $friend-picture-size: 50px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-x: hidden;
+    overflow: visible;
     width: 100%;
   }
 
@@ -164,6 +172,10 @@ $friend-picture-size: 50px;
   }
 
   }
+}
+
+#code{
+  margin-top: 10px;
 }
 
 .picture-indicator{

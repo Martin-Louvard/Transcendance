@@ -13,12 +13,11 @@ $chat-menu-icon-open:175px;
   position: fixed;
   right:0;
   bottom: 0;
-  height: 90%;  
+  height: 91vh;  
   display: flex;
   flex-direction: column;
   align-items: center;
   z-index: 1;
-  border-top-left-radius: 15px;
   border-left: solid 1px black;
   border-top: solid 1px black;
 }
@@ -133,6 +132,7 @@ $chat-menu-icon-open:175px;
 }
 
 .chat-creator{
+    font-size: smaller;
     width: 100%;
     overflow: hidden;
     .form{
