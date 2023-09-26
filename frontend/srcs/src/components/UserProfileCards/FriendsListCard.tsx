@@ -55,7 +55,7 @@ const FriendsListCard: React.FC = (props) =>{
               {friendRequests ? friendRequests.map((friendship, index) => (
                 <li className="item" key={index}>
                   <Avatar onClick={()=>{displayFriendProfile(friendship)}} sx={{width:'60px', height:"60px"}} src={friendship.friend_id == user?.id ? friendship.user.avatar: friendship.friend.avatar}/>
-                <div>
+                <div className="notif-content">
                   <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
                   <div className='accept-deny'>
                     <button onClick={()=>{ dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username, Status.ACCEPTED] }) }}>Add Friend ✅</button>
