@@ -63,3 +63,46 @@ $react-color: #61dafbaa;
   }
 }
 
+.menu-toggle{
+  display: block;
+  width: 40px;
+}
+
+.open-menu{
+  display: block;
+}
+
+.close-menu{
+  display: none;
+}
+
+
+@media (min-width: 890px){
+  .menu-middle{
+    display: block;
+  }
+
+  .menu-toggle{
+    display: none;
+  }
+}
+
+@media (max-width: 890px) {
+  .menu-middle{
+    flex-direction: column;
+    right: 0;
+    top: 9vh;
+    z-index: 200;
+    background-color: #242526;
+    position: fixed;
+    padding: 8px;
+    border-left: 1px solid white;
+    border-bottom: 1px solid white;
+
+    border-radius: 0 0 15px 15px;
+  }
+
+  .menu-toggle {
+    display: block; /* Show the toggle button */
+  }
+}
