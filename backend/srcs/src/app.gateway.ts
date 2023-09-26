@@ -358,6 +358,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     this.server.emit('join_chat', updatedChats);
@@ -379,9 +381,34 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     this.server.emit('add_admin', updatedChats);
+  }
+
+  @SubscribeMessage('ban_user')
+  async handleBanUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const bannedUser = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const updatedChats = await this.prisma.chatChannel.update({
+      where: { id: parseInt(body[0]) },
+      data: { bannedUsers: { connect: { id: bannedUser.id } } },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
+      },
+    });
+    this.server.emit('ban_user', updatedChats);
   }
 
   @SubscribeMessage('add_user_chat')
@@ -400,6 +427,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     this.server.emit('add_user_chat', updatedChats);
@@ -431,6 +460,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     this.server.emit('leave_chat', [updatedChat, parseInt(body[1])]);
@@ -451,6 +482,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     const updatedAdmins = chat.admins.filter(
@@ -467,6 +500,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     this.server.emit('remove_admin', updatedChat);
@@ -517,6 +552,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     this.server.emit('change_owner', updatedChannel);
@@ -537,6 +574,7 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
       },
     });
     const updatedParticipants = chat.participants.filter(
@@ -559,6 +597,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     this.server.emit('kick_user', [updatedChat, userToKick.id]);
@@ -598,6 +638,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     this.server.emit('create_chat', chatChannel);
@@ -619,6 +661,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     this.server.emit('update_chat', channel);
@@ -697,6 +741,7 @@ export class AppGateway
           admins: true,
           messages: { include: { sender: true } },
           participants: true,
+          bannedUsers: true,
         },
       });
       const friendplayer = this.playerService.getPlayerById(friend_id);

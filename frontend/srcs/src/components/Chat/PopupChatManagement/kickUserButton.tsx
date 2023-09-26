@@ -46,11 +46,8 @@ const KickUserButton = ({ user, chat }:{
     nested
     {...{contentStyle}}>
       <div className="chat-popup popup-ban" >
-    <button className="chrono-for-action" onClick={() => handleKick(5)}>{"5min"}</button>
-    <button className="chrono-for-action" onClick={() => handleKick(10)}>{"10min"}</button>
-    <button className="chrono-for-action" onClick={() => handleKick(20)}>{"20min"}</button>
-    <button className="chrono-for-action" onClick={() => handleKick(30)}>{"30min"}</button>
-    <button className="chrono-for-action" onClick={() => handleBan()}>{"Ban"}</button>
+    <button className="chrono-for-action" onClick={() => handleBan()}>{"BAN"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick(10)}>{"KICK"}</button>
     </div>
   </Popup>
   );
