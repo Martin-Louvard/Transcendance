@@ -33,7 +33,7 @@ export class FriendsService {
 
     const chat = await this.chatChannelsService.create({
       ownerId: createFriendDto.user_id,
-      channelType: 'private',
+      channelType: 'private-message',
       participants: {
         connect: [
           { id: createFriendDto.user_id },

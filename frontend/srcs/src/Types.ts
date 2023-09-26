@@ -77,6 +77,16 @@ export interface Message {
   createdAt: string;
 }
 
+export interface  ActionOnUser {
+  id: number;
+  user_id: number;
+  chat_id: number;
+  action: string;
+  time: number;
+  chat: ChatChannels;
+  createdAt: string;
+}
+
 export interface ChatChannels {
   id: number;
   owner: User;
@@ -90,6 +100,7 @@ export interface ChatChannels {
   bannedUsers: User[];
   isOpen: boolean;
   notifications: number ;
+  actionOnUser: ActionOnUser[];
 }
 
 

@@ -28,3 +28,7 @@ export function getLastMessage(chat: ChatChannels, userId: number | undefined) {
     return lastMessage;
   } else return null;
 }
+
+  /*export function checkActionOnUser(chat: ChatChannels, userId: number) {
+  if ()
+}*/
