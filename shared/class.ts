@@ -181,14 +181,14 @@ export type ClientPayloads = {
 export interface PlayerBody {
 	position: [number, number, number];
 	size: [number, number, number];
-	quaternion: CANNON.Quaternion;
+	quaternion: {x: number, y: number, z: number, w: number};
 	id: number;
 	team: 'home' | 'visitor',
 }
 
 export interface Ball {
 	position: [number, number, number],
-	quaternion: CANNON.Quaternion
+	quaternion: {x: number, y: number, z: number, w: number},
 	size: number,
 }
 

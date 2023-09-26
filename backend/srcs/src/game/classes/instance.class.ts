@@ -586,11 +586,11 @@ export class Instance {
 	copyData() {
 		let i: number = 0;
 		this.world.balls.forEach((ball) => {
-			this.data.balls[i++] = {position: [ball.body.position.x, ball.body.position.y, ball.body.position.z], size: ball.radius, quaternion: ball.body.quaternion}
+			this.data.balls[i++] = {position: [ball.body.position.x, ball.body.position.y, ball.body.position.z], size: ball.radius, quaternion: {x: ball.body.quaternion.x, y: ball.body.quaternion.y, z: ball.body.quaternion.z, w: ball.body.quaternion.w}}
 		})
 		i = 0
 		this.world.players.forEach((player) => {
-			this.data.players[i++] = {position: [player.body.position.x, player.body.position.y, player.body.position.z], size: player.size, id: player.player.id, quaternion: player.body.quaternion, team: player.player.team};
+			this.data.players[i++] = {position: [player.body.position.x, player.body.position.y, player.body.position.z], size: player.size, id: player.player.id, quaternion: {x: player.body.quaternion.x, y: player.body.quaternion.y, z: player.body.quaternion.z, w: player.body.quaternion.w}, team: player.player.team};
 		})
 	}
 
