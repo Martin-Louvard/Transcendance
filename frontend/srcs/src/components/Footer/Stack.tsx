@@ -9,7 +9,7 @@ const Stack: React.FC = () => {
 
   return (
     <div id="stack-logos">
-      <label id="stack-logos-label">Made With</label>
+      <label id="stack-logos-label">Made With ❤️ and</label>
       <a href="https://nestjs.com/" target="_blank" rel="noopener noreferrer">
         <img src={nestLogo} className="logo" alt="NestJs logo" />
       </a>

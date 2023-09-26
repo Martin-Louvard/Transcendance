@@ -14,6 +14,7 @@ import Notification from '../UserProfileCards/Notification.tsx';
 import { setContentToShow } from '../../redux/sessionSlice.ts';
 import FriendCard from '../UserProfileCards/FriendCard.tsx';
 import { LobbyType } from '@shared/class.ts';
+import Leaderboard from '../Leaderboard/Leaderboard.tsx';
 
 const Dashboard: React.FC = () => {
   const contentToShow = useAppSelector((state) => state.session.contentToShow);
@@ -42,7 +43,7 @@ const Dashboard: React.FC = () => {
   const renderContent = () => {
     if (contentToShow === ContentOptions.PROFILE) return <ProfileCard/>;
     if (contentToShow === ContentOptions.FRIENDS) return <FriendsListCard />;
-    if (contentToShow === ContentOptions.HISTORY) return <HistoryCard />;
+    if (contentToShow === ContentOptions.HISTORY) return <Leaderboard />;
     if (contentToShow === ContentOptions.PLAY) return <Lobby />;
     if (contentToShow === ContentOptions.FRIENDPROFILE && friendProfile)  return <FriendCard userToDisplay={friendProfile}/>;
   };
@@ -69,7 +70,7 @@ const Dashboard: React.FC = () => {
 
      
   return (
-    <div className={contentToShow === ContentOptions.PLAY ?"dashboard-wrapper-game" :  "dashboard-wrapper"}>
+    <div className="dashboard-wrapper">
       <SideChatMenu />
       <div className="canvas-wrapper">
         {renderContent()}

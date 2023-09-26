@@ -72,6 +72,7 @@ export const Lobby: React.FC = (props) => {
   }
 
   return (
+    <div className='card-wrapper'>
     <div style={{position: "relative", width: "100%", height:"100%"}}>
       {/*<div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"row"}}>*/}
        <div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"column"}}>
@@ -120,6 +121,7 @@ export const Lobby: React.FC = (props) => {
         }
         </div>
       </div>
+    </div>
     </div>
   );
 }

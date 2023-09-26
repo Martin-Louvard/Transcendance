@@ -63,6 +63,8 @@ body {
   flex: 1;
   padding: 0;
   background-color: $background-color;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 // Links
@@ -145,6 +147,7 @@ ul{
   :root {
     color: #213547;
     background-color: #cdcdcd;
+    right: 0;
   }
 
   a:hover {
