@@ -115,7 +115,7 @@ const ProfileCard: React.FC = () => {
           <p>Scan this QRcode with the google authenticator app and enter your code below</p>
           <img src={twoFaQrcode}/>
           <form onSubmit={handleSubmit}>
-            <input type="text" id="code" value={codeInput} onChange={handleChange} ></input>
+            <input type="text" id="code" value={codeInput} onChange={handleChange} placeholder='code...' ></input>
             <button type="submit">Confirm</button>
           </form>
         </>
@@ -153,7 +153,7 @@ const ProfileCard: React.FC = () => {
         <div className="card-wrapper">
         {
           changeInfoOpen ? <ChangeInfo setChangeInfoOpen={setChangeInfoOpen}/>:
-          showGames ? <HistoryCard/> :
+          showGames ? <HistoryCard user={user}/> :
           Profile()
         }
         </div>

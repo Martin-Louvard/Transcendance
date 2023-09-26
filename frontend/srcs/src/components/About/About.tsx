@@ -5,7 +5,6 @@ const About: React.FC = () => {
 
     return <>
     <div className="about-wrapper">
-        <h1>About page</h1> 
     <h2>Website by </h2>
     <ul  className="authors">
     <div className="row">

@@ -79,7 +79,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ userToDisplay }) => {
 
   return (
     <div className="card-wrapper">
-      { showGames ? <HistoryCard /> : <Profile/>}
+      { showGames ? <HistoryCard user={userToDisplay}/> : <Profile/>}
     </div>
   );
 };

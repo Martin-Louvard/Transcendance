@@ -48,6 +48,177 @@ async function main() {
     },
   });
 
+  const user3 = await prisma.user.upsert({
+    where: { username: 'User3' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User3',
+      email: 'fakeEmail3@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user4 = await prisma.user.upsert({
+    where: { username: 'User4' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User4',
+      email: 'fakeEmail4@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user5 = await prisma.user.upsert({
+    where: { username: 'User5' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User5',
+      email: 'fakeEmail5@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user6 = await prisma.user.upsert({
+    where: { username: 'User6' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User6',
+      email: 'fakeEmail6@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user7 = await prisma.user.upsert({
+    where: { username: 'User7' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User7',
+      email: 'fakeEmail7@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user8 = await prisma.user.upsert({
+    where: { username: 'User8' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User8',
+      email: 'fakeEmail8@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user9 = await prisma.user.upsert({
+    where: { username: 'User9' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User9',
+      email: 'fakeEmail9@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user10 = await prisma.user.upsert({
+    where: { username: 'User10' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User10',
+      email: 'fakeEmail10@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user11 = await prisma.user.upsert({
+    where: { username: 'User11' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User11',
+      email: 'fakeEmail11@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user12 = await prisma.user.upsert({
+    where: { username: 'User12' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User12',
+      email: 'fakeEmail12@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user13 = await prisma.user.upsert({
+    where: { username: 'User13' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User13',
+      email: 'fakeEmail13@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user14 = await prisma.user.upsert({
+    where: { username: 'User14' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User14',
+      email: 'fakeEmail14@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+  const user15 = await prisma.user.upsert({
+    where: { username: 'User15' },
+    update: { password: commonpassword },
+    create: {
+      username: 'User16',
+      email: 'fakeEmail16@gmail.com',
+      password: commonpassword,
+      //friends: {
+      // create:[{friend_id: admin.id}]
+      //}
+    },
+  });
+
+
+
   const user42 = await prisma.user.upsert({
     where: { username: 'User42' },
     update: { password: commonpassword },
@@ -69,7 +240,7 @@ async function main() {
       channelType: 'general',
       name: 'WorldChannel',
       participants: {
-        connect: [{ id: admin.id }, { id: user1.id }, { id: user2.id }],
+        connect: [{ id: admin.id }, { id: user1.id }, { id: user2.id }, { id: user3.id },{ id: user4.id },{ id: user5.id }, { id: user6.id },{ id: user7.id },{ id: user8.id },{ id: user9.id },{ id: user10.id },{ id: user11.id },{ id: user12.id },{ id: user13.id },{ id: user14.id },{ id: user15.id }, { id: user42.id }],
       },
     },
   });
