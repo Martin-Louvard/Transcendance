@@ -14,9 +14,10 @@ import { AppGateway } from './app.gateway';
 import { LobbyModule } from './game/lobby/lobby.module';
 import { PlayerModule } from './game/player/player.module';
 import { Instance } from './game/classes/instance.class';
+import { ActionOnUserModule } from './action-on-user/action-on-user.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, ChatChannelsModule, ChatMessagesModule, AuthModule, FriendsModule, LobbyModule, PlayerModule],
+  imports: [PrismaModule, UsersModule, ChatChannelsModule, ChatMessagesModule, AuthModule, FriendsModule, LobbyModule, PlayerModule, ActionOnUserModule],
   controllers: [AppController],
   providers: [AppService, AppGateway],
 })
