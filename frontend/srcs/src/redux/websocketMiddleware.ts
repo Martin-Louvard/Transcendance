@@ -46,15 +46,14 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
             store.dispatch(resetLobbyData())
           if (data.lobbyId && state.LobbyType != LobbyType.score && state.LobbyType != LobbyType.auto && state.LobbyType != LobbyType.classic)
             store.dispatch(setLobbyType(LobbyType.wait));
-          store.dispatch(setAuthState(data));})
+          store.dispatch(setAuthState(data));
+        })
         socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => {
           if (data.hasFinished)
             store.dispatch(setLobbyType(LobbyType.score)); 
         store.dispatch(setLobbyState(data))})
         socket.on(ServerEvents.GameState, (data: any) => {store.dispatch(setGameState(data))})
         socket.on(ServerEvents.LobbySlotsState, (data: any) => {
-          //if ( store.getState().websocket.LobbyType != LobbyType.score && store.getState().websocket.LobbyType != LobbyType.auto && store.getState().websocket.LobbyType != LobbyType.classic)
-          //  store.dispatch(setLobbyType(LobbyType.wait))
           store.dispatch(setLobbySlots(data))
         })
         socket.on(ServerEvents.GameRequest, (data: GameRequest) => {store.dispatch(setGameRequests(data))})

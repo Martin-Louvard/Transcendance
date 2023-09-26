@@ -31,7 +31,7 @@ export const useKeyboardInput = () => {
 			case 'arrowleft':
 				setInput(prevState => ({ ...prevState, left: true }));
 				break;
-			case 'z':
+			case 'w':
 				setInput(prevState => ({ ...prevState, up: true }));
 				break;
 			case 's':
@@ -40,7 +40,7 @@ export const useKeyboardInput = () => {
 			case 'd':
 				setInput(prevState => ({ ...prevState, right: true }));
 				break;
-			case 'q':
+			case 'a':
 				setInput(prevState => ({ ...prevState, left: true }));
 				break;
 			case 'space':
@@ -72,7 +72,7 @@ export const useKeyboardInput = () => {
 			case 'arrowleft':
 				setInput(prevState => ({ ...prevState, left: false }));
 				break;
-			case 'z':
+			case 'w':
 				setInput(prevState => ({ ...prevState, up: false }));
 				break;
 			case 's':
@@ -81,7 +81,7 @@ export const useKeyboardInput = () => {
 			case 'd':
 				setInput(prevState => ({ ...prevState, right: false }));
 				break;
-			case 'q':
+			case 'a':
 				setInput(prevState => ({ ...prevState, left: false }));
 				break;
 			case 'space':

@@ -1,4 +1,4 @@
-import { Box, OrbitControls, PerspectiveCamera, TrackballControls, useTexture } from "@react-three/drei";
+import { Box, OrbitControls, PerspectiveCamera, Sphere, TrackballControls, useTexture } from "@react-three/drei";
 import { Canvas, extend, useFrame, useThree} from "@react-three/fiber";
 import React, { useEffect, useRef, forwardRef, useState, useMemo, useLayoutEffect} from "react";
 import { socket } from "../../socket";
@@ -31,12 +31,14 @@ export const Ball: React.FC = (props) => {
 
 	useFrame(() => {
 		ballRef.current.position.set(props.position[0], props.position[1], props.position[2]);
-		ballRef.current.quaternion.copy(props.quaternion);
-	  }, [])
+		ballRef.current.quaternion.set(props.quaternion.x, props.quaternion.y, props.quaternion.z, props.quaternion.w);
+	  })
+	  
 	return (
 		<mesh position={[0, 0, 0]} ref={ballRef}>
-			<sphereGeometry args={props.args} />
-			<meshBasicMaterial color="white" side={DoubleSide} map={colorTexture}/>
+			<Sphere args={props.args}>
+				<meshPhongMaterial color="white" side={DoubleSide} />
+			</Sphere>
 	  </mesh>
 	)
 }
@@ -236,7 +238,7 @@ export const Render: React.FC = (props) => {
 	const [me, setMe] = useState(null);
 	const [KeyboardInput, prevInput] = useKeyboardInput();
 	const user = useAppSelector((state) => state.session.user);
-	const game: WebSocketState = props.game;
+	const game: WebSocketState = useAppSelector(state => state.websocket);
 	const dispatch = useAppDispatch();
 
 
@@ -479,8 +481,8 @@ export const Render: React.FC = (props) => {
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
 					<GrassField position={[0, 0, 0]} width={game.mapHeight} height={game.mapWidth}/>
-					{/*<Camera player={me} classic={game.params.classic}/>*/}
-					<Goals/>
+					<Camera player={me} classic={game.params.classic}/>
+					 <Goals/>
 					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, game.mapHeight / 2]} />
 					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, -game.mapHeight / 2]}/>
 					<Wall size={[2, 25, game.mapHeight]} position={[game.mapWidth / 2, 5, 0]} />
@@ -489,7 +491,7 @@ export const Render: React.FC = (props) => {
 						<boxBufferGeometry args={[game.mapWidth, 1.5, 2]}/>
 						<meshBasicMaterial color={"white"}/>
 					</mesh>
-					{balls}
+					{balls}/
 					{players}
 					{/*<Effects/>*/}
 		</>

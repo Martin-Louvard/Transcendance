@@ -31,7 +31,7 @@ export const store = configureStore({
 // Configure listeners using the provided defaults
 setupListeners(store.dispatch);
 export const persistor = persistStore(store);
-//persistor.purge();
+// persistor.purge();
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;
