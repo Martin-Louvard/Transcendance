@@ -7,7 +7,7 @@ import { ChatMessagesService } from 'src/chat-messages/chat-messages.service';
 @Module({
   controllers: [ChatChannelsController],
   providers: [ChatChannelsService, ChatMessagesService],
-  imports: [PrismaModule ],
-  exports: [ChatChannelsService]
+  imports: [PrismaModule],
+  exports: [ChatChannelsService],
 })
 export class ChatChannelsModule {}
