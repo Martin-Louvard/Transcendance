@@ -6,9 +6,9 @@ import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, up
 import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType} from '@shared/class';
 import { useAppSelector } from './hooks';
 
-export let socket: Socket | null = null;
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
 
+  let socket: Socket | null = null;
   return (next: Dispatch<AnyAction>) => (action: AnyAction) => {
     switch (action.type) {
       case 'WEBSOCKET_CONNECT':
@@ -24,7 +24,10 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           store.dispatch(setWaitingToConnect(false));
           store.dispatch(websocketDisconnected())
         });
-        socket.on('message', (data: any) => {store.dispatch(receiveMessage(data))});
+        socket.on('message', (data: any) => {
+          console.log("ouais c'est greg");
+          store.dispatch( 
+          receiveMessage(data))});
         socket.on('friend_request', (data: any) => {store.dispatch(updateFriendRequest(data))});
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
         socket.on('block_user', (data: any) => {store.dispatch(updateBlockStatus(data))})
@@ -40,6 +43,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('add_user_chat', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('kick_user', (data: any) => {store.dispatch(beenKicked(data))});
         socket.on('remove_admin', (data: any) => {store.dispatch(updateOneChat(data))});
+        socket.on('erase_action', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('read', (data: any) => {store.dispatch(addReaderId(data))});
         socket.on(ServerEvents.AuthState, (data: ServerPayloads[ServerEvents.AuthState]) => {
           const state = store.getState().websocket;
@@ -239,6 +243,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       case 'REMOVE_ADMIN':
         if (socket && socket.connected) {
           socket.emit('remove_admin', action.payload);
+        }
+        break;
+
+      case 'ERASE_ACTION':
+        if (socket && socket.connected) {
+          socket.emit('erase_action', action.payload);
         }
         break;
 

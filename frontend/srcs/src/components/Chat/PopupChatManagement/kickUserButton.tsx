@@ -27,6 +27,7 @@ const KickUserButton = ({ user, chat }:{
     }
 
     const handleBan = () => {
+      dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
       dispatch({type:'BAN_USER', payload:[chat.id, user.id]});
       toast.success(user.username + " banned from channel")
     }
@@ -45,8 +46,8 @@ const KickUserButton = ({ user, chat }:{
     nested
     {...{contentStyle}}>
       <div className="chat-popup popup-ban" >
-    <button className="chrono-for-action" onClick={() => {handleBan(); setIsClicked(false)}}>{"BAN"}</button>
-    <button className="chrono-for-action" onClick={() => {handleKick(10); setIsClicked(false)}}>{"KICK"}</button>
+    <button className="chrono-for-action" onClick={() => handleBan()}>{"BAN"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick()}>{"KICK"}</button>
     </div>
   </Popup>
   );
