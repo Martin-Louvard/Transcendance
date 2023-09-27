@@ -34,7 +34,7 @@ const ProfileCard: React.FC = () => {
         console.log(err);
       }
     }
-
+    
     const disable2fa = async () =>{
       const requestOptions = {
         method: 'DELETE',
@@ -83,6 +83,7 @@ const ProfileCard: React.FC = () => {
     return <>
         <div className="card-wrapper">
         {
+          
           Profile()
         }
         </div>
