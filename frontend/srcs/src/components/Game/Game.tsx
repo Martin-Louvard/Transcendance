@@ -441,7 +441,10 @@ export const Render: React.FC = (props) => {
 					<ambientLight intensity={0.5}/>
 					<GrassField position={[0, 0, 0]} width={game.mapHeight} height={game.mapWidth}/>
 					<Camera player={me} classic={game.params.classic} mapSize={{x: game.mapWidth, y: game.mapHeight}}/>
-					 <Goals/>
+					 {
+						!game.params.classic &&
+					 		<Goals/>
+					 }
 					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, game.mapHeight / 2]} />
 					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, -game.mapHeight / 2]}/>
 					<Wall size={[2, 25, game.mapHeight]} position={[game.mapWidth / 2, 5, 0]} />

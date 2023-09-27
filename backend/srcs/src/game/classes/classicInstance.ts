@@ -61,6 +61,27 @@ interface GameParameters {
 		time: number, // temps d'une game
 	}
 }
+export function recalculateBallAngle(angle: number): number {
+	console.log('angle : ', angle);
+	if (angle < 0.8)
+		return 0.8;
+	else if (angle > 2.5)
+		return 2.5;
+	// if (angle >= 0 && angle < 0.8) {
+	// 	// angle += 0.6;
+	// 	angle = findNearest(angle, 3, 1);
+	// 	console.log("1nearest angle found : ", angle);
+	// }  else if (angle > 6) {
+	// 	angle = 0.6;
+	// 	console.log("2nearest angle found : ", angle);
+	// }
+	// return Math.PI;
+	return angle;
+}
+
+export function findNearest(X: number, nb1: number, nb2: number): number {
+	return Math.abs(X - nb1) < Math.abs(X - nb2) ? nb1 : nb2;
+}
 
 
 export class ClassicInstance {
@@ -84,7 +105,9 @@ export class ClassicInstance {
 	public startTime: number;
 	accelerationRate = 50;
 	maxAcceleration = 5000;
+	private zPosition = 80;
 	private rotationSpeed;
+	private isRestarting = false;
 	automatch: boolean = true;
 	private playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
 	private params: GameParameters = {
@@ -239,9 +262,16 @@ export class ClassicInstance {
 	}
 
 	ballPhysics() {
+		const minSpeed = 100;
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
+			const velocityMagnitude = e.body.velocity.length();
+			if (!this.isRestarting && velocityMagnitude < minSpeed) {
+				console.log(this.isRestarting);
+				const velocityDirection = e.body.velocity.unit();
+				e.body.velocity.copy(velocityDirection.scale(minSpeed));
+			}
 			//e.body.velocity.x *= (this.params.ball.globalSpeed / 10);
 			//e.body.velocity.z *= (this.params.ball.globalSpeed / 10);
 			//const coef = new CANNON.Vec3(0.005, 0.005, 0.005);
@@ -260,32 +290,28 @@ export class ClassicInstance {
 				this.world.players.forEach((pl) => {
 					if (pl.body.id == contact.bj.id) {
 
-						// Calculate the collision normal
 						const collisionNormal = contact.ni;
 			  
-						// Calculate the ball's velocity along the collision normal
 						const ballVelocityAlongNormal = collisionNormal.dot(bl.body.velocity);
 			  
-						// Calculate the new velocity by reversing the component along the normal
 						const newVelocity = bl.body.velocity.vsub(
 						  collisionNormal.scale(2 * ballVelocityAlongNormal)
 						);
 			  
-						// Update the ball's velocity with the new velocity
 						bl.body.velocity.copy(newVelocity);
 			  
 			  
-						// Invert the angular rotation (optional)
 						bl.body.angularVelocity.scale(-0.1);
 			  
-						// Apply an impulse force to the ball's new direction (optional)
-						const impulseStrength = 100;
+						const impulseStrength = 150;
 						const impulseDirection = new CANNON.Vec3(
 						  Math.floor(Math.random() * 2) - 1,
 						  0,
 						  Math.random()
 						);
 						impulseDirection.normalize();
+						// let angle = Math.atan2(impulseDirection.z, impulseDirection.x);
+						// angle = recalculateBallAngle(angle);
 						const impulseForce = impulseDirection.scale(impulseStrength);
 						bl.body.applyImpulse(impulseForce, bl.body.position);
 			  
@@ -318,11 +344,10 @@ export class ClassicInstance {
 				}
 				if (ball && wall) {
 					const impactDirection: CANNON.Vec3 = contact.ri.clone();
-					const angle = Math.atan2(impactDirection.z, impactDirection.x);
-
+					let angle = recalculateBallAngle(Math.atan2(impactDirection.z, impactDirection.x));
 					const ballSpeed = ball.body.velocity.length();
 
-					const impulseForce = (angle * ballSpeed) / 1000;
+					const impulseForce = (angle * ballSpeed) / 100;
 
 					const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
 					ball.body.applyImpulse(impulseVector, ball.body.position);
@@ -333,13 +358,18 @@ export class ClassicInstance {
 	}
 
 	async timeoutAction(ms, callback) {
+		this.isRestarting = true;
 		await new Promise(resolve => setTimeout(resolve, ms));
+		this.isRestarting = false;
 		callback();
 	}
 
 	ballStart(ball: Sphere) {
+		console.log(Math.random());
 		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
-		const angle = Math.atan2(direction.z, direction.x);
+		console.log(direction);
+		let angle = recalculateBallAngle(Math.atan2(direction.z, direction.x));
+		// si angle entre -> (PI/6 - 11PI/6) - (5PI/6 - 7PI/6) => set langle de la ball a l'angle le plus proche.
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
 		const impulseStrength = 500; 
 		ball.body.applyImpulse(direction.scale(impulseStrength), ball.body.position);
@@ -472,6 +502,7 @@ export class ClassicInstance {
 			elem.team = i % 2 ? 'home' : 'visitor';
 			this.startTime = Date.now() / 1000;
 			i++;
+
 		});
 	}
 
@@ -549,8 +580,12 @@ export class ClassicInstance {
 			if (e.body.position.x <= -this.world.mapWidth / 2)
 				e.body.position.x = -(this.world.mapWidth / 2);
 			if (e.body.position.x >= this.world.mapWidth / 2)
-				e.body.position.x = this.world.mapWidth / 2;  
-		})	
+				e.body.position.x = this.world.mapWidth / 2;
+			e.player.team == 'visitor' ?
+				e.body.position.z = this.zPosition
+				:
+				e.body.position.z = -this.zPosition;
+			})
 	}
 
 	animate() {

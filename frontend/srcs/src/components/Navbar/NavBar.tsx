@@ -83,7 +83,7 @@ const Navbar: React.FC = () => {
             <Link className="nav-link" to="/about">About</Link>
           </li>
           <li className="nav-item">
-            {  user?.id && user.id != 0 ? <button className="nav-link" onClick={logout}>Logout</button> : null }
+            {  user?.id && user.id != 0 ? <button style={{color:'black'}} className="nav-link" onClick={logout}>Logout</button> : null }
           </li>
 
         </ul>

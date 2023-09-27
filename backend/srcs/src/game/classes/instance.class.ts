@@ -4,6 +4,7 @@ import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
 import { Injectable } from "@nestjs/common";
+import { findNearest, recalculateBallAngle } from "./classicInstance";
 
 interface Sphere {
 	radius: number;
@@ -287,7 +288,7 @@ export class Instance {
 	}
 
 	ballPhysics() {
-		const minVelocityThreshold = this.params.ball.globalSpeed;
+		const minSpeed = this.params.ball.globalSpeed;
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
@@ -297,10 +298,10 @@ export class Instance {
 				e.body.velocity.vadd(accelerationVector);
 				
 				const velocityMagnitude = e.body.velocity.length();
-				if (velocityMagnitude < minVelocityThreshold) {
-				const velocityDirection = e.body.velocity.unit();
-				e.body.velocity.copy(velocityDirection.scale(minVelocityThreshold));
-			}
+				if (velocityMagnitude < minSpeed) {
+					const velocityDirection = e.body.velocity.unit();
+					e.body.velocity.copy(velocityDirection.scale(minSpeed));
+				}
 		}
 	
 		})
@@ -313,32 +314,20 @@ export class Instance {
 			if (bl.body.id == contact.bi.id) {
 				this.world.players.forEach((pl) => {
 					if (pl.body.id == contact.bj.id) {
-
-						// Calculate the collision normal
 						const collisionNormal = contact.ni;
-			  
-						// Calculate the ball's velocity along the collision normal
 						const ballVelocityAlongNormal = collisionNormal.dot(bl.body.velocity);
-			  
-						// Calculate the new velocity by reversing the component along the normal
 						const newVelocity = bl.body.velocity.vsub(
 						  collisionNormal.scale(2 * ballVelocityAlongNormal)
 						);
-			  
-						// Update the ball's velocity with the new velocity
 						bl.body.velocity.copy(newVelocity);
-			  
-			  
-						// Invert the angular rotation (optional)
 						bl.body.angularVelocity.scale(-0.1);
-			  
-						// Apply an impulse force to the ball's new direction (optional)
-						const impulseStrength = 100;
+						const impulseStrength = 500;
 						const impulseDirection = new CANNON.Vec3(
 						  Math.floor(Math.random() * 2) - 1,
 						  0,
 						  Math.random()
 						);
+						let angle = recalculateBallAngle(Math.atan2(impulseDirection.z, impulseDirection.x));
 						impulseDirection.normalize();
 						const impulseForce = impulseDirection.scale(impulseStrength);
 						bl.body.applyImpulse(impulseForce, bl.body.position);
@@ -374,11 +363,10 @@ export class Instance {
 			}
 				if (ball && wall) {
 					const impactDirection: CANNON.Vec3 = contact.ri.clone();
-					const angle = Math.atan2(impactDirection.z, impactDirection.x);
-
+					let angle = recalculateBallAngle(Math.atan2(impactDirection.z, impactDirection.x));
 					const ballSpeed = ball.body.velocity.length();
 
-					const impulseForce = (angle * ballSpeed) / 1000;
+					const impulseForce = (angle * ballSpeed) / 100;
 
 					const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
 					ball.body.applyImpulse(impulseVector, ball.body.position);
@@ -397,9 +385,9 @@ export class Instance {
 
 	ballStart(ball: Sphere) {
 		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
-		const angle = Math.atan2(direction.z, direction.x);
+		let angle = recalculateBallAngle( Math.atan2(direction.z, direction.x));
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
-		const impulseStrength = 500; 
+		const impulseStrength = 150; 
 		ball.body.applyImpulse(direction.scale(impulseStrength), ball.body.position);
 	}
 
