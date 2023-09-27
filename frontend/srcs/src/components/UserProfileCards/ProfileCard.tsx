@@ -5,12 +5,13 @@ import ChangeInfo from '../Forms/UpdateUserInfoForm';
 import HistoryCard from './HistoryCard';
 import toast from 'react-hot-toast'
 import { setSessionUser } from '../../redux/sessionSlice';
+import { setContentToShow } from '../../redux/sessionSlice';
+import { ContentOptions } from '../../Types';
 
 const ProfileCard: React.FC = () => {
   const user = useAppSelector((state) => state.session.user);
   const access_token = useAppSelector((state) => state.session.access_token);
   const dispatch = useAppDispatch();
-  const [changeInfoOpen, setChangeInfoOpen] = useState<boolean>(false);
   const [showGames, setShowGames] = useState<boolean>(false);
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(user?.avatar);
   const [twoFaQrcode, setTwoFaQrcode] = useState<string>('');
@@ -139,11 +140,11 @@ const ProfileCard: React.FC = () => {
           <h6> Defeats:{user?.defeatCount} </h6>
       </div>
       <div className='list'>
-      <button  onClick={() =>{setShowGames(true)}}>Game History</button> 
+      <button  onClick={() =>{dispatch(setContentToShow(ContentOptions.HISTORY))}}>Game History</button> 
       {
         !user?.twoFAEnabled ? <button  onClick={() =>{activate2fa()}}>Activate 2fa</button> : <button  onClick={() =>{disable2fa()}}>Disable 2fa</button>
       }
-      <button  onClick={() =>{setChangeInfoOpen(true)}}>Change my infos</button>
+      <button  onClick={() =>{dispatch(setContentToShow(ContentOptions.CHANGEINFO))}}>Change my infos</button>
       {twoFaQrcode.length ? QrCode() : null}
       </div>
     </>)
@@ -152,8 +153,6 @@ const ProfileCard: React.FC = () => {
     return <>
         <div className="card-wrapper">
         {
-          changeInfoOpen ? <ChangeInfo setChangeInfoOpen={setChangeInfoOpen}/>:
-          showGames ? <HistoryCard user={user}/> :
           Profile()
         }
         </div>

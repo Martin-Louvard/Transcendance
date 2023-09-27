@@ -19,7 +19,9 @@ export enum ContentOptions{
   FRIENDS = "friends",
   HISTORY= "games",
   PLAY = "lobby",
-  FRIENDPROFILE = "friendProfile"
+  FRIENDPROFILE = "friendProfile",
+  LEADERBOARD = "leaderboard",
+  CHANGEINFO = "changeinfos"
 }
 
 

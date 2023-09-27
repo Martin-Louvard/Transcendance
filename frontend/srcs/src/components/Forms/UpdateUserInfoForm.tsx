@@ -3,9 +3,8 @@ import Form from './Form';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { toast } from 'react-hot-toast';
 import { setSessionUser } from '../../redux/sessionSlice';
-import type { Dispatch, SetStateAction } from 'react';
 
-const ChangeInfo = ({setChangeInfoOpen}: {setChangeInfoOpen: Dispatch<SetStateAction<boolean>>}) => {
+const ChangeInfo = () => {
     const user = useAppSelector((state) => state.session.user);
     const access_token = useAppSelector((state) => state.session.access_token)
     const [email, setEmail] = useState(user?.email);
@@ -37,7 +36,6 @@ const ChangeInfo = ({setChangeInfoOpen}: {setChangeInfoOpen: Dispatch<SetStateAc
             newUser.access_token = access_token;
             toast.success("Information updated")
             dispatch(setSessionUser(newUser))
-            setChangeInfoOpen(false)
         }
       }catch(err) {
         console.log(err);

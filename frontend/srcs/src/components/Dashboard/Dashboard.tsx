@@ -15,6 +15,7 @@ import { setContentToShow } from '../../redux/sessionSlice.ts';
 import FriendCard from '../UserProfileCards/FriendCard.tsx';
 import { LobbyType } from '@shared/class.ts';
 import Leaderboard from '../Leaderboard/Leaderboard.tsx';
+import ChangeInfo from '../Forms/UpdateUserInfoForm.tsx';
 
 const Dashboard: React.FC = () => {
   const contentToShow = useAppSelector((state) => state.session.contentToShow);
@@ -43,9 +44,11 @@ const Dashboard: React.FC = () => {
   const renderContent = () => {
     if (contentToShow === ContentOptions.PROFILE) return <ProfileCard/>;
     if (contentToShow === ContentOptions.FRIENDS) return <FriendsListCard />;
-    if (contentToShow === ContentOptions.HISTORY) return <Leaderboard />;
+    if (contentToShow === ContentOptions.LEADERBOARD) return <Leaderboard />;
     if (contentToShow === ContentOptions.PLAY) return <Lobby />;
     if (contentToShow === ContentOptions.FRIENDPROFILE && friendProfile)  return <FriendCard userToDisplay={friendProfile}/>;
+    if (contentToShow === ContentOptions.CHANGEINFO) return <ChangeInfo />;
+    if (user && contentToShow === ContentOptions.HISTORY) return <HistoryCard user={user}/>;
   };
 
   const renderMenuButtons = () => (
