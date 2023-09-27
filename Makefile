@@ -1,6 +1,4 @@
-
-NPM_DEV_FLAGS	?=
-VOL				:= $(shell docker volume ls -q)
+VOL := $(shell docker volume ls -q)
 
 all: build up
 
@@ -11,13 +9,14 @@ restart:
 	docker compose -f docker-compose.yml restart
 
 up:
-	docker compose -f docker-compose.yml up --detach 
+	docker compose -f docker-compose.yml up --detach
 
 stop:
 	docker compose -f docker-compose.yml stop
 
 purge:
 	docker compose -f docker-compose.yml down -v --rmi 'all'
+
 re:
 	make stop
 	make purge
@@ -31,5 +30,8 @@ fclean:
 	make stop
 	make purge
 	make rmvol
+
+toggle_hostname:
+	-sh tools/toggle_hostname.sh
 
 .PHONY: all, build, restart, up, stop, purge, re, rmvol, fclean
