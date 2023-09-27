@@ -1,7 +1,6 @@
 import { Avatar, Button, ButtonGroup, Card, CardContent, Dialog, DialogTitle, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Slider, Stack } from "@mui/material";
 import { ClientEvents, ClientPayloads, LobbySlotCli, LobbySlotType, LobbyType } from "@shared/class";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { Friend, Friendships, Status } from "/src/Types";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParams } from "../../../redux/websocketSlice";
 import LoopIcon from '@mui/icons-material/Loop';
@@ -10,6 +9,7 @@ import { CreateMatch } from "./CreateMatch";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import toast from "react-hot-toast";
 import LogoutIcon from '@mui/icons-material/Logout';
+import { Friend, Friendships, Status, UserStatus } from "../../../Types";
 
   export const CreateMatchLobby: React.FC = (props) => {
 	const size = props.size;
@@ -31,11 +31,12 @@ import LogoutIcon from '@mui/icons-material/Logout';
 		return friendship.status === 'ACCEPTED';
 	}));
 	setInvitableFriends(friendships.filter((friendship) => {
-		return friendship.status === 'ACCEPTED' && game.sentInvites.findIndex((invite) => 
-		invite.receiver.id == (friendship.sender_id == user?.id ? friendship.user_id : friendship.sender_id)
-		) == -1 && game.lobbySlots.findIndex((slot) => 
-		slot.player && slot.player.id == (friendship.sender_id == user?.id ? friendship.user_id : friendship.sender_id)
-		) == -1
+		const friend: Friend = friendship.friend_id == user?.id ? friendship.user : friendship.friend;
+
+		return friendship.status === 'ACCEPTED'
+			&& game.sentInvites.findIndex((invite) => invite.receiver.id == (friend)) == -1 
+			&& game.lobbySlots.findIndex((slot) => slot.player && slot.player.id == friend) == -1
+			&& friend.status == UserStatus.ONLINE
 	}))
 	}, [friendships, game.sentInvites, game.invitedGames, game.lobbySlots])
   

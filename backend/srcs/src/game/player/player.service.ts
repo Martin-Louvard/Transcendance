@@ -9,7 +9,6 @@ export class PlayerService {
 	constructor() {
 	}
 	private readonly logger = new Logger("PlayerService");
-	/* Player Handling */
 	players: Map<number, Player> = new Map<number, Player>();
 	requests: Map<string, GameRequest> = new Map<string, GameRequest>();
 

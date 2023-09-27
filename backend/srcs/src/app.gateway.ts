@@ -44,19 +44,25 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
-      if (user_id){
-      this.connected_clients.set(user_id, client);
-      this.server.emit('update_friend_connection_state', {
-        user_id: user_id,
-        status: 'ONLINE',
-      });
-      await this.prisma.user.update({
-        where: { id: user_id },
-        data: { status: 'ONLINE' },
-      });
-    }
+      const user = await this.prisma.game.findUnique({
+        where: {
+          id: user_id,
+        },
+      })
+      if (user){
+        this.connected_clients.set(user_id, client);
+        this.server.emit('update_friend_connection_state', {
+          user_id: user_id,
+          status: 'ONLINE',
+        });
+          await this.prisma.user.update({
+            where: { id: user_id },
+            data: { status: 'ONLINE' },
+        });
+      }
     }
     this.appService.auth(client);
+    this.playerService.dispatchGameRequest();
   }
 
   afterInit(server: Server) {
@@ -67,16 +73,21 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
-      if (user_id){
-      this.connected_clients.delete(user_id);
-      this.server.emit('update_friend_connection_state', {
-        user_id: user_id,
-        status: 'OFFLINE',
-      });
-      await this.prisma.user.update({
-        where: { id: user_id },
-        data: { status: 'OFFLINE' },
-      });
+      const user = await this.prisma.game.findUnique({
+        where: {
+          id: user_id,
+        },
+      })
+      if (user){
+        this.connected_clients.delete(user_id);
+        this.server.emit('update_friend_connection_state', {
+          user_id: user_id,
+          status: 'OFFLINE',
+        });
+        await this.prisma.user.update({
+          where: { id: user_id },
+          data: { status: 'OFFLINE' },
+        });
       }
     }
     const player = this.playerService.getPlayerBySocketId(client.id);
@@ -159,6 +170,7 @@ export class AppGateway
         lobby.slots[index].player = undefined;
         lobby.dispatchLobbySlots();
       } else {
+        console.log("delete game request : ", data);
         if (!data || !data.sender || !data.sender.id || !data.receiver || !data.receiver.id) {
           return false;
         }

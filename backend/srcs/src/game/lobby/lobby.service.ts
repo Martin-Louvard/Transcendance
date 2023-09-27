@@ -16,7 +16,6 @@ import { UsersService } from 'src/users/users.service';
 export class LobbyService {
 	public constructor(private readonly playerService: PlayerService, private readonly prismaService: PrismaService) {
 	}
-	gameRequest: GameRequest[];
 	private readonly logger = new Logger("LobbyService");
 	private lobbies: Map<string, Lobby> = new Map<string, Lobby>();
 	server: Server;
@@ -280,15 +279,6 @@ export class LobbyService {
 		lobby.dispatchLobbySlots();
 		this.playerService.addRequest(payload);
 	  }
-	//  model Game {
-	//	id        Int      @id @default(autoincrement())
-	//	scoreHome     Int
-	//	scoreVisitor  Int
-	//	players   User[]   @relation("PlayersInGame")
-	//	home      User[]   @relation("HomeTeam")
-	//	visitor   User[]   @relation("VisitorTeam")
-	//	createdAt DateTime @default(now())
-	//  }
 
 	async postGame(id: string) {
 		const lobby = this.lobbies.get(id);
