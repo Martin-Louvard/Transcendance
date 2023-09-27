@@ -12,7 +12,9 @@ export class GameService {
   async getLeaderboard(){
     const users = await this.prisma.user.findMany({});
     const sortedUsers = users.sort((a, b) => b.victoriesCount - a.victoriesCount);
-    return (sortedUsers.slice(0, 10));
+    const sortedWithWin = sortedUsers.filter(u => (u.victoriesCount > 0))
+    const length = sortedWithWin.length < 10 ? sortedWithWin.length : 10
+    return (sortedWithWin.slice(0, length));
   }
 
 }
