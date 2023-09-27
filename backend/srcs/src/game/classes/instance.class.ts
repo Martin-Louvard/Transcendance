@@ -250,6 +250,28 @@ export class Instance {
 		})
 	}
 
+	triggerFinishSurrender(player: Player) {
+		this.hasFinished = true;
+		this.interval.forEach((e) => {
+			clearInterval(e);
+		})
+		this.lobby.players.forEach((e) => {
+			const payload: ServerPayloads[ServerEvents.LobbyState] = {
+				lobbyId: this.lobby.id,
+				mode: this.lobby.mode,
+				hasStarted: this.hasStarted,
+				hasFinished: this.hasFinished,
+				playersCount: this.lobby.nbPlayers,
+				isSuspended: this.isSuspended,
+				playersInfo: [],
+				team: e.team,
+				winner: player.team == 'visitor' ? 'home' : 'visitor', 
+				score: this.data.score,
+			};
+			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
+		})
+	}
+
 	processInput() {
 
 		let directionVector = new CANNON.Vec3();
@@ -321,7 +343,7 @@ export class Instance {
 						);
 						bl.body.velocity.copy(newVelocity);
 						bl.body.angularVelocity.scale(-0.1);
-						const impulseStrength = 500;
+						const impulseStrength = this.params.ball.reboundForce;
 						const impulseDirection = new CANNON.Vec3(
 						  Math.floor(Math.random() * 2) - 1,
 						  0,
@@ -366,7 +388,7 @@ export class Instance {
 					let angle = recalculateBallAngle(Math.atan2(impactDirection.z, impactDirection.x));
 					const ballSpeed = ball.body.velocity.length();
 
-					const impulseForce = (angle * ballSpeed) / 100;
+					const impulseForce = (angle * ballSpeed * this.params.ball.reboundForce) / 100;
 
 					const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
 					ball.body.applyImpulse(impulseVector, ball.body.position);
@@ -387,7 +409,7 @@ export class Instance {
 		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
 		let angle = recalculateBallAngle( Math.atan2(direction.z, direction.x));
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
-		const impulseStrength = 150; 
+		const impulseStrength = 500; 
 		ball.body.applyImpulse(direction.scale(impulseStrength), ball.body.position);
 	}
 

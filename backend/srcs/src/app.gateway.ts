@@ -247,7 +247,7 @@ export class AppGateway
     @MessageBody() data: ClientPayloads[ClientEvents.LobbyState],
   ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player || player.socket.id != client.id || !player.lobby) return;
+    if (!player || player.socket.id != client.id) return;
     if (data.leaveLobby) {
       this.lobbyService.leaveLobby(player);
     }

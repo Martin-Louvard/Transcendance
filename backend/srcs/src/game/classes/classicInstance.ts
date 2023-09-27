@@ -67,15 +67,6 @@ export function recalculateBallAngle(angle: number): number {
 		return 0.8;
 	else if (angle > 2.5)
 		return 2.5;
-	// if (angle >= 0 && angle < 0.8) {
-	// 	// angle += 0.6;
-	// 	angle = findNearest(angle, 3, 1);
-	// 	console.log("1nearest angle found : ", angle);
-	// }  else if (angle > 6) {
-	// 	angle = 0.6;
-	// 	console.log("2nearest angle found : ", angle);
-	// }
-	// return Math.PI;
 	return angle;
 }
 
@@ -240,6 +231,29 @@ export class ClassicInstance {
 		})
 	}
 
+	triggerFinishSurrender(player: Player) {
+		this.hasFinished = true;
+		this.interval.forEach((e) => {
+			clearInterval(e);
+		})
+		this.lobby.players.forEach((e) => {
+			const payload: ServerPayloads[ServerEvents.LobbyState] = {
+				lobbyId: this.lobby.id,
+				mode: this.lobby.mode,
+				hasStarted: this.hasStarted,
+				hasFinished: this.hasFinished,
+				playersCount: this.lobby.nbPlayers,
+				isSuspended: this.isSuspended,
+				playersInfo: [],
+				team: e.team,
+				winner: player.team == 'visitor' ? 'home' : 'visitor', 
+				score: this.data.score,
+			};
+			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
+		})
+	}
+
+
 	processInput() {
 
 		let directionVector = new CANNON.Vec3();
@@ -268,7 +282,6 @@ export class ClassicInstance {
 			e.body.position.y = e.radius;
 			const velocityMagnitude = e.body.velocity.length();
 			if (!this.isRestarting && velocityMagnitude < minSpeed) {
-				console.log(this.isRestarting);
 				const velocityDirection = e.body.velocity.unit();
 				e.body.velocity.copy(velocityDirection.scale(minSpeed));
 			}
@@ -291,7 +304,7 @@ export class ClassicInstance {
 					if (pl.body.id == contact.bj.id) {
 
 						const collisionNormal = contact.ni;
-			  
+
 						const ballVelocityAlongNormal = collisionNormal.dot(bl.body.velocity);
 			  
 						const newVelocity = bl.body.velocity.vsub(
@@ -303,7 +316,7 @@ export class ClassicInstance {
 			  
 						bl.body.angularVelocity.scale(-0.1);
 			  
-						const impulseStrength = 150;
+						const impulseStrength = this.params.ball.reboundForce;
 						const impulseDirection = new CANNON.Vec3(
 						  Math.floor(Math.random() * 2) - 1,
 						  0,
@@ -347,7 +360,7 @@ export class ClassicInstance {
 					let angle = recalculateBallAngle(Math.atan2(impactDirection.z, impactDirection.x));
 					const ballSpeed = ball.body.velocity.length();
 
-					const impulseForce = (angle * ballSpeed) / 100;
+					const impulseForce = (angle * ballSpeed * this.params.ball.reboundForce) / 100;
 
 					const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
 					ball.body.applyImpulse(impulseVector, ball.body.position);
@@ -455,7 +468,7 @@ export class ClassicInstance {
 			}),
 			contactVelocity: new CANNON.Vec3(0, 0, 0),
 		};
-		sphere.body.position.set(0, radius, 0)
+		sphere.body.position.set(0, radius, 0);
 		this.world.world.addBody(sphere.body);
 		this.world.balls = new Array<Sphere>();
 		this.world.balls.push(sphere);

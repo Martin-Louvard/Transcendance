@@ -115,6 +115,20 @@ export const Game: React.FC = () => {
         const seconds = Math.floor(Math.round(elapsedTime) % 60);
         return `${minutes} : ${seconds < 10 ? '0' : ''}${seconds}`;
     }
+
+	function leaveLobby(): void {
+		const payload: ClientPayloads[ClientEvents.LobbyState] = {
+		  leaveLobby: true,
+		  mode: null,
+		  automatch: null,
+		}
+			dispatch({
+				type: 'WEBSOCKET_SEND_LOBBYSTATE',
+				payload: payload,
+			});
+		dispatch(setLobbyType(LobbyType.none));
+	  }
+
 	useEffect(() => {
 		if (!game.isConnected || !game.isPlaying)
 			navigate('/');
@@ -138,7 +152,7 @@ export const Game: React.FC = () => {
 				<Render game={game}/>
 			</Canvas>
 			<div>
-				<Button> Leave </Button>
+				<Button onClick={() => leaveLobby()}> Leave </Button>
 			</div>
 		</>
 		: 
