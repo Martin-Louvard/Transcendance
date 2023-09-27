@@ -44,7 +44,7 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
-      const user = await this.prisma.game.findUnique({
+      const user = await this.prisma.user.findUnique({
         where: {
           id: user_id,
         },
@@ -59,6 +59,8 @@ export class AppGateway
             where: { id: user_id },
             data: { status: 'ONLINE' },
         });
+      } else {
+        return ;
       }
     }
     this.appService.auth(client);
@@ -73,7 +75,7 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
-      const user = await this.prisma.game.findUnique({
+      const user = await this.prisma.user.findUnique({
         where: {
           id: user_id,
         },
@@ -88,6 +90,8 @@ export class AppGateway
           where: { id: user_id },
           data: { status: 'OFFLINE' },
         });
+      } else {
+        return ;
       }
     }
     const player = this.playerService.getPlayerBySocketId(client.id);
@@ -174,34 +178,34 @@ export class AppGateway
         if (!data || !data.sender || !data.sender.id || !data.receiver || !data.receiver.id) {
           return false;
         }
-      const receiver = this.playerService.getPlayerById(data.receiver.id);
-      const sender = this.playerService.getPlayerById(data.sender.id);
-      const current = this.playerService.getPlayerBySocketId(client.id)
-      if (!receiver || !sender || !current) {
-        return false;
-      }
-      this.playerService.deleteRequests(undefined, undefined, undefined, data.id);
-      const lobby = this.lobbyService.getLobby(data.lobby.id);
-      if (!lobby)
-        return false;
-      let isInLobby = false;
-      lobby.players.forEach((e) => {
-        if (e.id == receiver.id) {
-          isInLobby = true ;
-          return ;
+        const receiver = this.playerService.getPlayerById(data.receiver.id);
+        const sender = this.playerService.getPlayerById(data.sender.id);
+        const current = this.playerService.getPlayerBySocketId(client.id)
+        if (!receiver || !sender || !current) {
+          return false;
         }
-      })
-      if (!lobby || isInLobby)
-        return false;
-      const index = lobby.slots.findIndex((slot) => slot.player.id == data.receiver.id);
-      lobby.slots[index].full = false;
-      lobby.slots[index].type = LobbySlotType.friend;
-      lobby.slots[index].player = undefined;
-      lobby.dispatchLobbySlots();
-      }
-    } catch(err) {
-      console.log(err);
-  }
+        this.playerService.deleteRequests(undefined, undefined, undefined, data.id);
+        const lobby = this.lobbyService.getLobby(data.lobby.id);
+        if (!lobby)
+          return false;
+        let isInLobby = false;
+        lobby.players.forEach((e) => {
+          if (e.id == receiver.id) {
+            isInLobby = true ;
+            return ;
+          }
+        })
+        if (!lobby || isInLobby)
+          return false;
+        const index = lobby.slots.findIndex((slot) => slot.player.id == data.receiver.id);
+        lobby.slots[index].full = false;
+        lobby.slots[index].type = LobbySlotType.friend;
+        lobby.slots[index].player = undefined;
+        lobby.dispatchLobbySlots();
+        }
+      } catch(err) {
+        console.log(err);
+    }
   }
 
   @SubscribeMessage(ClientEvents.ListenLobbies)
