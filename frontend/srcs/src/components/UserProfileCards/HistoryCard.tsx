@@ -1,4 +1,3 @@
-import { useAppSelector } from '/src/redux/hooks';
 import './Cards.scss'
 import { useEffect, useState } from 'react';
 import { Game } from '@shared/class';
