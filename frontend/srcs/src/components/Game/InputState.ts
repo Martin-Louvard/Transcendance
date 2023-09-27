@@ -46,7 +46,7 @@ export const useKeyboardInput = () => {
 			case 'space':
 				setInput(prevState => ({ ...prevState, boost: true }));
 				break;
-			case 'a':
+			case 'q':
 				setInput(prevState => ({...prevState, rotLeft: true}));
 				break ;
 			case 'e':
@@ -87,7 +87,7 @@ export const useKeyboardInput = () => {
 			case 'space':
 				setInput(prevState => ({ ...prevState, boost: false }));
 				break;
-			case 'a':
+			case 'q':
 				setInput(prevState => ({...prevState, rotLeft: false}));
 				break ;
 			case 'e':

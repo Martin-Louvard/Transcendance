@@ -1,30 +1,32 @@
-$chat-menu-width: 15vw;
+$chat-menu-width: 175px;
 $chat-menu-bg-color: #242526;
 $chat-exit-button-height: 5%;
 $chat-exit-button-radius: 20px;
-$chat-menu-icon-right: 15vw;
-$chat-menu-animation-range: 15.2vw ;
-$chat-menu-icon-open: 15vw;
+$chat-menu-icon-right: 175px;
+$chat-menu-animation-range: 175px ;
+$chat-menu-icon-open:175px;
 
 .chat-menu-wrapper {
   width: $chat-menu-width;
   background-color: $chat-menu-bg-color;
+  min-width: 150px;
   position: fixed;
   right:0;
   bottom: 0;
-  height: 90%;  
+  height: 91vh;  
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 111;
-  border-top-left-radius: 15px;
+  z-index: 1;
   border-left: solid 1px black;
   border-top: solid 1px black;
 }
 
 .search-chat-input {
-	display: flex;
-	justify-content: space-evenly;
+  padding: 5px;
+  input{
+    width: 90%;
+  }
 }
 
 .inner-chat-menu-wrapper {
@@ -43,6 +45,9 @@ $chat-menu-icon-open: 15vw;
 	display: flex;
 	justify-content: space-around;
   align-items: center;
+}
+.channel-type-name{
+  font-size: small;
 }
 
 .chat-menu-header {
@@ -67,6 +72,7 @@ $chat-menu-icon-open: 15vw;
   cursor: pointer;
   margin-right: 10px;
   right: $chat-menu-icon-right;
+  
   bottom: 0;
   z-index: 10;
   height: 35px;
@@ -126,6 +132,7 @@ $chat-menu-icon-open: 15vw;
 }
 
 .chat-creator{
+    font-size: smaller;
     width: 100%;
     overflow: hidden;
     .form{
@@ -149,7 +156,8 @@ $chat-menu-icon-open: 15vw;
 	justify-content: space-between;
 	flex-direction: row;
   align-items: center;
-	font-size: 12px;
+  
+	font-size: 10px;
   padding: 5px;
 }
 
@@ -161,6 +169,8 @@ $chat-menu-icon-open: 15vw;
   
   div{
     padding-top: 5px;
+    font-size: 10px;
+
   }
 }
 
@@ -173,4 +183,8 @@ $chat-menu-icon-open: 15vw;
 .chat-item-active {
   background-color: #c0c0c0;
   font-weight: bold;
+}
+
+.inner-chat-list-wrapper{
+  overflow-y: scroll;
 }

@@ -67,12 +67,12 @@ export const JoinMatch: React.FC = () => {
 	const [secondary, setSecondary] = useState(false);
 	return (
 	  <div sx={{width:"100%"}}>
-		<Grid item xs={12} md={6}  sx={{width:"50%", m:"auto"}}>
+		<div item xs={12} md={6} >
 			<Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
 			  Avalaible Lobbies
 			</Typography>
 			{renderLobbies}
-		</Grid>
+		</div>
 	  </div>
 	);
   }

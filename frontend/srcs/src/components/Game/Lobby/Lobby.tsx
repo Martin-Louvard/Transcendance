@@ -79,11 +79,11 @@ export const Lobby: React.FC = (props) => {
         lobbyType == LobbyType.none &&
         <div style={{ width: "100%"}} >
           <img className='logo' src="/duel.svg" />
-        <h1>Let's Play!</h1>
+        <h1 className='letsplay'>Let's Play!</h1>
         </div>
         }
         {
-          lobbyType != LobbyType.none && !game.lobbyId &&
+          lobbyType != LobbyType.none && !game.isPlaying &&
             <Button color={'primary'} onClick={() => {handleReturnButton()}}>
               <ArrowCircleLeftIcon />
             </Button>

@@ -24,6 +24,7 @@ import { GrassField } from "./GrassField";
 import { useWindowSize } from "./Lobby/CreateMatch";
 import { websocketConnected } from "/src/redux/websocketSlice";
 import { WebSocketState } from "src/redux/websocketSlice";
+import { Button } from "@mui/material";
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
@@ -89,58 +90,18 @@ const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player }) =
 
 const Camera: React.FC = (props) => {
 	let player = props.player;
+	let mapSize:{x: number, y: number} = props.mapSize;
 
 	const { camera } = useThree();
 
 	useFrame(() => {
 		if (!player)
 			return ;
-		camera.position.set(0, 150, 0)
+		camera.position.set(0, Math.max(mapSize.x, mapSize.y), 0)
 		camera.lookAt(0,0, 0);
 		if (player.team == 'home')
 			camera.rotation.z = Math.PI;
 	}, [])
-}
-
-function Effects() {
-	// const strength = useControls("Horizontal Blur", {
-	//   strength: { value: 0.1, min: 0, max: 1 }
-	// })
-  
-	const HorizontalBlur = forwardRef(({ strength = 0 }, ref) => {
-	  const effect = useMemo(() => new HorizontalBlurEffect({ strength }), [strength])
-	  return <primitive ref={ref} object={effect} dispose={null} />
-	})
-  
-	const { distortion, distortion2, speed, rollSpeed } = useControls('BadTV', {
-	  distortion: { value: 0.0, min: 0, max: 50.0 },
-	  distortion2: { value: 1.0, min: 0, max: 50.0 },
-	  speed: { value: 0.05, min: 0, max: 5.0 },
-	  rollSpeed: { value: 0, min: 0, max: 5.0 }
-	})
-  
-	const BadTV = forwardRef(({ distortion = 3.0, distortion2 = 5.0, speed = 0.2, rollSpeed = 0.1 }, ref) => {
-	  const effect = useMemo(() => new BadTVEffect({ distortion, distortion2, speed, rollSpeed }), [
-		distortion,
-		distortion2,
-		speed,
-		rollSpeed
-	  ])
-	  return <primitive ref={ref} object={effect} dispose={null} />
-	})
-	const {scene, camera, size} = useThree();
-	const aspect = useMemo(() => new THREE.Vector2(size.width, size.height), [size])
-
-	return (
-	  <EffectComposer>
-		{/*<Bloom intensity={0.1} luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />*/}
-		<Noise opacity={0.02} />
-		{/*<BadTV distortion={distortion} distortion2={distortion2} speed={speed} rollSpeed={rollSpeed} />*/}
-		{/*<HorizontalBlur strength={strength} />*/}
-		{/*<AfterimagePass  attachArray="passes"  uniforms-damp-value={0.991}/>*/}
-
-	  </EffectComposer>
-	)
 }
 
 export const Game: React.FC = () => {
@@ -176,6 +137,9 @@ export const Game: React.FC = () => {
 			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#cfcfcf" }} >
 				<Render game={game}/>
 			</Canvas>
+			<div>
+				<Button> Leave </Button>
+			</div>
 		</>
 		: 
 		<></>
@@ -464,13 +428,8 @@ export const Render: React.FC = (props) => {
 	useEffect(() => {
 		if (user)
 			emitInput(KeyboardInput, prevInput, user.id);
-		//player.setInput(KeyboardInput);
 	}, [KeyboardInput])
 
-
-	//useThree(({ camera }) => {
-	//	camera.position.set(me[0], me[1], me[2]);
-	//})
 
 	return (
 		game.balls && game.players ?
@@ -481,7 +440,7 @@ export const Render: React.FC = (props) => {
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
 					<GrassField position={[0, 0, 0]} width={game.mapHeight} height={game.mapWidth}/>
-					<Camera player={me} classic={game.params.classic}/>
+					<Camera player={me} classic={game.params.classic} mapSize={{x: game.mapWidth, y: game.mapHeight}}/>
 					 <Goals/>
 					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, game.mapHeight / 2]} />
 					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, -game.mapHeight / 2]}/>
@@ -493,10 +452,8 @@ export const Render: React.FC = (props) => {
 					</mesh>
 					{balls}/
 					{players}
-					{/*<Effects/>*/}
 		</>
 		: 
 		<></>
-			//<p>PAS DE JEU</p>
 	);
 }

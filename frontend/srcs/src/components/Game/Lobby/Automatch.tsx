@@ -51,7 +51,7 @@ export const AutoMatch: React.FC = (props) => {
 				<button onClick={() => {setGameState({isDuel: true, isDouble: false});}}>Duel</button>
 				<button onClick={() => {setGameState({isDuel: false, isDouble: true });}}>Double</button>
 			</div>
-			<h2>Choose Mode</h2>
+			<h2 className="choosemode">Choose Mode</h2>
 		  </div>
 	  );
   }

@@ -313,9 +313,11 @@ export class LobbyService {
 				id: {in: duel ? [homeInfos[0].id] : [homeInfos[0].id, homeInfos[1].id]},
 			}
 		})
+		const visitorScore = lobby.instance.data.score.visitor
+		const homeScore = lobby.instance.data.score.home
 		const gameData = {
-			scoreHome: lobby.instance.data.score.home,
-			scoreVisitor: lobby.instance.data.score.visitor,
+			scoreHome: homeScore,
+			scoreVisitor: visitorScore,
 			players: {
 			  connect: users.map((user) => ({ id: user.id })),
 			},
@@ -325,6 +327,7 @@ export class LobbyService {
 			visitor: {
 			  connect: visitor.map((user) => ({ id: user.id })),
 			},
+			winner: homeScore > visitorScore ? 'home' : homeScore < visitorScore ? 'visitor' : 'nul',
 		  };
 		
 		  try {

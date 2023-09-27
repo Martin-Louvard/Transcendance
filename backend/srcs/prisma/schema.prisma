@@ -25,6 +25,7 @@ enum UserStatus {
   INGAME
 }
 
+
 model User {
   id                     Int           @id @default(autoincrement())
   username               String        @unique
@@ -51,6 +52,16 @@ model User {
   GameAsVisitor          Game[]        @relation("VisitorTeam")
   chatMessages           ChatMessage[]
   createdAt              DateTime      @default(now())
+}
+
+model ActionOnUser {
+	id			Int		@id @default(autoincrement())
+	user_id 	Int
+	chat_id		Int
+	action		String
+	time		Int
+	chat		ChatChannel	@relation("ActionOnUser", fields: [chat_id], references: [id])
+	createdAt	DateTime	@default(now())
 }
 
 model Friends {
@@ -80,6 +91,7 @@ model ChatChannel {
   admins		          User[]	    @relation("AdminOnChannels")
   participants            User[]        @relation("JoinedChannels")
   bannedUsers             User[]        @relation("BannedFromChannels")
+  actionOnUser			  ActionOnUser[] @relation("ActionOnUser")
   messages                ChatMessage[]
 }
 
@@ -101,5 +113,6 @@ model Game {
   players   User[]   @relation("PlayersInGame")
   home      User[]   @relation("HomeTeam")
   visitor   User[]   @relation("VisitorTeam")
+  winner    String
   createdAt DateTime @default(now())
 }

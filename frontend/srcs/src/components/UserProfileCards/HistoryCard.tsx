@@ -2,12 +2,17 @@ import { useAppSelector } from '/src/redux/hooks';
 import './Cards.scss'
 import { useEffect, useState } from 'react';
 import { Game } from '@shared/class';
+import { User} from '../../Types';
+interface HistoryProps {
+  user: User;
+}
 
-const HistoryCard = () => {
+
+const HistoryCard: React.FC<HistoryProps> = ({user}) => {
   const [games, setGames] = useState<Game[]>([]);
-  const user = useAppSelector(state => state.session.user);
 
   useEffect(() => {
+    console.log(user)
     async function fetchGames() {
         const requestOptions = {
           method: 'GET',
@@ -27,6 +32,15 @@ const HistoryCard = () => {
     fetchGames();
   }, [])
 
+  function isWinner(game: Game, id: number) {
+    if  ((game.visitor.find((v) =>  v.id == user.id) && game.winner == 'visitor')
+          ||
+        (game.home.find((v) =>  v.id == user.id) && game.winner == 'home'))
+      return true;
+    else
+      return true; 
+  }
+
   return (
     <>
       <div className="card-wrapper">
@@ -38,12 +52,18 @@ const HistoryCard = () => {
                 <p>|</p>
                 <div>
 
-                <p>{
-                  game.visitor.find((v) => v.id == user.id) ?
-                  `Visitor (you) - Home` :  `Visitor - Home (you)`
+                <p >
+                  {
+                    isWinner(game, user.id) ?
+                      " Win"
+                        :
+                      "Lost"
+                  
+                  //  ?
+                  // `Visitor (you) - Home` :  `Visitor - Home (you)`
                 }
-                </p>
-                <p> {`${game.scoreVisitor} - ${game.scoreHome} `}</p>
+                </p >
+                <p style={{width: "150px"}}> {`${game.scoreVisitor} - ${game.scoreHome} `}</p>
                 </div>
                 {/*<p>Score: {game.score}</p>*/}
             </li>

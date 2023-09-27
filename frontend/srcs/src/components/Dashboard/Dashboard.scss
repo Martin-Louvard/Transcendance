@@ -1,35 +1,25 @@
 .dashboard-wrapper{
-  margin: 80px 60px 0px 60px;
+  margin: 80px 0 0 0;
   height: 100%;
   //border: 2px solid white;
   //border-radius: 25%;
   background-color: #1F1F1F;
   max-width: 1500px;
-  width: 60vw;
+  width: auto;
   align-items: center;
-  overflow-x:scroll ;
+  overflow-x:hidden ;
 }
 
-.dashboard-wrapper-game{
-  margin: 80px 60px 0px 60px;
-  height: 100%;
-  //border: 2px solid white;
-  //border-radius: 25%;
-  background-color: #1F1F1F;
-  max-width: 1500px;
-  min-width: 1200px;
-  width: 60vw;
-  align-items: center;
-  overflow-x:scroll ;
-}
 
 .canvas-wrapper{
-  height: 100%;
+  height: auto;
   //border-radius: 25%;
   display: flex;
   flex-direction: row;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  overflow: hidden;
+  min-width: 680px;
+  overflow-x:hidden ;
+
 }
 
 .menu-bottom{
@@ -44,10 +34,5 @@
 
 }
 
-.menu-middle{
-  display: flex;
-  flex-direction: row;
-  width: auto;
-}
 
 
