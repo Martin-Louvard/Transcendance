@@ -127,7 +127,7 @@ export type ServerPayloads = {
 	  	playersCount: number,
 	  	isSuspended: boolean,
 		playersInfo: PlayerInfo[],
-		winner: 'home' | 'visitor' | null,
+		winner: 'home' | 'visitor' | "draw",
 		team: 'home' | 'visitor',
 		score: {'home': number, 'visitor': number},
 	},

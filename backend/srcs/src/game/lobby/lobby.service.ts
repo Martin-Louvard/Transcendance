@@ -324,7 +324,7 @@ export class LobbyService {
 			visitor: {
 			  connect: visitor.map((user) => ({ id: user.id })),
 			},
-			winner: homeScore > visitorScore ? 'home' : homeScore < visitorScore ? 'visitor' : 'nul',
+			winner: homeScore > visitorScore ? 'home' : homeScore < visitorScore ? 'visitor' : 'draw',
 		  };
 		
 		  try {

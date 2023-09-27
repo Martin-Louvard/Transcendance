@@ -24,7 +24,13 @@ export const LobbyDisplayScore: React.FC = (props) => {
   return (
     game.lastGame &&
       <div>
-        <p>{game.lastGame.winner} win the game</p>
+        {
+          game.lastGame.winner != 'draw' ?
+         <p>{game.lastGame.winner} win the game</p>
+         :
+         <p>{game.lastGame.winner} Draw</p>
+        }
+        <p style={{width: "150px"}}> {`${game.lastGame.score.visitor} - ${game.lastGame.score.home} `}</p>
       </div>
   )
 }
@@ -57,10 +63,6 @@ export const Lobby: React.FC = (props) => {
     dispatch(setLobbyType(LobbyType.none));
   }
 
-  //useEffect(() => {
-  //  console.log(game.LobbyType);
-  //}, [lobbyType])
-  
   function handleReturnButton () {
 
     if (game.LobbyType == LobbyType.find) {
@@ -93,6 +95,9 @@ export const Lobby: React.FC = (props) => {
         }
         <div style={{display: 'flex'}}>
         {
+          lobbyType == LobbyType.score ?
+          <LobbyDisplayScore/>
+          :
           !game.lobbyId && lobbyType == LobbyType.auto ?
           <AutoMatch user={user} game={game}/>
           :
@@ -116,10 +121,8 @@ export const Lobby: React.FC = (props) => {
           <button className="join-current-game" onClick={() => {navigate('/game/' + game.lobbyId)}}>Join Game</button>
         </div>
         :
-        lobbyType != LobbyType.none && lobbyType != LobbyType.score ?
+        lobbyType != LobbyType.none && lobbyType != LobbyType.score &&
         <CreateMatchLobby game={game} size={size} leaveLobby={leaveLobby}/>
-        : lobbyType == LobbyType.score &&
-        <LobbyDisplayScore/>
         }
         </div>
       </div>

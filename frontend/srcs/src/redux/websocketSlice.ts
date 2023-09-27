@@ -21,7 +21,7 @@ export interface WebSocketState {
   sentInvites: GameRequest[];
   full: boolean;
   lobbies: LobbyCli[];
-  lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor', team: 'home' | 'visitor', timestamp: number} | null,
+  lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor' | 'draw', team: 'home' | 'visitor', timestamp: number} | null,
   isWaitingToConnect: boolean;
   paramsReceived: boolean;
 }
@@ -158,7 +158,8 @@ const websocketSlice = createSlice({
       state.sentInvites = [...newState]
     },
     resetLobbyData: (state) => {
-      state.LobbyType = LobbyType.none;
+      if (state.LobbyType != LobbyType.score)
+        state.LobbyType = LobbyType.none;
       state.balls = [];
       state.elapsedTime = 0;
       state.full = false;

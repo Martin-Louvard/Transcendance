@@ -33,14 +33,16 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
     fetchGames();
   }, [])
 
-  function isWinner(game: Game, id: number) {
+  function isWinner(game: Game, id: number):number {
     console.log(game)
     if  ((game.visitor.find((v) =>  v.id == user.id) && game.winner == 'visitor')
           ||
         (game.home.find((v) =>  v.id == user.id) && game.winner == 'home'))
-      return true;
+      return 0;
+    else if (game.winner == 'draw')
+      return 1;
     else
-      return false; 
+      return 2; 
   }
 
   const navigate = useNavigate();
@@ -61,9 +63,11 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
                 <div>
                 <p >
                   {
-                    isWinner(game, user.id) ?
+                    isWinner(game, user.id) == 0 ?
                       "Won against "
                         :
+                        isWinner(game, user.id) == 1 ?
+                        "Draw against" :
                       "Lost against "
                   
                   //  ?
