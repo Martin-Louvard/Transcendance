@@ -44,6 +44,8 @@ const SideChatMenu = () => {
     storedJoinedChannels?.filter((chat) => chat.channelType === "general");
   const privateChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => chat.channelType === "Private");
+  const privateMsgChannels: ChatChannels[] | undefined =
+    storedJoinedChannels?.filter((chat) => chat.channelType === "private-message");
   const joinedGroupChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => {
       if (chat.channelType === "created" || chat.channelType === "Password")
@@ -135,8 +137,9 @@ const SideChatMenu = () => {
   const displayList = () => {
     return (
       <div className="inner-chat-list-wrapper">
-        {channelsTypeList(privateChannels, "private")}
+        {channelsTypeList(privateMsgChannels, "private-message")}
         {channelsTypeList(generalChannels, "general")}
+        {channelsTypeList(privateChannels, "private")}
         {channelsTypeList(joinedGroupChannels, "created")}
         {channelsTypeList(publicChannels, "public")}
       </div>

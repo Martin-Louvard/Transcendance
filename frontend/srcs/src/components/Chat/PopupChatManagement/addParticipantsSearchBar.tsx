@@ -63,8 +63,8 @@ const AddParticipantsSearchBar = ({chat} : {chat: ChatChannels}) => {
         onChange={handleInputChange}
         onKeyDown={handleKeyDown} />
       <div className="popup-button-add-people" onClick={() => handleSearch()}>
-          <div>ADD PEOPLE</div>
-          <IoMdPersonAdd />
+        <div>ADD PEOPLE</div>
+        <IoMdPersonAdd />
       </div>
     </div>
   );

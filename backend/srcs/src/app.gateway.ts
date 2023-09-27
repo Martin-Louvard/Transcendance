@@ -408,7 +408,41 @@ export class AppGateway
         actionOnUser: true,
       },
     });
-    this.server.emit('ban_user', updatedChats);
+    this.server.emit('ban_user', [updatedChats, bannedUser.id]);
+  }
+
+  @SubscribeMessage('mute_user')
+  async handleMuteUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const mutedUser = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const concernedChat = await this.prisma.chatChannel.findUnique({
+      where: { id: parseInt(body[0]) },
+    });
+    const event = await this.prisma.actionOnUser.create({
+      data: {
+        user_id: mutedUser.id,
+        chat: { connect: { id: concernedChat.id } },
+        time: parseInt(body[2]),
+        action: body[3],
+      },
+    });
+    const updatedChats = await this.prisma.chatChannel.update({
+      where: { id: parseInt(body[0]) },
+      data: { actionOnUser: { connect: { id: event.id } } },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
+      },
+    });
+    this.server.emit('mute_user', updatedChats);
   }
 
   @SubscribeMessage('add_user_chat')

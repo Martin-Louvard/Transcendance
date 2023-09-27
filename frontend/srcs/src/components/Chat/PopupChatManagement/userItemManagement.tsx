@@ -7,6 +7,7 @@ import KickUserButton from "./kickUserButton.tsx";
 import StatusDot from "../../UserProfileCards/StatusDot.tsx";
 import BlockUserButton from "./blockUserButton.tsx";
 import { useAppDispatch } from "../../../redux/hooks";
+import MuteUserButton from "./muteUserButton.tsx";
 import {
   setContentToShow,
   setFriendProfile,
@@ -66,6 +67,9 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
       </div>
       <div>
         {isKickable() ? <KickUserButton user={user} chat={chat} /> : ""}{" "}
+      </div>
+      <div>
+        {isKickable() ? <MuteUserButton chat={chat} user={user} /> : ""}{" "}
       </div>
       <div>
         <BlockUserButton user={user} />
