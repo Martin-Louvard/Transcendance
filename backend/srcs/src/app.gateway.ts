@@ -586,6 +586,29 @@ export class AppGateway
     this.server.emit('delete_chat', parseInt(body[0]));
   }
 
+  @SubscribeMessage('unban_user')
+  async handleUnbanUser(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const unbanUser = await this.prisma.user.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const updatedChat = await this.prisma.chatChannel.update({
+      where: { id: parseInt(body[0]) },
+      data: { bannedUsers: { disconnect: { id: unbanUser.id } } },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
+      },
+    });
+    this.server.emit('unban_user', updatedChat);
+  }
+
   @SubscribeMessage('change_owner')
   async handleChangeOwner(
     @ConnectedSocket() client: Socket,
@@ -602,6 +625,8 @@ export class AppGateway
         admins: true,
         messages: { include: { sender: true } },
         participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
       },
     });
     const updateParticipants = chat.participants.filter(

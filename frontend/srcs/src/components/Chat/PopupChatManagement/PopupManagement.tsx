@@ -6,6 +6,7 @@ import ChatSettings from "./chatSettings.tsx";
 import React, { useState, useEffect } from 'react';
 import LeaveChatButton from "./leaveChatButton.tsx";
 import AddParticipants from "./addParticipants.tsx";
+import BanUserItem from "./banUsersItem.tsx";
 
 let contentStyle = { background: 'transparent', border: "none"};
 const arrowStyle = { color: '#000' }; 
@@ -19,6 +20,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
       setIsDefine(currentOpenedChat?.owner?.id === currentUser.id);
     }
   }, [currentOpenedChat, currentUser]);
+  const [listTodisplay, setListToDisplay] = useState<string>("participants");
 
   useEffect(() => {
     if (!currentOpenedChat?.participants?.filter((user) => user.id === currentUser?.id).length)
@@ -37,16 +39,27 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
       <div className='chat-popup'>
         <div className='popup-top'>
         <div className="management-currentOpenedChat-popup">
-            {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
+            {(isDefine && listTodisplay === "participants") ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
           </div>
-          <AddParticipants chat={currentOpenedChat!} />
-      </div>
+    {listTodisplay === "participants" ? <AddParticipants chat={currentOpenedChat!} /> : ""}
+        </div>
+        <button onClick={ () => setListToDisplay("participants")}>{"ALL USERS"}</button>
+        <button onClick={ () => setListToDisplay("banned")}>{"BANNED USERS"}</button>
       <ul>
-        {currentOpenedChat?.participants?.map((user)=>{
-          if (currentUser?.id !== user?.id)
-            return (<UserListItem key={user.id} user={user} chat={currentOpenedChat} setIsOpen={setIsOpen} />);
+        {listTodisplay === "participants" ? 
+          currentOpenedChat?.participants?.map((user)=>{
+          if (currentUser?.id !== user?.id && )
+            return (<UserListItem 
+              key={user.id} 
+              user={user} 
+              chat={currentOpenedChat} 
+              setIsOpen={setIsOpen} />);
           return null;
-      })}
+          }) 
+          : 
+          currentOpenedChat?.bannedUsers?.map((user)=>{
+            return (<BanUserItem key={user.id} user={user} chat={currentOpenedChat} />);
+          })}
     </ul>
 
     </div>
