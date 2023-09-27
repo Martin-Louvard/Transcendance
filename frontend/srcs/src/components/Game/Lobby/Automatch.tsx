@@ -10,7 +10,7 @@ export const AutoMatch: React.FC = (props) => {
 	const dispatch = useAppDispatch();
 	const user: User | undefined = props.user;
 	const game: WebSocketState = props.game;
-	const lobbyState = props.lobbyState
+	const lobbyState = props.lobbyState;
   
 	useEffect(() => {
 	  if (gameState.isDouble && user) {
@@ -45,7 +45,7 @@ export const AutoMatch: React.FC = (props) => {
 	}
   
 	  return (
-		  <div  style={{width:'100%'}}>
+		  <div  style={{width:'100%', marginTop:"10vh"}}>
           <div className='play-buttons light-purple' style={{width:'100%'}}>
 				<button onClick={() => {findClassicGame()}}>Classic</button>
 				<button onClick={() => {setGameState({isDuel: true, isDouble: false});}}>Duel</button>
