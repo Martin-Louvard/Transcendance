@@ -5,7 +5,7 @@
 SRCS=frontend/srcs/src
 IP=$(hostname -i)
 
-if grep -rq "10.33.4.3:3001" $SRCS; then
+if grep -rq $IP $SRCS; then
     find $SRCS -type f -exec sed -i "s|$IP:|localhost:|g" {} +
     echo "Replaced $IP with localhost"
 else
