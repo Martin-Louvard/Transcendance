@@ -29,9 +29,6 @@ async function main() {
       username: 'User1',
       email: 'fakeEmail@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -42,9 +39,6 @@ async function main() {
       username: 'User2',
       email: 'fakeEmail2@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -55,9 +49,6 @@ async function main() {
       username: 'User3',
       email: 'fakeEmail3@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -68,9 +59,6 @@ async function main() {
       username: 'User4',
       email: 'fakeEmail4@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -81,9 +69,6 @@ async function main() {
       username: 'User5',
       email: 'fakeEmail5@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -94,9 +79,6 @@ async function main() {
       username: 'User6',
       email: 'fakeEmail6@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -107,9 +89,6 @@ async function main() {
       username: 'User7',
       email: 'fakeEmail7@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -120,9 +99,6 @@ async function main() {
       username: 'User8',
       email: 'fakeEmail8@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -133,9 +109,6 @@ async function main() {
       username: 'User9',
       email: 'fakeEmail9@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -146,9 +119,6 @@ async function main() {
       username: 'User10',
       email: 'fakeEmail10@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -159,9 +129,6 @@ async function main() {
       username: 'User11',
       email: 'fakeEmail11@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -172,9 +139,6 @@ async function main() {
       username: 'User12',
       email: 'fakeEmail12@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -185,9 +149,6 @@ async function main() {
       username: 'User13',
       email: 'fakeEmail13@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -198,9 +159,6 @@ async function main() {
       username: 'User14',
       email: 'fakeEmail14@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
 
@@ -208,16 +166,11 @@ async function main() {
     where: { username: 'User15' },
     update: { password: commonpassword },
     create: {
-      username: 'User16',
-      email: 'fakeEmail16@gmail.com',
+      username: 'User15',
+      email: 'fakeEmail15@gmail.com',
       password: commonpassword,
-      //friends: {
-      // create:[{friend_id: admin.id}]
-      //}
     },
   });
-
-
 
   const user42 = await prisma.user.upsert({
     where: { username: 'User42' },
@@ -227,9 +180,6 @@ async function main() {
       email: 'fakeEmail42@gmail.com',
       email42: '42email@stud42.fr',
       password: commonpassword,
-      //friends: {
-      //  create:[{friend_id: admin.id}]
-      //}
     },
   });
 

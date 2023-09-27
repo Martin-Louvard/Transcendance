@@ -285,6 +285,7 @@ export class LobbyService {
 		if (!lobby)
 			return ;
 		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance;
+		console.log("duel:  ", duel, ", lobby.mode = duel ? = ", lobby.mode == LobbyMode.duel, ", instanceClassic ? : ", lobby.instance instanceof ClassicInstance);
 		const players = [...lobby.players.values()];
 		const users = await this.prismaService.user.findMany({
 			where: {
@@ -328,7 +329,35 @@ export class LobbyService {
 		  } catch (error) {
 			console.error("Error creating a game:", error);
 		  }
+		  try {
+			await this.prismaService.user.updateMany({
+				where: {
+					id: {
+						in: home.map((user) => ( user.id ))
+					}
+				},
+				data: {
+					defeatCount: {increment: homeScore < visitorScore ? 1 : 0},
+					victoriesCount: {increment: homeScore > visitorScore ? 1 : 0},
+				}
+			});
+			await this.prismaService.user.updateMany({
+				where: {
+					id: {
+						in: visitor.map((user) => ( user.id ))
+					}
+				},
+				data: {
+					defeatCount: {increment: visitorScore < homeScore ? 1 : 0},
+					victoriesCount: {increment: visitorScore > homeScore ? 1 : 0},
+				}
+			});
+
+		  } catch (error) {
+			console.error("Error creating a game:", error);
+		  }
 		}
+		
 		//console.log(res);
 
 	async getGames(playerId: number) {
