@@ -3,6 +3,7 @@ import { Popup } from 'reactjs-popup';
 import { useState } from "react";
 import { useAppDispatch } from "../../../redux/hooks";
 import { User, ChatChannels } from "../../../Types.ts";
+import toast from "react-hot-toast";
 
 let contentStyle = { width:"fit-content", background: 'transparent', border: "none"};
 
@@ -15,21 +16,25 @@ const MuteUserButton = ({ user, chat }:{
 
 
     const handleKickButton = () => {
+      console.log("hey")
       if (isClicked) {
         setIsClicked(false);
       }
       else {
         setIsClicked(true);
       }
+      console.log(isClicked)
     };
 
     const handleMuteTime = (time: number) => {
       dispatch({type: 'MUTE_USER', payload:[chat.id, user.id, time, 'mute']})
       handleKickButton();
+      toast.success("Muted for " + time + " minutes")
     }
 
     return (
       <Popup 
+        open={isClicked == true}
         trigger={
           <div className="management-button" onClick={() => handleKickButton()}>
             <ImVolumeMute2 />
