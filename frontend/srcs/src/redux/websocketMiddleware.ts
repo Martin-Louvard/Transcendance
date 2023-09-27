@@ -39,6 +39,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
         socket.on('add_admin', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('ban_user', (data: any) => {store.dispatch(beenKicked(data))});
+        socket.on('unban_user', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('mute_user', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('add_user_chat', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('kick_user', (data: any) => {store.dispatch(beenKicked(data))});

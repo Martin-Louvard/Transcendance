@@ -592,8 +592,8 @@ export class AppGateway
     @MessageBody() body: Array<any>,
   ): Promise<void> {
     const unbanUser = await this.prisma.user.findUnique({
-      where: { id: parseInt(body[1]) }
-    })
+      where: { id: parseInt(body[1]) },
+    });
     const updatedChat = await this.prisma.chatChannel.update({
       where: { id: parseInt(body[0]) },
       data: { bannedUsers: { disconnect: { id: unbanUser.id } } },
@@ -604,8 +604,8 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-      }
-    })
+      },
+    });
     this.server.emit('unban_user', updatedChat);
   }
 
