@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Form from './Form';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { toast } from 'react-hot-toast';
-import { setSessionUser } from '../../redux/sessionSlice';
+import { setContentToShow, setSessionUser } from '../../redux/sessionSlice';
+import { ContentOptions } from '../../Types';
 
 const ChangeInfo = () => {
     const user = useAppSelector((state) => state.session.user);
@@ -36,6 +37,8 @@ const ChangeInfo = () => {
             newUser.access_token = access_token;
             toast.success("Information updated")
             dispatch(setSessionUser(newUser))
+            dispatch(setContentToShow(ContentOptions.PROFILE))
+            console.log(ContentOptions.PROFILE)
         }
       }catch(err) {
         console.log(err);

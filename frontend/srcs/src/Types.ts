@@ -21,7 +21,8 @@ export enum ContentOptions{
   PLAY = "lobby",
   FRIENDPROFILE = "friendProfile",
   LEADERBOARD = "leaderboard",
-  CHANGEINFO = "changeinfos"
+  CHANGEINFO = "changeInfos",
+  TWOFA = "twoFa"
 }
 
 
