@@ -3,6 +3,7 @@ import { User, ChatChannels } from "../../../Types.ts";
 import { GiBootKick } from "react-icons/gi";
 import { useState } from "react";
 import { Popup } from 'reactjs-popup';
+import toast from "react-hot-toast";
 
 
 let contentStyle = { width:"fit-content", background: 'transparent', border: "none"};
@@ -21,10 +22,13 @@ const KickUserButton = ({ user, chat }:{
 
     const handleKick = () => {
       dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
+      toast.success(user.username + " kicked from channel")
+
     }
 
     const handleBan = () => {
       dispatch({type:'BAN_USER', payload:[chat.id, user.id]});
+      toast.success(user.username + " banned from channel")
     }
 
 

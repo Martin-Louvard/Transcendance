@@ -44,22 +44,15 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
-      const user = await this.prisma.game.findUnique({
-        where: {
-          id: user_id,
-        },
-      })
-      if (user){
-        this.connected_clients.set(user_id, client);
-        this.server.emit('update_friend_connection_state', {
-          user_id: user_id,
-          status: 'ONLINE',
-        });
-          await this.prisma.user.update({
-            where: { id: user_id },
-            data: { status: 'ONLINE' },
-        });
-      }
+      this.connected_clients.set(user_id, client);
+      this.server.emit('update_friend_connection_state', {
+        user_id: user_id,
+        status: 'ONLINE',
+      });
+        await this.prisma.user.update({
+          where: { id: user_id },
+          data: { status: 'ONLINE' },
+      });
     }
     this.appService.auth(client);
     this.playerService.dispatchGameRequest();
@@ -72,23 +65,16 @@ export class AppGateway
   async handleDisconnect(client: Socket) {
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
-      const user_id = parseInt(user_id_string);
-      const user = await this.prisma.game.findUnique({
-        where: {
-          id: user_id,
-        },
-      })
-      if (user){
-        this.connected_clients.delete(user_id);
-        this.server.emit('update_friend_connection_state', {
-          user_id: user_id,
-          status: 'OFFLINE',
-        });
-        await this.prisma.user.update({
-          where: { id: user_id },
-          data: { status: 'OFFLINE' },
-        });
-      }
+      const user_id = parseInt(user_id_string);     
+      this.connected_clients.delete(user_id);
+      this.server.emit('update_friend_connection_state', {
+        user_id: user_id,
+        status: 'OFFLINE',
+      });
+      await this.prisma.user.update({
+        where: { id: user_id },
+        data: { status: 'OFFLINE' },
+      });
     }
     const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player) return;
