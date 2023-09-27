@@ -72,8 +72,7 @@ export const Lobby: React.FC = (props) => {
   }
 
   return (
-    <div style={{position: "relative", width: "100%", height:"100%"}}>
-      {/*<div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"row"}}>*/}
+    <div style={{position: "relative", width: "100%", height:"100%", marginTop:"15vh"}}>
        <div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"column"}}>
       {
         lobbyType == LobbyType.none &&

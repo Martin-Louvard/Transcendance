@@ -9,6 +9,7 @@ import {setLobbyType, setParams } from "../../redux/websocketSlice";
 import { GameRequest, LobbyType } from "@shared/class";
 import { Avatar } from "@mui/material";
 import { setContentToShow, setFriendProfile } from "../../redux/sessionSlice";
+import { useNavigate } from "react-router-dom";
 
 const FriendsListCard: React.FC = (props) =>{
     const user = useAppSelector((state) => state.session.user);
@@ -19,7 +20,7 @@ const FriendsListCard: React.FC = (props) =>{
     const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>();
     const gameRequest= useAppSelector((state) => state.websocket.invitedGames)
     const contentToShow = useAppSelector((state) => state.session.contentToShow)
-    
+    const navigate = useNavigate();
     
   const getAccepted = ()=>{
     if (friendships){
@@ -45,7 +46,7 @@ const FriendsListCard: React.FC = (props) =>{
   
     const displayFriendProfile = (friendship: Friendships) => {
       dispatch(setFriendProfile(friendship.user_id === user?.id ? friendship.friend : friendship.user)); 
-      dispatch(setContentToShow(ContentOptions.FRIENDPROFILE));
+      dispatch(navigate("friendprofile"));
     };
 
     const renderNotifications = () => (   

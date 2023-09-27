@@ -200,7 +200,6 @@ export const Goals: React.FC = (props) => {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		console.log(game.params);
 		if (game.LobbyType == LobbyType.auto) {
 			const params: GameParameters = JSON.parse(JSON.stringify(game.params));
 			params.map.size[1] = 200;

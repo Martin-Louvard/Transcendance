@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
 
 
   const logout = () =>{
-    window.location.href="http://localhost:3000/"
+    window.location.href="http://10.33.4.5:3000/"
     dispatch(cleanSession())
     localStorage.removeItem('persist:root')
       const payload: ClientPayloads[ClientEvents.LobbyState] = {
@@ -54,9 +54,9 @@ const Navbar: React.FC = () => {
     event.preventDefault();
     navigate('/');
     const targetId = event.currentTarget.id;
-    if (targetId === "profile") dispatch(setContentToShow(ContentOptions.PROFILE));
-    else if (targetId === "friends") dispatch(setContentToShow(ContentOptions.FRIENDS));
-    else if (targetId === "leaderboard") dispatch(setContentToShow(ContentOptions.LEADERBOARD));
+    if (targetId === "profile") navigate("/profile");
+    else if (targetId === "friends")navigate("/friends");
+    else if (targetId === "leaderboard") navigate("/leaderboard");
     else if (targetId === "play") dispatch(setContentToShow(ContentOptions.PLAY));
   };
 
@@ -82,7 +82,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="navbar">
-        <Link  to="/" className="nav-elem-wrapper" onClick={()=>{dispatch(setContentToShow(ContentOptions.PLAY))}}>
+        <Link  to="/" className="nav-elem-wrapper" onClick={()=>{navigate("/")}}>
           <img src={logo} className="logo-nav" alt="PONGƎD logo" />
           <div className="navbar-brand">PONGƎD</div>
         </Link>
@@ -95,7 +95,7 @@ const Navbar: React.FC = () => {
             <Link className="nav-link" to="/about">About</Link>
           </li>
           <li className="nav-item">
-            {  user?.id && user.id != 0 ? <button style={{color:'black'}} className="nav-link" onClick={logout}>Logout</button> : null }
+            {  user?.id && user.id != 0 ? <button style={{color:'black', backgroundColor:"white"}} className="nav-link" onClick={logout}>Logout</button> : null }
           </li>
 
         </ul>

@@ -16,6 +16,7 @@ export interface WebSocketState {
   params: GameParameters;
   owner: string | null;
   lobbySlots: LobbySlotCli[];
+  inLobby: boolean;
   invitedGames: GameRequest[];
   sentInvites: GameRequest[];
   full: boolean;
@@ -39,13 +40,14 @@ const initialState: WebSocketState = {
   playersInfo: new Array<PlayerInfo>(),
   owner: null,
   lobbySlots: [],
+  inLobby: false,
   params: {
-   classic: true,
+   classic: false,
    duel: false,
     
    map: {
     size: [100, 200],
-    goalSize: 60,
+    goalSize: 40,
     medianOffset: 10,
    },
    ball: {
@@ -55,7 +57,7 @@ const initialState: WebSocketState = {
     rotationForce: 1, // force de rotation
    },
    players: {
-    speed: 150, // vitesse X et Z
+    speed: 120, // vitesse X et Z
     rotationSpeed: 50, // vitesse de rotation
     boostForce: 10, // force du boost
    },
@@ -95,6 +97,7 @@ const websocketSlice = createSlice({
         state.params.classic = false;
     },
     setParams: (state, action) => {
+      console.log(action.payload);
       state.params = JSON.parse(JSON.stringify(action.payload)); 
     },
     setLobbySlots: (state, action) => {
@@ -168,54 +171,56 @@ const websocketSlice = createSlice({
       state.playersInfo = [];
       state.mapWidth = 0;
       state.params = {
-        classic: true,
-        duel: false,
-        map: {
-         size: [200, 100],
-         goalSize: 20,
-         medianOffset: 20,
-        },
-        ball: {
-         globalSpeed: 10, // speed
-         reboundForce: 10, // force du rebond
-         ballAcceleration: 0.5, // m / sec
-         rotationForce: 1, // force de rotation
-        },
-        players: {
-         speed: 60, // vitesse X et Z
-         rotationSpeed: 10, // vitesse de rotation
-         boostForce: 10, // force du boost
-        },
-        general: {
-         time: 180,
-        }
-       }
+   classic: false,
+   duel: false,
+    
+   map: {
+    size: [100, 200],
+    goalSize: 40,
+    medianOffset: 10,
+   },
+   ball: {
+    globalSpeed: 50, // speed
+    reboundForce: 100, // force du rebond
+    ballAcceleration: 10, // m / sec
+    rotationForce: 1, // force de rotation
+   },
+   players: {
+    speed: 120, // vitesse X et Z
+    rotationSpeed: 50, // vitesse de rotation
+    boostForce: 10, // force du boost
+   },
+   general: {
+    time: 120,
+   }
+  }
        state.score = {'home': 0, 'visitor': 0};
     },
     resetParams: (state) => {
       state.params = {
-        classic: true,
-        duel: false,
-        map: {
-         size: [200, 100],
-         goalSize: 20,
-         medianOffset: 20,
-        },
-        ball: {
-         globalSpeed: 10, // speed
-         reboundForce: 10, // force du rebond
-         ballAcceleration: 0.5, // m / sec
-         rotationForce: 1, // force de rotation
-        },
-        players: {
-         speed: 60, // vitesse X et Z
-         rotationSpeed: 10, // vitesse de rotation
-         boostForce: 10, // force du boost
-        },
-        general: {
-         time: 180,
-        }
-       }
+   classic: false,
+   duel: false,
+    
+   map: {
+    size: [100, 200],
+    goalSize: 40,
+    medianOffset: 10,
+   },
+   ball: {
+    globalSpeed: 50, // speed
+    reboundForce: 100, // force du rebond
+    ballAcceleration: 10, // m / sec
+    rotationForce: 1, // force de rotation
+   },
+   players: {
+    speed: 120, // vitesse X et Z
+    rotationSpeed: 50, // vitesse de rotation
+    boostForce: 10, // force du boost
+   },
+   general: {
+    time: 120,
+   }
+  }
     },
     setDuel: (state, action) => {
       state.params.duel = action.payload;
@@ -238,26 +243,27 @@ const websocketSlice = createSlice({
         state.owner = null;
         state.playersInfo = [];
         state.params = {
-          classic: true,
+          classic: false,
           duel: false,
+           
           map: {
-           size: [200, 100],
-           goalSize: 20,
-           medianOffset: 20,
+           size: [100, 200],
+           goalSize: 40,
+           medianOffset: 10,
           },
           ball: {
-           globalSpeed: 10, // speed
-           reboundForce: 10, // force du rebond
-           ballAcceleration: 0.5, // m / sec
+           globalSpeed: 50, // speed
+           reboundForce: 100, // force du rebond
+           ballAcceleration: 10, // m / sec
            rotationForce: 1, // force de rotation
           },
           players: {
-           speed: 60, // vitesse X et Z
-           rotationSpeed: 10, // vitesse de rotation
+           speed: 120, // vitesse X et Z
+           rotationSpeed: 50, // vitesse de rotation
            boostForce: 10, // force du boost
           },
           general: {
-           time: 180,
+           time: 120,
           }
          }
       }
@@ -282,6 +288,10 @@ const websocketSlice = createSlice({
         state.playersInfo = action.payload.playersInfo;
       }
     },
+    setInLobby: (state, action) => {
+      state.inLobby = action.payload;
+    }
+    ,
     setLobbies: (state, action) => {
       if (!action.payload)
         state.lobbies = [];
@@ -290,6 +300,6 @@ const websocketSlice = createSlice({
   },
 });
 
-export const { websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect, resetLobbyData, setParamsReceived} = websocketSlice.actions;
+export const {setInLobby, websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect, resetLobbyData, setParamsReceived} = websocketSlice.actions;
 
 export default websocketSlice.reducer;

@@ -87,7 +87,7 @@ export class Instance {
 	maxAcceleration = 5000;
 	private rotationSpeed;
 	automatch: boolean = true;
-	private playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
+	private playerSpawnPos;
 	private params: GameParameters = {
 		classic: false,
 		duel: false,
@@ -137,7 +137,11 @@ export class Instance {
 	public currentCurveForce = new CANNON.Vec3(0, 0, 0)
 	private isRestarting: boolean = false;
 
-	setParams(params: GameParameters) {this.params = params; this.automatch = false };
+	setParams(params: GameParameters) {
+		this.params = params;
+		this.automatch = false
+		this.playerSpawnPos= [[0, 2, params.map.size[1] / 2 - 20], [0, 2, -params.map.size[1] / 2 + 20], [50, 2, 0], [50, 2, 0]]
+	};
 	getParams(): GameParameters {return this.params};
 	isInstanceOfInputPacket(object: any): boolean {
 		return ('code' in object && 'timestamp' in object);

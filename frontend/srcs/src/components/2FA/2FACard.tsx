@@ -83,7 +83,7 @@ const TwoFACard: React.FC = () => {
 
   return (
     <>
-      <div className="card-wrapper">
+      <div className="card-wrapper" style={{marginTop:"10vh"}}>
         {twoFaQrcode.length ? QrCode() : <>Server Error</>}
       </div>
     </>

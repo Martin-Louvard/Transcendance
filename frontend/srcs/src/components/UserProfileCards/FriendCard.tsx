@@ -61,7 +61,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ userToDisplay }) => {
   const Profile: React.FC = () => {
     return (
       <>
-        <div className="profile-picture">
+        <div className="profile-picture" style={{marginTop:"10vh"}}>
           <img src={userToDisplay.avatar} alt={`${userToDisplay.username}'s Avatar`} />
         </div>
 

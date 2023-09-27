@@ -102,7 +102,7 @@ export class ClassicInstance {
 	automatch: boolean = true;
 	private playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
 	private params: GameParameters = {
-		classic: false,
+		classic: true,
 		duel: false,
 		map: {
 			size:[100, 200],
@@ -116,7 +116,7 @@ export class ClassicInstance {
 			rotationForce: 20,
 		},
 		players: {
-			speed: 150,
+			speed: 120,
 			rotationSpeed: 50,
 			boostForce: 20,
 		},

@@ -2,6 +2,8 @@ import './Cards.scss'
 import { useEffect, useState } from 'react';
 import { Game } from '@shared/class';
 import { User} from '../../Types';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
 interface HistoryProps {
   user: User;
 }
@@ -40,12 +42,16 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
       return true; 
   }
 
+  const navigate = useNavigate();
+
   return (
     <>
       <div className="card-wrapper">
         <h2>Game History</h2>
         <ul className="list">
-          {games.map((game, index) => (
+          {
+            games && games.length > 0 ?
+          games.map((game, index) => (
             <li className="item" key={index}>
                 <p>Date: {new Date(game.createdAt).toDateString()}</p>
                 <p>|</p>
@@ -66,7 +72,13 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
                 </div>
                 {/*<p>Score: {game.score}</p>*/}
             </li>
-          ))}
+          ))
+            :
+            <>
+              <p>Play to have an History</p>
+              <Button variant='contained' onClick={() => {navigate("/")}}>Play</Button>
+            </>
+        }
         </ul>
       </div>
     </>

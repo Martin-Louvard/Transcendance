@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParams } from "../../../redux//websocketSlice";
 import { BallParam, GeneralParam, MapParams, PlayersParam } from "./Params";
 import { User } from "../../../Types";
+import toast, { Toaster } from "react-hot-toast";
   
   export function useWindowSize() {
 	const [size, setSize] = useState({width: 0, height: 0});
@@ -28,23 +29,23 @@ import { User } from "../../../Types";
 	const [duel, setDuel] = useState(false);
 	const params = useAppSelector((state) => state.websocket.params)
 	const [mapParam, setMapParam] = useState({
-	  size: [200, 100],
-	  goalSize: 20,
-	  medianOffset: 20,
+	  size: [100, 200],
+	  goalSize: 40,
+	  medianOffset: 10,
 	});
 	const [ballParam, setBallParam] = useState({
-	  globalSpeed: 10, // speed
-	  reboundForce: 10, // force du rebond
-	  ballAcceleration: 0.5, // m / sec
+	  globalSpeed: 50, // speed
+	  reboundForce: 100, // force du rebond
+	  ballAcceleration: 10, // m / sec
 	  rotationForce: 1, // force de rotation
 	})
 	const [playersParam, setPlayersParam] = useState({
-	  speed: 60, // vitesse X et Z
-	  rotationSpeed: 10, // vitesse de rotation
+	  speed: 120, // vitesse X et Z
+	  rotationSpeed: 50, // vitesse de rotation
 	  boostForce: 10, // force du boost
 	})
 	const [generalParam, setGeneralParam] = useState({
-	  time: 180,
+	  time: 120,
 	})
 	const [sliderSize, setSliderSize] = useState((size.width / 100));
 	const sliderStyle = {
@@ -78,14 +79,13 @@ import { User } from "../../../Types";
   
 	function storeParams(): void {
 	  const params: GameParameters = {
-		classic: 'false',
+		classic: false,
 		duel: duel,
 		map: mapParam,
 		ball: ballParam,
 		players: playersParam,
 		general: generalParam,
 	  }
-	  //setParams(params);
 	  dispatch(setParams(params));
 	  if (user) {
 		dispatch({
@@ -132,7 +132,15 @@ import { User } from "../../../Types";
 			<div style={{display:'flex', flexDirection:'column', color:'white'}}>
 				<p>Mode: </p>
 				<ButtonGroup size="large" variant="contained" sx={{boxShadow:'0' ,margin:4, display:'flex', justifyContent:'center', color:'white'}}>
-					<Button onClick={() => {setDuel(true)}} disabled={duel}>Duel</Button>
+					<Button onClick={() => {
+						if (game.lobbySlots.filter((e) => e.full == true).length <= 2)
+							setDuel(true)
+						else if (game.owner == user?.username)
+							toast.error("Too much player");
+						}}
+						disabled={duel}>
+							Duel
+					</Button>
 					<Button onClick={() => {setDuel(false)}} disabled={!duel}>Double</Button>
 				</ButtonGroup>
 			</div>

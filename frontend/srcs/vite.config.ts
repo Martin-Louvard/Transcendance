@@ -12,9 +12,4 @@ export default defineConfig({
   resolve: {
     alias: [{ find: '@shared', replacement: path.resolve(__dirname, 'shared') }],
   },
-  build: {
-    rollupOptions: {
-      plugins: [inject({ Buffer: ['Buffer', 'Buffer'], process: 'process' })],
-    }
-  }
 })
