@@ -148,7 +148,11 @@
 
   .popup-top{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: center;
+   }
+   .popup-chat-menu{
+    margin-bottom:10px;
    }
   
   .add-participants-search-bar-wrapper{

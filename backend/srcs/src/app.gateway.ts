@@ -748,16 +748,40 @@ export class AppGateway
     this.server.emit('create_chat', chatChannel);
   }
 
+  @SubscribeMessage('modify_chat_info')
+  async handleModifyChatInfo(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: {id: number, name: string, channelType: string, password: string },
+  ): Promise<void> {
+    const updatedChatChannel = await this.prisma.chatChannel.update({
+      where: { id: body.id },
+      data: { name: body.name, channelType: body.channelType, password: body.password },
+    });
+    const channel = await this.prisma.chatChannel.findUnique({
+      where: { id: body.id },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
+      },
+    });
+
+    this.server.emit('update_chat', channel);
+  }
+
   @SubscribeMessage('update_chat')
   async handleUpdateChat(
     @ConnectedSocket() client: Socket,
     @MessageBody() body: { id: number; password: string },
   ): Promise<void> {
-    const updatedChatChannel = this.prisma.chatChannel.update({
+    const updatedChatChannel = await this.prisma.chatChannel.update({
       where: { id: body[0] },
       data: { password: body[1] },
     });
-    const channel = this.prisma.chatChannel.findUnique({
+    const channel = await this.prisma.chatChannel.findUnique({
       where: { id: body[0] },
       include: {
         owner: true,
