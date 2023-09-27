@@ -8,6 +8,8 @@ import { setContentToShow } from '../../redux/sessionSlice.ts';
 import { Friendships, Status, ContentOptions } from '../../Types';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ClientEvents, ClientPayloads, LobbyType } from '@shared/class.ts';
+import { setLobbyType } from '/src/redux/websocketSlice.ts';
 
 const Navbar: React.FC = () => {
   const logo = '/marvin.png'
@@ -36,6 +38,16 @@ const Navbar: React.FC = () => {
     window.location.href="http://localhost:3000/"
     dispatch(cleanSession())
     localStorage.removeItem('persist:root')
+      const payload: ClientPayloads[ClientEvents.LobbyState] = {
+        leaveLobby: true,
+        mode: null,
+        automatch: null,
+      }
+      dispatch({
+        type: 'WEBSOCKET_SEND_LOBBYSTATE',
+        payload: payload,
+      });
+      dispatch(setLobbyType(LobbyType.none));
   }
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLImageElement>) => {
