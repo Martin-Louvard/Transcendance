@@ -28,10 +28,12 @@ const FriendCard: React.FC<FriendCardProps> = ({ userToDisplay }) => {
 
   const deleteFriendship = async () => {
      dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship?.id, friendship?.friend_id == user?.id ? friendship?.user.username:friendship?.friend.username, Status.CANCELED] })
+     toast.success("User Removed From Friends")
   };
 
   const blockFriendship = async () => {
     dispatch({type: "WEBSOCKET_SEND_FRIEND_REQUEST", payload: [friendship?.id, friendship?.friend_id == user?.id ? friendship?.user.username:friendship?.friend.username, Status.BLOCKED] })
+    toast.success("User Blocked")
   }
 
   const sendFriendRequest = async () => {
