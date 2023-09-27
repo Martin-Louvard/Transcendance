@@ -15,10 +15,10 @@ export function  WhatsMyName(currentUser: User, friendShip: Friendships) {
 
 export function  WhatsMyId(currentUser: User, friendShip: Friendships) {
   if (currentUser.id === friendShip.friend_id) {
-    return (friendShip.user.id);
+    return (friendShip.user?.id);
   }
   else {
-    return (friendShip.friend.id);
+    return (friendShip.friend?.id);
   }
 }
 
