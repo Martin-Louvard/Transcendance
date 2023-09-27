@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
 
 
   const logout = () =>{
-    window.location.href="http://10.33.4.5:3000/"
+    window.location.href="http://localhost:3000/"
     dispatch(cleanSession())
     localStorage.removeItem('persist:root')
       const payload: ClientPayloads[ClientEvents.LobbyState] = {
