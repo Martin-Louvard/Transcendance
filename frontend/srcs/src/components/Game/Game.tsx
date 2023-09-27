@@ -2,7 +2,7 @@ import { Box, OrbitControls, PerspectiveCamera, Sphere, TrackballControls, useTe
 import { Canvas, extend, useFrame, useThree} from "@react-three/fiber";
 import React, { useEffect, useRef, forwardRef, useState, useMemo, useLayoutEffect} from "react";
 import { socket } from "../../socket";
-import { ServerEvents, ServerPayloads, ClientEvents, ClientPayloads, Input, InputPacket, Player, LobbyType} from '@shared/class';
+import { ServerEvents, ServerPayloads, ClientEvents, ClientPayloads, Input, InputPacket, Player, LobbyType, GameParameters} from '@shared/class';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import { DoubleSide, Mesh, PlaneGeometry, SphereGeometry, Vector3 } from "three";
 import { InstancedBufferGeometry, Float32BufferAttribute, BufferAttribute } from 'three';
@@ -23,7 +23,7 @@ import {BadTVEffect} from './effects/BadTV'
 import { GrassField } from "./GrassField";
 import { useWindowSize } from "./Lobby/CreateMatch";
 import { websocketConnected } from "/src/redux/websocketSlice";
-import { WebSocketState } from "src/redux/websocketSlice";
+import { WebSocketState, setParams } from "/src/redux/websocketSlice";
 import { Button } from "@mui/material";
 
 export const Ball: React.FC = (props) => {
@@ -197,9 +197,16 @@ const Cage: React.FC = (props) => {
 
 export const Goals: React.FC = (props) => {
 	const game = useAppSelector((state) => state.websocket);
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		console.log(game.params);
+		if (game.LobbyType == LobbyType.auto) {
+			const params: GameParameters = JSON.parse(JSON.stringify(game.params));
+			params.map.size[1] = 200;
+			params.map.goalSize = 40;
+			dispatch(setParams(params));
+		}
 	}, [])
 
 	return (
@@ -449,8 +456,8 @@ export const Render: React.FC = (props) => {
 		game.balls && game.players ?
 		<>
 
-				<TrackballControls noPan noZoom/>
-				<OrbitControls/>
+				{/* <TrackballControls noPan noZoom/> */}
+				{/* <OrbitControls/> */}
 					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
 					<ambientLight intensity={0.5}/>
 					<GrassField position={[0, 0, 0]} width={game.mapHeight} height={game.mapWidth}/>

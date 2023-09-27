@@ -11,7 +11,7 @@ const [board, setBoard] = useState<User[]>();
           method: 'GET',
       };
       try{
-          const response = await fetch(`http://localhost:3001/game/leaderboard`, requestOptions)
+          const response = await fetch(`http://10.33.4.5:3001/game/leaderboard`, requestOptions)
           const data = await response.json();
           setBoard(data);
       }catch(err) {
@@ -29,7 +29,7 @@ const [board, setBoard] = useState<User[]>();
           {board && board[0] && board?.map((user, index) => (
             <li className="item" key={index}>
                 <div className='friend-picture'>
-                    <img src={"http://localhost:3001/users/avatar/" + user.username + "/" + user.avatar.split("/").reverse()[0]}/>
+                    <img src={"http://10.33.4.5:3001/users/avatar/" + user.username + "/" + user.avatar.split("/").reverse()[0]}/>
                   </div>
                   <p>{user.username}</p>
                 <p> {`${user.victoriesCount} - ${user.defeatCount} `}</p>

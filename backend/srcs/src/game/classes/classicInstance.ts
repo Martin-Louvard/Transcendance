@@ -110,18 +110,18 @@ export class ClassicInstance {
 			medianOffset: 20,
 		},
 		ball: {
-			globalSpeed: 20,
+			globalSpeed: 0,
 			reboundForce: 20,
 			ballAcceleration: 20,
 			rotationForce: 20,
 		},
 		players: {
-			speed: 60,
+			speed: 150,
 			rotationSpeed: 50,
 			boostForce: 20,
 		},
 		general: {
-			time: 180,
+			time: 120,
 		}
 	};
 
@@ -280,6 +280,9 @@ export class ClassicInstance {
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
+			const accelerationVector = e.body.velocity.clone().unit().scale(this.params.ball.ballAcceleration);
+			e.body.velocity.vadd(accelerationVector);
+			
 			const velocityMagnitude = e.body.velocity.length();
 			if (!this.isRestarting && velocityMagnitude < minSpeed) {
 				const velocityDirection = e.body.velocity.unit();

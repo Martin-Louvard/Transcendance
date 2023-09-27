@@ -44,23 +44,23 @@ const initialState: WebSocketState = {
    duel: false,
     
    map: {
-    size: [200, 100],
-    goalSize: 20,
-    medianOffset: 20,
+    size: [100, 200],
+    goalSize: 60,
+    medianOffset: 10,
    },
    ball: {
-    globalSpeed: 10, // speed
-    reboundForce: 10, // force du rebond
-    ballAcceleration: 0.5, // m / sec
+    globalSpeed: 50, // speed
+    reboundForce: 100, // force du rebond
+    ballAcceleration: 10, // m / sec
     rotationForce: 1, // force de rotation
    },
    players: {
-    speed: 60, // vitesse X et Z
-    rotationSpeed: 10, // vitesse de rotation
+    speed: 150, // vitesse X et Z
+    rotationSpeed: 50, // vitesse de rotation
     boostForce: 10, // force du boost
    },
    general: {
-    time: 180,
+    time: 120,
    }
   },
   invitedGames: [],

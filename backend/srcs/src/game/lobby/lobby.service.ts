@@ -51,7 +51,7 @@ export class LobbyService {
 		if (!player.lobby)
 			return false;
 		const lobby = player.lobby;
-		if (lobby.instance.hasStarted && !lobby.instance.hasFinished) {
+		if (lobby && lobby.instance && lobby.instance.hasStarted && !lobby.instance.hasFinished) {
 			lobby.instance.triggerFinishSurrender(player);
 			return ;
 		}

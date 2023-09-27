@@ -14,7 +14,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       case 'WEBSOCKET_CONNECT':
         if (!action.payload || action.payload.length == 0)
           return ;
-        socket = io("http://localhost:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
+        socket = io("http://10.33.4.5:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
 
         socket.on('connect', () => {
           store.dispatch(setWaitingToConnect(false));
@@ -57,7 +57,15 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => {
           if (data.hasFinished)
             store.dispatch(setLobbyType(LobbyType.score)); 
-        store.dispatch(setLobbyState(data))})
+          store.dispatch(setLobbyState(data))
+          console.log("/?? : ", (data.hasStarted && data.lobbyId && store.getState().websocket.LobbyType == LobbyType.auto));
+          if (data.hasStarted && data.lobbyId && store.getState().websocket.LobbyType == LobbyType.auto) {
+            const params = store.getState().websocket.params;
+            params.map.size[1] = 200;
+            params.map.size[0] = 200;
+            store.dispatch(setParams(params));
+          }
+        })
         socket.on(ServerEvents.GameState, (data: any) => {store.dispatch(setGameState(data))})
         socket.on(ServerEvents.LobbySlotsState, (data: any) => {
           store.dispatch(setLobbySlots(data))

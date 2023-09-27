@@ -302,9 +302,14 @@ export class Instance {
 			if (e.activeDirections.boost) {
 				console.log("BOOOOSt");
 			}
-			e.body.quaternion.vmult(directionVector, worldVelocity);
-			e.body.velocity.x = worldVelocity.x;
-			e.body.velocity.z = worldVelocity.z;
+			// e.body.quaternion.vmult(directionVector, worldVelocity);
+			if (e.player.team == 'visitor') {
+				e.body.velocity.x = directionVector.x;
+				e.body.velocity.z = directionVector.z;
+			} else {
+				e.body.velocity.x = -directionVector.x;
+				e.body.velocity.z = -directionVector.z;
+			}
 			directionVector.set(0, 0, 0);
 		})
 	}
