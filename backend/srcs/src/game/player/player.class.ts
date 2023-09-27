@@ -27,6 +27,8 @@ export class Player {
 		return (true);
 	}
 	public emit<T>(event: ServerEvents, payload: T) {
+		if (!this.socket)
+			return ;
 		this.socket.emit(event, payload);
 	}
 
