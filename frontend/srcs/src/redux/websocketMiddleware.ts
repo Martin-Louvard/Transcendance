@@ -205,6 +205,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         }
         break;
 
+      case 'UNBAN_USER':
+        if (socket && socket.connected) {
+          socket.emit('unban_user', action.payload);
+        }
+        break;
+
       case 'DEL_CHAT':
         if (socket && socket.connected) {
           socket.emit('delete_chat', action.payload);
