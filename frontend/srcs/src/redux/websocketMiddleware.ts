@@ -6,9 +6,9 @@ import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, up
 import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType} from '@shared/class';
 import { useAppSelector } from './hooks';
 
-export let socket: Socket | null = null;
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
 
+  let socket: Socket | null = null;
   return (next: Dispatch<AnyAction>) => (action: AnyAction) => {
     switch (action.type) {
       case 'WEBSOCKET_CONNECT':
