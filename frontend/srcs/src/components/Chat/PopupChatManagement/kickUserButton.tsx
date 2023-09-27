@@ -16,15 +16,10 @@ const KickUserButton = ({ user, chat }:{
 
 
     const handleKickButton = () => {
-      if (isClicked) {
-        setIsClicked(false);
-      }
-      else {
-        setIsClicked(true);
-      }
+        setIsClicked(!isClicked);
     };
 
-    const handleKick = (time: number) => {
+    const handleKick = () => {
       dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
     }
 
@@ -34,7 +29,7 @@ const KickUserButton = ({ user, chat }:{
 
 
   return (
-  <Popup 
+  <Popup
     trigger={
       <div className="management-button" onClick={() => handleKickButton()}>
         <GiBootKick />
@@ -46,8 +41,8 @@ const KickUserButton = ({ user, chat }:{
     nested
     {...{contentStyle}}>
       <div className="chat-popup popup-ban" >
-    <button className="chrono-for-action" onClick={() => handleBan()}>{"BAN"}</button>
-    <button className="chrono-for-action" onClick={() => handleKick(10)}>{"KICK"}</button>
+    <button className="chrono-for-action" onClick={() => {handleBan(); setIsClicked(false)}}>{"BAN"}</button>
+    <button className="chrono-for-action" onClick={() => {handleKick(10); setIsClicked(false)}}>{"KICK"}</button>
     </div>
   </Popup>
   );
