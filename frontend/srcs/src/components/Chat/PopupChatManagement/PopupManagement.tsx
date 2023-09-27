@@ -35,10 +35,13 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
   const display = () => {
     if (listTodisplay === "participants")
       return (currentOpenedChat?.participants?.map((user)=>{
-            if (currentUser?.id !== user?.id && !currentRelations?.filter((relation) => {
+        if (currentUser?.id !== user?.id && currentRelations?.filter((relation) => {
+          console.log(relation);
+          console.log(WhatsMyId(currentUser!, relation));
+          console.log(user.id);
               if (WhatsMyId(currentUser!, relation) === user.id)
                 return relation;
-            }).length)
+            }).length === 0)
             return (<UserListItem 
               key={user.id} 
               user={user} 
