@@ -59,7 +59,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
               return (<BanUserItem key={userban.id} user={userban} chat={currentOpenedChat} />);
       }));
     else if (listTodisplay === "modify")
-      return (<ModifyChatForm />);
+      return (<ModifyChatForm chat={chat}/>);
   }
 
   return (
@@ -67,27 +67,30 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         open={isOpen}
         closeOnDocumentClick={false}
         onClose={() => setIsOpen(false)}
-        {...{ contentStyle, arrowStyle }}  
+        {...{ contentStyle, arrowStyle }}
     >
       <div className='popup-close-container'>
-      <button className='close-popup' onClick={() =>{setIsOpen(false)}}>x</button>
-      <div className='chat-popup'>
-        <div className='popup-top'>
-        <div className="management-currentOpenedChat-popup">
-            {(isDefine && listTodisplay === "participants") ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
+        <button className='close-popup' onClick={() =>{setIsOpen(false)}}>x</button>
+        <div className='chat-popup'>
+          <div className='popup-top'>
+            <div className='popup-chat-menu'>
+              {chat?.owner.id === currentUser?.id ? <button onClick={ () => setListToDisplay("modify")}>{"MODIFY"}</button> : ""}
+              <button onClick={ () => setListToDisplay("participants")}>{"ALL USERS"}</button>
+              <button onClick={ () => setListToDisplay("banned")}>{"BANNED USERS"}</button>
+            </div>
+            <div className="management-currentOpenedChat-popup">
+                {(isDefine && listTodisplay === "participants") ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
+            </div>
+            {listTodisplay === "participants" ? <AddParticipants chat={currentOpenedChat!} /> : ""}
+
           </div>
-    {listTodisplay === "participants" ? <AddParticipants chat={currentOpenedChat!} /> : ""}
+          <ul>
+            {display()}
+          </ul>
         </div>
-        {chat?.owner.id === currentUser?.id ? <button onClick={ () => setListToDisplay("modify")}>{"MODIFY"}</button> : ""}
-        <button onClick={ () => setListToDisplay("participants")}>{"ALL USERS"}</button>
-        <button onClick={ () => setListToDisplay("banned")}>{"BANNED USERS"}</button>
-      <ul>
-        {display()}
-    </ul>
-
-    </div>
-    <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
-
+        <div className="popup-leave-currentOpenedChat-button">
+          <LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} />
+        </div>
     </div>
     </Popup>
   );

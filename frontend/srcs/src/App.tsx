@@ -26,6 +26,7 @@ import { CreateMatch } from './components/Game/Lobby/CreateMatch.tsx';
 
 export function App() {
   const user = useAppSelector((state) => state.session.user);
+  const lobbyType = useAppSelector((state) => state.websocket.lobbyType);
   const access_token = useAppSelector((state) => state.session.access_token);
   const isConnected = useAppSelector((state) => state.websocket.isConnected);
   const dispatch = useAppDispatch();
@@ -38,7 +39,6 @@ export function App() {
       dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, access_token] });
     }
   }, [user?.id]);
-
 
   return (
     <Router>

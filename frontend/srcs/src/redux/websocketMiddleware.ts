@@ -211,6 +211,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         }
         break;
 
+        case 'MODIFY_CHAT_INFO':
+          if (socket && socket.connected) {
+            socket.emit('modify_chat_info', action.payload);
+          }
+          break;
+      
       case 'UNBAN_USER':
         if (socket && socket.connected) {
           socket.emit('unban_user', action.payload);

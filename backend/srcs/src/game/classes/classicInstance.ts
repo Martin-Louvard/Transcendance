@@ -224,7 +224,7 @@ export class ClassicInstance {
 				isSuspended: this.isSuspended,
 				playersInfo: [],
 				team: e.team,
-				winner: this.data.score.home == this.data.score.visitor ? null : this.data.score.home > this.data.score.visitor ? 'home' : 'visitor', 
+				winner: this.data.score.home == this.data.score.visitor ? "draw" : this.data.score.home > this.data.score.visitor ? 'home' : 'visitor', 
 				score: this.data.score,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);

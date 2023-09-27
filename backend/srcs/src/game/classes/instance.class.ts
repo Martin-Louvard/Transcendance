@@ -140,7 +140,7 @@ export class Instance {
 	setParams(params: GameParameters) {
 		this.params = params;
 		this.automatch = false
-		this.playerSpawnPos= [[0, 2, params.map.size[1] / 2 - 20], [0, 2, -params.map.size[1] / 2 + 20], [50, 2, 0], [50, 2, 0]]
+		this.playerSpawnPos= [[0, 2, params.map.size[1] / 2 - 20], [0, 2, -params.map.size[1] / 2 + 20], [50, 2, params.map.size[1] / 2 - 20], [50, 2, -params.map.size[1] / 2 + 20]]
 	};
 	getParams(): GameParameters {return this.params};
 	isInstanceOfInputPacket(object: any): boolean {
@@ -246,7 +246,7 @@ export class Instance {
 				isSuspended: this.isSuspended,
 				playersInfo: [],
 				team: e.team,
-				winner: this.data.score.home == this.data.score.visitor ? null : this.data.score.home > this.data.score.visitor ? 'home' : 'visitor', 
+				winner: this.data.score.home == this.data.score.visitor ? "draw" : this.data.score.home > this.data.score.visitor ? 'home' : 'visitor', 
 				score: this.data.score,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
