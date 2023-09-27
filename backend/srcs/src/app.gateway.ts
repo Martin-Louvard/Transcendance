@@ -44,12 +44,6 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
-      const user = await this.prisma.game.findUnique({
-        where: {
-          id: user_id,
-        },
-      })
-      if (user){
         this.connected_clients.set(user_id, client);
         this.server.emit('update_friend_connection_state', {
           user_id: user_id,
@@ -59,7 +53,6 @@ export class AppGateway
             where: { id: user_id },
             data: { status: 'ONLINE' },
         });
-      }
     }
     this.appService.auth(client);
     this.playerService.dispatchGameRequest();
@@ -73,12 +66,6 @@ export class AppGateway
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
-      const user = await this.prisma.game.findUnique({
-        where: {
-          id: user_id,
-        },
-      })
-      if (user){
         this.connected_clients.delete(user_id);
         this.server.emit('update_friend_connection_state', {
           user_id: user_id,
@@ -88,7 +75,6 @@ export class AppGateway
           where: { id: user_id },
           data: { status: 'OFFLINE' },
         });
-      }
     }
     const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player) return;
@@ -455,6 +441,42 @@ export class AppGateway
       },
     });
     this.server.emit('mute_user', updatedChats);
+  }
+
+  @SubscribeMessage('erase_action')
+  async handleEraseAction(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: Array<any>,
+  ): Promise<void> {
+    const actionToErase = await this.prisma.actionOnUser.findUnique({
+      where: { id: parseInt(body[1]) },
+    });
+    const chatToUpdate = await this.prisma.chatChannel.findUnique({
+      where: { id: parseInt(body[0]) },
+      include: { actionOnUser: true },
+    });
+    const updatedAction = chatToUpdate.actionOnUser.filter(
+      (action) => action.id !== actionToErase.id);
+    const updatedChat = await this.prisma.chatChannel.update({
+      where: { id: chatToUpdate.id },
+      data: {
+        actionOnUser: {
+          set: updatedAction.map((action) => ({ id: action.id }))
+        }
+      },
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
+      },
+    });
+    await this.prisma.actionOnUser.delete({
+      where: { id: actionToErase.id }
+    });
+    this.server.emit('erase_action', updatedChat);
   }
 
   @SubscribeMessage('add_user_chat')

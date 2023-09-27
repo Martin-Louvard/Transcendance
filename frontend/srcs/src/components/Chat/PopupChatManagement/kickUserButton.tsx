@@ -24,11 +24,12 @@ const KickUserButton = ({ user, chat }:{
       }
     };
 
-    const handleKick = (time: number) => {
+    const handleKick = () => {
       dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
     }
 
     const handleBan = () => {
+      dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
       dispatch({type:'BAN_USER', payload:[chat.id, user.id]});
     }
 
@@ -47,7 +48,7 @@ const KickUserButton = ({ user, chat }:{
     {...{contentStyle}}>
       <div className="chat-popup popup-ban" >
     <button className="chrono-for-action" onClick={() => handleBan()}>{"BAN"}</button>
-    <button className="chrono-for-action" onClick={() => handleKick(10)}>{"KICK"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick()}>{"KICK"}</button>
     </div>
   </Popup>
   );
