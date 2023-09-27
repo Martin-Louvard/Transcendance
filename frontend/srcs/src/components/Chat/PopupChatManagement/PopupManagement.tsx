@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
 import LeaveChatButton from "./leaveChatButton.tsx";
 import AddParticipants from "./addParticipants.tsx";
 import BanUserItem from "./banUsersItem.tsx";
+import { WhatsMyId, WhatsMyName } from "./addParticipantsSearchBar.tsx";
+import ModifyChatForm from "./modifyChatForm.tsx";
 
 let contentStyle = { background: 'transparent', border: "none"};
 const arrowStyle = { color: '#000' }; 
@@ -21,11 +23,41 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
     }
   }, [currentOpenedChat, currentUser]);
   const [listTodisplay, setListToDisplay] = useState<string>("participants");
+  const currentRelations = useAppSelector(
+    (state) => state.session.friendships)?.filter(
+      (relations) => relations.status === 'BLOCKED');
 
   useEffect(() => {
     if (!currentOpenedChat?.participants?.filter((user) => user.id === currentUser?.id).length)
       setIsOpen(false);
   }, [currentOpenedChat]);
+
+  const display = () => {
+    if (listTodisplay === "participants")
+      return (currentOpenedChat?.participants?.map((user)=>{
+            if (currentUser?.id !== user?.id && !currentRelations?.filter((relation) => {
+              if (WhatsMyId(currentUser!, relation) === user.id)
+                return relation;
+            }).length)
+            return (<UserListItem 
+              key={user.id} 
+              user={user} 
+              chat={currentOpenedChat} 
+              setIsOpen={setIsOpen} />);
+          return null;
+      }))
+    else if (listTodisplay === "banned")
+      return (currentOpenedChat?.bannedUsers?.map((userban)=>{
+            if (!currentRelations?.filter((relation) => {
+              console.log(relation);
+              if (WhatsMyId(currentUser!, relation) === userban.id)
+                return relation;
+            }).length)
+              return (<BanUserItem key={userban.id} user={userban} chat={currentOpenedChat} />);
+      }));
+    else if (listTodisplay === "modify")
+      return (<ModifyChatForm />);
+  }
 
   return (
     <Popup
@@ -43,23 +75,11 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
           </div>
     {listTodisplay === "participants" ? <AddParticipants chat={currentOpenedChat!} /> : ""}
         </div>
+        {chat?.owner.id === currentUser?.id ? <button onClick={ () => setListToDisplay("modify")}>{"MODIFY"}</button> : ""}
         <button onClick={ () => setListToDisplay("participants")}>{"ALL USERS"}</button>
         <button onClick={ () => setListToDisplay("banned")}>{"BANNED USERS"}</button>
       <ul>
-        {listTodisplay === "participants" ? 
-          currentOpenedChat?.participants?.map((user)=>{
-          if (currentUser?.id !== user?.id )
-            return (<UserListItem 
-              key={user.id} 
-              user={user} 
-              chat={currentOpenedChat} 
-              setIsOpen={setIsOpen} />);
-          return null;
-          }) 
-          : 
-          currentOpenedChat?.bannedUsers?.map((user)=>{
-            return (<BanUserItem key={user.id} user={user} chat={currentOpenedChat} />);
-          })}
+        {display()}
     </ul>
 
     </div>
