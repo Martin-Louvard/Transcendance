@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
     const targetId = event.currentTarget.id;
     if (targetId === "profile") dispatch(setContentToShow(ContentOptions.PROFILE));
     else if (targetId === "friends") dispatch(setContentToShow(ContentOptions.FRIENDS));
-    else if (targetId === "history") dispatch(setContentToShow(ContentOptions.HISTORY));
+    else if (targetId === "leaderboard") dispatch(setContentToShow(ContentOptions.LEADERBOARD));
     else if (targetId === "play") dispatch(setContentToShow(ContentOptions.PLAY));
   };
 
@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
       <button id="profile" onClick={handleClick}>
         My Profile
       </button>
-      <button id="history" onClick={handleClick}>
+      <button id="leaderboard" onClick={handleClick}>
         LeaderBoard
       </button>
     </div>

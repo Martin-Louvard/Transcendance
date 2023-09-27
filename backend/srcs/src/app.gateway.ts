@@ -825,13 +825,25 @@ export class AppGateway
       const friendplayer = this.playerService.getPlayerById(friend_id);
       const friend_socket = friendplayer ? friendplayer.socket : undefined;
       client.emit('friend_request', friendship);
-      if (body[2] === 'ACCEPTED') client.emit('create_chat', chat);
-      else client.emit('update_chat', chat);
+      if (!body[2])
+      {
+        console.log("PENDING")
+      }
+      else if (body[2] === 'ACCEPTED') 
+        client.emit('create_chat', chat);
+      else
+        client.emit('update_chat', chat);
 
       if (friend_socket) {
         friend_socket.emit('friend_request', friendship);
-        if (body[2] === 'ACCEPTED') friend_socket.emit('create_chat', chat);
-        else friend_socket.emit('update_chat', chat);
+        if (!body[2])
+        {
+          console.log("PENDING")
+        }
+        else if (body[2] === 'ACCEPTED')
+          friend_socket.emit('create_chat', chat);
+        else
+          friend_socket.emit('update_chat', chat);
       }
     }
   }
