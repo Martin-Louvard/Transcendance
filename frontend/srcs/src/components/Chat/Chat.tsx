@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 interface ChatProps {
   chatId: number;
 }
-  
+
 function  isMute(chat: ChatChannels, user: User) {
   const actionOnUsers: ActionOnUser[] = chat.actionOnUser;
   if (actionOnUsers?.filter((action) => {
@@ -28,6 +28,7 @@ function  isMute(chat: ChatChannels, user: User) {
   return false;
 }
 
+
 const Chat: React.FC<ChatProps> = ({ chatId }) => {
   const user = useAppSelector((state) => state.session.user);
   const chat = useAppSelector((state) =>
@@ -35,13 +36,14 @@ const Chat: React.FC<ChatProps> = ({ chatId }) => {
   );
   const dispatch = useAppDispatch();
 
+
   const handleSendMessage = (value: string) => {
     if (chat && user) {
       if (!isMute(chat, user))
-      dispatch({
-        type: 'WEBSOCKET_SEND_MESSAGE',
-        payload: [chat.id, user.id, value]
-      });
+        dispatch({
+          type: 'WEBSOCKET_SEND_MESSAGE',
+          payload: [chat.id, user.id, value]
+        });
     }
   };
 

@@ -32,8 +32,9 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         onClose={() => setIsOpen(false)}
         {...{ contentStyle, arrowStyle }}  
     >
+      <div className='popup-close-container'>
+      <button className='close-popup' onClick={() =>{setIsOpen(false)}}>x</button>
       <div className='chat-popup'>
-        <button className='close-popup' onClick={() =>{setIsOpen(false)}}>x</button>
         <div className='popup-top'>
         <div className="management-currentOpenedChat-popup">
             {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
@@ -49,6 +50,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
     </ul>
     <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
 
+    </div>
     </div>
     </Popup>
   );

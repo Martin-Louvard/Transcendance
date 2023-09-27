@@ -3,6 +3,7 @@ import { User, ChatChannels } from "../../../Types.ts";
 import { GiBootKick } from "react-icons/gi";
 import { useState } from "react";
 import { Popup } from 'reactjs-popup';
+import toast from "react-hot-toast";
 
 
 let contentStyle = { width:"fit-content", background: 'transparent', border: "none"};
@@ -16,25 +17,24 @@ const KickUserButton = ({ user, chat }:{
 
 
     const handleKickButton = () => {
-      if (isClicked) {
-        setIsClicked(false);
-      }
-      else {
-        setIsClicked(true);
-      }
+        setIsClicked(!isClicked);
     };
 
-    const handleKick = (time: number) => {
+    const handleKick = () => {
       dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
+      toast.success(user.username + " kicked from channel")
+
     }
 
     const handleBan = () => {
+      dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
       dispatch({type:'BAN_USER', payload:[chat.id, user.id]});
+      toast.success(user.username + " banned from channel")
     }
 
 
   return (
-  <Popup 
+  <Popup
     trigger={
       <div className="management-button" onClick={() => handleKickButton()}>
         <GiBootKick />
@@ -47,7 +47,7 @@ const KickUserButton = ({ user, chat }:{
     {...{contentStyle}}>
       <div className="chat-popup popup-ban" >
     <button className="chrono-for-action" onClick={() => handleBan()}>{"BAN"}</button>
-    <button className="chrono-for-action" onClick={() => handleKick(10)}>{"KICK"}</button>
+    <button className="chrono-for-action" onClick={() => handleKick()}>{"KICK"}</button>
     </div>
   </Popup>
   );
