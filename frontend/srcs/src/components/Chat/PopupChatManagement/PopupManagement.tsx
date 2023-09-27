@@ -61,9 +61,10 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
             return (<BanUserItem key={user.id} user={user} chat={currentOpenedChat} />);
           })}
     </ul>
-    <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
 
     </div>
+    <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>
+
     </div>
     </Popup>
   );

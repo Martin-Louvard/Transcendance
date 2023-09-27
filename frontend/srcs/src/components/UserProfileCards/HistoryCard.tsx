@@ -32,12 +32,13 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
   }, [])
 
   function isWinner(game: Game, id: number) {
+    console.log(game)
     if  ((game.visitor.find((v) =>  v.id == user.id) && game.winner == 'visitor')
           ||
         (game.home.find((v) =>  v.id == user.id) && game.winner == 'home'))
       return true;
     else
-      return true; 
+      return false; 
   }
 
   return (
@@ -46,27 +47,30 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
         <h2>Game History</h2>
         <ul className="list">
           {games.map((game, index) => (
+            <>			  { isWinner(game, user.id) ? <img src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} /> : ""}
+    
             <li className="item" key={index}>
                 <p>Date: {new Date(game.createdAt).toDateString()}</p>
                 <p>|</p>
                 <div>
-
                 <p >
                   {
                     isWinner(game, user.id) ?
-                      " Win"
+                      "Won against "
                         :
-                      "Lost"
+                      "Lost against "
                   
                   //  ?
                   // `Visitor (you) - Home` :  `Visitor - Home (you)`
-                }
+                } {game.visitor[0].id === user.id ? game.home[0].username : game.visitor[0].username}
                 </p >
                 <p style={{width: "150px"}}> {`${game.scoreVisitor} - ${game.scoreHome} `}</p>
                 </div>
                 {/*<p>Score: {game.score}</p>*/}
             </li>
-          ))}
+            </>
+            ))
+          }
         </ul>
       </div>
     </>

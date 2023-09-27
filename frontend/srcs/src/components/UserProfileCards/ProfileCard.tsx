@@ -34,7 +34,7 @@ const ProfileCard: React.FC = () => {
         console.log(err);
       }
     }
-
+    
     const disable2fa = async () =>{
       const requestOptions = {
         method: 'DELETE',
@@ -59,7 +59,7 @@ const ProfileCard: React.FC = () => {
         <div className="profile-picture form-picture">
           <img src={avatarUrl} id={avatarUrl} />
           <form>
-            <input type="file" id="file" onChange={ (e) => {if(e.target.files) updateAvatar(e.target.files)}} />
+            <input type="file" id="file"  accept="image/png, image/jpeg" onChange={ (e) => {if(e.target.files) updateAvatar(e.target.files)}} />
             <label htmlFor="file" id="uploadBtn">Modify</label>
           </form>
       </div>
@@ -83,6 +83,7 @@ const ProfileCard: React.FC = () => {
     return <>
         <div className="card-wrapper">
         {
+          
           Profile()
         }
         </div>
