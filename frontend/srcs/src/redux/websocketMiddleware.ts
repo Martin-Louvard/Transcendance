@@ -24,10 +24,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           store.dispatch(setWaitingToConnect(false));
           store.dispatch(websocketDisconnected())
         });
-        socket.on('message', (data: any) => {
-          console.log("ouais c'est greg");
-          store.dispatch( 
-          receiveMessage(data))});
+        socket.on('message', (data: any) => {store.dispatch(receiveMessage(data))});
         socket.on('friend_request', (data: any) => {store.dispatch(updateFriendRequest(data))});
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
         socket.on('block_user', (data: any) => {store.dispatch(updateBlockStatus(data))})
@@ -39,6 +36,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
         socket.on('add_admin', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('ban_user', (data: any) => {store.dispatch(beenKicked(data))});
+        socket.on('unban_user', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('mute_user', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('add_user_chat', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('kick_user', (data: any) => {store.dispatch(beenKicked(data))});
@@ -210,6 +208,12 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       case 'UPDATE_CHAT':
         if (socket && socket.connected) {
           socket.emit('update_chat', action.payload);
+        }
+        break;
+
+      case 'UNBAN_USER':
+        if (socket && socket.connected) {
+          socket.emit('unban_user', action.payload);
         }
         break;
 

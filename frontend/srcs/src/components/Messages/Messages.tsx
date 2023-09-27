@@ -39,14 +39,14 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
   return (
     <div className="chat-messages" ref={chatMessagesRef}>
       {messages?.map((message, index) => (
-        <>
+        <div  key={index}>
         {   
           messages[index - 1] && message.createdAt.substring(0, 10) !== messages[index - 1].createdAt.substring(0, 10) || !messages[index  -1] ? 
           <span className="message-date"> {message.createdAt.substring(0, 10)}</span> : ""
         }
         <div className={`message-wrapper  ${
           message.senderId === user?.id ? "left" : "right"
-        }`}  key={index}>
+        }`} >
         <div
          
           className={`chat-message ${
@@ -71,7 +71,7 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
  </div>
  : ""
  }
- </>
+ </div>
       ))}
     </div>
   );

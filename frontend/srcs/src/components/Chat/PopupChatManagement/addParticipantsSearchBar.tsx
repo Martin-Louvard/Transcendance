@@ -4,7 +4,7 @@ import React, { useState,  KeyboardEvent } from 'react';
 import toast from 'react-hot-toast';
 import {IoMdPersonAdd} from "react-icons/io";
 
-function  WhatsMyName(currentUser: User, friendShip: Friendships) {
+export function  WhatsMyName(currentUser: User, friendShip: Friendships) {
   if (currentUser.id === friendShip.friend_id) {
     return (friendShip.user.username);
   }
@@ -13,7 +13,7 @@ function  WhatsMyName(currentUser: User, friendShip: Friendships) {
   }
 }
 
-function  WhatsMyId(currentUser: User, friendShip: Friendships) {
+export function  WhatsMyId(currentUser: User, friendShip: Friendships) {
   if (currentUser.id === friendShip.friend_id) {
     return (friendShip.user.id);
   }

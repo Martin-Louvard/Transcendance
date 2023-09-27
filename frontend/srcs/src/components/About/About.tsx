@@ -9,30 +9,38 @@ const About: React.FC = () => {
     <ul  className="authors">
     <div className="row">
     <li className="item" >
+        <a href="https://github.com/Martin-Louvard">
         <div className='friend-picture'>
             <img src="/martin.jpg"/>
         </div>
         <p>Martin Louvard</p>
+        </a>
     </li>
     <li className="item" >
+        <a href="https://github.com/Youkass">
         <div className='friend-picture'>
-            <img src="/default.jpg"/>
+            <img src="/youri.jpg"/>
         </div>
         <p>Youri Bougre</p>
+        </a>
     </li>
     </div>
     <div className="row">
     <li className="item" >
+        <a href="https://github.com/clemedon">
         <div className='friend-picture'>
             <img src="/default.jpg"/>
         </div>
         <p>Clement Vidon</p>
+        </a>
     </li>
     <li className="item" >
+        <a  href="https://github.com/dariansereno">
         <div className='friend-picture'>
-            <img src="/default.jpg"/>
+            <img src="/darian.jpg"/>
         </div>
         <p>Darian Sereno</p>
+        </a>
         </li>
         </div>
 
