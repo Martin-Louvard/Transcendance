@@ -4,7 +4,6 @@ import { GiBootKick } from "react-icons/gi";
 import { useState } from "react";
 import { Popup } from 'reactjs-popup';
 
-
 let contentStyle = { width:"fit-content", background: 'transparent', border: "none"};
 
 const KickUserButton = ({ user, chat }:{
@@ -29,6 +28,7 @@ const KickUserButton = ({ user, chat }:{
     }
 
     const handleBan = () => {
+      dispatch({type:'KICK_USER', payload:[chat.id, user.id]})
       dispatch({type:'BAN_USER', payload:[chat.id, user.id]});
     }
 

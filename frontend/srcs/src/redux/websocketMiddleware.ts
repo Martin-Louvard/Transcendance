@@ -24,10 +24,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           store.dispatch(setWaitingToConnect(false));
           store.dispatch(websocketDisconnected())
         });
-        socket.on('message', (data: any) => {
-          console.log("ouais c'est greg");
-          store.dispatch( 
-          receiveMessage(data))});
+        socket.on('message', (data: any) => {store.dispatch(receiveMessage(data))});
         socket.on('friend_request', (data: any) => {store.dispatch(updateFriendRequest(data))});
         socket.on('update_friend_connection_state', (data: any) => {store.dispatch(updateFriendStatus(data))})
         socket.on('block_user', (data: any) => {store.dispatch(updateBlockStatus(data))})

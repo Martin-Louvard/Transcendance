@@ -39,16 +39,16 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
       <div className='chat-popup'>
         <div className='popup-top'>
         <div className="management-currentOpenedChat-popup">
-            {isDefine  ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
+            {(isDefine && listTodisplay === "participants") ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
           </div>
-          <AddParticipants chat={currentOpenedChat!} />
+    {listTodisplay === "participants" ? <AddParticipants chat={currentOpenedChat!} /> : ""}
         </div>
         <button onClick={ () => setListToDisplay("participants")}>{"ALL USERS"}</button>
         <button onClick={ () => setListToDisplay("banned")}>{"BANNED USERS"}</button>
       <ul>
         {listTodisplay === "participants" ? 
           currentOpenedChat?.participants?.map((user)=>{
-          if (currentUser?.id !== user?.id)
+          if (currentUser?.id !== user?.id && )
             return (<UserListItem 
               key={user.id} 
               user={user} 
@@ -58,7 +58,7 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
           }) 
           : 
           currentOpenedChat?.bannedUsers?.map((user)=>{
-            return (<BanUserItem user={user} chat={currentOpenedChat} />);
+            return (<BanUserItem key={user.id} user={user} chat={currentOpenedChat} />);
           })}
     </ul>
     <div className="popup-leave-currentOpenedChat-button"><LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /></div>

@@ -9,7 +9,7 @@ const UnbanUserButton = ({ user, chat }: { user: User; chat: ChatChannels }) => 
   };
 
   return (
-    <div className="popup-button">
+    <div className="management-button" onClick={() => handleUnban()}>
       {'UNBAN'}
     </div>
   );
