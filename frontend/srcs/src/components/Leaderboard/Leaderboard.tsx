@@ -1,9 +1,18 @@
 import '../UserProfileCards/Cards.scss'
 import { useEffect, useState } from 'react';
 import { User } from 'src/Types';
+import { useAppDispatch } from '../../redux/hooks';
+import { ContentOptions } from '../../Types';
+import { setFriendProfile, setContentToShow } from '../../redux/sessionSlice';
 
 const Leaderboard = () => {
 const [board, setBoard] = useState<User[]>();
+const dispatch = useAppDispatch();
+
+const goToUserProfile = (user: User) => {
+  dispatch(setFriendProfile(user));
+  dispatch(setContentToShow(ContentOptions.FRIENDPROFILE));
+};
 
   useEffect(() => {
     async function fetchGames() {
@@ -27,12 +36,13 @@ const [board, setBoard] = useState<User[]>();
         <h2>Leaderboard</h2>
         <ul className="list">
           {board && board[0] && board?.map((user, index) => (
-            <li className="item" key={index}>
+
+            <li className="item" key={index}  onClick={() => {goToUserProfile(user);}}>
                 <div className='friend-picture'>
                     <img src={"http://localhost:3001/users/avatar/" + user.username + "/" + user.avatar.split("/").reverse()[0]}/>
                   </div>
                   <p>{user.username}</p>
-                <p> {`${user.victoriesCount} - ${user.defeatCount} `}</p>
+                <p> {`V ${user.victoriesCount} - ${user.defeatCount} D`}</p>
             </li>
           ))}
         </ul>
