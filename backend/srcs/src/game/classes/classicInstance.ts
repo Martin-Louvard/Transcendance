@@ -61,6 +61,18 @@ interface GameParameters {
 		time: number, // temps d'une game
 	}
 }
+export function recalculateBallAngle(angle: number): number {
+	console.log('angle : ', angle);
+	if (angle < 0.8)
+		return 0.8;
+	else if (angle > 2.5)
+		return 2.5;
+	return angle;
+}
+
+export function findNearest(X: number, nb1: number, nb2: number): number {
+	return Math.abs(X - nb1) < Math.abs(X - nb2) ? nb1 : nb2;
+}
 
 
 export class ClassicInstance {
@@ -84,11 +96,13 @@ export class ClassicInstance {
 	public startTime: number;
 	accelerationRate = 50;
 	maxAcceleration = 5000;
+	private zPosition = 80;
 	private rotationSpeed;
+	private isRestarting = false;
 	automatch: boolean = true;
 	private playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
 	private params: GameParameters = {
-		classic: false,
+		classic: true,
 		duel: false,
 		map: {
 			size:[100, 200],
@@ -96,18 +110,18 @@ export class ClassicInstance {
 			medianOffset: 20,
 		},
 		ball: {
-			globalSpeed: 20,
+			globalSpeed: 0,
 			reboundForce: 20,
 			ballAcceleration: 20,
 			rotationForce: 20,
 		},
 		players: {
-			speed: 60,
+			speed: 120,
 			rotationSpeed: 50,
 			boostForce: 20,
 		},
 		general: {
-			time: 180,
+			time: 120,
 		}
 	};
 
@@ -217,6 +231,29 @@ export class ClassicInstance {
 		})
 	}
 
+	triggerFinishSurrender(player: Player) {
+		this.hasFinished = true;
+		this.interval.forEach((e) => {
+			clearInterval(e);
+		})
+		this.lobby.players.forEach((e) => {
+			const payload: ServerPayloads[ServerEvents.LobbyState] = {
+				lobbyId: this.lobby.id,
+				mode: this.lobby.mode,
+				hasStarted: this.hasStarted,
+				hasFinished: this.hasFinished,
+				playersCount: this.lobby.nbPlayers,
+				isSuspended: this.isSuspended,
+				playersInfo: [],
+				team: e.team,
+				winner: player.team == 'visitor' ? 'home' : 'visitor', 
+				score: this.data.score,
+			};
+			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
+		})
+	}
+
+
 	processInput() {
 
 		let directionVector = new CANNON.Vec3();
@@ -239,9 +276,18 @@ export class ClassicInstance {
 	}
 
 	ballPhysics() {
+		const minSpeed = 100;
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
+			const accelerationVector = e.body.velocity.clone().unit().scale(this.params.ball.ballAcceleration);
+			e.body.velocity.vadd(accelerationVector);
+			
+			const velocityMagnitude = e.body.velocity.length();
+			if (!this.isRestarting && velocityMagnitude < minSpeed) {
+				const velocityDirection = e.body.velocity.unit();
+				e.body.velocity.copy(velocityDirection.scale(minSpeed));
+			}
 			//e.body.velocity.x *= (this.params.ball.globalSpeed / 10);
 			//e.body.velocity.z *= (this.params.ball.globalSpeed / 10);
 			//const coef = new CANNON.Vec3(0.005, 0.005, 0.005);
@@ -260,32 +306,28 @@ export class ClassicInstance {
 				this.world.players.forEach((pl) => {
 					if (pl.body.id == contact.bj.id) {
 
-						// Calculate the collision normal
 						const collisionNormal = contact.ni;
-			  
-						// Calculate the ball's velocity along the collision normal
+
 						const ballVelocityAlongNormal = collisionNormal.dot(bl.body.velocity);
 			  
-						// Calculate the new velocity by reversing the component along the normal
 						const newVelocity = bl.body.velocity.vsub(
 						  collisionNormal.scale(2 * ballVelocityAlongNormal)
 						);
 			  
-						// Update the ball's velocity with the new velocity
 						bl.body.velocity.copy(newVelocity);
 			  
 			  
-						// Invert the angular rotation (optional)
 						bl.body.angularVelocity.scale(-0.1);
 			  
-						// Apply an impulse force to the ball's new direction (optional)
-						const impulseStrength = 100;
+						const impulseStrength = this.params.ball.reboundForce;
 						const impulseDirection = new CANNON.Vec3(
 						  Math.floor(Math.random() * 2) - 1,
 						  0,
 						  Math.random()
 						);
 						impulseDirection.normalize();
+						// let angle = Math.atan2(impulseDirection.z, impulseDirection.x);
+						// angle = recalculateBallAngle(angle);
 						const impulseForce = impulseDirection.scale(impulseStrength);
 						bl.body.applyImpulse(impulseForce, bl.body.position);
 			  
@@ -318,11 +360,10 @@ export class ClassicInstance {
 				}
 				if (ball && wall) {
 					const impactDirection: CANNON.Vec3 = contact.ri.clone();
-					const angle = Math.atan2(impactDirection.z, impactDirection.x);
-
+					let angle = recalculateBallAngle(Math.atan2(impactDirection.z, impactDirection.x));
 					const ballSpeed = ball.body.velocity.length();
 
-					const impulseForce = (angle * ballSpeed) / 1000;
+					const impulseForce = (angle * ballSpeed * this.params.ball.reboundForce) / 100;
 
 					const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
 					ball.body.applyImpulse(impulseVector, ball.body.position);
@@ -333,13 +374,18 @@ export class ClassicInstance {
 	}
 
 	async timeoutAction(ms, callback) {
+		this.isRestarting = true;
 		await new Promise(resolve => setTimeout(resolve, ms));
+		this.isRestarting = false;
 		callback();
 	}
 
 	ballStart(ball: Sphere) {
+		console.log(Math.random());
 		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
-		const angle = Math.atan2(direction.z, direction.x);
+		console.log(direction);
+		let angle = recalculateBallAngle(Math.atan2(direction.z, direction.x));
+		// si angle entre -> (PI/6 - 11PI/6) - (5PI/6 - 7PI/6) => set langle de la ball a l'angle le plus proche.
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
 		const impulseStrength = 500; 
 		ball.body.applyImpulse(direction.scale(impulseStrength), ball.body.position);
@@ -425,7 +471,7 @@ export class ClassicInstance {
 			}),
 			contactVelocity: new CANNON.Vec3(0, 0, 0),
 		};
-		sphere.body.position.set(0, radius, 0)
+		sphere.body.position.set(0, radius, 0);
 		this.world.world.addBody(sphere.body);
 		this.world.balls = new Array<Sphere>();
 		this.world.balls.push(sphere);
@@ -472,6 +518,7 @@ export class ClassicInstance {
 			elem.team = i % 2 ? 'home' : 'visitor';
 			this.startTime = Date.now() / 1000;
 			i++;
+
 		});
 	}
 
@@ -549,8 +596,12 @@ export class ClassicInstance {
 			if (e.body.position.x <= -this.world.mapWidth / 2)
 				e.body.position.x = -(this.world.mapWidth / 2);
 			if (e.body.position.x >= this.world.mapWidth / 2)
-				e.body.position.x = this.world.mapWidth / 2;  
-		})	
+				e.body.position.x = this.world.mapWidth / 2;
+			e.player.team == 'visitor' ?
+				e.body.position.z = this.zPosition
+				:
+				e.body.position.z = -this.zPosition;
+			})
 	}
 
 	animate() {

@@ -2,6 +2,8 @@ import './Cards.scss'
 import { useEffect, useState } from 'react';
 import { Game } from '@shared/class';
 import { User} from '../../Types';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
 interface HistoryProps {
   user: User;
 }
@@ -18,7 +20,7 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
       };
     
       try{
-          const response = await fetch(`http://localhost:3001/users/{id}/games?id=${user.id}`, requestOptions)
+          const response = await fetch(`http://10.33.4.5:3001/users/{id}/games?id=${user.id}`, requestOptions)
           const data = await response.json();
           setGames(data);
           console.log(games);
@@ -41,12 +43,16 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
       return false; 
   }
 
+  const navigate = useNavigate();
+
   return (
     <>
       <div className="card-wrapper">
         <h2>Game History</h2>
         <ul className="list">
-          {games.map((game, index) => (
+          {
+            games && games.length > 0 ?
+          games.map((game, index) => (
             <>			  { isWinner(game, user.id) ? <img src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} /> : ""}
     
             <li className="item" key={index}>
@@ -70,6 +76,11 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
             </li>
             </>
             ))
+            :
+            <>
+              <p>Play to have an History</p>
+              <Button variant='contained' onClick={() => {navigate("/")}}>Play</Button>
+            </>
           }
         </ul>
       </div>

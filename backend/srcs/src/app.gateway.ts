@@ -49,10 +49,15 @@ export class AppGateway
         user_id: user_id,
         status: 'ONLINE',
       });
+      try {
+
         await this.prisma.user.update({
           where: { id: user_id },
           data: { status: 'ONLINE' },
-      });
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }
     this.appService.auth(client);
     this.playerService.dispatchGameRequest();
@@ -71,10 +76,15 @@ export class AppGateway
         user_id: user_id,
         status: 'OFFLINE',
       });
-      await this.prisma.user.update({
-        where: { id: user_id },
-        data: { status: 'OFFLINE' },
-      });
+      try {
+
+        await this.prisma.user.update({
+          where: { id: user_id },
+          data: { status: 'OFFLINE' },
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }
     const player = this.playerService.getPlayerBySocketId(client.id);
     if (!player) return;
@@ -237,7 +247,7 @@ export class AppGateway
     @MessageBody() data: ClientPayloads[ClientEvents.LobbyState],
   ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player || player.socket.id != client.id || !player.lobby) return;
+    if (!player || player.socket.id != client.id) return;
     if (data.leaveLobby) {
       this.lobbyService.leaveLobby(player);
     }

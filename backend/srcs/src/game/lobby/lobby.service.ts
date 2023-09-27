@@ -51,6 +51,11 @@ export class LobbyService {
 		if (!player.lobby)
 			return false;
 		const lobby = player.lobby;
+		if (lobby && lobby.instance && lobby.instance.hasStarted && !lobby.instance.hasFinished) {
+			lobby.instance.triggerFinishSurrender(player);
+			return ;
+		}
+		
 		this.playerService.deleteRequests(player.id, player.id);
 		lobby.removePlayer(player);
 		this.logger.log(`${player.id} leave lobby ${lobby.id}`);
@@ -286,6 +291,7 @@ export class LobbyService {
 			return ;
 		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance;
 		console.log("duel:  ", duel, ", lobby.mode = duel ? = ", lobby.mode == LobbyMode.duel, ", instanceClassic ? : ", lobby.instance instanceof ClassicInstance);
+		console.log(lobby.players.values());
 		const players = [...lobby.players.values()];
 		const users = await this.prismaService.user.findMany({
 			where: {

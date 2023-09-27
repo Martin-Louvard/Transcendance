@@ -10,12 +10,22 @@ import { Toaster } from 'react-hot-toast';
 import Dashboard from './components/Dashboard/Dashboard.tsx';
 import Authentication from './components/Authentication/Authentication.tsx';
 import { websocketDisconnected } from './redux/websocketSlice.ts';
+import { Lobby } from './components/Game/Lobby/Lobby.tsx';
+import Leaderboard from './components/Leaderboard/Leaderboard.tsx';
+import FriendsListCard from './components/UserProfileCards/FriendsListCard.tsx';
+import ProfileCard from './components/UserProfileCards/ProfileCard.tsx';
+import ChangeInfo from './components/Forms/UpdateUserInfoForm.tsx';
+import HistoryCard from './components/UserProfileCards/HistoryCard.tsx';
+import TwoFACard from './components/2FA/2FACard.tsx';
+import FriendCard from './components/UserProfileCards/FriendCard.tsx';
+import SideChatMenu from './components/Chat/SideChatMenu.tsx';
 
 export function App() {
   const user = useAppSelector((state) => state.session.user);
   const access_token = useAppSelector((state) => state.session.access_token);
   const isConnected = useAppSelector((state) => state.websocket.isConnected);
   const dispatch = useAppDispatch();
+  const friendProfile = useAppSelector((state) => state.session.friendProfile);
 
   useEffect(() => {
 
@@ -29,11 +39,27 @@ export function App() {
     <Router>
       <Toaster   position="bottom-right"/>
       <Navbar/>
-        <Routes>
-          <Route path="/" element={user && isConnected ? <Dashboard /> : <Authentication/>} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/game/:id" element={<Game />} />
-        </Routes>
+      <div className="dashboard-wrapper">
+        <SideChatMenu />
+        <div className="canvas-wrapper">
+          <Routes>
+            <Route path="/" element={user && isConnected ? <Lobby /> : <Authentication/>} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/game/:id" element={<Game />} />
+            <Route path="/lobby" element={<Lobby />} />
+            <Route path="/profile" element={<ProfileCard />} />
+            <Route path="/leaderboard" element={<Leaderboard/>} />
+            <Route path="/friends" element={<FriendsListCard/>} />
+            <Route path="/profile/edit" element={<ChangeInfo/>} />
+            <Route path="/profile/2fa" element={<TwoFACard/>} />
+            <Route path="/friends/friendprofile" element={<FriendCard userToDisplay={friendProfile}/>} />
+            {
+              user &&
+              <Route path="/profile/history" element={<HistoryCard user={user}/>} />
+            }
+          </Routes>
+        </div>
+      </div>
     </Router>
   )
 }

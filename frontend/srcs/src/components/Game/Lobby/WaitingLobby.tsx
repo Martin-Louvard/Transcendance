@@ -2,7 +2,7 @@ import { Avatar, Button, ButtonGroup, Card, CardContent, Dialog, DialogTitle, Li
 import { ClientEvents, ClientPayloads, LobbySlotCli, LobbySlotType, LobbyType } from "@shared/class";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { WebSocketState, deleteSentInvite, setLobbySlots, setLobbyType, setParams } from "../../../redux/websocketSlice";
+import { WebSocketState, deleteSentInvite, setInLobby, setLobbySlots, setLobbyType, setParams } from "../../../redux/websocketSlice";
 import LoopIcon from '@mui/icons-material/Loop';
 import './Lobby.scss'
 import { CreateMatch } from "./CreateMatch";
@@ -301,11 +301,9 @@ import { Friend, Friendships, Status, UserStatus } from "../../../Types";
 		  payload: request,
 		});
 	  }
-	  
   
 	return (
 	<div style={{display:"flex", flexDirection:'row', height:"100%"}}>
-		{/*<div style={{height:"100vh"}}/>*/}
 	{
 		game && game.params &&
 		<div style={{width: "100%", height: size.height / 2, position:"relative"}}>

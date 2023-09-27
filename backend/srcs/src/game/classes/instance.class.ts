@@ -4,6 +4,7 @@ import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
 import { Injectable } from "@nestjs/common";
+import { findNearest, recalculateBallAngle } from "./classicInstance";
 
 interface Sphere {
 	radius: number;
@@ -86,7 +87,7 @@ export class Instance {
 	maxAcceleration = 5000;
 	private rotationSpeed;
 	automatch: boolean = true;
-	private playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
+	private playerSpawnPos;
 	private params: GameParameters = {
 		classic: false,
 		duel: false,
@@ -136,7 +137,11 @@ export class Instance {
 	public currentCurveForce = new CANNON.Vec3(0, 0, 0)
 	private isRestarting: boolean = false;
 
-	setParams(params: GameParameters) {this.params = params; this.automatch = false };
+	setParams(params: GameParameters) {
+		this.params = params;
+		this.automatch = false
+		this.playerSpawnPos= [[0, 2, params.map.size[1] / 2 - 20], [0, 2, -params.map.size[1] / 2 + 20], [50, 2, 0], [50, 2, 0]]
+	};
 	getParams(): GameParameters {return this.params};
 	isInstanceOfInputPacket(object: any): boolean {
 		return ('code' in object && 'timestamp' in object);
@@ -249,6 +254,28 @@ export class Instance {
 		})
 	}
 
+	triggerFinishSurrender(player: Player) {
+		this.hasFinished = true;
+		this.interval.forEach((e) => {
+			clearInterval(e);
+		})
+		this.lobby.players.forEach((e) => {
+			const payload: ServerPayloads[ServerEvents.LobbyState] = {
+				lobbyId: this.lobby.id,
+				mode: this.lobby.mode,
+				hasStarted: this.hasStarted,
+				hasFinished: this.hasFinished,
+				playersCount: this.lobby.nbPlayers,
+				isSuspended: this.isSuspended,
+				playersInfo: [],
+				team: e.team,
+				winner: player.team == 'visitor' ? 'home' : 'visitor', 
+				score: this.data.score,
+			};
+			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
+		})
+	}
+
 	processInput() {
 
 		let directionVector = new CANNON.Vec3();
@@ -279,15 +306,20 @@ export class Instance {
 			if (e.activeDirections.boost) {
 				console.log("BOOOOSt");
 			}
-			e.body.quaternion.vmult(directionVector, worldVelocity);
-			e.body.velocity.x = worldVelocity.x;
-			e.body.velocity.z = worldVelocity.z;
+			// e.body.quaternion.vmult(directionVector, worldVelocity);
+			if (e.player.team == 'visitor') {
+				e.body.velocity.x = directionVector.x;
+				e.body.velocity.z = directionVector.z;
+			} else {
+				e.body.velocity.x = -directionVector.x;
+				e.body.velocity.z = -directionVector.z;
+			}
 			directionVector.set(0, 0, 0);
 		})
 	}
 
 	ballPhysics() {
-		const minVelocityThreshold = this.params.ball.globalSpeed;
+		const minSpeed = this.params.ball.globalSpeed;
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
@@ -297,10 +329,10 @@ export class Instance {
 				e.body.velocity.vadd(accelerationVector);
 				
 				const velocityMagnitude = e.body.velocity.length();
-				if (velocityMagnitude < minVelocityThreshold) {
-				const velocityDirection = e.body.velocity.unit();
-				e.body.velocity.copy(velocityDirection.scale(minVelocityThreshold));
-			}
+				if (velocityMagnitude < minSpeed) {
+					const velocityDirection = e.body.velocity.unit();
+					e.body.velocity.copy(velocityDirection.scale(minSpeed));
+				}
 		}
 	
 		})
@@ -313,32 +345,20 @@ export class Instance {
 			if (bl.body.id == contact.bi.id) {
 				this.world.players.forEach((pl) => {
 					if (pl.body.id == contact.bj.id) {
-
-						// Calculate the collision normal
 						const collisionNormal = contact.ni;
-			  
-						// Calculate the ball's velocity along the collision normal
 						const ballVelocityAlongNormal = collisionNormal.dot(bl.body.velocity);
-			  
-						// Calculate the new velocity by reversing the component along the normal
 						const newVelocity = bl.body.velocity.vsub(
 						  collisionNormal.scale(2 * ballVelocityAlongNormal)
 						);
-			  
-						// Update the ball's velocity with the new velocity
 						bl.body.velocity.copy(newVelocity);
-			  
-			  
-						// Invert the angular rotation (optional)
 						bl.body.angularVelocity.scale(-0.1);
-			  
-						// Apply an impulse force to the ball's new direction (optional)
-						const impulseStrength = 100;
+						const impulseStrength = this.params.ball.reboundForce;
 						const impulseDirection = new CANNON.Vec3(
 						  Math.floor(Math.random() * 2) - 1,
 						  0,
 						  Math.random()
 						);
+						let angle = recalculateBallAngle(Math.atan2(impulseDirection.z, impulseDirection.x));
 						impulseDirection.normalize();
 						const impulseForce = impulseDirection.scale(impulseStrength);
 						bl.body.applyImpulse(impulseForce, bl.body.position);
@@ -374,11 +394,10 @@ export class Instance {
 			}
 				if (ball && wall) {
 					const impactDirection: CANNON.Vec3 = contact.ri.clone();
-					const angle = Math.atan2(impactDirection.z, impactDirection.x);
-
+					let angle = recalculateBallAngle(Math.atan2(impactDirection.z, impactDirection.x));
 					const ballSpeed = ball.body.velocity.length();
 
-					const impulseForce = (angle * ballSpeed) / 1000;
+					const impulseForce = (angle * ballSpeed * this.params.ball.reboundForce) / 100;
 
 					const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
 					ball.body.applyImpulse(impulseVector, ball.body.position);
@@ -397,7 +416,7 @@ export class Instance {
 
 	ballStart(ball: Sphere) {
 		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
-		const angle = Math.atan2(direction.z, direction.x);
+		let angle = recalculateBallAngle( Math.atan2(direction.z, direction.x));
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
 		const impulseStrength = 500; 
 		ball.body.applyImpulse(direction.scale(impulseStrength), ball.body.position);

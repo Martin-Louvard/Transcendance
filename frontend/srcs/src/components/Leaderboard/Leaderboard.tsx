@@ -20,7 +20,7 @@ const goToUserProfile = (user: User) => {
           method: 'GET',
       };
       try{
-          const response = await fetch(`http://localhost:3001/game/leaderboard`, requestOptions)
+          const response = await fetch(`http://10.33.4.5:3001/game/leaderboard`, requestOptions)
           const data = await response.json();
           setBoard(data);
       }catch(err) {
@@ -39,7 +39,7 @@ const goToUserProfile = (user: User) => {
 
             <li className="item" key={index}  onClick={() => {goToUserProfile(user);}}>
                 <div className='friend-picture'>
-                    <img src={"http://localhost:3001/users/avatar/" + user.username + "/" + user.avatar.split("/").reverse()[0]}/>
+                    <img src={"http://10.33.4.5:3001/users/avatar/" + user.username + "/" + user.avatar.split("/").reverse()[0]}/>
                   </div>
                   <p>{user.username}</p>
                 <p> {`V ${user.victoriesCount} - ${user.defeatCount} D`}</p>

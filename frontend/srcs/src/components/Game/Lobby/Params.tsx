@@ -28,12 +28,12 @@ export const MapParams: React.FC = (props) => {
 				  
 				<Stack spacing={5} direction="row" sx={{ mt: 0, mb: 1 }} alignItems="center">
 				  <p>Width</p>
-				  <Slider size="small" disabled={owner == user?.username || !game.lobbyId ? false : true} value={params.map.size[0]}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
+				  <Slider size="small" disabled={owner == user?.username || !game.lobbyId ? false : true} value={params.map.size[0]}  defaultValue={100} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
 				  onChange={(_, val) => {setMapParam(prev => ({...prev, size: [val as number, prev.size[1]]}))}}/>
 				</Stack>
 				<Stack spacing={5} direction="row" sx={{ mt: 0, mb: 1}} alignItems="center">
 				  <p>Height</p>
-				  <Slider size="small" disabled={owner == user?.username || !game.lobbyId ? false : true} value={params.map.size[1]} defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
+				  <Slider size="small" disabled={owner == user?.username || !game.lobbyId ? false : true} value={params.map.size[1]} defaultValue={200} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
 				  onChange={(_, val) => {setMapParam(prev => ({...prev, size: [prev.size[0], val as number]}))}}/>
 				</Stack>
 			  </Stack>
@@ -41,7 +41,7 @@ export const MapParams: React.FC = (props) => {
 			{/*Goal Size Size*/}
 			<Stack spacing={2} direction="column" sx={{ mt: 30, mb: 1}} alignItems="center">
 				<p>Goal Size</p>
-				<Slider size="small" disabled={owner == user?.username || !game.lobbyId ? false : true} value={params.map.goalSize} defaultValue={0} aria-label="Default" valueLabelDisplay="auto" max={mapParam.size[0]} min={Math.floor(mapParam.size[0] / 8)} sx={sliderStyle}
+				<Slider size="small" disabled={owner == user?.username || !game.lobbyId ? false : true} value={params.map.goalSize} defaultValue={60} aria-label="Default" valueLabelDisplay="auto" max={mapParam.size[0]} min={Math.floor(mapParam.size[0] / 8)} sx={sliderStyle}
 				onChange={(_, val) => {setMapParam(prev => ({...prev, goalSize: val as number}))}}/>
 			</Stack>
 			{/*Median Offset Size*/}
@@ -77,18 +77,13 @@ export const MapParams: React.FC = (props) => {
 			</Stack>
 			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
 			  <p>Rebound Force</p>
-			  <Slider size="small" value={params.ball.reboundForce} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" min={10} max={500} sx={sliderStyle}
+			  <Slider size="small" value={params.ball.reboundForce} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={100} aria-label="Default" valueLabelDisplay="auto" min={50} max={500} sx={sliderStyle}
 			  onChange={(_, val) => {setBallParam(prev => ({...prev, reboundForce: val as number}))}}/>
 			</Stack>
 			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
 			  <p>Acceleration</p>
-			  <Slider size="small" value={params.ball.ballAcceleration} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={0} aria-label="Default" valueLabelDisplay="auto" min={0} max={100} sx={sliderStyle}
+			  <Slider size="small" value={params.ball.ballAcceleration} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={10} aria-label="Default" valueLabelDisplay="auto" min={0} max={100} sx={sliderStyle}
 			  onChange={(_, val) => {setBallParam(prev => ({...prev, ballAcceleration: val as number}))}}/>
-			</Stack>
-			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
-			  <p>Rotation Force</p>
-			  <Slider size="small" value={params.ball.rotationForce} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
-			  onChange={(_, val) => {setBallParam(prev => ({...prev, rotationForce: val as number}))}}/>
 			</Stack>
 		  </Stack>
 	  </Stack>
@@ -112,18 +107,13 @@ export const MapParams: React.FC = (props) => {
 		<Stack spacing={1} direction={size.width > 700 ? "row" : "column"} sx={{color:'white', mb: 1, justifyContent:'center'} } alignItems="center">
 			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1, }} alignItems="center">
 			  <p>Speed</p>
-			  <Slider size="small" value={params.players.speed} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={150} min={10} sx={sliderStyle}
+			  <Slider size="small" value={params.players.speed} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={150} aria-label="Default" valueLabelDisplay="auto" max={300} min={80} sx={sliderStyle}
 			  onChange={(_, val) => {setPlayersParam(prev => ({...prev, speed: val as number}))}}/>
 			</Stack>
 			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
 			  <p>Rotation Speed</p>
 			  <Slider size="small" value={params.players.rotationSpeed} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={100} min={10} sx={sliderStyle}
 			  onChange={(_, val) => {setPlayersParam(prev => ({...prev, rotationSpeed: val as number}))}}/>
-			</Stack>
-			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
-			  <p>Boost Force</p>
-			  <Slider size="small" value={params.players.boostForce} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={500} min={100} sx={sliderStyle}
-			  onChange={(_, val) => {setPlayersParam(prev => ({...prev, boostForce: val as number}))}}/>
 			</Stack>
 		  </Stack>
 	  </Stack>
@@ -146,7 +136,7 @@ export const MapParams: React.FC = (props) => {
 		<p>General Param</p>
 		<Stack spacing={0} direction="column" sx={{mt: 0, mb: 1, color:'white'}} alignItems="center">
 		  <p>Time (seconds)</p>
-		  <Slider size="small" value={params.general.time} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={600} min={10} sx={sliderStyle}
+		  <Slider size="small" value={params.general.time} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={120} aria-label="Default" valueLabelDisplay="auto" max={600} min={10} sx={sliderStyle}
 		  onChange={(_, val) => {setGeneralParam(prev => ({...prev, time: val as number}))}}/>
 		</Stack>
 	  </Stack>

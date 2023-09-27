@@ -82,7 +82,7 @@ const Authentication: React.FC = () => {
   };
 
   return (
-    <div className="auth-wrapper">
+    <div className="auth-wrapper" style={{marginTop:"10vh"}}>
       <div className="auth-card-block">
         <div className="auth-card">
           <button onClick={handleLoginClick}>Login</button>
