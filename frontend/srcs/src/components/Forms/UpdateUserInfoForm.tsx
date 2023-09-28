@@ -27,13 +27,14 @@ const ChangeInfo = () => {
             'Authorization': `Bearer ${access_token}`
         },
         body: JSON.stringify({
-          username: username,
-          email: email,
-          password: password,
+            id: user?.id,
+            username: username,
+            email: email,
+            password: password,
          })
       };
       try{
-        const response =  await fetch(`http://localhost:3001/users/${user?.username}`, requestOptions)
+        const response =  await fetch(`http://localhost:3001/users/${user?.id}`, requestOptions)
         if (response.ok)
         {
             const newUser = await response.json();

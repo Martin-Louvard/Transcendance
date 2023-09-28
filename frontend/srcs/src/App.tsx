@@ -57,16 +57,16 @@ export function App() {
           <Routes>
             <Route path="/" element={user && isConnected ? <Lobby /> : <Authentication/>} />
             <Route path="/about" element={<AboutPage />} />
-              <Route path="/game/:id" element={user && isConnected ? <Game /> : <NotFound />} />
-              <Route path="/profile" element={user && isConnected ? <ProfileCard /> : <NotFound />} />
-              <Route path="/leaderboard" element={user && isConnected ? <Leaderboard/> : <NotFound />} />
-              <Route path="/friends" element={user && isConnected ? <FriendsListCard/> : <NotFound />} />
-              <Route path="/profile/edit" element={user && isConnected ? <ChangeInfo/> : <NotFound />} />
-              <Route path="/profile/2fa" element={user && isConnected ? <TwoFACard/> : <NotFound />} />
-              <Route path="/friends/friendprofile" element={user && isConnected ? <FriendCard userToDisplay={friendProfile}/> : <NotFound />} />
+              <Route path="/game/:id" element={user && isConnected ? <Game /> : null} />
+              <Route path="/profile" element={user && isConnected ? <ProfileCard /> :null} />
+              <Route path="/leaderboard" element={user && isConnected ? <Leaderboard/> :null} />
+              <Route path="/friends" element={user && isConnected ? <FriendsListCard/> :null} />
+              <Route path="/profile/edit" element={user && isConnected ? <ChangeInfo/> :null} />
+              <Route path="/profile/2fa" element={user && isConnected ? <TwoFACard/> :null} />
+              <Route path="/friends/friendprofile" element={user && isConnected ? <FriendCard userToDisplay={friendProfile}/> :null} />
               {
                 user &&
-                <Route path="/profile/history" element={user && isConnected ? <HistoryCard user={user}/> : <NotFound />} />
+                <Route path="/profile/history" element={user && isConnected ? <HistoryCard user={user}/> :null} />
               }
             <Route path={"/*"} element={ <Navigate to="/" replace />}/>
           </Routes>
