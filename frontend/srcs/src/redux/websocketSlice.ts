@@ -21,7 +21,7 @@ export interface WebSocketState {
   sentInvites: GameRequest[];
   full: boolean;
   lobbies: LobbyCli[];
-  lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor' | 'draw', team: 'home' | 'visitor', timestamp: number} | null,
+  lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor' | 'draw', team: 'home' | 'visitor', timestamp: number} | null
   isWaitingToConnect: boolean;
   paramsReceived: boolean;
 }
