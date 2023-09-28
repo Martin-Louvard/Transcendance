@@ -37,12 +37,12 @@ const SignupForm: React.FC = () => {
       dispatch(setSessionUser(user))
       dispatch(setToken(user.access_token))
       dispatch(fetchRelatedUserData(user.id))
-
-      const payloads: ClientPayloads[ClientEvents.AuthState] = {
+      /*const payloads: ClientPayloads[ClientEvents.AuthState] = {
         id: user.id,
         token: user.access_token,
       }
-      socket.emit(ClientEvents.AuthState, payloads);
+
+      socket.emit(ClientEvents.AuthState, payloads);*/
     }catch(error) {
       console.log(error)
     }
@@ -67,6 +67,7 @@ const SignupForm: React.FC = () => {
     if ( password !== confirmPassword)
         return toast.error("Passwords do not match")
     signup()
+    
   };
 
   return (

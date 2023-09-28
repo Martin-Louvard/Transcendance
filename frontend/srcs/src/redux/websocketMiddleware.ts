@@ -30,6 +30,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('block_user', (data: any) => {store.dispatch(updateBlockStatus(data))})
         socket.on('create_chat', (data: any) => {store.dispatch(createChat(data))});
         socket.on('leave_chat', (data: any) => {store.dispatch(leaveChat(data))});
+        socket.on('new_signup', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('change_owner', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('delete_chat', (data: any) => {store.dispatch(leaveChat(data))});
         socket.on('update_chat', (data: any) => {store.dispatch(updateOneChat(data))});
@@ -106,6 +107,13 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
             socket.emit(ClientEvents.StartGame);
           }
           break;
+
+      case 'NEW_SIGNUP':
+      if (socket && socket.connected) {
+        console.log("coucouc")
+        socket.emit('new_signup');
+      }
+      break;
 
       case 'WEBSOCKET_SEND_DELETE_GAME_INVITATION':
         if (socket && socket.connected) {
