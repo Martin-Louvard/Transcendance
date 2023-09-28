@@ -808,6 +808,10 @@ export class AppGateway
       const updatedFriend = await this.prisma.friends.update({
         where: { id: friendRecv.id },
         data: { status: 'BLOCKED' },
+        include: {
+          friend: true,
+          user: true,
+        },
       });
       this.server.emit('block_user', updatedFriend);
     } else {
@@ -820,7 +824,7 @@ export class AppGateway
       const updatedFriend = await this.prisma.friends.update({
         where: { id: createdFriendShip.id },
         data: { status: 'BLOCKED' },
-        include: { friend: true },
+        include: { friend: true, user: true },
       });
       this.server.emit('block_user', updatedFriend);
     }
