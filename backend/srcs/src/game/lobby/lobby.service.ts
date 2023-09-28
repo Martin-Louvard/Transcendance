@@ -290,6 +290,8 @@ export class LobbyService {
 			return ;
 		const players = [...lobby.players.values()];
 		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance || players.length <= 2;
+		if (players.length < 2)
+			return ;
 		const users = await this.prismaService.user.findMany({
 			where: {
 				id: {in: duel ? [players[0].id, players[1].id] : [players[0].id, players[1].id, players[2].id, players[3].id]},
@@ -297,6 +299,8 @@ export class LobbyService {
 		});
 		const visitorInfos = players.filter((pl) => pl.team == 'visitor');
 		const homeInfos = players.filter((pl) => pl.team == 'home');
+		if (homeInfos.length < 1 || visitorInfos.length < 1)
+			return ;
 		const visitor = await this.prismaService.user.findMany({
 			where: {
 				id: {in: duel ? [visitorInfos[0].id] : [visitorInfos[0].id, visitorInfos[1].id]},

@@ -88,7 +88,7 @@ export const Lobby: React.FC = (props) => {
         </div>
         }
         {
-          lobbyType != LobbyType.none && !game.isPlaying &&
+          lobbyType != LobbyType.none && !game.isPlaying && !game.lobbyId &&
             <Button color={'primary'} onClick={() => {handleReturnButton()}}>
               <ArrowCircleLeftIcon />
             </Button>

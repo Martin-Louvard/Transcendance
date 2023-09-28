@@ -28,7 +28,6 @@ export class Instance {
 	private maxAcceleration = 5000;
 	private rotationSpeed;
 	automatch: boolean = true;
-	private playerSpawnPos;
 	private params: GameParameters = {
 		classic: false,
 		duel: false,
@@ -53,6 +52,7 @@ export class Instance {
 			time: 180,
 		}
 	};
+	private playerSpawnPos = [[0, 2, this.params.map.size[1] / 2 - 20], [0, 2, -this.params.map.size[1] / 2 + 20], [50, 2, this.params.map.size[1] / 2 - 20], [50, 2, -this.params.map.size[1] / 2 + 20]]
 
 	// un player quitte pendant le temps d'attente du demarage
 	public data: GameData = {
