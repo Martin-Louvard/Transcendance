@@ -73,10 +73,6 @@ export const Lobby: React.FC = (props) => {
     dispatch(setLobbyType(LobbyType.none))
   }
 
-  useEffect(() => {
-    console.log("type: ", lobbyType);
-  }, [])
-
   return (
     <div style={{position: "relative", width: "100%", height:"100%"}}>
        <div style={{position: "relative", display:"flex", height:"100%", width:"100%", alignItems:'center', justifyContent: "center", flexDirection:"column"}}>

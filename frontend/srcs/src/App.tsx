@@ -46,13 +46,6 @@ export function App() {
     dispatch({type: 'NEW_SIGNUP'});
   },[isConnected])
 
-  const ProtectedRoute = ({ access_token }: {access_token: string | undefined}) => {
-    if (!access_token) {
-      return <Navigate to="/" replace />;
-    }
-  
-    return <Outlet/>;
-  };
 
   return (
     <Router>
@@ -64,19 +57,17 @@ export function App() {
           <Routes>
             <Route path="/" element={user && isConnected ? <Lobby /> : <Authentication/>} />
             <Route path="/about" element={<AboutPage />} />
-            <Route element={<ProtectedRoute access_token={access_token}/>}>
-              <Route path="/game/:id" element={<Game />} />
-              <Route path="/profile" element={<ProfileCard />} />
-              <Route path="/leaderboard" element={<Leaderboard/>} />
-              <Route path="/friends" element={<FriendsListCard/>} />
-              <Route path="/profile/edit" element={<ChangeInfo/>} />
-              <Route path="/profile/2fa" element={<TwoFACard/>} />
-              <Route path="/friends/friendprofile" element={<FriendCard userToDisplay={friendProfile}/>} />
+              <Route path="/game/:id" element={user && isConnected ? <Game /> : null} />
+              <Route path="/profile" element={user && isConnected ? <ProfileCard /> : null} />
+              <Route path="/leaderboard" element={user && isConnected ? <Leaderboard/> : null} />
+              <Route path="/friends" element={user && isConnected ? <FriendsListCard/> : null} />
+              <Route path="/profile/edit" element={user && isConnected ? <ChangeInfo/> : null} />
+              <Route path="/profile/2fa" element={user && isConnected ? <TwoFACard/> : null} />
+              <Route path="/friends/friendprofile" element={user && isConnected ? <FriendCard userToDisplay={friendProfile}/> : null} />
               {
                 user &&
-                <Route path="/profile/history" element={<HistoryCard user={user}/>} />
+                <Route path="/profile/history" element={user && isConnected ? <HistoryCard user={user}/> : null} />
               }
-            </Route>
             <Route path={"/*"} element={ <Navigate to="/" replace />}/>
           </Routes>
         {/* </div> */}

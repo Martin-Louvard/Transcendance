@@ -101,7 +101,6 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
       return(data);
     }
   }catch(err) {
-    console.log(err);
   }
 }
 

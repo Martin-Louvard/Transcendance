@@ -305,10 +305,10 @@ export class UsersService {
     twoFactorAuthenticationCode: string,
     username: string,
   ) {
+
     const user = await this.prisma.user.findUnique({ where: { username } });
     if (!user)
       throw new NotFoundException(`No user found for username: ${username}`);
-
     return authenticator.verify({
       token: twoFactorAuthenticationCode,
       secret: user.twoFASecret,

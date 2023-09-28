@@ -33,7 +33,6 @@ const TwoFACard: React.FC = () => {
   
           }
         }catch(err) {
-          console.log(err);
         }
       }
 
@@ -59,7 +58,6 @@ const TwoFACard: React.FC = () => {
             navigate("/profile")
           }
         }catch(err) {
-          console.log(err);
         }
       }
 

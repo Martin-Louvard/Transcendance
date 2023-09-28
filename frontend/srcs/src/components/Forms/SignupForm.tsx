@@ -27,9 +27,12 @@ const SignupForm: React.FC = () => {
     };
 
     try{
-      const response = await fetch('http://10.33.3.1:3001/users', requestOptions)
-      if (response.status !== 201) 
-        return toast.error("Username or email is already used by someone else")
+      const response = await fetch('http://localhost:3001/users', requestOptions)
+      if (response.status !== 201){
+        toast.error("Username or email is already used by someone else")
+        return 
+      }
+
       const user = await login(username,password)
       if (!user)
         return toast.error("Account created but signin failed")
@@ -44,7 +47,6 @@ const SignupForm: React.FC = () => {
 
       socket.emit(ClientEvents.AuthState, payloads);*/
     }catch(error) {
-      console.log(error)
     }
   }
 

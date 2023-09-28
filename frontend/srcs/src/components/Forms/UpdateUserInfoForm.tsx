@@ -43,7 +43,6 @@ const ChangeInfo = () => {
            navigate("/profile");
         }
       }catch(err) {
-        console.log(err);
       }
     }
     useEffect(()=>{},[changeInfo])

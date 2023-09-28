@@ -26,7 +26,6 @@ const Navbar: React.FC = () => {
   },[friendships])
 
   const toggleMenu = () => {
-    console.log(isMenuOpen)
     if (isMenuOpen=== "open-menu")
       setIsMenuOpen("close-menu")
     else 
