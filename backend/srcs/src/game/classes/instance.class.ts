@@ -1,72 +1,13 @@
 import { Timeout } from "@nestjs/schedule";
-import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo} from "@shared/class";
+import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo, GameParameters, World, Sphere, Paddle} from "@shared/class";
 import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
 import { Injectable } from "@nestjs/common";
 import { findNearest, recalculateBallAngle } from "./classicInstance";
 
-interface Sphere {
-	radius: number;
-	body: CANNON.Body | null;
-	contactVelocity: CANNON.Vec3;
-}
-
-interface Paddle {
-	size: [number, number, number],
-	acceleration: CANNON.Vec3,
-	body: CANNON.Body | null;
-	previousVelocity: CANNON.Vec3;
-	player: Player;
-	lastMovement: number | null;
- 	activeDirections : {
-		up: boolean,
-		right: boolean,
-		down: boolean,
-		left: boolean,
-		boost: boolean,
-		rotRight: boolean,
-		rotLeft: boolean,
-	};	
-}
-
-interface World {
-	mapHeight:  number;
-	mapWidth: number;
-	world: CANNON.World | null;
-	groundBody: CANNON.Body | null;
-	players: Map<number, Paddle> | null;
-	walls: CANNON.Body[] | null;
-	balls: Sphere[] | null;
-}
-
-interface GameParameters {
-	classic: boolean,
-	duel : boolean,
-	map : {
-		size: [number, number], // width, height
-		goalSize: number, // width
-		medianOffset: number, // length
-	},
-	ball : {
-		globalSpeed: number, // speed
-		reboundForce: number, // force du rebond
-		ballAcceleration: number, // m / sec
-		rotationForce: number, // force de rotation
-	},
-	players: {
-		speed: number, // vitesse X et Z
-		rotationSpeed: number, // vitesse de rotation
-		boostForce: number, // force du boost
-	},
-	general : {
-		time: number, // temps d'une game
-	}
-}
-
 export class Instance {
 	constructor(lobby: Lobby) {
-		console.log("Instance created");
 		this.lobby = lobby;
 		this.id = Instance.nbInstances++;
 	}
@@ -83,8 +24,8 @@ export class Instance {
 	private moveDistance: number = 60; // this could be sended by the host of the game in the game parameter
 	private ballContactVelocity: CANNON.Vec3;
 	public startTime: number;
-	accelerationRate = 50;
-	maxAcceleration = 5000;
+	private accelerationRate = 50;
+	private maxAcceleration = 5000;
 	private rotationSpeed;
 	automatch: boolean = true;
 	private playerSpawnPos;
@@ -106,6 +47,7 @@ export class Instance {
 			speed: 60,
 			rotationSpeed: 50,
 			boostForce: 20,
+			paddleSize: [12, 3, 2],
 		},
 		general: {
 			time: 180,
@@ -304,7 +246,6 @@ export class Instance {
 				e.body.quaternion = rotationQuaternion.mult(e.body.quaternion);
 			}
 			if (e.activeDirections.boost) {
-				console.log("BOOOOSt");
 			}
 			// e.body.quaternion.vmult(directionVector, worldVelocity);
 			if (e.player.team == 'visitor') {
@@ -323,10 +264,18 @@ export class Instance {
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
+
+			if ((e.body.position.x < -(this.params.map.size[0] / 2) || e.body.position.x > (this.params.map.size[0] / 2))
+				||
+				(e.body.position.z < -(this.params.map.size[1] / 2) || e.body.position.z > (this.params.map.size[1] / 2))
+		 		) {
+					this.restartRound();
+				}
 			if (!this.isRestarting) {
 
-				const accelerationVector = e.body.velocity.clone().unit().scale(this.params.ball.ballAcceleration);
-				e.body.velocity.vadd(accelerationVector);
+				// const accelerationVector = e.body.velocity.clone().unit().scale(this.params.ball.ballAcceleration);
+				// console.log(accelerationVector);
+				// e.body.velocity.vadd(accelerationVector);
 				
 				const velocityMagnitude = e.body.velocity.length();
 				if (velocityMagnitude < minSpeed) {
@@ -352,7 +301,7 @@ export class Instance {
 						);
 						bl.body.velocity.copy(newVelocity);
 						bl.body.angularVelocity.scale(-0.1);
-						const impulseStrength = this.params.ball.reboundForce;
+						const impulseStrength = this.params.ball.reboundForce * 2;
 						const impulseDirection = new CANNON.Vec3(
 						  Math.floor(Math.random() * 2) - 1,
 						  0,
@@ -383,11 +332,9 @@ export class Instance {
 					const ballX = ball.body.position.x;
 					if (ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2) {
 				if (wall.id == 99) {
-					console.log('HOME score 1 point');
 					this.data.score.home += 1;
 					this.restartRound();
 				} else if (wall.id == 100) {
-					console.log("VISITOR score 1 point");
 					this.data.score.visitor += 1;
 					this.restartRound();
 				}
@@ -514,7 +461,7 @@ export class Instance {
 		this.world.players = new Map<number, Paddle>();
 		this.data.players = new Array<PlayerBody>();
 		let i: number = 0;
-		const paddleSize:[number, number, number] = [12, 3, 2];
+		const paddleSize = this.params.players.paddleSize;
 		const playerMaterial: CANNON.Material = new CANNON.Material('slippery');
 		this.lobby.players.forEach((elem) => {
 			const paddle: Paddle = {
@@ -553,7 +500,6 @@ export class Instance {
 	}
 
 	generate() {
-		console.log(this.params);
 		if (this.params) {
 			let angleMax = Math.PI / 2 * (1 / 6);
 			this.rotationSpeed = (this.params.players.rotationSpeed / 100) * (angleMax);

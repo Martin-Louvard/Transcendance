@@ -1,4 +1,5 @@
 import * as CANNON from 'cannon-es'
+import { Player } from 'src/game/player/player.class';
 import { User } from 'src/users/entities/user.entity';
 
 export enum LobbyMode {
@@ -78,6 +79,8 @@ export enum ClientEvents
   CreateLobby = 'client.create.lobby',
 
   KickLobby = 'client.kick.lobby',
+
+  CreateAndInvite = 'client.create.and.invite.lobby',
 }
 
 export interface LobbyCli {
@@ -174,7 +177,8 @@ export type ClientPayloads = {
 	}
 	[ClientEvents.CreateLobby]: {
 		id: number,
-	}
+	},
+	[ClientEvents.CreateAndInvite]: number, // id
 };
 
 export interface PlayerBody {
@@ -260,21 +264,46 @@ export interface GameParameters {
 		speed: number, // vitesse X et Z
 		rotationSpeed: number, // vitesse de rotation
 		boostForce: number, // force du boost
+		paddleSize: [number, number, number],
 	},
 	general : {
 		time: number, // temps d'une game
 	}
 }
 
-	//  model Game {
-	//	id        Int      @id @default(autoincrement())
-	//	scoreHome     Int
-	//	scoreVisitor  Int
-	//	players   User[]   @relation("PlayersInGame")
-	//	home      User[]   @relation("HomeTeam")
-	//	visitor   User[]   @relation("VisitorTeam")
-	//	createdAt DateTime @default(now())
-	//  }
+export interface Sphere {
+	radius: number;
+	body: CANNON.Body | null;
+	contactVelocity: CANNON.Vec3;
+}
+
+export interface Paddle {
+	size: [number, number, number],
+	acceleration: CANNON.Vec3,
+	body: CANNON.Body | null;
+	previousVelocity: CANNON.Vec3;
+	player: Player;
+	lastMovement: number | null;
+ 	activeDirections : {
+		up: boolean,
+		right: boolean,
+		down: boolean,
+		left: boolean,
+		boost: boolean,
+		rotRight: boolean,
+		rotLeft: boolean,
+	};	
+}
+
+export interface World {
+	mapHeight:  number;
+	mapWidth: number;
+	world: CANNON.World | null;
+	groundBody: CANNON.Body | null;
+	players: Map<number, Paddle> | null;
+	walls: CANNON.Body[] | null;
+	balls: Sphere[] | null;
+}
 
 export interface Game {
 	id: number;

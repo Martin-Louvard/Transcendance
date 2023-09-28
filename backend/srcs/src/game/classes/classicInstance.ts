@@ -1,68 +1,10 @@
 import { Timeout } from "@nestjs/schedule";
-import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo} from "@shared/class";
+import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo, Sphere, Paddle, GameParameters, World} from "@shared/class";
 import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
 
-interface Sphere {
-	radius: number;
-	body: CANNON.Body | null;
-	contactVelocity: CANNON.Vec3;
-}
-
-interface Paddle {
-	size: [number, number, number],
-	acceleration: CANNON.Vec3,
-	body: CANNON.Body | null;
-	previousVelocity: CANNON.Vec3;
-	player: Player;
-	lastMovement: number | null;
- 	activeDirections : {
-		up: boolean,
-		right: boolean,
-		down: boolean,
-		left: boolean,
-		boost: boolean,
-		rotRight: boolean,
-		rotLeft: boolean,
-	};	
-}
-
-interface World {
-	mapHeight:  number;
-	mapWidth: number;
-	world: CANNON.World | null;
-	groundBody: CANNON.Body | null;
-	players: Map<number, Paddle> | null;
-	walls: CANNON.Body[] | null;
-	balls: Sphere[] | null;
-}
-
-interface GameParameters {
-	classic: boolean,
-	duel : boolean,
-	map : {
-		size: [number, number], // width, height
-		goalSize: number, // width
-		medianOffset: number, // length
-	},
-	ball : {
-		globalSpeed: number, // speed
-		reboundForce: number, // force du rebond
-		ballAcceleration: number, // m / sec
-		rotationForce: number, // force de rotation
-	},
-	players: {
-		speed: number, // vitesse X et Z
-		rotationSpeed: number, // vitesse de rotation
-		boostForce: number, // force du boost
-	},
-	general : {
-		time: number, // temps d'une game
-	}
-}
 export function recalculateBallAngle(angle: number): number {
-	console.log('angle : ', angle);
 	if (angle < 0.8)
 		return 0.8;
 	else if (angle > 2.5)
@@ -77,7 +19,6 @@ export function findNearest(X: number, nb1: number, nb2: number): number {
 
 export class ClassicInstance {
 	constructor(lobby: Lobby) {
-		console.log("ClassicInstance created");
 		this.lobby = lobby;
 		this.id = ClassicInstance.nbInstances++;
 	}
@@ -119,6 +60,7 @@ export class ClassicInstance {
 			speed: 120,
 			rotationSpeed: 50,
 			boostForce: 20,
+			paddleSize: [12, 3, 2],
 		},
 		general: {
 			time: 120,
@@ -282,7 +224,12 @@ export class ClassicInstance {
 			e.body.position.y = e.radius;
 			const accelerationVector = e.body.velocity.clone().unit().scale(this.params.ball.ballAcceleration);
 			e.body.velocity.vadd(accelerationVector);
-			
+			if ((e.body.position.x < -(this.params.map.size[0] / 2) || e.body.position.x > (this.params.map.size[0] / 2))
+				||
+				(e.body.position.z < -(this.params.map.size[1] / 2) || e.body.position.z > (this.params.map.size[1] / 2))
+		 		) {
+					this.restartRound();
+			}
 			const velocityMagnitude = e.body.velocity.length();
 			if (!this.isRestarting && velocityMagnitude < minSpeed) {
 				const velocityDirection = e.body.velocity.unit();
@@ -350,11 +297,9 @@ export class ClassicInstance {
 					const ball = this.world.balls.find(ball => ball.body === bi || ball.body === bj);
 					const wall = this.world.walls.find(wall => wall == bj || wall == bi);
 				if (wall.id == 99) {
-					console.log('HOME score 1 point');
 					this.data.score.home += 1;
 					this.restartRound();
 				} else if (wall.id == 100) {
-					console.log("VISITOR score 1 point");
 					this.data.score.visitor += 1;
 					this.restartRound();
 				}
@@ -381,9 +326,7 @@ export class ClassicInstance {
 	}
 
 	ballStart(ball: Sphere) {
-		console.log(Math.random());
 		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
-		console.log(direction);
 		let angle = recalculateBallAngle(Math.atan2(direction.z, direction.x));
 		// si angle entre -> (PI/6 - 11PI/6) - (5PI/6 - 7PI/6) => set langle de la ball a l'angle le plus proche.
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
@@ -523,7 +466,6 @@ export class ClassicInstance {
 	}
 
 	generate() {
-		console.log(this.params);
 		if (this.params) {
 			let angleMax = Math.PI / 2 * (1 / 6);
 			this.rotationSpeed = (this.params.players.rotationSpeed / 100) * (angleMax);

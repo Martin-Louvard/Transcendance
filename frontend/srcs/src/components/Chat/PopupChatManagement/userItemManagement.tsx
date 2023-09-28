@@ -13,6 +13,7 @@ import {
   setFriendProfile,
 } from "../../../redux/sessionSlice.ts";
 import { useNavigate } from "react-router-dom";
+import InviteGameButton from "./inviteToGameButton.tsx";
 
 const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannels, setIsOpen:React.Dispatch<React.SetStateAction<boolean>> }) => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -67,6 +68,9 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
       </div>
       <div>
         {isKickable() ? <MuteUserButton chat={chat} user={user} /> : ""}{" "}
+      </div>
+      <div>
+        <InviteGameButton user={user}/>
       </div>
       <div>
         <BlockUserButton user={user} />

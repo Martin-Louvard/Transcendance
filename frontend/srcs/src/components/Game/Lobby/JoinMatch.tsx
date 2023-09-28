@@ -63,11 +63,9 @@ export const JoinMatch: React.FC = () => {
 	  )))
   
 	}, [game.lobbies])
-	const [dense, setDense] = useState(false);
-	const [secondary, setSecondary] = useState(false);
 	return (
-	  <div sx={{width:"100%"}}>
-		<div item xs={12} md={6} >
+	  <div style={{width:"100%"}}>
+		<div item={+true} xs={12} md={6} >
 			<Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
 			  Avalaible Lobbies
 			</Typography>

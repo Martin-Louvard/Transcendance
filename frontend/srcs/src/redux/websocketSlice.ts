@@ -44,7 +44,6 @@ const initialState: WebSocketState = {
   params: {
    classic: false,
    duel: false,
-    
    map: {
     size: [100, 200],
     goalSize: 40,
@@ -60,6 +59,7 @@ const initialState: WebSocketState = {
     speed: 120, // vitesse X et Z
     rotationSpeed: 50, // vitesse de rotation
     boostForce: 10, // force du boost
+    paddleSize: [12, 3, 2],
    },
    general: {
     time: 120,
@@ -160,68 +160,70 @@ const websocketSlice = createSlice({
     resetLobbyData: (state) => {
       if (state.LobbyType != LobbyType.score)
         state.LobbyType = LobbyType.none;
-      state.balls = [];
-      state.elapsedTime = 0;
-      state.full = false;
-      state.isPlaying = false;
-      state.lobbyId = null;
-      state.lobbySlots = [];
-      state.mapHeight = 0;
-      state.players = [];
-      state.owner = null;
-      state.playersInfo = [];
-      state.mapWidth = 0;
-      state.params = {
-   classic: false,
-   duel: false,
-    
-   map: {
-    size: [100, 200],
-    goalSize: 40,
-    medianOffset: 10,
-   },
-   ball: {
-    globalSpeed: 50, // speed
-    reboundForce: 100, // force du rebond
-    ballAcceleration: 10, // m / sec
-    rotationForce: 1, // force de rotation
-   },
-   players: {
-    speed: 120, // vitesse X et Z
-    rotationSpeed: 50, // vitesse de rotation
-    boostForce: 10, // force du boost
-   },
-   general: {
-    time: 120,
-   }
-  }
+          state.balls = [];
+          state.elapsedTime = 0;
+          state.full = false;
+          state.isPlaying = false;
+          state.lobbyId = null;
+          state.lobbySlots = [];
+          state.mapHeight = 0;
+          state.players = [];
+          state.owner = null;
+          state.playersInfo = [];
+          state.mapWidth = 0;
+          websocketSlice.caseReducers.resetParams(state);
+      //     state.params = {
+      // classic: false,
+      // duel: false,
+        
+      // map: {
+      //   size: [100, 200],
+      //   goalSize: 40,
+      //   medianOffset: 10,
+      // },
+      // ball: {
+      //   globalSpeed: 50, // speed
+      //   reboundForce: 100, // force du rebond
+      //   ballAcceleration: 10, // m / sec
+      //   rotationForce: 1, // force de rotation
+      // },
+      // players: {
+      //   speed: 120, // vitesse X et Z
+      //   rotationSpeed: 50, // vitesse de rotation
+      //   boostForce: 10, // force du boost
+      // },
+      // general: {
+      //   time: 120,
+      // }
+      // }
        state.score = {'home': 0, 'visitor': 0};
     },
     resetParams: (state) => {
       state.params = {
-   classic: false,
-   duel: false,
-    
-   map: {
-    size: [100, 200],
-    goalSize: 40,
-    medianOffset: 10,
-   },
-   ball: {
-    globalSpeed: 50, // speed
-    reboundForce: 100, // force du rebond
-    ballAcceleration: 10, // m / sec
-    rotationForce: 1, // force de rotation
-   },
-   players: {
-    speed: 120, // vitesse X et Z
-    rotationSpeed: 50, // vitesse de rotation
-    boostForce: 10, // force du boost
-   },
-   general: {
-    time: 120,
-   }
-  }
+        classic: false,
+        duel: false,
+          
+        map: {
+          size: [100, 200],
+          goalSize: 40,
+          medianOffset: 10,
+        },
+        ball: {
+          globalSpeed: 50, // speed
+          reboundForce: 100, // force du rebond
+          ballAcceleration: 10, // m / sec
+          rotationForce: 1, // force de rotation
+        },
+        players: {
+          speed: 120, // vitesse X et Z
+          rotationSpeed: 50, // vitesse de rotation
+          boostForce: 10, // force du boost
+          paddleSize: [12, 3, 2],
+        },
+        general: {
+          time: 120,
+        }
+      }
     },
     setDuel: (state, action) => {
       state.params.duel = action.payload;
@@ -243,30 +245,31 @@ const websocketSlice = createSlice({
         state.players = [];
         state.owner = null;
         state.playersInfo = [];
-        state.params = {
-          classic: false,
-          duel: false,
+        websocketSlice.caseReducers.resetParams(state);
+        // state.params = {
+        //   classic: false,
+        //   duel: false,
            
-          map: {
-           size: [100, 200],
-           goalSize: 40,
-           medianOffset: 10,
-          },
-          ball: {
-           globalSpeed: 50, // speed
-           reboundForce: 100, // force du rebond
-           ballAcceleration: 10, // m / sec
-           rotationForce: 1, // force de rotation
-          },
-          players: {
-           speed: 120, // vitesse X et Z
-           rotationSpeed: 50, // vitesse de rotation
-           boostForce: 10, // force du boost
-          },
-          general: {
-           time: 120,
-          }
-         }
+        //   map: {
+        //    size: [100, 200],
+        //    goalSize: 40,
+        //    medianOffset: 10,
+        //   },
+        //   ball: {
+        //    globalSpeed: 50, // speed
+        //    reboundForce: 100, // force du rebond
+        //    ballAcceleration: 10, // m / sec
+        //    rotationForce: 1, // force de rotation
+        //   },
+        //   players: {
+        //    speed: 120, // vitesse X et Z
+        //    rotationSpeed: 50, // vitesse de rotation
+        //    boostForce: 10, // force du boost
+        //   },
+        //   general: {
+        //    time: 120,
+        //   }
+        //  }
       }
       state.lobbyId = action.payload.lobbyId;
       state.isPlaying = action.payload.hasStarted

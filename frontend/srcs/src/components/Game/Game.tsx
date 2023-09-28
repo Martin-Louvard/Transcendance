@@ -201,8 +201,7 @@ export const Goals: React.FC = (props) => {
 
 	useEffect(() => {
 		if (game.LobbyType == LobbyType.auto) {
-			console.log("salut");
-			const params: GameParameters = JSON.parse(JSON.stringify(game.params));
+ 			const params: GameParameters = JSON.parse(JSON.stringify(game.params));
 			params.map.size[1] = 200;
 			params.map.goalSize = 40;
 			dispatch(setParams(params));
@@ -455,27 +454,24 @@ export const Render: React.FC = (props) => {
 	return (
 		game.balls && game.players ?
 		<>
-
-				{/* <TrackballControls noPan noZoom/> */}
-				{/* <OrbitControls/> */}
-					<directionalLight position={[1, 2, 3]} intensity={1.5}/>
-					<ambientLight intensity={0.5}/>
-					<GrassField position={[0, 0, 0]} width={game.mapHeight} height={game.mapWidth}/>
-					<Camera player={me} classic={game.params.classic} mapSize={{x: game.mapWidth, y: game.mapHeight}}/>
-					 {
-						!game.params.classic &&
-					 		<Goals/>
-					 }
-					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, game.mapHeight / 2]} />
-					<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, -game.mapHeight / 2]}/>
-					<Wall size={[2, 25, game.mapHeight]} position={[game.mapWidth / 2, 5, 0]} />
-					<Wall size={[2, 25, game.mapHeight]} position={[-game.mapWidth / 2, 5, 0]} />
-					<mesh>
-						<boxBufferGeometry args={[game.mapWidth, 1.5, 2]}/>
-						<meshBasicMaterial color={"white"}/>
-					</mesh>
-					{balls}/
-					{players}
+			<directionalLight position={[1, 2, 3]} intensity={1.5}/>
+			<ambientLight intensity={0.5}/>
+			<GrassField position={[0, 0, 0]} width={game.mapHeight} height={game.mapWidth}/>
+			<Camera player={me} classic={game.params.classic} mapSize={{x: game.mapWidth, y: game.mapHeight}}/>
+				{
+				!game.params.classic &&
+					<Goals/>
+				}
+			<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, game.mapHeight / 2]} />
+			<Wall size={[game.mapWidth, 25, 2]} position={[0, 5, -game.mapHeight / 2]}/>
+			<Wall size={[2, 25, game.mapHeight]} position={[game.mapWidth / 2, 5, 0]} />
+			<Wall size={[2, 25, game.mapHeight]} position={[-game.mapWidth / 2, 5, 0]} />
+			<mesh>
+				<boxBufferGeometry args={[game.mapWidth, 1.5, 2]}/>
+				<meshBasicMaterial color={"white"}/>
+			</mesh>
+			{balls}/
+			{players}
 		</>
 		: 
 		<></>

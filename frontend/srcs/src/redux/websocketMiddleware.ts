@@ -139,6 +139,13 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         break ;
       } 
 
+      case 'WEBSOCKET_SEND_CREATE_AND_INVITE': {
+        if (socket && socket.connected) {
+          socket.emit(ClientEvents.CreateAndInvite, action.payload);
+        }
+        break ;
+      } 
+
       case 'WEBSOCKET_SEND_PARAMETERS':
         if (socket && socket.connected) {
           socket.emit(ClientEvents.ParameterState, action.payload);

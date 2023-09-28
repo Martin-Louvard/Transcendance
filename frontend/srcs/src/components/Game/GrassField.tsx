@@ -118,13 +118,6 @@ export function GrassField(props) {
         //grassParticles.material.uniforms.time.value = t;
 
     }
-
-	//useFrame((state, delta) => {
-	//	//console.log(delta);
-	//	//update(delta);
-		
-	//})
-
 	return (
 		<></>
 	)

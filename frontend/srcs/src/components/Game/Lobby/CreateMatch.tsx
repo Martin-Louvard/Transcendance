@@ -43,6 +43,7 @@ import toast, { Toaster } from "react-hot-toast";
 	  speed: 120, // vitesse X et Z
 	  rotationSpeed: 50, // vitesse de rotation
 	  boostForce: 10, // force du boost
+	  paddleSize: [12, 3, 2],
 	})
 	const [generalParam, setGeneralParam] = useState({
 	  time: 120,

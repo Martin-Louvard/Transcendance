@@ -138,7 +138,6 @@ export class Lobby {
 		try {
 
 			if (player.lobby == null || !player || !player.socket) {
-				console.log("remove player error");
 				return false;
 			}
 			player.socket.leave(this.id);
@@ -195,7 +194,6 @@ export class Lobby {
 			})
 			return false;
 		} catch(error) {
-			console.log(error);
 		}
 	}
 	setPlayerOffline(player: Player):boolean {

@@ -75,7 +75,6 @@ export class LobbyService {
 	}
 
 	dispatchEvent() {
-		console.log("dispatching event");
 		this.listeners.forEach((e) => {
 			e.emit(
 				ServerEvents.ListLobbies,
@@ -110,8 +109,9 @@ export class LobbyService {
 			this.lobbies.set(lobby.id, lobby);
 			lobby.dispatchLobbyState();
 			this.dispatchEvent();
+			return lobby;
 		} catch (error) {
-			return error
+			return null;
 		}
 	}
 
@@ -155,7 +155,6 @@ export class LobbyService {
 				this.dispatchEvent();
 			}
 		} catch (error) {
-			console.log(error);
 			return error
 		}
 	}
@@ -290,8 +289,6 @@ export class LobbyService {
 		if (!lobby)
 			return ;
 		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance;
-		console.log("duel:  ", duel, ", lobby.mode = duel ? = ", lobby.mode == LobbyMode.duel, ", instanceClassic ? : ", lobby.instance instanceof ClassicInstance);
-		console.log(lobby.players.values());
 		const players = [...lobby.players.values()];
 		const users = await this.prismaService.user.findMany({
 			where: {
@@ -364,7 +361,6 @@ export class LobbyService {
 		  }
 		}
 		
-		//console.log(res);
 
 	async getGames(playerId: number) {
 		const gamesForPlayer = await this.prismaService.game.findMany({

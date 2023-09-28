@@ -16,14 +16,12 @@ const MuteUserButton = ({ user, chat }:{
 
 
     const handleKickButton = () => {
-      console.log("hey")
       if (isClicked) {
         setIsClicked(false);
       }
       else {
         setIsClicked(true);
       }
-      console.log(isClicked)
     };
 
     const handleMuteTime = (time: number) => {

@@ -41,7 +41,6 @@ const ChangeInfo = () => {
             toast.success("Information updated")
             dispatch(setSessionUser(newUser))
            navigate("/profile");
-            console.log(ContentOptions.PROFILE)
         }
       }catch(err) {
         console.log(err);

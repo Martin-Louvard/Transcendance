@@ -1,4 +1,4 @@
-import { Avatar, Button, ButtonGroup, Card, CardContent, Dialog, DialogTitle, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Slider, Stack } from "@mui/material";
+import { Avatar, Button, ButtonGroup, Card, CardContent, Dialog, DialogTitle, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Slider, Stack, Typography } from "@mui/material";
 import { ClientEvents, ClientPayloads, LobbySlotCli, LobbySlotType, LobbyType } from "@shared/class";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Friend, Friendships } from "src/Types";
@@ -75,16 +75,16 @@ export const MapParams: React.FC = (props) => {
 			  <Slider size="small" value={params.ball.globalSpeed} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" min={10} max={500} sx={sliderStyle}
 			  onChange={(_, val) => {setBallParam(prev => ({...prev, globalSpeed: val as number}))}}/>
 			</Stack>
-			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
+			{/* <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
 			  <p>Rebound Force</p>
-			  <Slider size="small" value={params.ball.reboundForce} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={100} aria-label="Default" valueLabelDisplay="auto" min={50} max={500} sx={sliderStyle}
+			  <Slider size="small" value={params.ball.reboundForce} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={100} aria-label="Default" valueLabelDisplay="auto" min={50} max={300} sx={sliderStyle}
 			  onChange={(_, val) => {setBallParam(prev => ({...prev, reboundForce: val as number}))}}/>
-			</Stack>
-			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
+			</Stack> */}
+			{/* <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
 			  <p>Acceleration</p>
 			  <Slider size="small" value={params.ball.ballAcceleration} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={10} aria-label="Default" valueLabelDisplay="auto" min={0} max={100} sx={sliderStyle}
 			  onChange={(_, val) => {setBallParam(prev => ({...prev, ballAcceleration: val as number}))}}/>
-			</Stack>
+			</Stack> */}
 		  </Stack>
 	  </Stack>
 	);
@@ -114,6 +114,24 @@ export const MapParams: React.FC = (props) => {
 			  <p>Rotation Speed</p>
 			  <Slider size="small" value={params.players.rotationSpeed} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={100} min={10} sx={sliderStyle}
 			  onChange={(_, val) => {setPlayersParam(prev => ({...prev, rotationSpeed: val as number}))}}/>
+			</Stack>
+			<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
+			  <p>Paddle Size</p>
+			  <Stack spacing={0} direction="row" sx={{ mt: 0, mb: 1 }} alignItems="center">
+				<Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
+					<Slider size="small" value={params.players.paddleSize[0]} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={12} aria-label="Default" valueLabelDisplay="auto" max={25} min={1} sx={sliderStyle}
+					onChange={(_, val) => {setPlayersParam(prev => ({...prev, paddleSize: [val as number, prev.paddleSize[1], prev.paddleSize[2]]}))}}/>
+								<Slider size="small" value={params.players.paddleSize[1]} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={25} min={1} sx={sliderStyle}
+					onChange={(_, val) => {setPlayersParam(prev => ({...prev, paddleSize: [prev.paddleSize[0], val as number, prev.paddleSize[2]]}))}}/>
+								<Slider size="small" value={params.players.paddleSize[2]} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={50} aria-label="Default" valueLabelDisplay="auto" max={30} min={2} sx={sliderStyle}
+					onChange={(_, val) => {setPlayersParam(prev => ({...prev, paddleSize: [prev.paddleSize[0], prev.paddleSize[1], val as number]}))}}/>
+				</Stack>
+				<Stack>
+					<Typography>Width</Typography>
+					<Typography>Height</Typography>
+					<Typography>Depth</Typography>
+				</Stack>
+				</Stack>
 			</Stack>
 		  </Stack>
 	  </Stack>

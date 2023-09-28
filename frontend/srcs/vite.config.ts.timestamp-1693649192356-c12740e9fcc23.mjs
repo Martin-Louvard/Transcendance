@@ -11,11 +11,6 @@ var vite_config_default = defineConfig({
   resolve: {
     alias: [{ find: "@shared", replacement: path.resolve(__vite_injected_original_dirname, "shared") }]
   },
-  build: {
-    rollupOptions: {
-      plugins: [inject({ Buffer: ["Buffer", "Buffer"], process: "process" })]
-    }
-  }
 });
 export {
   vite_config_default as default

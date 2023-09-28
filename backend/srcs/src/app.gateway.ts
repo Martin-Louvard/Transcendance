@@ -166,7 +166,6 @@ export class AppGateway
         lobby.slots[index].player = undefined;
         lobby.dispatchLobbySlots();
       } else {
-        console.log("delete game request : ", data);
         if (!data || !data.sender || !data.sender.id || !data.receiver || !data.receiver.id) {
           return false;
         }
@@ -292,6 +291,22 @@ export class AppGateway
       return ;
     this.lobbyService.createLobby(undefined, this.server, player);
     this.lobbyService.dispatchEvent();
+  }
+
+  @SubscribeMessage(ClientEvents.CreateAndInvite)
+  createAndInvite(@ConnectedSocket() client: Socket, @MessageBody() data: ClientPayloads[ClientEvents.CreateAndInvite]) {
+    const receiver = this.playerService.getPlayer(data);
+    const sender = this.playerService.getPlayerBySocketId(client.id);
+    if (!sender || !receiver) {
+      return ;
+    }
+    if (sender.lobby && sender.lobby.instance && !sender.lobby.instance.hasStarted) {
+      this.lobbyService.invitePlayer(receiver, {senderId: sender.id, receiverId: receiver.id, lobbyId: sender.lobby.id});
+    } else if (!sender.lobby) {
+      if (this.lobbyService.createLobby(undefined, this.server, sender)){ 
+        this.lobbyService.invitePlayer(receiver, {senderId: sender.id, receiverId: receiver.id, lobbyId: sender.lobby.id});
+      }
+    }
   }
 
   @SubscribeMessage(ClientEvents.ParameterState)
