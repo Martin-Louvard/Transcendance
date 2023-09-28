@@ -383,8 +383,6 @@ export const sessionSlice = createSlice({
     },
     updateBlockStatus: (state, action) => {
       const updatedFriendShip = action.payload;
-      console.log("updatedFriendShip");
-      console.log(updatedFriendShip);
       if (state.friendships){
         if (state.friendships.filter((friendShip) => friendShip.id === updatedFriendShip.id).length > 0){
           state.friendships = state.friendships.map((friendShip) => {
