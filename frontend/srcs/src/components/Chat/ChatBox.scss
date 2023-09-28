@@ -17,6 +17,7 @@
 	height: 100%;
 	border-top-left-radius: 10%;
 	border-top-right-radius: 10%;
+
 }
 
 .chat-box {
@@ -28,6 +29,7 @@
 	height: 100%;
 	border-top-left-radius: 15px;
 	border-top-right-radius: 15px;
+	z-index: 40;
 
 	&.minimized {
 		height: 45px;
