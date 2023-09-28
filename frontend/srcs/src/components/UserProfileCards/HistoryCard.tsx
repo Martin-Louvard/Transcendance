@@ -60,11 +60,12 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
                 <p >
                   {
                     isWinner(game, user.id) == 0 ?
-                      "Won against "
+                    "Lost against "
                         :
                         isWinner(game, user.id) == 1 ?
                         "Draw against" :
-                      "Lost against "
+                        "Won against "
+                      
                   
                   //  ?
                   // `Visitor (you) - Home` :  `Visitor - Home (you)`
