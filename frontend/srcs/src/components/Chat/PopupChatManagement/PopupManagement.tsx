@@ -73,19 +73,23 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         <div className='chat-popup'>
           <div className='popup-top'>
             <div className='popup-chat-menu'>
+              {chat?.channelType !== "private-message" ? (
+                <>
+                {chat?.owner.id === currentUser?.id ? <button onClick={ () => setListToDisplay("modify")}>{"MODIFY"}</button> : ""}
+                <button onClick={ () => setListToDisplay("participants")}>{"ALL USERS"}</button>
+                <button onClick={ () => setListToDisplay("banned")}>{"BANNED USERS"}</button>
+            </>) : (" ")}
 
-              {chat?.owner.id === currentUser?.id ? <button onClick={ () => setListToDisplay("modify")}>{"MODIFY"}</button> : ""}
-              <button onClick={ () => setListToDisplay("participants")}>{"ALL USERS"}</button>
-              <button onClick={ () => setListToDisplay("banned")}>{"BANNED USERS"}</button>
             </div>
-            {listTodisplay === "participants" ? <AddParticipants chat={currentOpenedChat!} /> : ""}
+            {listTodisplay === "participants" && chat?.channelType !== "private-message" ? <AddParticipants chat={currentOpenedChat!} /> : ""}
           </div>
           <ul>
             {display()}
           </ul>
         </div>
         <div className="popup-leave-currentOpenedChat-button">
-          <LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} />
+          {chat?.channelType !== 'private-message' ? 
+          <LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /> : ""}
         </div>
     </div>
     </Popup>

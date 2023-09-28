@@ -32,6 +32,7 @@ const SignupForm: React.FC = () => {
         toast.error("Username or email is already used by someone else")
         return 
       }
+
       const user = await login(username,password)
       if (!user)
         return toast.error("Account created but signin failed")

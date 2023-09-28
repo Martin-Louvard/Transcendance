@@ -23,7 +23,7 @@ const ProfileCard: React.FC = () => {
       };
 
       try{
-        const response = await fetch(`http://localhost:3001/users/${user?.username}/avatar`, requestOptions)
+        const response = await fetch(`http://10.33.3.1:3001/users/${user?.username}/avatar`, requestOptions)
         if (response.ok){
           const result = await response.json()
           dispatch(setSessionUser(result))
@@ -41,7 +41,7 @@ const ProfileCard: React.FC = () => {
       };
 
       try{
-        const response = await fetch(`http://localhost:3001/2fa/${user?.username}/`, requestOptions)
+        const response = await fetch(`http://10.33.3.1:3001/2fa/${user?.username}/`, requestOptions)
         if (response.ok) {
           const result = await response.json()
           dispatch(setSessionUser(result))
