@@ -88,7 +88,7 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
         <InviteGameButton user={user}/>
       </div>
       <div>
-        <BlockUserButton user={user} />
+        <BlockUserButton chat={chat} user={user} setIsOpen={setIsOpen}/>
       </div>
     </div>
   );
