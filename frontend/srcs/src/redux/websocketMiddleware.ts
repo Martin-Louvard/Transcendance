@@ -110,7 +110,6 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
 
       case 'NEW_SIGNUP':
       if (socket && socket.connected) {
-        console.log("coucouc")
         socket.emit('new_signup');
       }
       break;

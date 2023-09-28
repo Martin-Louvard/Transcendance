@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
+import { Outlet, BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar/NavBar.tsx'
 import AboutPage from './pages/About/index.tsx';
@@ -23,6 +23,7 @@ import { AutoMatch } from './components/Game/Lobby/Automatch.tsx';
 import { CreateMatchLobby } from './components/Game/Lobby/WaitingLobby.tsx';
 import { JoinMatch } from './components/Game/Lobby/JoinMatch.tsx';
 import { CreateMatch } from './components/Game/Lobby/CreateMatch.tsx';
+import { Navigate } from 'react-router-dom';
 
 export function App() {
   const user = useAppSelector((state) => state.session.user);
@@ -45,6 +46,14 @@ export function App() {
     dispatch({type: 'NEW_SIGNUP'});
   },[isConnected])
 
+  const ProtectedRoute = ({ access_token }: {access_token: string | undefined}) => {
+    if (!access_token) {
+      return <Navigate to="/" replace />;
+    }
+  
+    return <Outlet/>;
+  };
+
   return (
     <Router>
       <Toaster   position="bottom-right"/>
@@ -55,17 +64,20 @@ export function App() {
           <Routes>
             <Route path="/" element={user && isConnected ? <Lobby /> : <Authentication/>} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/game/:id" element={<Game />} />
-            <Route path="/profile" element={<ProfileCard />} />
-            <Route path="/leaderboard" element={<Leaderboard/>} />
-            <Route path="/friends" element={<FriendsListCard/>} />
-            <Route path="/profile/edit" element={<ChangeInfo/>} />
-            <Route path="/profile/2fa" element={<TwoFACard/>} />
-            <Route path="/friends/friendprofile" element={<FriendCard userToDisplay={friendProfile}/>} />
-            {
-              user &&
-              <Route path="/profile/history" element={<HistoryCard user={user}/>} />
-            }
+            <Route element={<ProtectedRoute access_token={access_token}/>}>
+              <Route path="/game/:id" element={<Game />} />
+              <Route path="/profile" element={<ProfileCard />} />
+              <Route path="/leaderboard" element={<Leaderboard/>} />
+              <Route path="/friends" element={<FriendsListCard/>} />
+              <Route path="/profile/edit" element={<ChangeInfo/>} />
+              <Route path="/profile/2fa" element={<TwoFACard/>} />
+              <Route path="/friends/friendprofile" element={<FriendCard userToDisplay={friendProfile}/>} />
+              {
+                user &&
+                <Route path="/profile/history" element={<HistoryCard user={user}/>} />
+              }
+            </Route>
+            <Route path={"/*"} element={ <Navigate to="/" replace />}/>
           </Routes>
         {/* </div> */}
       {/* </div> */}
