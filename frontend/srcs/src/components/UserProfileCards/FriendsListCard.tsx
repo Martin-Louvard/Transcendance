@@ -15,20 +15,25 @@ const FriendsListCard: React.FC = (props) =>{
     const user = useAppSelector((state) => state.session.user);
     const friendships = useAppSelector((state) => state.session.friendships);
     const [friendshipsAccepted, setFriendshipsAccepted] = useState<Friendships[] | undefined>()
+    const [friendshipsBlocked, setFriendshipsBlocked] = useState<Friendships[] | undefined>()
     const [newFriendUsername, setNewFriendUsername] = useState('');
     const dispatch = useAppDispatch();
     const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>();
     const gameRequest= useAppSelector((state) => state.websocket.invitedGames)
     const contentToShow = useAppSelector((state) => state.session.contentToShow)
     const navigate = useNavigate();
-    
+    const [showBlocked, setShowBlocked] = useState(false);
+
   const getAccepted = ()=>{
     if (friendships){
       setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
     }
     const accepted = friendships?.filter(f => f.status === Status.ACCEPTED)
+    const blocked = friendships?.filter(f => f.status === Status.BLOCKED)
     if (accepted)
       setFriendshipsAccepted(accepted)
+    if (blocked)
+      setFriendshipsBlocked(blocked)
   }
 
 
@@ -130,6 +135,13 @@ const FriendsListCard: React.FC = (props) =>{
 return (
   <>
   <h2>My Friends</h2>
+  {   
+        friendshipsBlocked?.length ?
+        <div>
+          <button onClick={()=>{setShowBlocked(!showBlocked)}}>{showBlocked ? "Hide" : "Show"} blocked users</button>
+        </div>
+        : ""
+        }
         <ul className="list">
           {friendshipsAccepted
             ? friendshipsAccepted.map((friendship, index) => (
@@ -151,8 +163,40 @@ return (
       )
   }
 
+  const unblockUser = (friendship: Friendships) =>{
+    dispatch({
+      type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username, Status.ACCEPTED] 
+    })
+    toast.success(friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username +' unblocked')
+  }
+
+  const displayBlockedFriendships = () =>{
+
+    return (
+      <>
+      <h2>Blocked Users</h2>
+            <ul className="list">
+              {friendshipsBlocked
+                ? friendshipsBlocked.map((friendship, index) => (
+                  <li className="item" onClick={() => displayFriendProfile(friendship)} key={index}>
+                      <div className='friend-picture'>
+                        <img 
+                          src={friendship.friend_id == user?.id ? friendship.user.avatar:friendship.friend.avatar}
+                        />
+                      </div>
+                    <p>{friendship.friend_id == user?.id ? friendship.user.username:friendship.friend.username}</p>
+                    <button onClick={()=> unblockUser(friendship)}>Unblock</button>
+                  </li>
+                )) 
+              : null}
+            </ul>
+            </>
+          )
+      }
+
   const friendList = () =>{
       return (
+        <>
       <div className="card-wrapper">
         <Form onSubmit={sendFriendRequest} title="Add a new friend" buttonText="Add">
           <div>
@@ -165,15 +209,16 @@ return (
             />
           </div>
         </Form>
+        
         { friendRequests?.length ? renderNotifications() : ""}
+        {showBlocked && friendshipsBlocked?.length ? displayBlockedFriendships() : ""}
         {gameRequest?.length  ? renderGameRequests() : ""}
-        {displayFriendships()}
         
       </div>
+              {displayFriendships()}
+              </>
       )
     }
-
-
 
   return (
     <>
