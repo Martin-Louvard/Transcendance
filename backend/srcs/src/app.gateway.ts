@@ -264,15 +264,18 @@ export class AppGateway
       this.lobbyService.leaveLobby(player);
     }
     const user_id = player.id;
+    try {
     if (data.start) {
-      try {
         await this.prisma.user.update({
           where: { id: user_id },
           data:  {inGame: true},
-        });
-      } catch (e) { }
-      
-    }
+      });} 
+    else {
+        await this.prisma.user.update({
+          where: { id: user_id },
+          data:  {inGame: false},
+      });}
+    } catch (e) { }
   }
   @SubscribeMessage(ClientEvents.LobbySlotsState)
   lobbySlotsHandling(

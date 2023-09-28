@@ -1,10 +1,47 @@
 import io, {Socket} from 'socket.io-client';
-import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
-import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, resetLobbyData, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setParams, setParamsReceived, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
+import { Middleware, Dispatch, AnyAction, MiddlewareAPI, CombinedState } from '@reduxjs/toolkit';
+import { WebSocketState, addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, resetLobbyData, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setParams, setParamsReceived, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
-import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat, addNewChatChannel, updateOneChat, updateBlockStatus, addReaderId, leaveChat, beenKicked } from './sessionSlice';
+import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat, addNewChatChannel, updateOneChat, updateBlockStatus, addReaderId, leaveChat, beenKicked, sessionState } from './sessionSlice';
 import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType, ClientPayloads} from '@shared/class';
 import { useAppSelector } from './hooks';
+
+
+function handleLobbyState(data:ServerPayloads[ServerEvents.LobbyState], socket: Socket | null, store:MiddlewareAPI<Dispatch<AnyAction>, CombinedState<{
+  session: sessionState;
+  websocket: WebSocketState;
+}>>) {
+  if (data.hasFinished)
+    store.dispatch(setLobbyType(LobbyType.score)); 
+  store.dispatch(setLobbyState(data))
+  console.log("test");
+  let payload: ClientPayloads[ClientEvents.LobbyState];
+  if (data.hasStarted&& data.lobbyId){
+    payload= {
+      automatch:  null,
+      leaveLobby: null,
+      mode: null,
+      start: true,
+    }
+    socket?.emit(ClientEvents.LobbyState, payload);
+  } 
+  if (data.hasFinished){
+    console.log("salut");
+    payload = {
+      automatch:  null,
+      leaveLobby: null,
+      mode: null,
+      start: false,
+    }
+    socket?.emit(ClientEvents.LobbyState, payload);
+  } 
+  if (data.hasStarted && data.lobbyId && store.getState().websocket.LobbyType == LobbyType.auto) {
+    const params = store.getState().websocket.params;
+    params.map.size[1] = 200;
+    params.map.size[0] = 200;
+    store.dispatch(setParams(params));
+  }
+}
 
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
 
@@ -53,30 +90,9 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
             store.dispatch(setLobbyType(LobbyType.wait));
           store.dispatch(setAuthState(data));
         })
-        socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => {
-          if (data.hasFinished)
-            store.dispatch(setLobbyType(LobbyType.score)); 
-          store.dispatch(setLobbyState(data))
-          if (data.hasStarted&& data.lobbyId){
-            const payload: ClientPayloads[ClientEvents.LobbyState] = {
-              automatch:  null,
-              leaveLobby: null,
-              mode: null,
-              start: true,
-            }
-            socket?.emit(ClientEvents.LobbyState, payload);
-          } 
-          if (data.hasStarted && data.lobbyId && store.getState().websocket.LobbyType == LobbyType.auto) {
-            const params = store.getState().websocket.params;
-            params.map.size[1] = 200;
-            params.map.size[0] = 200;
-            store.dispatch(setParams(params));
-          }
-        })
+        socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => { handleLobbyState(data, socket, store) })
         socket.on(ServerEvents.GameState, (data: any) => {store.dispatch(setGameState(data))})
-        socket.on(ServerEvents.LobbySlotsState, (data: any) => {
-          store.dispatch(setLobbySlots(data))
-        })
+        socket.on(ServerEvents.LobbySlotsState, (data: any) => {  store.dispatch(setLobbySlots(data))  })
         socket.on(ServerEvents.GameRequest, (data: GameRequest) => {store.dispatch(setGameRequests(data))})
         socket.on(ServerEvents.SuccessfulInvited, (data: GameRequest) => {store.dispatch(addSentInvte(data));
           setTimeout(() => {
