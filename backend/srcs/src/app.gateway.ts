@@ -859,6 +859,8 @@ export class AppGateway
       const friend = await this.prisma.user.findUnique({
         where: { username: body[1] },
       });
+      if (!friend)
+        return
       const friend_id = friend?.id;
       let friendship = await this.friendService.friendshipExists(
         user_id,

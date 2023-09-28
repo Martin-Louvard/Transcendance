@@ -1,4 +1,3 @@
-import FriendCard from "./FriendCard"
 import { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
@@ -20,7 +19,6 @@ const FriendsListCard: React.FC = (props) =>{
     const dispatch = useAppDispatch();
     const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>();
     const gameRequest= useAppSelector((state) => state.websocket.invitedGames)
-    const contentToShow = useAppSelector((state) => state.session.contentToShow)
     const navigate = useNavigate();
     const [showBlocked, setShowBlocked] = useState(false);
 
@@ -99,17 +97,16 @@ const FriendsListCard: React.FC = (props) =>{
         )
     
 
-        useEffect(()=>{
-          
+  useEffect(()=>{
     if (friendships){
       getAccepted()
+      //let friendshipstmp: Friendships[] = [];
+      //friendships.forEach((e) => {
+      //  if (e.status === Status.PENDING && e.sender_id != user?.id)
+       //   friendshipstmp.push(e);
+     // })
+      //setFriendRequest(friendshipstmp);
 
-      let friendshipstmp: Friendships[] = [];
-      friendships.forEach((e) => {
-        if (e.status === Status.PENDING && e.sender_id != user?.id)
-          friendshipstmp.push(e);
-      })
-      setFriendRequest(friendshipstmp);
     }
   }, [friendships])
 
@@ -131,6 +128,7 @@ const FriendsListCard: React.FC = (props) =>{
   }
 
   const displayFriendships = () =>{
+    console.log(friendRequests)
 
 return (
   <>
