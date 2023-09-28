@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import Form from "../Forms/Form";
 import { toast } from "react-hot-toast";
-import { ContentOptions, Friendships, Status } from "../../Types";
+import { Friendships, Status } from "../../Types";
 import StatusDot from "./StatusDot";
 import {setLobbyType, setParams } from "../../redux/websocketSlice";
 import { GameRequest, LobbyType } from "@shared/class";
@@ -51,7 +51,7 @@ const FriendsListCard: React.FC = (props) =>{
   
     const displayFriendProfile = (friendship: Friendships) => {
       dispatch(setFriendProfile(friendship.user_id === user?.id ? friendship.friend : friendship.user)); 
-      dispatch(navigate("friendprofile"));
+     navigate("/friends/friendprofile");
     };
 
     const renderNotifications = () => (   

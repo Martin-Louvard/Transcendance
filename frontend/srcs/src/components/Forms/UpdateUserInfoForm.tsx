@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { toast } from 'react-hot-toast';
 import { setContentToShow, setSessionUser } from '../../redux/sessionSlice';
 import { ContentOptions } from '../../Types';
+import { useNavigate } from 'react-router-dom';
 
 const ChangeInfo = () => {
     const user = useAppSelector((state) => state.session.user);
@@ -14,6 +15,8 @@ const ChangeInfo = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const dispatch = useAppDispatch()
     const validEmailRegex = /^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$/
+    const navigate = useNavigate();
+
 
     const changeInfo = async () =>{
 
@@ -37,7 +40,7 @@ const ChangeInfo = () => {
             newUser.access_token = access_token;
             toast.success("Information updated")
             dispatch(setSessionUser(newUser))
-            dispatch(setContentToShow(ContentOptions.PROFILE))
+           navigate("/profile");
             console.log(ContentOptions.PROFILE)
         }
       }catch(err) {
