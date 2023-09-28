@@ -103,7 +103,6 @@ export class AppGateway
 
   @SubscribeMessage('new_signup')
   async NewSignup(@ConnectedSocket() client: Socket) {
-    console.log("coucu")
     const general = await this.prisma.chatChannel.findFirst({
       where: {channelType: "general"},
       include: {
@@ -115,7 +114,6 @@ export class AppGateway
         actionOnUser: true,
         friendship: true, 
       }})
-    console.log(general)
     this.server.emit('new_signup', general);
   }
 
