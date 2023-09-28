@@ -45,18 +45,18 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
       <>
         {   
           messages[index - 1] && message.createdAt.substring(0, 10) !== messages[index - 1].createdAt.substring(0, 10) || !messages[index  -1] ? 
-          <span className="message-date"> {message.createdAt.substring(0, 10)}</span> : ""
+          <span className="message-date "key={"message-date" + index}> {message.createdAt.substring(0, 10)}</span> : ""
         }
         <div key={index} className={`message-wrapper  ${
           message.senderId === user?.id ? "left" : "right"
         }`} >
         <div
-         
+         key={"message-user" + index}
           className={`chat-message ${
             message.senderId === user?.id ? "user1" : "user2"
           }`}
         >
-          <span className="content">{message.content}</span>
+          <span key={"message-content" + index} className="content">{message.content}</span>
         </div>
        
       </div>
