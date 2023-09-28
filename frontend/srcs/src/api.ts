@@ -7,7 +7,7 @@ export async function fetchChatChannels(userId: number): Promise<ChatChannels[]>
 
 export async function fetchAllRelatedInfoApi(userId: number): Promise<sessionState> {
   try {
-    const response = await fetch(`http://10.33.3.1:3001/users/id/{id}?id=${userId}`);
+    const response = await fetch(`http://localhost:3001/users/id/{id}?id=${userId}`);
     const data: sessionState = await response.json();
     return data;
   } catch (error) {
@@ -18,7 +18,7 @@ export async function fetchAllRelatedInfoApi(userId: number): Promise<sessionSta
 
 export async function fetchFriendsApi(userId: string): Promise<User[]>  {
     try {
-      const response = await fetch(`http://10.33.3.1:3001/users/friends/{id}?id=${userId}`);
+      const response = await fetch(`http://localhost:3001/users/friends/{id}?id=${userId}`);
       const data: User[] = await response.json();
       return data;
     } catch (error) {
@@ -28,7 +28,7 @@ export async function fetchFriendsApi(userId: string): Promise<User[]>  {
   
 export async function fetchFriendshipsApi(userId: string): Promise<Friendships[]> {
   try {
-    const response = await fetch(`http://10.33.3.1:3001/friends/user/{id}?id=${userId}`);
+    const response = await fetch(`http://localhost:3001/friends/user/{id}?id=${userId}`);
     const data: Friendships[] = await response.json();
     return data;
   } catch (error) {
@@ -38,7 +38,7 @@ export async function fetchFriendshipsApi(userId: string): Promise<Friendships[]
 
 export async function fetchChatChannelsApi(): Promise<ChatChannels[] | undefined> {
   try {
-    const response = await fetch(`http://10.33.3.1:3001/chat-channels`);
+    const response = await fetch(`http://localhost:3001/chat-channels`);
     const data: ChatChannels[] | undefined = await response.json();
     return data;
   }
@@ -57,7 +57,7 @@ export async function login (username: string, password: string): Promise<User> 
      })
   };
   try{
-    const response = await fetch('http://10.33.3.1:3001/auth/login', requestOptions);
+    const response = await fetch('http://localhost:3001/auth/login', requestOptions);
     const data: User = await response.json();
     return data;
   }catch(error) {
@@ -75,7 +75,7 @@ export async function login2fa (code: string | null, user: User, access_token: s
      })
   };
   try{
-    const response = await fetch(`http://10.33.3.1:3001/2fa/${user.username}/login`, requestOptions);
+    const response = await fetch(`http://localhost:3001/2fa/${user.username}/login`, requestOptions);
     const data: User = await response.json();
     data.access_token = access_token
     return data
@@ -95,7 +95,7 @@ export async function login42 (code42: string | null): Promise<User> {
   };
 
   try{
-    const response = await fetch('http://10.33.3.1:3001/auth/42login', requestOptions);
+    const response = await fetch('http://localhost:3001/auth/42login', requestOptions);
     const data: User = await response.json();
     return data
   }catch(error) {
