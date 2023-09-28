@@ -388,7 +388,6 @@ export const sessionSlice = createSlice({
       console.log(updatedFriendShip);
       if (state.friendships){
         if (state.friendships.filter((friendShip) => friendShip.id === updatedFriendShip.id).length > 0){
-          console.log("update relation");
           state.friendships = state.friendships.map((friendShip) => {
             if (friendShip.id === updatedFriendShip.id)
               return updatedFriendShip;
@@ -396,12 +395,10 @@ export const sessionSlice = createSlice({
           });
         }
         else {
-          console.log("already relations before block");
           state.friendships.push(updatedFriendShip);
         }
       }
       else {
-        console.log("0 relations before block");
         state.friendships = [updatedFriendShip];
       }
     },
