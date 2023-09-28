@@ -31,7 +31,6 @@ const ProfileCard: React.FC = () => {
           toast.success("Avatar updated");
         }
       }  catch(err) {
-        console.log(err);
       }
     }
     
@@ -49,7 +48,6 @@ const ProfileCard: React.FC = () => {
           toast.success("2fa disabled")
         }
       }catch(err) {
-        console.log(err);
       }
     }
 
