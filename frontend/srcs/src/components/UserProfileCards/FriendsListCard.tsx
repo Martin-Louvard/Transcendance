@@ -165,7 +165,7 @@ return (
 
   const unblockUser = (friendship: Friendships) =>{
     dispatch({
-      type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username, Status.ACCEPTED] 
+      type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship.id, friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username, Status.DECLINED] 
     })
     toast.success(friendship.friend_id == user?.id  ? friendship.user.username:friendship.friend.username +' unblocked')
   }
