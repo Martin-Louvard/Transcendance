@@ -3,8 +3,6 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import React , { useState } from 'react';
 import toast from 'react-hot-toast'
 import { setSessionUser } from '../../redux/sessionSlice';
-import { setContentToShow } from '../../redux/sessionSlice';
-import { ContentOptions } from '../../Types';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileCard: React.FC = () => {

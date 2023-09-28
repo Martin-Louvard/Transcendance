@@ -4,14 +4,16 @@ import { User } from 'src/Types';
 import { useAppDispatch } from '../../redux/hooks';
 import { ContentOptions } from '../../Types';
 import { setFriendProfile, setContentToShow } from '../../redux/sessionSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Leaderboard = () => {
 const [board, setBoard] = useState<User[]>();
 const dispatch = useAppDispatch();
+const navigate = useNavigate();
 
 const goToUserProfile = (user: User) => {
   dispatch(setFriendProfile(user));
-  dispatch(setContentToShow(ContentOptions.FRIENDPROFILE));
+ navigate("/friends/friendprofile");
 };
 
   useEffect(() => {

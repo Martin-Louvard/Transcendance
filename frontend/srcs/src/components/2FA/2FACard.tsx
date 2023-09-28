@@ -4,6 +4,7 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { setContentToShow, setSessionUser } from '../../redux/sessionSlice';
 import toast from 'react-hot-toast'
 import { ContentOptions } from '../../Types';
+import { useNavigate } from 'react-router-dom';
 
 
 const TwoFACard: React.FC = () => {
@@ -12,7 +13,7 @@ const TwoFACard: React.FC = () => {
     const [twoFaQrcode, setTwoFaQrcode] = useState<string>('');
     const dispatch = useAppDispatch();
     const [codeInput, setCodeInput] = useState<string>('');
-
+    const navigate = useNavigate();
     useEffect(()=>{
         generateQr()
     },[])
@@ -55,7 +56,7 @@ const TwoFACard: React.FC = () => {
             const result = await response.json()
             dispatch(setSessionUser(result));
             toast.success("2fa enabled")
-            dispatch(setContentToShow(ContentOptions.PROFILE))
+            navigate("/profile")
           }
         }catch(err) {
           console.log(err);
