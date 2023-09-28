@@ -49,7 +49,7 @@ const SideChatMenu = () => {
   const privateChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => chat.channelType === "Private");
   const privateMsgChannels: ChatChannels[] | undefined =
-    storedJoinedChannels?.filter((chat) => (chat.channelType === "private-message" && chat.friendship?.status !== 'BLOCKED'));
+    storedJoinedChannels?.filter((chat) => (chat.channelType === "private-message" && chat.friendship?.status === 'ACCEPTED'));
   const joinedGroupChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => {
       if (chat.channelType === "created" || chat.channelType === "Password")
@@ -113,7 +113,7 @@ const SideChatMenu = () => {
                   <BsFillPersonFill />
               </div>
             </li> 
-        ))}{" "}
+          ))}{" "}
       </div>
     );
   };
