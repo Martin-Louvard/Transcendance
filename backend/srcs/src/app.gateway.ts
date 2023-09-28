@@ -627,10 +627,13 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: Array<any>,
   ): Promise<void> {
+    const chat = await this.prisma.chatChannel.findUnique({where: {id: parseInt(body[0])}})
+    if (!chat)
+      return;
     await this.prisma.chatChannel.delete({
-      where: { id: parseInt(body[0]) },
+      where: { id: chat.id },
     });
-    this.server.emit('delete_chat', parseInt(body[0]));
+    this.server.emit('delete_chat', chat.id);
   }
 
   @SubscribeMessage('unban_user')
@@ -796,9 +799,11 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: {id: number, name: string, channelType: string, password: string },
   ): Promise<void> {
+    const hashedPassword = await bcrypt.hash(body.password, roundsOfHashing);
+
     const updatedChatChannel = await this.prisma.chatChannel.update({
       where: { id: body.id },
-      data: { name: body.name, channelType: body.channelType, password: body.password },
+      data: { name: body.name, channelType: body.channelType, password: hashedPassword },
     });
     const channel = await this.prisma.chatChannel.findUnique({
       where: { id: body.id },
@@ -821,9 +826,10 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: { id: number; password: string },
   ): Promise<void> {
+    const hashedPassword = await bcrypt.hash(body.password, roundsOfHashing);
     const updatedChatChannel = await this.prisma.chatChannel.update({
       where: { id: body[0] },
-      data: { password: body[1] },
+      data: { password: hashedPassword },
     });
     const channel = await this.prisma.chatChannel.findUnique({
       where: { id: body[0] },
@@ -946,8 +952,6 @@ export class AppGateway
       if (!body[2])
       {
       }
-      else if (body[2] === 'ACCEPTED') 
-        client.emit('create_chat', chat);
       else
         client.emit('update_chat', chat);
 
@@ -956,8 +960,6 @@ export class AppGateway
         if (!body[2])
         {
         }
-        else if (body[2] === 'ACCEPTED')
-          friend_socket.emit('create_chat', chat);
         else
           friend_socket.emit('update_chat', chat);
       }

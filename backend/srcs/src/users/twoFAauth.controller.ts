@@ -37,7 +37,6 @@ import { AuthService } from 'src/auth/auth.service';
     @Post(':username/login')
     @UseGuards(JwtAuthGuard)
     async loginWith2fa(@Param('username') username: string, @Body() body){
-      console.log(body)
       const isCodeValid = await 
       this.userService.isTwoFactorAuthenticationCodeValid(
         body.twoFactorAuthenticationCode,

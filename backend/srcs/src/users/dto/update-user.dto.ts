@@ -6,20 +6,23 @@ import { User } from '../entities/user.entity';
 export class UpdateUserDto extends PartialType(CreateUserDto) {
 
     @ApiPropertyOptional()
-    victoriesCount: number;
+    victoriesCount?: number;
 
     @ApiPropertyOptional()
-    defeatCount: number;
+    defeatCount?: number;
 
     @ApiPropertyOptional()
-    rank: string;
+    rank?: string;
 
     @ApiPropertyOptional()
-    level: number;
+    level?: number;
 
     @ApiPropertyOptional()
-    friends: User;
+    friends?: User;
 
     @ApiPropertyOptional()
-    twoFASecret: string;
+    twoFASecret?: string;
+
+    @ApiPropertyOptional()
+    username?: string;
 }

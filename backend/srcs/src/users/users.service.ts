@@ -147,18 +147,23 @@ export class UsersService {
     return user;
   }
 
-  async update(username: string, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(
         updateUserDto.password,
         roundsOfHashing,
       );
     }
-    const user = await this.prisma.user.update({
-      where: { username },
+    const userExists = await this.prisma.user.findUnique({where: {username: updateUserDto.username}})
+    const currentUser = await this.prisma.user.findUnique({where: {id}})
+    if (userExists && currentUser.id !== userExists.id && userExists.username === updateUserDto.username)
+      throw new NotAcceptableException("Username already taken by someone else");
+
+    const newUser = await this.prisma.user.update({
+      where: { id },
       data: updateUserDto,
     });
-    return this.findOne(user.username);
+    return this.findOne(newUser.username);
   }
 
   async remove(id: number) {
