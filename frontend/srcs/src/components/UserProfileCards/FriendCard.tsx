@@ -45,7 +45,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ userToDisplay }) => {
       </>
       )
     }
-    else{
+    else if (userToDisplay.id !== user?.id){
       return(<>
         <button onClick={() => sendFriendRequest()}>Add Friend</button>
       </>

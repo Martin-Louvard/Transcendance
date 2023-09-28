@@ -29,7 +29,7 @@ const FriendsListCard: React.FC = (props) =>{
       setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
     }
     const accepted = friendships?.filter(f => f.status === Status.ACCEPTED)
-    const blocked = friendships?.filter(f => f.status === Status.BLOCKED)
+    const blocked = friendships?.filter(f => f.status === Status.BLOCKED && f.sender_id === user?.id)
     if (accepted)
       setFriendshipsAccepted(accepted)
     if (blocked)

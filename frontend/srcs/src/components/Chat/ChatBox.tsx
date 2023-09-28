@@ -71,7 +71,7 @@ const ChatBoxes = () => {
             </div>
             <img
               onClick={() => handleToggleChatClose(chat)}
-              src={"cross.svg"}
+              src={"/cross.svg"}
               alt="Close"
               className="chat-box-button"
             />

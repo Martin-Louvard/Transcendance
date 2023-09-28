@@ -16,9 +16,13 @@ import SearchBarChat from "./SearchChat.tsx";
 import { BsFillPersonFill, BsSearch } from "react-icons/bs";
 import { fetchChatChannelsApi } from "../../api.ts"
 import ChatBoxes from "./ChatBox.tsx";
+import { WhatsMyName} from "./PopupChatManagement/addParticipantsSearchBar.tsx";
 
 const SideChatMenu = () => {
   const currentUser = useAppSelector((state) => state.session.user);
+  const currentBlockedUsers = useAppSelector(
+    (state) => state.session.friendships)?.filter(
+      (relations) => relations.status === 'BLOCKED');
   const dispatch = useAppDispatch();
   const storedJoinedChannels: ChatChannels[] | undefined = useAppSelector(
     (state) => state.session.JoinedChatChannels,
@@ -45,7 +49,7 @@ const SideChatMenu = () => {
   const privateChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => chat.channelType === "Private");
   const privateMsgChannels: ChatChannels[] | undefined =
-    storedJoinedChannels?.filter((chat) => chat.channelType === "private-message");
+    storedJoinedChannels?.filter((chat) => (chat.channelType === "private-message" && chat.friendship?.status === 'ACCEPTED'));
   const joinedGroupChannels: ChatChannels[] | undefined =
     storedJoinedChannels?.filter((chat) => {
       if (chat.channelType === "created" || chat.channelType === "Password")
@@ -108,8 +112,8 @@ const SideChatMenu = () => {
                 <div>{`${chat?.participants?.length}`}</div>
                   <BsFillPersonFill />
               </div>
-          </li>
-        ))}{" "}
+            </li> 
+          ))}{" "}
       </div>
     );
   };
@@ -119,6 +123,7 @@ const SideChatMenu = () => {
     _type: string,
   ) => {
     if (list !== undefined && list.length > 0) {
+
       return (
         <ul >
           <div

@@ -52,23 +52,27 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
         </div>
         <div className="management-chat-user-list-username">
           {user.username}
-          {chat.owner.id === user.id ? <GiImperialCrown /> : ""}
+          {chat.owner.id === user.id && chat.channelType !== 'private-message'? <GiImperialCrown /> : ""}
         </div>
       </div>
-      <AddUserButton user={user} />
-      <div>
-        {chat?.owner.id === currentUser?.id ? (
-          <AdminAddButton user={user} chat={chat} />
-        ) : (
-          ""
-        )}
-      </div>
-      <div>
-        {isKickable() ? <KickUserButton user={user} chat={chat} /> : ""}{" "}
-      </div>
-      <div>
-        {isKickable() ? <MuteUserButton chat={chat} user={user} /> : ""}{" "}
-      </div>
+      { chat.channelType !== 'private-message' ? (
+        <>
+          <AddUserButton user={user} />
+          <div>
+            {chat?.owner.id === currentUser?.id ? (
+              <AdminAddButton user={user} chat={chat} />
+              ) : (
+                ""
+              )}
+            </div>
+            <div>
+              {isKickable() ? <KickUserButton user={user} chat={chat} /> : ""}{" "}
+            </div>
+            <div>
+              {isKickable() ? <MuteUserButton chat={chat} user={user} /> : ""}{" "}
+            </div>
+          </>
+      ) : ( " " )}
       <div>
         <InviteGameButton user={user}/>
       </div>
