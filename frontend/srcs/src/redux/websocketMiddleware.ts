@@ -57,7 +57,6 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           if (data.hasFinished)
             store.dispatch(setLobbyType(LobbyType.score)); 
           store.dispatch(setLobbyState(data))
-          console.log("/?? : ", (data.hasStarted && data.lobbyId && store.getState().websocket.LobbyType == LobbyType.auto));
           if (data.hasStarted && data.lobbyId && store.getState().websocket.LobbyType == LobbyType.auto) {
             const params = store.getState().websocket.params;
             params.map.size[1] = 200;
