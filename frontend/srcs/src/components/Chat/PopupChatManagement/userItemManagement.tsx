@@ -59,7 +59,7 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
         <>
           <AddUserButton user={user} />
           <div>
-            {chat?.owner.id === currentUser?.id ? (
+            {chat?.owner.id === currentUser?.id && !chat?.admins.filter((admin) => admin.id === user.id).length ? (
               <AdminAddButton user={user} chat={chat} />
               ) : (
                 ""
