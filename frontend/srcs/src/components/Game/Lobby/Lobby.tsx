@@ -57,6 +57,7 @@ export const Lobby: React.FC = (props) => {
       leaveLobby: true,
       mode: null,
       automatch: null,
+      start: false,
     }
 		dispatch({
 			type: 'WEBSOCKET_SEND_LOBBYSTATE',

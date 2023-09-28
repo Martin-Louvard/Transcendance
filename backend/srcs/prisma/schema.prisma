@@ -34,6 +34,7 @@ model User {
   password               String?
   avatar                 String?       @default("default.jpg")
   status                 UserStatus    @default(OFFLINE)
+  inGame                 Boolean       @default(false)
   twoFAEnabled           Boolean       @default(false)
   twoFASecret            String?
   victoriesCount         Int           @default(0)

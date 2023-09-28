@@ -122,6 +122,7 @@ export const Game: React.FC = () => {
 		  leaveLobby: true,
 		  mode: null,
 		  automatch: null,
+		  start: false,
 		}
 			dispatch({
 				type: 'WEBSOCKET_SEND_LOBBYSTATE',

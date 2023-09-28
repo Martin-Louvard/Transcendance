@@ -254,7 +254,7 @@ export class AppGateway
   }
 
   @SubscribeMessage(ClientEvents.LobbyState)
-  lobbyStateHandling(
+  async lobbyStateHandling(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: ClientPayloads[ClientEvents.LobbyState],
   ) {
@@ -262,6 +262,16 @@ export class AppGateway
     if (!player || player.socket.id != client.id) return;
     if (data.leaveLobby) {
       this.lobbyService.leaveLobby(player);
+    }
+    const user_id = player.id;
+    if (data.start) {
+      try {
+        await this.prisma.user.update({
+          where: { id: user_id },
+          data:  {inGame: true},
+        });
+      } catch (e) { }
+      
     }
   }
   @SubscribeMessage(ClientEvents.LobbySlotsState)

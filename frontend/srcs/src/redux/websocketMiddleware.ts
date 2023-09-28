@@ -3,7 +3,7 @@ import { Middleware, Dispatch, AnyAction } from '@reduxjs/toolkit';
 import { addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, resetLobbyData, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setParams, setParamsReceived, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
 import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat, addNewChatChannel, updateOneChat, updateBlockStatus, addReaderId, leaveChat, beenKicked } from './sessionSlice';
-import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType} from '@shared/class';
+import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType, ClientPayloads} from '@shared/class';
 import { useAppSelector } from './hooks';
 
 const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
@@ -57,6 +57,15 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
           if (data.hasFinished)
             store.dispatch(setLobbyType(LobbyType.score)); 
           store.dispatch(setLobbyState(data))
+          if (data.hasStarted&& data.lobbyId){
+            const payload: ClientPayloads[ClientEvents.LobbyState] = {
+              automatch:  null,
+              leaveLobby: null,
+              mode: null,
+              start: true,
+            }
+            socket?.emit(ClientEvents.LobbyState, payload);
+          } 
           if (data.hasStarted && data.lobbyId && store.getState().websocket.LobbyType == LobbyType.auto) {
             const params = store.getState().websocket.params;
             params.map.size[1] = 200;
