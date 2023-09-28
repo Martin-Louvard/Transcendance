@@ -32,10 +32,14 @@ export class UsersService {
       roundsOfHashing,
     );
     createUserDto.password = hashedPassword;
-    const newUser = await this.prisma.user.create({ data: createUserDto });
-
+    const userExists = await this.prisma.user.findUnique({ where: { username: createUserDto.username } });
+    if (userExists)
+      throw new NotAcceptableException("User already exists");
+    
+    const newUser = await this.prisma.user.create  ({ data: createUserDto });
     await this.chatChannelService.addUserToGeneralChat(newUser);
     return newUser;
+    
   }
 
   findAll() {
