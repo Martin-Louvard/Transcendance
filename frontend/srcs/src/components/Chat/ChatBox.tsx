@@ -18,7 +18,7 @@ const ChatBoxes = () => {
   const currentUser = useAppSelector((state) => state.session.user);
   const openedChannels = useAppSelector(
     (state) => state.session.OpenedChatChannels,
-  );
+  ).filter((chat) => chat?.friendship?.status !== 'BLOCKED');
   const dispatch = useAppDispatch();
   const [minimizedChat, setMinimizedChat] = useState<number[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
