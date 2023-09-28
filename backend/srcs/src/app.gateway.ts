@@ -101,6 +101,24 @@ export class AppGateway
     lobby.removePlayer(player);
   }
 
+  @SubscribeMessage('new_signup')
+  async NewSignup(@ConnectedSocket() client: Socket) {
+    console.log("coucu")
+    const general = await this.prisma.chatChannel.findFirst({
+      where: {channelType: "general"},
+      include: {
+        owner: true,
+        admins: true,
+        messages: { include: { sender: true } },
+        participants: true,
+        bannedUsers: true,
+        actionOnUser: true,
+        friendship: true, 
+      }})
+    console.log(general)
+    this.server.emit('new_signup', general);
+  }
+
   @SubscribeMessage('automatch')
   autoMatch(
     @ConnectedSocket() client: Socket,

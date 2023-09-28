@@ -37,8 +37,13 @@ export function App() {
     dispatch(websocketDisconnected());
     if (user) {
       dispatch({ type: 'WEBSOCKET_CONNECT', payload: [user.id, access_token] });
+
     }
   }, [user?.id]);
+
+  useEffect(()=>{
+    dispatch({type: 'NEW_SIGNUP'});
+  },[isConnected])
 
   return (
     <Router>

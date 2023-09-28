@@ -35,7 +35,6 @@ export class UsersService {
     const newUser = await this.prisma.user.create({ data: createUserDto });
 
     await this.chatChannelService.addUserToGeneralChat(newUser);
-
     return newUser;
   }
 
