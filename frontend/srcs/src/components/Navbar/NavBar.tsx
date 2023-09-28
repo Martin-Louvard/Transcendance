@@ -19,6 +19,9 @@ const Navbar: React.FC = () => {
   const [friendRequests, setFriendRequest] = useState<Friendships[] | undefined>(friendships);
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState("open-menu")
+  const gameRequest= useAppSelector((state) => state.websocket.invitedGames)
+
+
   useEffect(() =>{
     if (friendships){
       setFriendRequest(friendships.filter(f => (f.status === Status.PENDING && f.sender_id != user?.id)))
@@ -66,7 +69,7 @@ const Navbar: React.FC = () => {
       </button>
       <button id="friends" onClick={handleClick}>
         Friends
-        <Notification number={friendRequests?.length}/>
+        <Notification number={friendRequests ? friendRequests?.length + gameRequest?.length : gameRequest?.length}/>
       </button>
       <button id="profile" onClick={handleClick}>
         My Profile
