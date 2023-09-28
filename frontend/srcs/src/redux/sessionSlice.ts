@@ -384,8 +384,11 @@ export const sessionSlice = createSlice({
     },
     updateBlockStatus: (state, action) => {
       const updatedFriendShip = action.payload;
+      console.log("updatedFriendShip");
+      console.log(updatedFriendShip);
       if (state.friendships){
         if (state.friendships.filter((friendShip) => friendShip.id === updatedFriendShip.id).length > 0){
+          console.log("update relation");
           state.friendships = state.friendships.map((friendShip) => {
             if (friendShip.id === updatedFriendShip.id)
               return updatedFriendShip;
@@ -393,10 +396,12 @@ export const sessionSlice = createSlice({
           });
         }
         else {
+          console.log("already relations before block");
           state.friendships.push(updatedFriendShip);
         }
       }
       else {
+        console.log("0 relations before block");
         state.friendships = [updatedFriendShip];
       }
     },
@@ -405,7 +410,7 @@ export const sessionSlice = createSlice({
         state.friendships = state.friendships.map((f) => {
           if (f.friend.id === action.payload.user_id)
             f.friend.status = action.payload.status;
-          else if (f.user.id === action.payload.user_id)
+          else if (f.user?.id === action.payload?.user_id)
             f.user.status = action.payload.status;
           return f;
         });

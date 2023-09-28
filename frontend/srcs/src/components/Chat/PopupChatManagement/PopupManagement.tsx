@@ -36,25 +36,24 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
     if (listTodisplay === "participants")
       return (currentOpenedChat?.participants?.map((user)=>{
         if (currentUser?.id !== user?.id && currentRelations?.filter((relation) => {
-          console.log(relation);
-          console.log(WhatsMyId(currentUser!, relation));
-          console.log(user.id);
-              if (WhatsMyId(currentUser!, relation) === user.id)
-                return relation;
-            }).length === 0)
+          if (WhatsMyId(currentUser!, relation) === user.id){
+            return relation;
+          }
+        }).length === 0){
             return (<UserListItem 
               key={user.id} 
               user={user} 
               chat={currentOpenedChat} 
               setIsOpen={setIsOpen} />);
+        }
           return null;
       }))
     else if (listTodisplay === "banned")
       return (currentOpenedChat?.bannedUsers?.map((userban)=>{
             if (!currentRelations?.filter((relation) => {
-              console.log(relation);
-              if (WhatsMyId(currentUser!, relation) === userban.id)
+              if (WhatsMyId(currentUser!, relation) === userban.id) {
                 return relation;
+              }
             }).length)
               return (<BanUserItem key={userban.id} user={userban} chat={currentOpenedChat} />);
       }));

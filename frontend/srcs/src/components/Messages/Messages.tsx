@@ -6,12 +6,14 @@ interface MessagesProps {
   messages: Message[] | undefined;
 }
 
+import { WhatsMyId } from "../Chat/PopupChatManagement/blockUserButton.tsx";
+
 const Messages: React.FC<MessagesProps> = ({ messages }) => {
   const chatMessagesRef = useRef<HTMLDivElement | null>(null);
   const user = useAppSelector((state) => state.session.user);
   const friendships = useAppSelector((state) => state.session.friendships)
   const [blockedFriendships, setBlockedFriendships] = useState<Friendships[]>()
-  const [blockedUsersIds, setBlockedUsersIds] = useState<number[]>()
+  const [blockedUsersIds, setBlockedUsersIds] = useState<number[]>([])
 
   useEffect(()=>{
     if (friendships)
@@ -39,7 +41,8 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
   return (
     <div className="chat-messages" ref={chatMessagesRef}>
       {messages?.map((message, index) => (
-        <>
+        !blockedUsersIds.includes(message.senderId) ? (
+      <>
         {   
           messages[index - 1] && message.createdAt.substring(0, 10) !== messages[index - 1].createdAt.substring(0, 10) || !messages[index  -1] ? 
           <span className="message-date"> {message.createdAt.substring(0, 10)}</span> : ""
@@ -71,8 +74,9 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
         </div>
         : ""
         }
-        </>
-              ))}
+      </>
+    ) : ( "" )
+    ))} 
         </div>
   );
 };
