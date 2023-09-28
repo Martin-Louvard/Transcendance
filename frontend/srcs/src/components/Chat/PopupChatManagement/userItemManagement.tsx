@@ -14,6 +14,7 @@ import {
 } from "../../../redux/sessionSlice.ts";
 import { useNavigate } from "react-router-dom";
 import InviteGameButton from "./inviteToGameButton.tsx";
+import { RiVipCrownFill } from "react-icons/ri";
 
 const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannels, setIsOpen:React.Dispatch<React.SetStateAction<boolean>> }) => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -34,6 +35,16 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
     navigate("/friends/friendprofile");
   };
 
+  const displayRights = () => {
+    if (chat.owner.id === user.id && chat.channelType !== 'private-message')
+      return (<GiImperialCrown />)
+    else if (chat.owner.id !== user.id && chat.channelType !== 'private-message'
+      && chat?.admins.filter((admin) => admin.id === user.id).length)
+      return (<RiVipCrownFill />)
+    else
+      return("");
+  };
+
   return (
     <div className="popup-user-list-item">
       <div
@@ -52,14 +63,14 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
         </div>
         <div className="management-chat-user-list-username">
           {user.username}
-          {chat.owner.id === user.id && chat.channelType !== 'private-message'? <GiImperialCrown /> : ""}
+          {displayRights()}
         </div>
       </div>
       { chat.channelType !== 'private-message' ? (
         <>
           <AddUserButton user={user} />
           <div>
-            {chat?.owner.id === currentUser?.id && !chat?.admins.filter((admin) => admin.id === user.id).length ? (
+            {chat?.owner.id === currentUser?.id ? (
               <AdminAddButton user={user} chat={chat} />
               ) : (
                 ""

@@ -88,7 +88,8 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
           </ul>
         </div>
         <div className="popup-leave-currentOpenedChat-button">
-          <LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} />
+          {chat?.channelType !== 'private-message' ? 
+          <LeaveChatButton chat={currentOpenedChat!} setIsOpen={setIsOpen} /> : ""}
         </div>
     </div>
     </Popup>
