@@ -77,9 +77,6 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
               <button onClick={ () => setListToDisplay("participants")}>{"ALL USERS"}</button>
               <button onClick={ () => setListToDisplay("banned")}>{"BANNED USERS"}</button>
             </div>
-            <div className="management-currentOpenedChat-popup">
-                {(isDefine && listTodisplay === "participants") ?  <ChatSettings chat={currentOpenedChat!}/>: ""}
-            </div>
             {listTodisplay === "participants" ? <AddParticipants chat={currentOpenedChat!} /> : ""}
 
           </div>
