@@ -56,7 +56,6 @@ export class AppGateway
           data: { status: 'ONLINE' },
         });
       } catch (e) {
-        console.log(e);
       }
     }
     this.appService.auth(client);
@@ -83,7 +82,6 @@ export class AppGateway
           data: { status: 'OFFLINE' },
         });
       } catch (e) {
-        console.log(e);
       }
     }
     const player = this.playerService.getPlayerBySocketId(client.id);
@@ -211,7 +209,6 @@ export class AppGateway
         lobby.dispatchLobbySlots();
         }
       } catch(err) {
-        console.log(err);
     }
   }
 
@@ -295,7 +292,7 @@ export class AppGateway
     @MessageBody() data: { lobbyId: string; info: PlayerInfo },
   ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player){ console.log("player not found"); return 'player not found';}
+    if (!player){ return 'player not found';}
     if (!this.lobbyService.joinLobby(player, data)) return 'cant join lobby';
     this.lobbyService.dispatchEvent();
   }
@@ -948,7 +945,6 @@ export class AppGateway
       client.emit('friend_request', friendship);
       if (!body[2])
       {
-        console.log("PENDING")
       }
       else if (body[2] === 'ACCEPTED') 
         client.emit('create_chat', chat);
@@ -959,7 +955,6 @@ export class AppGateway
         friend_socket.emit('friend_request', friendship);
         if (!body[2])
         {
-          console.log("PENDING")
         }
         else if (body[2] === 'ACCEPTED')
           friend_socket.emit('create_chat', chat);

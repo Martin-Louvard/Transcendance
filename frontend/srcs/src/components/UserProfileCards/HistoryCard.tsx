@@ -4,6 +4,7 @@ import { Game } from '@shared/class';
 import { User} from '../../Types';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
+import { useAppSelector } from '../../redux/hooks';
 interface HistoryProps {
   user: User;
 }
@@ -11,9 +12,9 @@ interface HistoryProps {
 
 const HistoryCard: React.FC<HistoryProps> = ({user}) => {
   const [games, setGames] = useState<Game[]>([]);
+  const sessionUser = useAppSelector((state)=>state.session.user)
 
   useEffect(() => {
-    console.log(user)
     async function fetchGames() {
         const requestOptions = {
           method: 'GET',
@@ -23,10 +24,8 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
           const response = await fetch(`http://localhost:3001/users/{id}/games?id=${user.id}`, requestOptions)
           const data = await response.json();
           setGames(data);
-          console.log(games);
     
       }catch(err) {
-        console.log(err);
       }
 
     }
@@ -34,7 +33,6 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
   }, [])
 
   function isWinner(game: Game, id: number):number {
-    console.log(game)
     if  ((game.visitor.find((v) =>  v.id == user.id) && game.winner == 'visitor')
           ||
         (game.home.find((v) =>  v.id == user.id) && game.winner == 'home'))
@@ -55,20 +53,21 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
           {
             games && games.length > 0 ?
           games.map((game, index) => (
-            <>			  { isWinner(game, user.id) ? <img src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} /> : ""}
+            <div key={"container" + index} className='history-container'>			  { isWinner(game, user.id) ? "":<img key={"image" + index}   src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} />}
     
             <li className="item" key={index}>
-                <p>Date: {new Date(game.createdAt).toDateString()}</p>
+                <p >Date: {new Date(game.createdAt).toDateString()}</p>
                 <p>|</p>
                 <div>
                 <p >
                   {
                     isWinner(game, user.id) == 0 ?
-                      "Won against "
+                    "Won against "
                         :
                         isWinner(game, user.id) == 1 ?
                         "Draw against" :
-                      "Lost against "
+                        "Lost against "
+                      
                   
                   //  ?
                   // `Visitor (you) - Home` :  `Visitor - Home (you)`
@@ -78,12 +77,21 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
                 </div>
                 {/*<p>Score: {game.score}</p>*/}
             </li>
-            </>
+            </div>
             ))
             :
             <>
-              <p>Play to have an History</p>
-              <Button variant='contained' onClick={() => {navigate("/")}}>Play</Button>
+              {
+                sessionUser.id === user.id ?
+                <>
+                  <p>Play to have an History</p>
+                  <Button variant='contained' onClick={() => {navigate("/")}}>Play</Button>
+                </>
+                :
+                <>
+                  {user.username} has not played games yet
+                </>
+              }
             </>
           }
         </ul>

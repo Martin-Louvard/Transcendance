@@ -18,6 +18,7 @@ import ChangeInfo from './components/Forms/UpdateUserInfoForm.tsx';
 import HistoryCard from './components/UserProfileCards/HistoryCard.tsx';
 import TwoFACard from './components/2FA/2FACard.tsx';
 import FriendCard from './components/UserProfileCards/FriendCard.tsx';
+import NotFound from './components/NotFound/NotFound.tsx';
 import SideChatMenu from './components/Chat/SideChatMenu.tsx';
 import { AutoMatch } from './components/Game/Lobby/Automatch.tsx';
 import { CreateMatchLobby } from './components/Game/Lobby/WaitingLobby.tsx';
@@ -46,14 +47,6 @@ export function App() {
     dispatch({type: 'NEW_SIGNUP'});
   },[isConnected])
 
-  const ProtectedRoute = ({ access_token }: {access_token: string | undefined}) => {
-    if (!access_token) {
-      return <Navigate to="/" replace />;
-    }
-  
-    return <Outlet/>;
-  };
-
   return (
     <Router>
       <Toaster   position="bottom-right"/>
@@ -64,19 +57,17 @@ export function App() {
           <Routes>
             <Route path="/" element={user && isConnected ? <Lobby /> : <Authentication/>} />
             <Route path="/about" element={<AboutPage />} />
-            <Route element={<ProtectedRoute access_token={access_token}/>}>
-              <Route path="/game/:id" element={<Game />} />
-              <Route path="/profile" element={<ProfileCard />} />
-              <Route path="/leaderboard" element={<Leaderboard/>} />
-              <Route path="/friends" element={<FriendsListCard/>} />
-              <Route path="/profile/edit" element={<ChangeInfo/>} />
-              <Route path="/profile/2fa" element={<TwoFACard/>} />
-              <Route path="/friends/friendprofile" element={<FriendCard userToDisplay={friendProfile}/>} />
+              <Route path="/game/:id" element={user && isConnected ? <Game /> : <NotFound />} />
+              <Route path="/profile" element={user && isConnected ? <ProfileCard /> : <NotFound />} />
+              <Route path="/leaderboard" element={user && isConnected ? <Leaderboard/> : <NotFound />} />
+              <Route path="/friends" element={user && isConnected ? <FriendsListCard/> : <NotFound />} />
+              <Route path="/profile/edit" element={user && isConnected ? <ChangeInfo/> : <NotFound />} />
+              <Route path="/profile/2fa" element={user && isConnected ? <TwoFACard/> : <NotFound />} />
+              <Route path="/friends/friendprofile" element={user && isConnected ? <FriendCard userToDisplay={friendProfile}/> : <NotFound />} />
               {
                 user &&
-                <Route path="/profile/history" element={<HistoryCard user={user}/>} />
+                <Route path="/profile/history" element={user && isConnected ? <HistoryCard user={user}/> : <NotFound />} />
               }
-            </Route>
             <Route path={"/*"} element={ <Navigate to="/" replace />}/>
           </Routes>
         {/* </div> */}
