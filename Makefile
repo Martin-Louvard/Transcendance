@@ -31,6 +31,14 @@ fclean:
 	make purge
 	make rmvol
 
+ffclean:
+	docker         stop          $$(docker ps -qa)
+	docker         rm    --force $$(docker ps -qa)
+	docker         rmi   --force $$(docker images -qa)
+	docker volume  rm            $$(docker volume ls -q)
+	docker network rm            $$(docker network ls -q)
+	docker builder prune --force
+
 toggle_hostname:
 	-sh tools/toggle_hostname.sh
 
