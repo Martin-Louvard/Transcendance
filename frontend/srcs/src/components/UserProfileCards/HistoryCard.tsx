@@ -4,6 +4,7 @@ import { Game } from '@shared/class';
 import { User} from '../../Types';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
+import { useAppSelector } from '../../redux/hooks';
 interface HistoryProps {
   user: User;
 }
@@ -11,6 +12,7 @@ interface HistoryProps {
 
 const HistoryCard: React.FC<HistoryProps> = ({user}) => {
   const [games, setGames] = useState<Game[]>([]);
+  const sessionUser = useAppSelector((state)=>state.session.user)
 
   useEffect(() => {
     async function fetchGames() {
@@ -51,7 +53,7 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
           {
             games && games.length > 0 ?
           games.map((game, index) => (
-            <div key={"container" + index} className='history-container'>			  { isWinner(game, user.id) ? <img key={"image" + index}   src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} /> : ""}
+            <div key={"container" + index} className='history-container'>			  { isWinner(game, user.id) ? "":<img key={"image" + index}   src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} />}
     
             <li className="item" key={index}>
                 <p >Date: {new Date(game.createdAt).toDateString()}</p>
@@ -60,11 +62,11 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
                 <p >
                   {
                     isWinner(game, user.id) == 0 ?
-                    "Lost against "
+                    "Won against "
                         :
                         isWinner(game, user.id) == 1 ?
                         "Draw against" :
-                        "Won against "
+                        "Lost against "
                       
                   
                   //  ?
@@ -79,8 +81,17 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
             ))
             :
             <>
-              <p>Play to have an History</p>
-              <Button variant='contained' onClick={() => {navigate("/")}}>Play</Button>
+              {
+                sessionUser.id === user.id ?
+                <>
+                  <p>Play to have an History</p>
+                  <Button variant='contained' onClick={() => {navigate("/")}}>Play</Button>
+                </>
+                :
+                <>
+                  {user.username} has not played games yet
+                </>
+              }
             </>
           }
         </ul>
