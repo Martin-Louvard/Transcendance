@@ -51,7 +51,7 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
           {
             games && games.length > 0 ?
           games.map((game, index) => (
-            <>			  { isWinner(game, user.id) ? <img key={"image" + index}   src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} /> : ""}
+            <div key={"container" + index} className='history-container'>			  { isWinner(game, user.id) ? <img key={"image" + index}   src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} /> : ""}
     
             <li className="item" key={index}>
                 <p >Date: {new Date(game.createdAt).toDateString()}</p>
@@ -74,7 +74,7 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
                 </div>
                 {/*<p>Score: {game.score}</p>*/}
             </li>
-            </>
+            </div>
             ))
             :
             <>
