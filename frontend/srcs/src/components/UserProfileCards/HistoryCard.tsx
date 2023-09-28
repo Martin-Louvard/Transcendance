@@ -13,7 +13,6 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
   const [games, setGames] = useState<Game[]>([]);
 
   useEffect(() => {
-    console.log(user)
     async function fetchGames() {
         const requestOptions = {
           method: 'GET',
@@ -23,10 +22,8 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
           const response = await fetch(`http://localhost:3001/users/{id}/games?id=${user.id}`, requestOptions)
           const data = await response.json();
           setGames(data);
-          console.log(games);
     
       }catch(err) {
-        console.log(err);
       }
 
     }
@@ -34,7 +31,6 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
   }, [])
 
   function isWinner(game: Game, id: number):number {
-    console.log(game)
     if  ((game.visitor.find((v) =>  v.id == user.id) && game.winner == 'visitor')
           ||
         (game.home.find((v) =>  v.id == user.id) && game.winner == 'home'))
@@ -55,10 +51,10 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
           {
             games && games.length > 0 ?
           games.map((game, index) => (
-            <>			  { isWinner(game, user.id) ? <img src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} /> : ""}
+            <>			  { isWinner(game, user.id) ? <img key={"image" + index}   src={'/crown.svg'} width={100} height={50} style={{ display: "flex", flexDirection: "column" }} /> : ""}
     
             <li className="item" key={index}>
-                <p>Date: {new Date(game.createdAt).toDateString()}</p>
+                <p >Date: {new Date(game.createdAt).toDateString()}</p>
                 <p>|</p>
                 <div>
                 <p >

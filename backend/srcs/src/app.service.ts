@@ -28,7 +28,6 @@ export class AppService {
           throw "user not registered";
         this.playerService.connectPlayer({id: user.id, username: user.username, avatar: user.avatar, socket: client});
     } catch (error) {
-      console.log(error);
       this.logger.log("Client disconnected - Invalid JWT Token");
       client.disconnect();
     }

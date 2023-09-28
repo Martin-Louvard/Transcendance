@@ -174,7 +174,6 @@ const SideChatMenu = () => {
         }
       }
       catch (error){
-        console.log(error);
       }
     }
   };

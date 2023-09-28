@@ -273,9 +273,6 @@ export class Instance {
 				}
 			if (!this.isRestarting) {
 
-				// const accelerationVector = e.body.velocity.clone().unit().scale(this.params.ball.ballAcceleration);
-				// console.log(accelerationVector);
-				// e.body.velocity.vadd(accelerationVector);
 				
 				const velocityMagnitude = e.body.velocity.length();
 				if (velocityMagnitude < minSpeed) {

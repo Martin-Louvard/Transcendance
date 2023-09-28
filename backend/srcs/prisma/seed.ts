@@ -195,7 +195,6 @@ async function main() {
     },
   });
 
-  console.log({ user1, user2, user42, admin, chatGeneral });
 }
 
 // execute the main function

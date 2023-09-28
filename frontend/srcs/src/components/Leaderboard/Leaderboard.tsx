@@ -26,7 +26,6 @@ const goToUserProfile = (user: User) => {
           const data = await response.json();
           setBoard(data);
       }catch(err) {
-        console.log(err);
       }
     }
     fetchGames();
