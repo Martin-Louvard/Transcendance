@@ -25,6 +25,7 @@ import { useWindowSize } from "./Lobby/CreateMatch";
 import { websocketConnected } from "/src/redux/websocketSlice";
 import { WebSocketState, setParams } from "/src/redux/websocketSlice";
 import { Button } from "@mui/material";
+import { setLobbyType } from "/src/redux/websocketSlice";
 
 export const Ball: React.FC = (props) => {
 	const ballRef = useRef<Mesh>(null!)
@@ -467,10 +468,10 @@ export const Render: React.FC = (props) => {
 			<Wall size={[2, 25, game.mapHeight]} position={[game.mapWidth / 2, 5, 0]} />
 			<Wall size={[2, 25, game.mapHeight]} position={[-game.mapWidth / 2, 5, 0]} />
 			<mesh>
-				<boxBufferGeometry args={[game.mapWidth, 1.5, 2]}/>
+				<boxGeometry args={[game.mapWidth, 1.5, 2]}/>
 				<meshBasicMaterial color={"white"}/>
 			</mesh>
-			{balls}/
+			{balls}
 			{players}
 		</>
 		: 

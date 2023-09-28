@@ -288,8 +288,8 @@ export class LobbyService {
 		const lobby = this.lobbies.get(id);
 		if (!lobby)
 			return ;
-		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance;
 		const players = [...lobby.players.values()];
+		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance || players.length <= 2;
 		const users = await this.prismaService.user.findMany({
 			where: {
 				id: {in: duel ? [players[0].id, players[1].id] : [players[0].id, players[1].id, players[2].id, players[3].id]},

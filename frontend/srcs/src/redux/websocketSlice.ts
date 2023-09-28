@@ -97,7 +97,6 @@ const websocketSlice = createSlice({
         state.params.classic = false;
     },
     setParams: (state, action) => {
-      console.log(action.payload);
       state.params = JSON.parse(JSON.stringify(action.payload)); 
     },
     setLobbySlots: (state, action) => {
