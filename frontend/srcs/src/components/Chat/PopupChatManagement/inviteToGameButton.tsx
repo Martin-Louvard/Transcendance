@@ -16,7 +16,7 @@ const InviteGameButton = ({ user }: { user: User }) => {
   };
   return (
     <div
-      className="management-add-user-button"
+      className="management-button"
       onClick={() => handleInviteUser()}
     >
       <IoLogoGameControllerB />

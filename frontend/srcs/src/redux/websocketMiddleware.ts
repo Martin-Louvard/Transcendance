@@ -14,7 +14,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       case 'WEBSOCKET_CONNECT':
         if (!action.payload || action.payload.length == 0)
           return ;
-        socket = io("http://localhost:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
+        socket = io("http://10.33.3.1:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
 
         socket.on('connect', () => {
           store.dispatch(setWaitingToConnect(false));
