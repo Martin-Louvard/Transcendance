@@ -52,12 +52,11 @@ const Navbar: React.FC = () => {
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement | HTMLImageElement>) => {
     event.preventDefault();
-    navigate('/');
     const targetId = event.currentTarget.id;
     if (targetId === "profile") navigate("/profile");
     else if (targetId === "friends")navigate("/friends");
     else if (targetId === "leaderboard") navigate("/leaderboard");
-    else if (targetId === "play") dispatch(setContentToShow(ContentOptions.PLAY));
+    else if (targetId === "play") navigate('/');
   };
 
   const renderMenuButtons = () => (

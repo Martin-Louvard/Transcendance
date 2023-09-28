@@ -12,10 +12,12 @@ import {
   setContentToShow,
   setFriendProfile,
 } from "../../../redux/sessionSlice.ts";
+import { useNavigate } from "react-router-dom";
 
 const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannels, setIsOpen:React.Dispatch<React.SetStateAction<boolean>> }) => {
   const currentUser = useAppSelector((state) => state.session.user);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const isKickable = () => {
     if (
@@ -28,7 +30,7 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
 
   const goToUserProfile = (user: User) => {
     dispatch(setFriendProfile(user));
-    dispatch(setContentToShow(ContentOptions.FRIENDPROFILE));
+    navigate("/friends/friendprofile");
   };
 
   return (

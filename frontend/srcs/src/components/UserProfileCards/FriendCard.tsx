@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
-import Chat from '../Chat/Chat';
 import HistoryCard from './HistoryCard';
 import { User, Status, Friendships } from '../../Types';
 import { toast } from "react-hot-toast";
-import { addOpenedChatChannel, setJoinedChatChannels } from '../../redux/sessionSlice';
 
 interface FriendCardProps {
   userToDisplay: User;
@@ -14,8 +12,6 @@ const FriendCard: React.FC<FriendCardProps> = ({ userToDisplay }) => {
   const user = useAppSelector((state) => state.session.user);
   const [friendship, setFriendship] = useState<Friendships>();
   const friendships = useAppSelector((state)=> state.session.friendships);
-  const joinedChatChannels = useAppSelector((state) => state.session.JoinedChatChannels)
-  const [chatOpen, setChatOpen] = useState<boolean>(false);
   const [showGames, setShowGames] = useState<boolean>(false);
   const dispatch = useAppDispatch();
 
@@ -24,7 +20,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ userToDisplay }) => {
      return userToDisplay.id === f.user_id || userToDisplay.id === f.friend_id
     })
     setFriendship(friendshipExists)
-  },[userToDisplay]) 
+  },[userToDisplay, friendships]) 
 
   const deleteFriendship = async () => {
      dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [friendship?.id, friendship?.friend_id == user?.id ? friendship?.user.username:friendship?.friend.username, Status.CANCELED] })
@@ -44,13 +40,12 @@ const FriendCard: React.FC<FriendCardProps> = ({ userToDisplay }) => {
   const options = () =>{
     if (friendship?.status === Status.ACCEPTED){
       return(<>
-        <button onClick={() => {if(friendship.chat_id){dispatch(addOpenedChatChannel(joinedChatChannels.filter(c =>c.id ==- friendship.chat_id)))}}}>Open Private Chat</button>
         <button onClick={() => deleteFriendship()}>Delete From Friends</button>
         <button onClick={() => blockFriendship()}>Block From Friends</button>
       </>
       )
     }
-    else if (friendship === undefined){
+    else if (userToDisplay.id !== user?.id){
       return(<>
         <button onClick={() => sendFriendRequest()}>Add Friend</button>
       </>

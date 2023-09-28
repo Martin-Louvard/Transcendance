@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { User, ChatChannels, Friendships, Friend, Message, ContentOptions } from "../Types";
+import { User, ChatChannels, Friendships, Friend, Message } from "../Types";
 import { fetchRelatedUserData } from "./sessionThunks";
 import { initNotifications } from './sessionFunctions';
 
