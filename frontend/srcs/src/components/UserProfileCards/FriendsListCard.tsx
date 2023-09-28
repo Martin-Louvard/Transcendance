@@ -128,7 +128,6 @@ const FriendsListCard: React.FC = (props) =>{
   }
 
   const displayFriendships = () =>{
-    console.log(friendRequests)
 
 return (
   <>

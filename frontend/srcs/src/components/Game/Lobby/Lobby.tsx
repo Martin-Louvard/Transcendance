@@ -74,7 +74,6 @@ export const Lobby: React.FC = (props) => {
   }
 
   useEffect(() => {
-    console.log("type: ", lobbyType);
   }, [])
 
   return (
@@ -96,7 +95,7 @@ export const Lobby: React.FC = (props) => {
         <div style={{display: 'flex'}}>
         {
           lobbyType == LobbyType.score ?
-          <LobbyDisplayScore/>
+          <LobbyDisplayScore />
           :
           !game.lobbyId && lobbyType == LobbyType.auto ?
           <AutoMatch user={user} game={game}/>
