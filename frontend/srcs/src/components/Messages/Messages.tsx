@@ -6,8 +6,6 @@ interface MessagesProps {
   messages: Message[] | undefined;
 }
 
-import { WhatsMyId } from "../Chat/PopupChatManagement/blockUserButton.tsx";
-
 const Messages: React.FC<MessagesProps> = ({ messages }) => {
   const chatMessagesRef = useRef<HTMLDivElement | null>(null);
   const user = useAppSelector((state) => state.session.user);

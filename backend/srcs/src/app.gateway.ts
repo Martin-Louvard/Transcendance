@@ -871,11 +871,7 @@ export class AppGateway
       )
         return;
       let update;
-      console.log(body[2]);
-      console.log(friendship);
-      console.log(body[2] === 'BLOCKED' && !friendship);
       if (body[2] === 'BLOCKED' && !friendship) {
-        console.log("ouais c'est greg");
         friendship = await this.friendService.create({
           user_id: user_id,
           friend_id: friend_id,

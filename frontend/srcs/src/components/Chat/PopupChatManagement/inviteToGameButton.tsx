@@ -1,7 +1,7 @@
 import { User } from "../../../Types.ts";
 import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
 import { toast } from "react-hot-toast";
-import { IoGameControllerOutline } from "react-icons/io";
+import { IoLogoGameControllerB } from "react-icons/io";
 
 const InviteGameButton = ({ user }: { user: User }) => {
   const currentUser = useAppSelector((state) => state.session.user);
@@ -16,7 +16,7 @@ const InviteGameButton = ({ user }: { user: User }) => {
       className="management-add-user-button"
       onClick={() => handleInviteUser()}
     >
-      <IoGameControllerOutline />
+      <IoLogoGameControllerB />
     </div>
   );
 };
