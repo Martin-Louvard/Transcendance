@@ -21,15 +21,6 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const isKickable = () => {
-    if (
-      (chat?.admins.includes(currentUser!) && !chat?.admins.includes(user)) ||
-      chat?.owner.id === currentUser?.id
-    )
-      return true;
-    else return false;
-  };
-
   const goToUserProfile = (user: User) => {
     dispatch(setFriendProfile(user));
     navigate("/friends/friendprofile");
@@ -77,10 +68,10 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
               )}
             </div>
             <div>
-              {isKickable() ? <KickUserButton user={user} chat={chat} /> : ""}{" "}
+              {chat?.admins.filter((admin) => admin.id === currentUser?.id).length ? <KickUserButton user={user} chat={chat} /> : ""}{" "}
             </div>
             <div>
-              {isKickable() ? <MuteUserButton chat={chat} user={user} /> : ""}{" "}
+              {chat?.admins.filter((admin) => admin.id === currentUser?.id).length ? <MuteUserButton chat={chat} user={user} /> : ""}{" "}
             </div>
           </>
       ) : ( " " )}
