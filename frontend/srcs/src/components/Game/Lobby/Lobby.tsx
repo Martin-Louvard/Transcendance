@@ -20,7 +20,9 @@ import "../Lobby.scss";
 
 export const LobbyDisplayScore: React.FC = (props) => {
   const game = useAppSelector((state) => state.websocket);
-
+  console.log(game.lastGame);
+  console.log(game.players);
+  console.log(game.playersInfo[0]);
   return (
     game.lastGame &&
       <div>
