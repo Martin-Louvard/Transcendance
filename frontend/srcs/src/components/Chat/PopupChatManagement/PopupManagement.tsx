@@ -73,12 +73,12 @@ const PopupManagement = ({chat, isOpen, setIsOpen}: {chat: ChatChannels | undefi
         <div className='chat-popup'>
           <div className='popup-top'>
             <div className='popup-chat-menu'>
+
               {chat?.owner.id === currentUser?.id ? <button onClick={ () => setListToDisplay("modify")}>{"MODIFY"}</button> : ""}
               <button onClick={ () => setListToDisplay("participants")}>{"ALL USERS"}</button>
               <button onClick={ () => setListToDisplay("banned")}>{"BANNED USERS"}</button>
             </div>
             {listTodisplay === "participants" ? <AddParticipants chat={currentOpenedChat!} /> : ""}
-
           </div>
           <ul>
             {display()}

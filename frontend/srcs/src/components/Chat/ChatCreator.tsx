@@ -4,6 +4,7 @@ import Form from "../Forms/Form";
 import { useAppDispatch } from "../../redux/hooks";
 import { Friend } from "../../Types";
 import './SideChatMenu.scss'
+import toast from 'react-hot-toast';
 
 const ChatCreator: React.FC = () => {
   const user = useAppSelector((state) => state.session.user);
@@ -17,22 +18,27 @@ const ChatCreator: React.FC = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => { 
     event.preventDefault();
+    
+    if (!name || name.length < 3 || name.length > 20){
+      toast.error("Chat name should be between 3 and 20 characteres long");
+    }
+    else {
+      dispatch({
+        type: "CREATE_CHAT",
+        payload: {
+          ownerId: user?.id,
+          name: name,
+          channelType: channelType,
+          password: password,
+          participants: participants,
+        },
+      });
 
-    dispatch({
-      type: "CREATE_CHAT",
-      payload: {
-        ownerId: user?.id,
-        name: name,
-        channelType: channelType,
-        password: password,
-        participants: participants,
-      },
-    });
-
-    setName("");
-    setChannelType("Private");
-    setPassword("");
-    setParticipants([]);
+      setName("");
+      setChannelType("Private");
+      setPassword("");
+      setParticipants([]);
+    }
   };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

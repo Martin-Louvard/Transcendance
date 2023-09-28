@@ -368,6 +368,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('join_chat', updatedChats);
@@ -391,6 +392,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('add_admin', updatedChats);
@@ -414,6 +416,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('ban_user', [updatedChats, bannedUser.id]);
@@ -448,6 +451,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('mute_user', updatedChats);
@@ -481,6 +485,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     await this.prisma.actionOnUser.delete({
@@ -507,6 +512,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('add_user_chat', updatedChats);
@@ -540,6 +546,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('leave_chat', [updatedChat, parseInt(body[1])]);
@@ -562,6 +569,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     const updatedAdmins = chat.admins.filter(
@@ -580,6 +588,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('remove_admin', updatedChat);
@@ -614,6 +623,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('unban_user', updatedChat);
@@ -637,6 +647,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     const updateParticipants = chat.participants.filter(
@@ -657,6 +668,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('change_owner', updatedChannel);
@@ -678,6 +690,7 @@ export class AppGateway
         messages: { include: { sender: true } },
         participants: true,
         bannedUsers: true,
+        friendship: true, 
       },
     });
     const updatedParticipants = chat.participants.filter(
@@ -702,6 +715,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('kick_user', [updatedChat, userToKick.id]);
@@ -743,6 +757,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('create_chat', chatChannel);
@@ -766,6 +781,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
 
@@ -790,6 +806,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
+        friendship: true, 
       },
     });
     this.server.emit('update_chat', channel);
@@ -808,6 +825,11 @@ export class AppGateway
       const updatedFriend = await this.prisma.friends.update({
         where: { id: friendRecv.id },
         data: { status: 'BLOCKED' },
+        include: {
+          friend: true,
+          user: true,
+          chat: true,
+        },
       });
       this.server.emit('block_user', updatedFriend);
     } else {
@@ -820,7 +842,7 @@ export class AppGateway
       const updatedFriend = await this.prisma.friends.update({
         where: { id: createdFriendShip.id },
         data: { status: 'BLOCKED' },
-        include: { friend: true },
+        include: { friend: true, user: true, chat: true },
       });
       this.server.emit('block_user', updatedFriend);
     }
@@ -849,12 +871,31 @@ export class AppGateway
       )
         return;
       let update;
-      if (body[2]) {
+      console.log(body[2]);
+      console.log(friendship);
+      console.log(body[2] === 'BLOCKED' && !friendship);
+      if (body[2] === 'BLOCKED' && !friendship) {
+        console.log("ouais c'est greg");
+        friendship = await this.friendService.create({
+          user_id: user_id,
+          friend_id: friend_id,
+          sender_id: user_id,
+          chat_id: 0,
+        });
+        update = await this.prisma.friends.update({
+          where: { id: friendship.id },
+          data: { status: 'BLOCKED' },
+          include: { friend: true, user: true, chat: true },
+        });
+      }
+      else if (body[2]) {
         update = await this.prisma.friends.update({
           where: { id: body[0] },
           data: { status: body[2], sender_id: user_id },
+          include: { chat: true }
         });
-      } else
+      } 
+      else
         update = await this.friendService.create({
           user_id: user_id,
           friend_id: friend_id,
@@ -870,6 +911,7 @@ export class AppGateway
           messages: { include: { sender: true } },
           participants: true,
           bannedUsers: true,
+          friendship: true, 
         },
       });
       const friendplayer = this.playerService.getPlayerById(friend_id);
