@@ -25,7 +25,7 @@ const TwoFACard: React.FC = () => {
         };
   
         try{
-          const response = await fetch(`http://10.33.3.1:3001/2fa/${user?.username}/generate`, requestOptions)
+          const response = await fetch(`http://localhost:3001/2fa/${user?.username}/generate`, requestOptions)
           if (response.ok) {
             const blobData = await response.blob();
             const blobText = await blobData.text()
@@ -49,7 +49,7 @@ const TwoFACard: React.FC = () => {
         };
   
         try{
-          const response = await fetch(`http://10.33.3.1:3001/2fa/${user?.username}/turn-on`, requestOptions)
+          const response = await fetch(`http://localhost:3001/2fa/${user?.username}/turn-on`, requestOptions)
           if (response.ok)
           {
             const result = await response.json()
