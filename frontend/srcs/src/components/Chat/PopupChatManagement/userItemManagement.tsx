@@ -68,10 +68,10 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
               )}
             </div>
             <div>
-              {chat?.admins.filter((admin) => admin.id === currentUser?.id).length ? <KickUserButton user={user} chat={chat} /> : ""}{" "}
+              {chat?.admins.filter((admin) => admin.id === currentUser?.id).length && chat?.owner.id !== user.id ? <KickUserButton user={user} chat={chat} /> : ""}{" "}
             </div>
             <div>
-              {chat?.admins.filter((admin) => admin.id === currentUser?.id).length ? <MuteUserButton chat={chat} user={user} /> : ""}{" "}
+              {chat?.admins.filter((admin) => admin.id === currentUser?.id).length && chat?.owner.id !== user.id ? <MuteUserButton chat={chat} user={user} /> : ""}{" "}
             </div>
           </>
       ) : ( " " )}

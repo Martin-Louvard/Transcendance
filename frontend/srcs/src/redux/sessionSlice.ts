@@ -318,7 +318,10 @@ export const sessionSlice = createSlice({
           for (let i = chat.messages.length - 1; i >= 0; i--) {
             if (
               !chat.messages[i]?.readersId?.includes(userId) &&
-              chat.messages[i]?.senderId !== userId
+              chat.messages[i]?.senderId !== userId && !state.friendships?.filter((rela) => {
+                if (rela.status === 'BLOCKED' && (rela.friend_id === chat.messages[i]?.senderId || rela.user_id === chat.messages[i]?.senderId))
+                  return rela;
+                }).length
             ) {
               notifs++;
             } else {

@@ -14,6 +14,7 @@ import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, 
 import { LobbyService } from './game/lobby/lobby.service';
 import { PlayerService } from './game/player/player.service';
 import { FriendsService } from './friends/friends.service';
+import { ChatChannelsService } from './chat-channels/chat-channels.service';
 import * as bcrypt from 'bcrypt';
 import { Logger } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
@@ -409,7 +410,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('join_chat', updatedChats);
