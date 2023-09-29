@@ -95,7 +95,7 @@ export const Game: React.FC = () => {
 				<Render game={game}/>
 			</Canvas>
 			<div>
-				<Button onClick={() => leaveLobby()}> Leave </Button>
+				<Button onClick={() => leaveLobby()}> Surrender </Button>
 			</div>
 		</>
 		: 
