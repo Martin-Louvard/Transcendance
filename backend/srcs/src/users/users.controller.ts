@@ -1,4 +1,4 @@
-import { UseInterceptors, UploadedFile, Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Res,   NotAcceptableException, Put,
+import { UseInterceptors, UploadedFile, Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Res,   NotAcceptableException, Put, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,6 +22,7 @@ export class UsersController {
 
   @Post()
   @ApiCreatedResponse({ type: User })
+  @UsePipes(new ValidationPipe())
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
     return user
@@ -71,6 +72,7 @@ export class UsersController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe())
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: User })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
@@ -89,6 +91,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: User })
+  @UsePipes(new ValidationPipe())
   addFriend(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
     return this.usersService.addFriend(username, updateUserFriendsDto);
   }
@@ -96,6 +99,7 @@ export class UsersController {
   @Delete(':username/friends')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @UsePipes(new ValidationPipe())
   removeFriend(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
     return this.usersService.removeFriend(username, updateUserFriendsDto);
   }

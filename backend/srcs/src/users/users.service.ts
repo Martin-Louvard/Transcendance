@@ -27,6 +27,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    console.log(createUserDto);
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
       roundsOfHashing,
