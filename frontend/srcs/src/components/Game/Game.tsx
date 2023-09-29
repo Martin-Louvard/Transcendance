@@ -11,7 +11,6 @@ import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass
 import * as THREE from 'three'
 import { useKeyboardInput } from "./InputState";
 import { PlayerState, usePlayerStore } from "./PlayerStore";
-import verify from "../Authentication/verify";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { emitInput } from "./emitInput";

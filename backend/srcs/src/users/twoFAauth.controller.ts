@@ -12,6 +12,7 @@ import { AuthService } from 'src/auth/auth.service';
     constructor(private userService: UsersService, private prisma: PrismaService) {}
   
     @Post(':username/generate')
+    @UseGuards(JwtAuthGuard)
     async register(@Param('username') username: string) {
       const { otpauthUrl } = await this.userService.generateTwoFactorAuthenticationSecret(username);
    

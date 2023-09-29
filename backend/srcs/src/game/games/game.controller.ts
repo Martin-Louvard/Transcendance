@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { GameService } from './game.service';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('game')
 @ApiTags('game')
@@ -13,6 +14,7 @@ export class GameController {
   }
 
   @Get('leaderboard')
+  @UseGuards(JwtAuthGuard)
   leaderboard(){
     return this.GameService.getLeaderboard();
   }
