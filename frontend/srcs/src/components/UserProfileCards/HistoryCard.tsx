@@ -22,7 +22,7 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
       };
     
       try{
-          const response = await fetch(`http://10.33.3.5:3001/users/{id}/games?id=${user.id}`, requestOptions)
+          const response = await fetch(`http://localhost:3001/users/{id}/games?id=${user.id}`, requestOptions)
           const data = await response.json();
           setGames(data);
     

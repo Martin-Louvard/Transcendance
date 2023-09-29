@@ -33,7 +33,7 @@ const ChangeInfo = () => {
          })
       };
       try{
-        const response =  await fetch(`http://10.33.3.5:3001/users/${user?.id}`, requestOptions)
+        const response =  await fetch(`http://localhost:3001/users/${user?.id}`, requestOptions)
         const parsedResponse = await response.json();
         if (response.ok)
         {
