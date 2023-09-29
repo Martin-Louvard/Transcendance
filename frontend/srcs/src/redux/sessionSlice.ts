@@ -64,29 +64,34 @@ export const sessionSlice = createSlice({
       }
     },
     addNewChatChannel: (state, action) => {
-      const newChat = action.payload;
-      if (
-        !state.JoinedChatChannels?.some(
-          (channel) => channel.id === newChat.id,
-        )){
-        state.JoinedChatChannels?.push(newChat);
-      }
-      else {
-        state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
-          if (newChat.id === chat.id){
-            return newChat;
-          }
-          return chat;
-        })
-        if (state.OpenedChatChannels.filter((chat) => chat.id === newChat.id).length > 0) {
-          state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) => {
+      const newChat: ChatChannels = action.payload;
+      if (newChat.participants.filter((user) => user.id === state.user?.id).length){
+        if (!state.JoinedChatChannels?.some(
+          (channel) => channel.id === newChat.id)){
+          state.JoinedChatChannels?.push(newChat);
+        }
+        else {
+          state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
             if (newChat.id === chat.id){
               return newChat;
             }
             return chat;
           })
+          if (state.OpenedChatChannels.filter((chat) => chat.id === newChat.id).length > 0) {
+            state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) => {
+              if (newChat.id === chat.id){
+                return newChat;
+              }
+              return chat;
+            })
+          }
         }
       }
+    },
+    removeJoinedChatChannel: (state, action) => {
+      const chatChannelId = action.payload;
+      state.JoinedChatChannels = state.JoinedChatChannels?.filter(
+        (chann) => chann.id !== chatChannelId);
     },
     removeOpenedChatChannel: (state, action) => {
       const chatChannelId = action.payload;
@@ -158,22 +163,24 @@ export const sessionSlice = createSlice({
     },
     updateOneChat: (state, action) => {
       const updatedChat: ChatChannels = action.payload;
-      if (!state.JoinedChatChannels?.filter(
-        (chann) => chann.id === updatedChat.id).length){
-        state.JoinedChatChannels?.push(updatedChat);
+      if (updatedChat.participants.filter((user) => user.id === state.user?.id).length) {
+        if (!state.JoinedChatChannels?.filter(
+          (chann) => chann.id === updatedChat.id).length){
+          state.JoinedChatChannels?.push(updatedChat);
+        }
+        state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
+          if (updatedChat.id === chat.id){
+            return updatedChat;
+          }
+          return chat;
+        })
+        state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) => {
+          if (updatedChat.id === chat.id){
+            return updatedChat;
+          }
+          return chat;
+        })
       }
-      state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
-        if (updatedChat.id === chat.id){
-          return updatedChat;
-        }
-        return chat;
-      })
-      state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) => {
-        if (updatedChat.id === chat.id){
-          return updatedChat;
-        }
-        return chat;
-      })
     },
     resetNotification: (state, action) => {
       const updatedChat: ChatChannels = action.payload;
@@ -299,7 +306,8 @@ export const sessionSlice = createSlice({
       if (chat && chat.isOpen){
         action.payload.readersId.push(state.user?.id); 
       }
-      state.JoinedChatChannels?.find((c) =>c.id == action.payload.channelId)?.messages?.push(action.payload);
+      state.JoinedChatChannels?.find(
+        (c) =>c.id == action.payload.channelId)?.messages?.push(action.payload);
 
       if (chat && !chat.isOpen && chat.messages?.length > 0) {
         const lastMessage: Message = chat.messages[chat.messages?.length - 1];
@@ -487,6 +495,7 @@ export const {
   updateChat,
   addOpenedChatChannel,
   removeOpenedChatChannel,
+  removeJoinedChatChannel,
   setChatClose,
   setChatOpen,
   resetNotification,

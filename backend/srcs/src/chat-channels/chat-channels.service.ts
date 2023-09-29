@@ -55,7 +55,12 @@ export class ChatChannelsService {
   }
 
   remove(id: number) {
-    return this.prisma.chatChannel.delete({ where: { id } });
+    return this.prisma.chatChannel.delete({ where: { id }, 
+      include: {
+        messages: true,
+        participants: true,
+      },
+    });
   }
 
   async addUserToGeneralChat(user)

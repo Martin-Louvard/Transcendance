@@ -8,7 +8,7 @@ const AddParticipants = ({chat} : {chat: ChatChannels}) => {
   const [isAllowed, setIsAllowed] = useState<boolean>(false);
 
   useEffect(() => {
-    if (chat.admins.filter((user) => user.id === currentUser?.id).length || chat.owner.id === currentUser?.id){
+    if (chat?.admins?.filter((user) => user.id === currentUser?.id).length || chat?.owner?.id === currentUser?.id){
       setIsAllowed(true);
     }
   }, [currentUser, chat]);

@@ -97,7 +97,7 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
      })
   };
   try{
-    const response =  await fetch(`http://localhost:3001/chat-channels/${selectedChat?.id}`, requestOptions)
+    const response =  await fetch(`http://10.33.3.5:3001/chat-channels/${selectedChat?.id}`, requestOptions)
     if (response.ok)
     {
       const data = await response.json();

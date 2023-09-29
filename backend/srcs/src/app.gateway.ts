@@ -587,7 +587,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('leave_chat', [updatedChat, parseInt(body[1])]);
@@ -640,9 +640,15 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: Array<any>,
   ): Promise<void> {
-    const chat = await this.prisma.chatChannel.findUnique({where: {id: parseInt(body[0])}})
-    if (!chat)
+    const chat = await this.prisma.chatChannel.findUnique({
+      where: { id: parseInt(body[0]) }
+    });
+    if (!chat) {
       return;
+    }
+    await this.prisma.chatMessage.deleteMany({
+      where: { channelId: chat.id },
+    })
     await this.prisma.chatChannel.delete({
       where: { id: chat.id },
     });
@@ -691,7 +697,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     const updateParticipants = chat.participants.filter(
@@ -712,7 +718,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('change_owner', updatedChannel);
@@ -734,7 +740,7 @@ export class AppGateway
         messages: { include: { sender: true } },
         participants: true,
         bannedUsers: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     const updatedParticipants = chat.participants.filter(
@@ -759,7 +765,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('kick_user', [updatedChat, userToKick.id]);
@@ -801,7 +807,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('create_chat', chatChannel);
