@@ -11,16 +11,15 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket, GameParameters, PlayerInfo, GameRequest, LobbySlotType } from '@shared/class';
-import { JwtService } from '@nestjs/jwt';
-import { AppService } from './app.service';
 import { LobbyService } from './game/lobby/lobby.service';
 import { PlayerService } from './game/player/player.service';
 import { FriendsService } from './friends/friends.service';
 import * as bcrypt from 'bcrypt';
-export const roundsOfHashing = 10;
-import { Player } from './game/player/player.class';
 import { Logger } from '@nestjs/common';
-import { Lobby } from './game/lobby/lobby.class';
+import { AuthService } from './auth/auth.service';
+
+
+export const roundsOfHashing = 10;
 
 @WebSocketGateway({ cors: '*' })
 export class AppGateway
@@ -29,9 +28,9 @@ export class AppGateway
   constructor(
     private prisma: PrismaService,
     private friendService: FriendsService,
-    private readonly appService: AppService,
     private readonly lobbyService: LobbyService,
     private readonly playerService: PlayerService,
+    private readonly authService: AuthService
   ) {}
 
   connected_clients = new Map<number, Socket>();
@@ -41,6 +40,7 @@ export class AppGateway
   server: Server;
 
   async handleConnection(client: Socket) {
+    this.authService.authSocket(client);
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
@@ -58,7 +58,6 @@ export class AppGateway
       } catch (e) {
       }
     }
-    this.appService.auth(client);
     this.playerService.dispatchGameRequest();
   }
 

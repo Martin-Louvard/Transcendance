@@ -22,7 +22,7 @@ export const LobbyDisplayScore: React.FC = (props) => {
   const game = useAppSelector((state) => state.websocket);
 
   return (
-    game.lastGame &&
+    game.lastGame && game.lastGame.score &&
       <div>
         {
           game.lastGame.winner != 'draw' ?
@@ -85,7 +85,7 @@ export const Lobby: React.FC = (props) => {
         </div>
         }
         {
-          lobbyType != LobbyType.none && !game.isPlaying && !game.lobbyId &&
+          lobbyType != LobbyType.none && !game.isPlaying && (!game.lobbyId || game.LobbyType == LobbyType.score) &&
             <Button color={'primary'} onClick={() => {handleReturnButton()}}>
               <ArrowCircleLeftIcon />
             </Button>

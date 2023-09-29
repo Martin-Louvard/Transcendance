@@ -11,7 +11,6 @@ import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass
 import * as THREE from 'three'
 import { useKeyboardInput } from "./InputState";
 import { PlayerState, usePlayerStore } from "./PlayerStore";
-import verify from "../Authentication/verify";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { emitInput } from "./emitInput";
@@ -26,24 +25,11 @@ import { websocketConnected } from "/src/redux/websocketSlice";
 import { WebSocketState, setParams } from "/src/redux/websocketSlice";
 import { Button } from "@mui/material";
 import { setLobbyType } from "/src/redux/websocketSlice";
+import { Ball } from "./Ball";
+import { Camera } from "./Camera";
+import { Goals } from "./Goals";
+import { Paddle } from "./Paddle";
 
-export const Ball: React.FC = (props) => {
-	const ballRef = useRef<Mesh>(null!)
-	const colorTexture = useTexture('/ballTest.png');
-
-	useFrame(() => {
-		ballRef.current.position.set(props.position[0], props.position[1], props.position[2]);
-		ballRef.current.quaternion.set(props.quaternion.x, props.quaternion.y, props.quaternion.z, props.quaternion.w);
-	  })
-	  
-	return (
-		<mesh position={[0, 0, 0]} ref={ballRef}>
-			<Sphere args={props.args}>
-				<meshPhongMaterial color="white" side={DoubleSide} />
-			</Sphere>
-	  </mesh>
-	)
-}
 
 interface WallProps {
     size: [number, number, number]; 
@@ -59,51 +45,6 @@ const Wall: React.FC<WallProps> = ({ size, position }) => {
         </mesh>
     );
 };
-
-interface PaddleProps {
-    size: [number, number, number]; // Largeur, hauteur, profondeur
-    position: [number, number, number]; // x, y, z
-	quaternion: CANNON.Quaternion,
-	team: 'visitor' | 'home' | null,
-}
-
-const Paddle: React.FC<PaddleProps> = ({ size, position, quaternion, player }) => {
-    const paddleRef = useRef<Mesh>(null)!;
-
-    useFrame(() => {
-		paddleRef.current?.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
-		paddleRef.current?.position.set(position[0], position[1], position[2]);
-		// mise a jour en temps reel si necessaire.
-		// TODO: Peut etre prevoir les directions pour eviter les latences reseaux ???
-    });
-
-    return (
-		<mesh >
-			<Box
-				ref={paddleRef}
-				args={size}
-				position={[0, 0, 0]}>
-							<meshPhongMaterial color={player.team ? (player.team == 'visitor' ? "#0042ff" : "#FF0000") : "#45FF40" } />
-        	</Box>
-		</mesh>
-    ); // // TODO: Ajuste le material en fonction des données  recu. TODO: REcuperer le material en fonction des parametres de skin du player BCP plus tard. TODO... faudra les recuperer dans la db coté back.
-};
-
-const Camera: React.FC = (props) => {
-	let player = props.player;
-	let mapSize:{x: number, y: number} = props.mapSize;
-
-	const { camera } = useThree();
-
-	useFrame(() => {
-		if (!player)
-			return ;
-		camera.position.set(0, Math.max(mapSize.x, mapSize.y), 0)
-		camera.lookAt(0,0, 0);
-		if (player.team == 'home')
-			camera.rotation.z = Math.PI;
-	}, [])
-}
 
 export const Game: React.FC = () => {
 	const game = useAppSelector((state) => state.websocket);
@@ -160,62 +101,6 @@ export const Game: React.FC = () => {
 		: 
 		<></>
 	)
-}
-
-const Cage: React.FC = (props) => {
-	const goalSize = props.goalSize
-	const mapSize = props.mapSize;
-	const team = props.team;
-	if (team) {
-		return (
-			<mesh >
-				<Box args={[goalSize, 2, 0.1]} position={[0, 10, mapSize[1] / 2 - 1]}  >
-					<meshPhongMaterial color="white"  />
-				</Box>
-				<Box args={[2, 10, 0.1]} position={[goalSize / 2 - 1, 5, mapSize[1] / 2 - 1]}  >
-					<meshPhongMaterial color="white"  />
-				</Box>
-				<Box args={[2, 10, 0.1]} position={[-(goalSize / 2 - 1), 5, mapSize[1] / 2 - 1]}  >
-					<meshPhongMaterial color="white"  />
-				</Box>
-			</mesh>
-		);
-	} else {
-		return (
-			<mesh >
-				<Box args={[goalSize, 2, 0.1]} position={[0, 10, -(mapSize[1] / 2 - 1)]}  >
-					<meshPhongMaterial color="white"  />
-				</Box>
-				<Box args={[2, 10, 0.1]} position={[goalSize / 2 - 1, 5, -(mapSize[1] / 2 - 1)]}  >
-					<meshPhongMaterial color="white"  />
-				</Box>
-				<Box args={[2, 10, 0.1]} position={[-(goalSize / 2 - 1), 5, -(mapSize[1] / 2 - 1)]}  >
-					<meshPhongMaterial color="white"  />
-				</Box>
-			</mesh>
-		);
-	}
-}
-
-export const Goals: React.FC = (props) => {
-	const game = useAppSelector((state) => state.websocket);
-	const dispatch = useAppDispatch();
-
-	useEffect(() => {
-		if (game.LobbyType == LobbyType.auto) {
- 			const params: GameParameters = JSON.parse(JSON.stringify(game.params));
-			params.map.size[1] = 200;
-			params.map.goalSize = 40;
-			dispatch(setParams(params));
-		}
-	}, [])
-
-	return (
-		<>
-			<Cage goalSize={game.params.map.goalSize} mapSize={game.params.map.size} team={false} />
-			<Cage goalSize={game.params.map.goalSize} mapSize={game.params.map.size} team={true} />
-		</>
-	);
 }
 
 export const Render: React.FC = (props) => {

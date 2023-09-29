@@ -83,8 +83,6 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
   }
 
   const  checkPassword = async () =>{
-
-
   const requestOptions = {
     method: 'POST',
     headers: { 
