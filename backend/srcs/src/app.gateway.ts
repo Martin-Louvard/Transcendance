@@ -50,10 +50,10 @@ export class AppGateway
         status: 'ONLINE',
       });
       try {
-
+        const user = await this.prisma.user.findUnique({where: {id: user_id}})
         await this.prisma.user.update({
           where: { id: user_id },
-          data: { status: 'ONLINE' },
+          data: { status: 'ONLINE', connections: user.connections + 1 },
         });
       } catch (e) {
       }

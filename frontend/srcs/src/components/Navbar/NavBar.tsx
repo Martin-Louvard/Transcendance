@@ -9,8 +9,10 @@ import { Friendships, Status, ContentOptions } from '../../Types';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClientEvents, ClientPayloads, LobbyType } from '@shared/class.ts';
-import { setLobbyType } from '/src/redux/websocketSlice.ts';
+import { setLobbyType } from '../../redux/websocketSlice.ts';
+import { Popup } from 'reactjs-popup';
 
+let contentStyle = { background: 'transparent', border: "none"};
 const Navbar: React.FC = () => {
   const logo = '/marvin.png'
   const user = useAppSelector((state) => state.session.user);
@@ -75,7 +77,7 @@ const Navbar: React.FC = () => {
       <button id="profile" onClick={handleClick}>
         My Profile
       </button>
-      <button id="leaderboard" onClick={handleClick}>
+      <button   id="leaderboard" onClick={handleClick}>
         LeaderBoard
       </button>
     </div>
@@ -99,10 +101,18 @@ const Navbar: React.FC = () => {
           <li className="nav-item">
             {  user?.id && user.id != 0 ? <button style={{color:'black', backgroundColor:"white"}} className="nav-link" onClick={logout}>Logout</button> : null }
           </li>
-
         </ul>
-
-       
+        { user?.connections === 0 ?
+          <Popup
+          open={true}
+          closeOnDocumentClick={true}
+          {...{contentStyle}}
+          >
+            <div className="chat-popup popup-onnboarding">
+              Please, modify your information in MY Profile tab
+            </div>
+        </Popup>
+      : null}
     </nav>
   );
 }
