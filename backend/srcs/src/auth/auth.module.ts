@@ -8,7 +8,6 @@ import { PassportModule } from '@nestjs/passport';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtStrategy } from './jwt.strategy';
 import { PlayerService } from '../game/player/player.service';
-import { AppGateway } from 'src/app.gateway';
 import { LobbyService } from 'src/game/lobby/lobby.service';
 import { PlayerModule } from 'src/game/player/player.module';
 import { FriendsModule } from 'src/friends/friends.module';
@@ -27,7 +26,7 @@ import { FriendsModule } from 'src/friends/friends.module';
     FriendsModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, PlayerService, AppGateway, LobbyService ],
+  providers: [AuthService, JwtStrategy, PlayerService, LobbyService ],
   exports: [AuthService],
 })
 export class AuthModule {}

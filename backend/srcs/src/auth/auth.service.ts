@@ -93,21 +93,4 @@ export class AuthService {
         }
     }
 
-    async authSocket(client: Socket): Promise<void> {
-        try {
-          if (!client.handshake.auth.token) {
-            throw "no jwt token"
-          }
-          const payload = this.jwtService.verify(
-            client.handshake.auth.token,
-          );
-            const user = await this.usersService.findById(client.handshake.auth.user_id);
-            if (!user) 
-              throw "user not registered";
-            this.playerService.connectPlayer({id: user.id, username: user.username, avatar: user.avatar, socket: client});
-        } catch (error) {
-          client.disconnect();
-        }
-      }
-
 }
