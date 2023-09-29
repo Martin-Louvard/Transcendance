@@ -14,7 +14,6 @@ function handleLobbyState(data:ServerPayloads[ServerEvents.LobbyState], socket: 
   if (data.hasFinished)
     store.dispatch(setLobbyType(LobbyType.score)); 
   store.dispatch(setLobbyState(data))
-  console.log("test");
   let payload: ClientPayloads[ClientEvents.LobbyState];
   if (data.hasStarted&& data.lobbyId){
     payload= {
@@ -26,7 +25,6 @@ function handleLobbyState(data:ServerPayloads[ServerEvents.LobbyState], socket: 
     socket?.emit(ClientEvents.LobbyState, payload);
   } 
   if (data.hasFinished){
-    console.log("salut");
     payload = {
       automatch:  null,
       leaveLobby: null,

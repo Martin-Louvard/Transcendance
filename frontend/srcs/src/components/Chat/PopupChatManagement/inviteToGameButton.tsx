@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 export function isPlayerInGame(slots: LobbySlotCli[], user: User): Boolean {
   let isInGame = false;
   slots.forEach((slot) => {
-    console.log(slot);
     if (slot.player?.id == user.id)
       isInGame = true;
   })

@@ -497,7 +497,6 @@ export class Instance {
 	}
 
 	generate() {
-		console.log('start generate');
 		if (this.params) {
 			let angleMax = Math.PI / 2 * (1 / 6);
 			this.rotationSpeed = (this.params.players.rotationSpeed / 100) * (angleMax);
@@ -527,7 +526,6 @@ export class Instance {
 		this.world.balls.forEach((e) => {
 			this.timeoutAction(3000, () => this.ballStart(e));
 		})
-		console.log("end generate");
 	}
 
 	clear() {

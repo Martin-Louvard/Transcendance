@@ -27,7 +27,6 @@ const ChangeInfo = () => {
             'Authorization': `Bearer ${access_token}`
         },
         body: JSON.stringify({
-            id: user?.id,
             username: username,
             email: email,
             password: password,
@@ -35,18 +34,21 @@ const ChangeInfo = () => {
       };
       try{
         const response =  await fetch(`http://localhost:3001/users/${user?.id}`, requestOptions)
+        const parsedResponse = await response.json();
         if (response.ok)
         {
-            const newUser = await response.json();
+            const newUser = parsedResponse
             newUser.access_token = access_token;
             toast.success("Information updated")
             dispatch(setSessionUser(newUser))
            navigate("/profile");
         }
+        else
+            toast.error(parsedResponse.message)
       }catch(err) {
+
       }
     }
-    useEffect(()=>{},[changeInfo])
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         event.target.id === "email" ? setEmail(event.target.value): 
