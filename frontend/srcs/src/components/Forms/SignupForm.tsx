@@ -29,7 +29,8 @@ const SignupForm: React.FC = () => {
     try{
       const response = await fetch('http://localhost:3001/users', requestOptions)
       if (response.status !== 201){
-        toast.error("Username or email is already used by someone else")
+        const parsedResponse = await response.json()
+        toast.error(parsedResponse.message)
         return 
       }
 

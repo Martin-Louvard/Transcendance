@@ -2,6 +2,7 @@ import { PartialType } from '@nestjs/swagger';
 import { CreateUserDto } from './create-user.dto';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from '../entities/user.entity';
+import { IsNotEmpty, MinLength } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
 
@@ -23,6 +24,8 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     @ApiPropertyOptional()
     twoFASecret?: string;
 
-    @ApiPropertyOptional()
+    @ApiProperty()
+    @IsNotEmpty()
+    @MinLength(1)
     username?: string;
 }
