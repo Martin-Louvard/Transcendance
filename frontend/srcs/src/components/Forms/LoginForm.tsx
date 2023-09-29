@@ -60,7 +60,8 @@ const LoginForm: React.FC = () => {
       setPromptIsOpen(true)
     }
     else
-      toast.error("Invalid username or password")
+      toast.error(user.message)
+    
   };
 
   return (
