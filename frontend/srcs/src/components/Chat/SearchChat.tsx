@@ -27,6 +27,7 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
   const [chatBox, setChatBox] = useState<ChatChannels | null>(null);
   const [selectedChat, setSelectedChat] = useState<ChatChannels | null>(null);
   const [passwordInput, setPasswordInput] = useState<string>("");
+  const access_token = useAppSelector((state)=>state.session.access_token)
   const dispatch = useAppDispatch();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,6 +89,8 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
     method: 'POST',
     headers: { 
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${access_token}`,
+
     },
     body: JSON.stringify({
       password: passwordInput,

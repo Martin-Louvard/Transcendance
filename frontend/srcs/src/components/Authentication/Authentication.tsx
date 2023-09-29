@@ -58,7 +58,7 @@ const Authentication: React.FC = () => {
       dispatch(setSessionUser(user2fa))
       dispatch(setToken(user2fa.access_token))
       if (user2fa.id)
-        dispatch(fetchRelatedUserData(user2fa.id))
+        dispatch(fetchRelatedUserData({userId:user2fa.id, access_token: user2fa.access_token}))
       toast.success("Logged in")
     } else if (user2fa.message)
         toast.error(user2fa.message)
@@ -70,7 +70,7 @@ const Authentication: React.FC = () => {
       if (!user.twoFAEnabled) {
         dispatch(setSessionUser(user));
         dispatch(setToken(user.access_token));
-        if (user) dispatch(fetchRelatedUserData(user.id));
+        if (user) dispatch(fetchRelatedUserData({userId:user.id, access_token:user.access_token}));
           toast.success('Logged in');
       } else {
         setTempUser(user)

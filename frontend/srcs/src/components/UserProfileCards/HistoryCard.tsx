@@ -13,11 +13,12 @@ interface HistoryProps {
 const HistoryCard: React.FC<HistoryProps> = ({user}) => {
   const [games, setGames] = useState<Game[]>([]);
   const sessionUser = useAppSelector((state)=>state.session.user)
-
+  const access_token = useAppSelector((state)=>state.session.access_token)
   useEffect(() => {
     async function fetchGames() {
         const requestOptions = {
           method: 'GET',
+          headers: { 'Authorization': `Bearer ${access_token}`},
       };
     
       try{
