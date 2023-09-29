@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChatChannelDto } from './dto/create-chat-channel.dto';
 import { UpdateChatChannelDto } from './dto/update-chat-channel.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -27,10 +27,12 @@ export class ChatChannelsService {
 
   async checkPassword(id: number, password: string) {
     const chat = await this.prisma.chatChannel.findUnique({ where: { id } });
+    if (!chat)
+      return false;
     const chatPassword = chat.password.toString();
     const isPasswordValid = await bcrypt.compare(password, chatPassword);
-
-    if (!isPasswordValid) return false;
+    if (!isPasswordValid) 
+      return false;
     return true;
   }
 
