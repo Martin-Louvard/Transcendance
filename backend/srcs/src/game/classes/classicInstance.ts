@@ -320,7 +320,6 @@ export class ClassicInstance {
 					const maxHorizontalAngle = Math.PI - minHorizontalAngle; // Average on 0
 				  
 					if (angle < minHorizontalAngle) {
-						console.log(Date.now)
 						const adjustmentAngle = minHorizontalAngle - angle;
 						const forceMagnitude = 100;
 						const force = new CANNON.Vec3(forceMagnitude, 0, 0);
