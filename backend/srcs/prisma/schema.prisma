@@ -32,6 +32,7 @@ model User {
   email                  String        @unique
   email42                String?       @unique
   password               String?
+  connections            Int           @default(0)
   avatar                 String?       @default("default.jpg")
   status                 UserStatus    @default(OFFLINE)
   inGame                 Boolean       @default(false)
