@@ -8,6 +8,10 @@ import { PassportModule } from '@nestjs/passport';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtStrategy } from './jwt.strategy';
 import { PlayerService } from '../game/player/player.service';
+import { AppGateway } from 'src/app.gateway';
+import { LobbyService } from 'src/game/lobby/lobby.service';
+import { PlayerModule } from 'src/game/player/player.module';
+import { FriendsModule } from 'src/friends/friends.module';
 
 
 @Module({
@@ -19,9 +23,11 @@ import { PlayerService } from '../game/player/player.service';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '1d' },
     }),
+    PlayerModule,
+    FriendsModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, PlayerService],
+  providers: [AuthService, JwtStrategy, PlayerService, AppGateway, LobbyService ],
   exports: [AuthService],
 })
 export class AuthModule {}
