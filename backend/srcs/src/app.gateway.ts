@@ -17,6 +17,7 @@ import { FriendsService } from './friends/friends.service';
 import * as bcrypt from 'bcrypt';
 import { Logger } from '@nestjs/common';
 import { AuthService } from './auth/auth.service';
+import { AppService } from './app.service';
 
 
 export const roundsOfHashing = 10;
@@ -30,7 +31,7 @@ export class AppGateway
     private friendService: FriendsService,
     private readonly lobbyService: LobbyService,
     private readonly playerService: PlayerService,
-    private readonly authService: AuthService
+    private readonly appService: AppService
   ) {}
 
   connected_clients = new Map<number, Socket>();
@@ -40,7 +41,7 @@ export class AppGateway
   server: Server;
 
   async handleConnection(client: Socket) {
-    this.authService.authSocket(client);
+    this.appService.authSocket(client);
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
