@@ -29,6 +29,7 @@ export class UsersController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: User, isArray: true })
   findAll() {
     return this.usersService.findAll();
@@ -43,6 +44,7 @@ export class UsersController {
 
   @Get(':id/games')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
 	async getGames(@Query('id') id: string) {
     return (await this.usersService.getGames(+id));
 		//return (await this.usersService.findById(+id)).games
@@ -50,6 +52,7 @@ export class UsersController {
 
   @Get('id/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findById(@Query('id') id: string) {
     return this.usersService.findById(+id);
   }
@@ -61,6 +64,7 @@ export class UsersController {
 
   @Get('friends/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findAllFriends(@Query('id') id: string){
     return this.usersService.findAllFriends(+id)
   }
@@ -83,6 +87,7 @@ export class UsersController {
 
   @Post(':username/friends')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiCreatedResponse({ type: User })
   addFriend(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
     return this.usersService.addFriend(username, updateUserFriendsDto);
@@ -90,12 +95,14 @@ export class UsersController {
 
   @Delete(':username/friends')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   removeFriend(@Param('username') username: string, @Body() updateUserFriendsDto: UpdateUserFriendsDto) {
     return this.usersService.removeFriend(username, updateUserFriendsDto);
   }
 
   @Post(':username/avatar')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: './uploads/avatars'

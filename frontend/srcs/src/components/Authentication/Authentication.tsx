@@ -27,7 +27,7 @@ const Authentication: React.FC = () => {
     }
   }, []);
 
-  
+  Popup
   const handleLoginClick = () => {
     setShowLogin(true);
   };

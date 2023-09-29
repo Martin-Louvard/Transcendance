@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { ChatChannelsService } from './chat-channels.service';
 import { CreateChatChannelDto } from './dto/create-chat-channel.dto';
 import { UpdateChatChannelDto } from './dto/update-chat-channel.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('chat-channels')
@@ -23,6 +23,7 @@ export class ChatChannelsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findAll() {
     return this.chatChannelsService.findAll();
   }

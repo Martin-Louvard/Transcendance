@@ -8,21 +8,27 @@ import { Injectable } from '@nestjs/common';
 import { LobbySlot } from "src/Types";
 import { ClassicInstance } from "../classes/classicInstance";
 import { BehaviorSubject, Observable } from 'rxjs';
+import { EventEmitter } from "stream";
 
 @Injectable()
 export class Lobby {
 	constructor(mode: LobbyMode | undefined, private readonly server: Server, creator: Player) {
+		this.eventEmitter = new EventEmitter();
 		if (mode)
 			this.mode = mode;
 		this.id = uuidv4();
-		if (mode == LobbyMode.classic)
+		if (mode == LobbyMode.classic) 
 			this.instance = new ClassicInstance(this);
 		else
 			this.instance = new Instance(this);
+		this.instance.onFinished(() =>{
+			this.eventEmitter.emit("finished");
+		})
 		this.full = false;
 		this.owner = creator;
 		this.slots = [{full: true, type: 0, player: {username: creator.infos.username, avatar: creator.infos.avatar, id: creator.id }}, {full: false, type: 0, player: null}, {full: false, type: 0, player: null}, {full: false, type: 0, player: null}];
 	};
+	private eventEmitter;
 	id: string;
 	mode: LobbyMode;
 	players: Map<string, Player> = new Map<string, Player>();
@@ -31,6 +37,10 @@ export class Lobby {
 	instance: Instance | ClassicInstance;
 	full: boolean;
 	owner: Player = null;
+
+	onFinished(callback: (result: any) => void) {
+		this.eventEmitter.on('finished', callback);
+	}
 
 	public static fromGameParameter(params: GameParameters, server: Server, creator: Player): Lobby {
 		const lobby = new Lobby(params.duel ? LobbyMode.duel : LobbyMode.double, server, creator);

@@ -27,12 +27,24 @@ export class LobbyService {
 		this.server = server;
 	}
 
+	async handleFinishedGame(lobby: Lobby) {
+		if (!lobby || !lobby.instance)
+			return ;
+		await this.postGame(lobby.id);
+		this.logger.log(`Lobby ${lobby.id} deleted`);
+		lobby.clear();
+		this.lobbies.delete(lobby.id);
+		this.dispatchEvent();
+	}
 
 	createLobby(mode: LobbyMode, server: Server, creator: Player) {
 		try {
 			const lobby = new Lobby(mode, server, creator);
 			if (!lobby)
 				return ;
+			lobby.onFinished(() => {
+				this.handleFinishedGame(lobby);
+			})
 			this.logger.log(`Lobby ${lobby.id} created`);
 			lobby.connectPlayer(creator);
 			this.logger.log(`creator ${creator.id} joined ${lobby.id}`);
@@ -71,6 +83,7 @@ export class LobbyService {
 			return false;
 		const lobby = player.lobby;
 		if (lobby && lobby.instance && lobby.instance.hasStarted && !lobby.instance.hasFinished) {
+			console.log("leave lobby trigger surrender : ", lobby.instance.hasFinished);
 			lobby.instance.triggerFinishSurrender(player);
 			return ;
 		}
@@ -287,9 +300,12 @@ export class LobbyService {
 	  }
 
 	async postGame(id: string) {
+		console.log("posting game");
 		const lobby = this.lobbies.get(id);
-		if (!lobby)
+		if (!lobby) {
+			console.log("no lobby");
 			return ;
+		}
 		const players = [...lobby.players.values()];
 		const duel =  lobby.mode == LobbyMode.duel || lobby.instance instanceof ClassicInstance || players.length <= 2;
 		if (players.length < 2)
@@ -301,8 +317,10 @@ export class LobbyService {
 		});
 		const visitorInfos = players.filter((pl) => pl.team == 'visitor');
 		const homeInfos = players.filter((pl) => pl.team == 'home');
-		if (homeInfos.length < 1 || visitorInfos.length < 1)
+		if (homeInfos.length < 1 || visitorInfos.length < 1) {
+			console.log("home or visitor info too short : ", homeInfos, ", ", visitorInfos);
 			return ;
+		}
 		const visitor = await this.prismaService.user.findMany({
 			where: {
 				id: {in: duel ? [visitorInfos[0].id] : [visitorInfos[0].id, visitorInfos[1].id]},
@@ -365,6 +383,7 @@ export class LobbyService {
 		  } catch (error) {
 			console.error("Error creating a game:", error);
 		  }
+		  console.log("game posted");
 		}
 		
 
@@ -379,22 +398,5 @@ export class LobbyService {
 			},
 		  });
 		return (gamesForPlayer);
-	}
-
-	// TODO: Pour le moment on clear tout toues les 5 minutes, une fois le jeu codé il faudra
-	// TODO... clear que les games terminé toutes les 5 minutes
-	@Cron(CronExpression.EVERY_5_SECONDS,
-		{name: 'lobby_cleaner'})
-	clearLobbies() {
-		this.lobbies.forEach(async (lobby: Lobby) => {
-			if (lobby.instance.hasFinished) {
-				await this.postGame(lobby.id);
-				this.logger.log(`Lobby ${lobby.id} deleted`);
-				lobby.clear();
-				this.lobbies.delete(lobby.id);
-				this.dispatchEvent();
-			}
-		})
-		//this.logger.log("Lobbies cleaned");
 	}
 }

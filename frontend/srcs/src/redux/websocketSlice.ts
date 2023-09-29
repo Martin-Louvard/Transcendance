@@ -277,14 +277,15 @@ const websocketSlice = createSlice({
     setLobbyState: (state, action) => {
       if (!state.lobbyId)
         state.lobbyId = action.payload.lobbyId;
-      if (action.payload.hasStarted && !state.isPlaying)
+      if (action.payload.hasStarted && !state.isPlaying && !action.payload.hasFinished)
             state.isPlaying = true;
-      if (action.payload.hasStarted) {
+      if (action.payload.hasStarted && !action.payload.hasFinished) {
         state.isPlaying = true;
       }
       if (action.payload.hasFinished) {
         state.isPlaying = false;
         state.LobbyType = LobbyType.score;
+        console.log("lobby state has finished : ", state.playersInfo);
         state.lastGame = {score: action.payload.score, winner: action.payload.winner, team: action.payload.team, timestamp: Date.now()};
       }
       if (action.payload.playersInfo) {
