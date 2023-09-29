@@ -5,10 +5,12 @@ import { PrismaService } from './../prisma/prisma.service';
 import { AuthEntity } from './entities/auth.entity';
 import * as bcrypt from 'bcrypt';
 import { env } from 'process';
+import { PlayerService } from '../game/player/player.service';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService, private jwtService: JwtService, private usersService: UsersService) {}
+    constructor(private prisma: PrismaService, private jwtService: JwtService, private usersService: UsersService, private readonly playerService: PlayerService) {}
     
     //Need to find the right type for the Promise return
     async login(username: string, pass: string): Promise<any> {
@@ -90,5 +92,22 @@ export class AuthService {
             return(err);
         }
     }
+
+    async authSocket(client: Socket): Promise<void> {
+        try {
+          if (!client.handshake.auth.token) {
+            throw "no jwt token"
+          }
+          const payload = this.jwtService.verify(
+            client.handshake.auth.token,
+          );
+            const user = await this.usersService.findById(client.handshake.auth.user_id);
+            if (!user) 
+              throw "user not registered";
+            this.playerService.connectPlayer({id: user.id, username: user.username, avatar: user.avatar, socket: client});
+        } catch (error) {
+          client.disconnect();
+        }
+      }
 
 }

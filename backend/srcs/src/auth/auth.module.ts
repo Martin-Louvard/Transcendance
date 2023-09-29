@@ -7,6 +7,7 @@ import { jwtConstants } from './constants';
 import { PassportModule } from '@nestjs/passport';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtStrategy } from './jwt.strategy';
+import { PlayerService } from '../game/player/player.service';
 
 
 @Module({
@@ -20,7 +21,7 @@ import { JwtStrategy } from './jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, PlayerService],
   exports: [AuthService],
 })
 export class AuthModule {}
