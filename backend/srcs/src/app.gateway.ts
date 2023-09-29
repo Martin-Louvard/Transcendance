@@ -266,14 +266,22 @@ export class AppGateway
     const user_id = player.id;
     try {
     if (data.start) {
+      this.server.emit('update_friend_connection_state', {
+        user_id: user_id,
+        status: 'INGAME',
+      });
         await this.prisma.user.update({
           where: { id: user_id },
-          data:  {inGame: true},
+          data:  {status: "INGAME"},
       });} 
     else {
+      this.server.emit('update_friend_connection_state', {
+        user_id: user_id,
+        status: 'ONLINE',
+      });
         await this.prisma.user.update({
           where: { id: user_id },
-          data:  {inGame: false},
+          data:  {status: "ONLINE"},
       });}
     } catch (e) { }
   }
