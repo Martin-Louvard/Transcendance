@@ -5,9 +5,14 @@ export async function fetchChatChannels(userId: number): Promise<ChatChannels[]>
 
 }; */
 
-export async function fetchAllRelatedInfoApi(userId: number): Promise<sessionState> {
+export async function fetchAllRelatedInfoApi(userId: number, access_token: string): Promise<sessionState> {
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json',
+    'Authorization': `Bearer ${access_token}` },
+  };
   try {
-    const response = await fetch(`http://localhost:3001/users/id/{id}?id=${userId}`);
+    const response = await fetch(`http://localhost:3001/users/id/{id}?id=${userId}`, requestOptions);
     const data: sessionState = await response.json();
     return data;
   } catch (error) {
@@ -36,9 +41,14 @@ export async function fetchFriendshipsApi(userId: string): Promise<Friendships[]
   }
 }
 
-export async function fetchChatChannelsApi(): Promise<ChatChannels[] | undefined> {
+export async function fetchChatChannelsApi(access_token: string | undefined): Promise<ChatChannels[] | undefined> {
+  const requestOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json',
+    'Authorization': `Bearer ${access_token}` },
+  };
   try {
-    const response = await fetch(`http://localhost:3001/chat-channels`);
+    const response = await fetch(`http://localhost:3001/chat-channels`, requestOptions);
     const data: ChatChannels[] | undefined = await response.json();
     return data;
   }

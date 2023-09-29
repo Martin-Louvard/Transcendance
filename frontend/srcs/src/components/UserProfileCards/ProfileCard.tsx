@@ -19,6 +19,7 @@ const ProfileCard: React.FC = () => {
       formData.append("file", selectorFiles[0])
       const requestOptions = {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${access_token}`},
         body: formData
       };
 

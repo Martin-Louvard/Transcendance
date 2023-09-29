@@ -39,7 +39,7 @@ const SignupForm: React.FC = () => {
       toast.success("Logged in")
       dispatch(setSessionUser(user))
       dispatch(setToken(user.access_token))
-      dispatch(fetchRelatedUserData(user.id))
+      dispatch(fetchRelatedUserData({userId:user.id, access_token:user.access_token}))
       /*const payloads: ClientPayloads[ClientEvents.AuthState] = {
         id: user.id,
         token: user.access_token,

@@ -448,7 +448,6 @@ export const sessionSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    fetchRelatedUserData(5);
     builder.addCase(fetchRelatedUserData.pending, (state) => {
       state.loading = true;
       state.error = undefined; });

@@ -37,6 +37,7 @@ const SideChatMenu = () => {
   const [isChatList, setIsChatList] = useState<boolean>(true);
   const [searchList, setSearchList] = useState<ChatChannels[] | undefined>([]);
   const userName = currentUser?.username;
+  const access_token = useAppSelector((state)=>state.session.access_token)
   const toggleMenu = () => {
     setMenuCss((prevCss) =>
       prevCss.startsWith("open")
@@ -167,7 +168,7 @@ const SideChatMenu = () => {
     if (chatMenuChoice !== "searchChat") {
       setChatMenuChoice("searchChat");
       try {
-      const fetchedChannels: ChatChannels[] | undefined = await fetchChatChannelsApi();
+      const fetchedChannels: ChatChannels[] | undefined = await fetchChatChannelsApi(access_token);
         if (fetchedChannels){
           setChatMenuChoice("searchChatWithList");
           setSearchList(fetchedChannels);

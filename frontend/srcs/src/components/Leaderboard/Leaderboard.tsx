@@ -1,7 +1,7 @@
 import '../UserProfileCards/Cards.scss'
 import { useEffect, useState } from 'react';
 import { User } from 'src/Types';
-import { useAppDispatch } from '../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { ContentOptions } from '../../Types';
 import { setFriendProfile, setContentToShow } from '../../redux/sessionSlice';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,7 @@ const Leaderboard = () => {
 const [board, setBoard] = useState<User[]>();
 const dispatch = useAppDispatch();
 const navigate = useNavigate();
-
+const access_token = useAppSelector((state)=>state.session.access_token)
 const goToUserProfile = (user: User) => {
   dispatch(setFriendProfile(user));
  navigate("/friends/friendprofile");
@@ -19,6 +19,7 @@ const goToUserProfile = (user: User) => {
   useEffect(() => {
     async function fetchGames() {
         const requestOptions = {
+          headers: { 'Authorization': `Bearer ${access_token}`},
           method: 'GET',
       };
       try{
