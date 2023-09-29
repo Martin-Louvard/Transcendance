@@ -40,6 +40,7 @@ export interface User {
   achievements: JSON | null;
   createdAt: string;
   access_token: string;
+  connections: number;
 }
 
 export interface Friend {

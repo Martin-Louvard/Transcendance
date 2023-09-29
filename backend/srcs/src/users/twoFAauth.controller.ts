@@ -13,6 +13,7 @@ import { AuthService } from 'src/auth/auth.service';
   
     @Post(':username/generate')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     async register(@Param('username') username: string) {
       const { otpauthUrl } = await this.userService.generateTwoFactorAuthenticationSecret(username);
    
@@ -21,6 +22,7 @@ import { AuthService } from 'src/auth/auth.service';
 
     @Post(':username/turn-on')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     async turnOnTwoFactorAuthentication(@Param('username') username: string, @Body() body) {
       const isCodeValid = await 
         this.userService.isTwoFactorAuthenticationCodeValid(
@@ -37,6 +39,7 @@ import { AuthService } from 'src/auth/auth.service';
 
     @Post(':username/login')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     async loginWith2fa(@Param('username') username: string, @Body() body){
       const isCodeValid = await 
       this.userService.isTwoFactorAuthenticationCodeValid(
@@ -51,6 +54,7 @@ import { AuthService } from 'src/auth/auth.service';
 
     @Delete(':username')
     @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
     async delete2fa(@Param('username') username: string){
       await this.prisma.user.update({where: {username}, data: {twoFAEnabled: false}});
       return this.userService.findOne(username)
