@@ -35,6 +35,9 @@ export class UsersService {
     const userExists = await this.prisma.user.findUnique({ where: { username: createUserDto.username } });
     if (userExists)
       throw new NotAcceptableException("User already exists");
+    const emailExists = await this.prisma.user.findUnique({ where: { email: createUserDto.email } });
+      if (emailExists)
+        throw new NotAcceptableException("Email already taken");
     
     const newUser = await this.prisma.user.create  ({ data: createUserDto });
     await this.chatChannelService.addUserToGeneralChat(newUser);
@@ -154,6 +157,8 @@ export class UsersService {
         roundsOfHashing,
       );
     }
+    if (updateUserDto.username.length < 1)
+      throw new NotAcceptableException("Username should be at least 1 character long")
     const userExists = await this.prisma.user.findUnique({where: {username: updateUserDto.username}})
     const currentUser = await this.prisma.user.findUnique({where: {id}})
     if (userExists && currentUser.id !== userExists.id && userExists.username === updateUserDto.username)
