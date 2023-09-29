@@ -196,8 +196,8 @@ export class ClassicInstance {
 				score: this.data.score,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
-			this.eventEmitter.emit("finished");
 		})
+		this.eventEmitter.emit("finished");
 	}
 
 	onFinished(callback: (result: any) => void) {

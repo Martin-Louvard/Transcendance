@@ -221,9 +221,9 @@ export class Instance {
 				winner: player.team == 'visitor' ? 'home' : 'visitor', 
 				score: this.data.score,
 			};
-			this.eventEmitter.emit("finished");
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
+		this.eventEmitter.emit("finished");
 	}
 
 	processInput() {

@@ -28,6 +28,8 @@ export class LobbyService {
 	}
 
 	async handleFinishedGame(lobby: Lobby) {
+		if (!lobby || !lobby.instance)
+			return ;
 		await this.postGame(lobby.id);
 		this.logger.log(`Lobby ${lobby.id} deleted`);
 		lobby.clear();
@@ -81,6 +83,7 @@ export class LobbyService {
 			return false;
 		const lobby = player.lobby;
 		if (lobby && lobby.instance && lobby.instance.hasStarted && !lobby.instance.hasFinished) {
+			console.log("leave lobby trigger surrender : ", lobby.instance.hasFinished);
 			lobby.instance.triggerFinishSurrender(player);
 			return ;
 		}

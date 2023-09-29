@@ -285,6 +285,7 @@ const websocketSlice = createSlice({
       if (action.payload.hasFinished) {
         state.isPlaying = false;
         state.LobbyType = LobbyType.score;
+        console.log("lobby state has finished : ", state.playersInfo);
         state.lastGame = {score: action.payload.score, winner: action.payload.winner, team: action.payload.team, timestamp: Date.now()};
       }
       if (action.payload.playersInfo) {
