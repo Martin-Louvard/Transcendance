@@ -277,9 +277,9 @@ const websocketSlice = createSlice({
     setLobbyState: (state, action) => {
       if (!state.lobbyId)
         state.lobbyId = action.payload.lobbyId;
-      if (action.payload.hasStarted && !state.isPlaying)
+      if (action.payload.hasStarted && !state.isPlaying && !action.payload.hasFinished)
             state.isPlaying = true;
-      if (action.payload.hasStarted) {
+      if (action.payload.hasStarted && !action.payload.hasFinished) {
         state.isPlaying = true;
       }
       if (action.payload.hasFinished) {

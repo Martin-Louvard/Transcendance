@@ -44,8 +44,8 @@ export const JoinMatch: React.FC = () => {
 	  if (!game.lobbies)
 		  return ;
 	  setRenderLobbies(game.lobbies.map((lobby, key) => (
-		<div style={{width:"500px", backgroundColor:"transparent", borderColor:"white", border:"3px solid", borderRadius:"15px"}}>
-			<ListItem key={key}
+		<div key={key} style={{width:"500px", backgroundColor:"transparent", borderColor:"white", border:"3px solid", borderRadius:"15px"}}>
+			<ListItem
 			secondaryAction={
 				<Button onClick={() => {joinLobby(lobby.id)}}>JOIN</Button>
 			}

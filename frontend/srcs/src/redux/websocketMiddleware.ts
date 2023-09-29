@@ -11,6 +11,7 @@ function handleLobbyState(data:ServerPayloads[ServerEvents.LobbyState], socket: 
   session: sessionState;
   websocket: WebSocketState;
 }>>) {
+  console.log("data: ", data);
   if (data.hasFinished)
     store.dispatch(setLobbyType(LobbyType.score)); 
   store.dispatch(setLobbyState(data))
@@ -88,7 +89,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
             store.dispatch(setLobbyType(LobbyType.wait));
           store.dispatch(setAuthState(data));
         })
-        socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => { handleLobbyState(data, socket, store) })
+        socket.on(ServerEvents.LobbyState, (data: ServerPayloads[ServerEvents.LobbyState]) => { console.log("handle lobby state"); handleLobbyState(data, socket, store) })
         socket.on(ServerEvents.GameState, (data: any) => {store.dispatch(setGameState(data))})
         socket.on(ServerEvents.LobbySlotsState, (data: any) => {  store.dispatch(setLobbySlots(data))  })
         socket.on(ServerEvents.GameRequest, (data: GameRequest) => {store.dispatch(setGameRequests(data))})

@@ -3,6 +3,7 @@ import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, In
 import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
+import { EventEmitter } from "stream";
 
 export function recalculateBallAngle(angle: number): number {
 	if (angle < 0.8)
@@ -23,6 +24,7 @@ export class ClassicInstance {
 		this.id = ClassicInstance.nbInstances++;
 	}
 	lobby: Lobby;
+	private eventEmitter = new EventEmitter();
 	private static nbInstances: number = 0;
 	public readonly id: number = 0;
 	private interval = new Array();
@@ -171,6 +173,8 @@ export class ClassicInstance {
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
+		this.eventEmitter.emit("finished");
+		this.lobby.dispatchAuthState();
 	}
 
 	triggerFinishSurrender(player: Player) {
@@ -192,7 +196,12 @@ export class ClassicInstance {
 				score: this.data.score,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
+			this.eventEmitter.emit("finished");
 		})
+	}
+
+	onFinished(callback: (result: any) => void) {
+		this.eventEmitter.on('finished', callback);
 	}
 
 
@@ -305,13 +314,23 @@ export class ClassicInstance {
 				}
 				if (ball && wall) {
 					const impactDirection: CANNON.Vec3 = contact.ri.clone();
-					let angle = recalculateBallAngle(Math.atan2(impactDirection.z, impactDirection.x));
-					const ballSpeed = ball.body.velocity.length();
 
-					const impulseForce = (angle * ballSpeed * this.params.ball.reboundForce) / 100;
-
-					const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
-					ball.body.applyImpulse(impulseVector, ball.body.position);
+					let angle = Math.atan2(impactDirection.z, impactDirection.x);
+					const minHorizontalAngle = Math.PI / 4;  // Average on π
+					const maxHorizontalAngle = Math.PI - minHorizontalAngle; // Average on 0
+				  
+					if (angle < minHorizontalAngle) {
+						console.log(Date.now)
+						const adjustmentAngle = minHorizontalAngle - angle;
+						const forceMagnitude = 100;
+						const force = new CANNON.Vec3(forceMagnitude, 0, 0);
+						ball.body.applyForce(force, ball.body.position);
+					  } else if (angle > maxHorizontalAngle) {
+						const adjustmentAngle = angle - maxHorizontalAngle;
+						const forceMagnitude = 100;
+						const force = new CANNON.Vec3(forceMagnitude, 0, 0);
+						ball.body.applyForce(force, ball.body.position);
+					  }
 
 				}
 			}

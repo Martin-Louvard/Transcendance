@@ -5,12 +5,14 @@ import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
 import { Injectable } from "@nestjs/common";
 import { findNearest, recalculateBallAngle } from "./classicInstance";
+import { EventEmitter } from "stream";
 
 export class Instance {
 	constructor(lobby: Lobby) {
 		this.lobby = lobby;
 		this.id = Instance.nbInstances++;
 	}
+	private eventEmitter = new EventEmitter();
 	lobby: Lobby;
 	private static nbInstances: number = 0;
 	public readonly id: number = 0;
@@ -192,8 +194,13 @@ export class Instance {
 				score: this.data.score,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
-			
 		})
+		this.eventEmitter.emit("finished");
+		this.lobby.dispatchAuthState();
+	}
+
+	onFinished(callback: (result: any) => void) {
+		this.eventEmitter.on('finished', callback);
 	}
 
 	triggerFinishSurrender(player: Player) {
@@ -214,6 +221,7 @@ export class Instance {
 				winner: player.team == 'visitor' ? 'home' : 'visitor', 
 				score: this.data.score,
 			};
+			this.eventEmitter.emit("finished");
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
 	}
