@@ -1,4 +1,4 @@
-import { UseInterceptors, UploadedFile, Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Res,   NotAcceptableException, Put,
+import { UseInterceptors, UploadedFile, Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Res,   NotAcceptableException, Put, UsePipes, ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,7 +13,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 const path = require('path');
-
 
 @Controller('users')
 @ApiTags('users')

@@ -10,14 +10,9 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class ChatChannelsController {
   constructor(private readonly chatChannelsService: ChatChannelsService) {}
 
-  @Post()
-  create(@Body() createChatChannelDto: CreateChatChannelDto) {
-    return this.chatChannelsService.create(createChatChannelDto);
-  }
-
   @Post(':id')
-  checkPassword(@Param('id') id: string, @Body() body){
-    return this.chatChannelsService.checkPassword(+id, body.password);
+  checkPassword(@Param('id') id: string, @Body() password: string){
+    return this.chatChannelsService.checkPassword(+id, password);
   }
 
 
