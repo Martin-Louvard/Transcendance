@@ -27,7 +27,7 @@ const SignupForm: React.FC = () => {
     };
 
     try{
-      const response = await fetch('http://localhost:3001/users', requestOptions)
+      const response = await fetch('http://10.33.3.5:3001/users', requestOptions)
       if (response.status !== 201){
         const parsedResponse = await response.json()
         toast.error(parsedResponse.message)
