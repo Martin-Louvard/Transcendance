@@ -11,7 +11,6 @@ import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass
 import * as THREE from 'three'
 import { useKeyboardInput } from "./InputState";
 import { PlayerState, usePlayerStore } from "./PlayerStore";
-import verify from "../Authentication/verify";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { emitInput } from "./emitInput";
@@ -64,6 +63,7 @@ export const Game: React.FC = () => {
 		  leaveLobby: true,
 		  mode: null,
 		  automatch: null,
+		  start: false,
 		}
 			dispatch({
 				type: 'WEBSOCKET_SEND_LOBBYSTATE',

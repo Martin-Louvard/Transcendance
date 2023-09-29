@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import LoginForm from '../Forms/LoginForm.js';
 import SignupForm from '../Forms/SignupForm.js';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks.js';
+import { useAppDispatch } from '../../redux/hooks.js';
 import './Authentication.scss'
 import toast from 'react-hot-toast'
-import { useNavigate } from "react-router-dom";
-import verify from './verify.js';
 import { fetchRelatedUserData, setSessionUser, setToken } from '../../redux/sessionSlice.js';
 import { login2fa, login42 } from '../../api.js';
 import { Popup } from 'reactjs-popup';
@@ -16,8 +14,6 @@ const Authentication: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
   const queryParameters = new URLSearchParams(window.location.search)
   const Api42uid = import.meta.env.VITE_42API_UID;
-  const user = useAppSelector((state) => state.session.user);
-  const navigate = useNavigate();
   const dispatch = useAppDispatch()
   const isInitialLoadRef = useRef(true); 
   const [twoFaCode, setTwoFaCode] = useState("")
@@ -31,14 +27,6 @@ const Authentication: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    async function verifyToken() {
-      if (await verify(user.access_token))
-          navigate('/');
-    }
-    if (user && user.access_token)
-      verifyToken();
-  }, [user])
   
   const handleLoginClick = () => {
     setShowLogin(true);
@@ -58,7 +46,7 @@ const Authentication: React.FC = () => {
       dispatch(setSessionUser(user2fa))
       dispatch(setToken(user2fa.access_token))
       if (user2fa.id)
-        dispatch(fetchRelatedUserData(user2fa.id))
+        dispatch(fetchRelatedUserData({userId:user2fa.id, access_token: user2fa.access_token}))
       toast.success("Logged in")
     } else if (user2fa.message)
         toast.error(user2fa.message)
@@ -70,7 +58,7 @@ const Authentication: React.FC = () => {
       if (!user.twoFAEnabled) {
         dispatch(setSessionUser(user));
         dispatch(setToken(user.access_token));
-        if (user) dispatch(fetchRelatedUserData(user.id));
+        if (user) dispatch(fetchRelatedUserData({userId:user.id, access_token:user.access_token}));
           toast.success('Logged in');
       } else {
         setTempUser(user)

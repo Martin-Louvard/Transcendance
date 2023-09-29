@@ -28,18 +28,18 @@ const SignupForm: React.FC = () => {
 
     try{
       const response = await fetch('http://localhost:3001/users', requestOptions)
-      console.log(response)
       if (response.status !== 201){
         toast.error("Username or email is already used by someone else")
         return 
       }
+
       const user = await login(username,password)
       if (!user)
         return toast.error("Account created but signin failed")
       toast.success("Logged in")
       dispatch(setSessionUser(user))
       dispatch(setToken(user.access_token))
-      dispatch(fetchRelatedUserData(user.id))
+      dispatch(fetchRelatedUserData({userId:user.id, access_token:user.access_token}))
       /*const payloads: ClientPayloads[ClientEvents.AuthState] = {
         id: user.id,
         token: user.access_token,
@@ -47,7 +47,6 @@ const SignupForm: React.FC = () => {
 
       socket.emit(ClientEvents.AuthState, payloads);*/
     }catch(error) {
-      console.log(error)
     }
   }
 

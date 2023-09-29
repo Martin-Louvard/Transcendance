@@ -11,16 +11,15 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Server, Socket } from 'socket.io';
 import { ClientEvents, ClientPayloads, LobbyMode, ServerEvents, ServerPayloads, InputPacket, GameParameters, PlayerInfo, GameRequest, LobbySlotType } from '@shared/class';
-import { JwtService } from '@nestjs/jwt';
-import { AppService } from './app.service';
 import { LobbyService } from './game/lobby/lobby.service';
 import { PlayerService } from './game/player/player.service';
 import { FriendsService } from './friends/friends.service';
 import * as bcrypt from 'bcrypt';
-export const roundsOfHashing = 10;
-import { Player } from './game/player/player.class';
 import { Logger } from '@nestjs/common';
-import { Lobby } from './game/lobby/lobby.class';
+import { AuthService } from './auth/auth.service';
+
+
+export const roundsOfHashing = 10;
 
 @WebSocketGateway({ cors: '*' })
 export class AppGateway
@@ -29,9 +28,9 @@ export class AppGateway
   constructor(
     private prisma: PrismaService,
     private friendService: FriendsService,
-    private readonly appService: AppService,
     private readonly lobbyService: LobbyService,
     private readonly playerService: PlayerService,
+    private readonly authService: AuthService
   ) {}
 
   connected_clients = new Map<number, Socket>();
@@ -41,6 +40,7 @@ export class AppGateway
   server: Server;
 
   async handleConnection(client: Socket) {
+    this.authService.authSocket(client);
     if (client.handshake.auth.user_id) {
       const user_id_string = client.handshake.auth.user_id;
       const user_id = parseInt(user_id_string);
@@ -56,10 +56,8 @@ export class AppGateway
           data: { status: 'ONLINE' },
         });
       } catch (e) {
-        console.log(e);
       }
     }
-    this.appService.auth(client);
     this.playerService.dispatchGameRequest();
   }
 
@@ -83,7 +81,6 @@ export class AppGateway
           data: { status: 'OFFLINE' },
         });
       } catch (e) {
-        console.log(e);
       }
     }
     const player = this.playerService.getPlayerBySocketId(client.id);
@@ -211,7 +208,6 @@ export class AppGateway
         lobby.dispatchLobbySlots();
         }
       } catch(err) {
-        console.log(err);
     }
   }
 
@@ -257,7 +253,7 @@ export class AppGateway
   }
 
   @SubscribeMessage(ClientEvents.LobbyState)
-  lobbyStateHandling(
+  async lobbyStateHandling(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: ClientPayloads[ClientEvents.LobbyState],
   ) {
@@ -266,6 +262,19 @@ export class AppGateway
     if (data.leaveLobby) {
       this.lobbyService.leaveLobby(player);
     }
+    const user_id = player.id;
+    try {
+    if (data.start) {
+        await this.prisma.user.update({
+          where: { id: user_id },
+          data:  {inGame: true},
+      });} 
+    else {
+        await this.prisma.user.update({
+          where: { id: user_id },
+          data:  {inGame: false},
+      });}
+    } catch (e) { }
   }
   @SubscribeMessage(ClientEvents.LobbySlotsState)
   lobbySlotsHandling(
@@ -295,7 +304,7 @@ export class AppGateway
     @MessageBody() data: { lobbyId: string; info: PlayerInfo },
   ) {
     const player = this.playerService.getPlayerBySocketId(client.id);
-    if (!player){ console.log("player not found"); return 'player not found';}
+    if (!player){ return 'player not found';}
     if (!this.lobbyService.joinLobby(player, data)) return 'cant join lobby';
     this.lobbyService.dispatchEvent();
   }
@@ -630,10 +639,13 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: Array<any>,
   ): Promise<void> {
+    const chat = await this.prisma.chatChannel.findUnique({where: {id: parseInt(body[0])}})
+    if (!chat)
+      return;
     await this.prisma.chatChannel.delete({
-      where: { id: parseInt(body[0]) },
+      where: { id: chat.id },
     });
-    this.server.emit('delete_chat', parseInt(body[0]));
+    this.server.emit('delete_chat', chat.id);
   }
 
   @SubscribeMessage('unban_user')
@@ -799,9 +811,11 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: {id: number, name: string, channelType: string, password: string },
   ): Promise<void> {
+    const hashedPassword = await bcrypt.hash(body.password, roundsOfHashing);
+
     const updatedChatChannel = await this.prisma.chatChannel.update({
       where: { id: body.id },
-      data: { name: body.name, channelType: body.channelType, password: body.password },
+      data: { name: body.name, channelType: body.channelType, password: hashedPassword },
     });
     const channel = await this.prisma.chatChannel.findUnique({
       where: { id: body.id },
@@ -824,9 +838,10 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: { id: number; password: string },
   ): Promise<void> {
+    const hashedPassword = await bcrypt.hash(body.password, roundsOfHashing);
     const updatedChatChannel = await this.prisma.chatChannel.update({
       where: { id: body[0] },
-      data: { password: body[1] },
+      data: { password: hashedPassword },
     });
     const channel = await this.prisma.chatChannel.findUnique({
       where: { id: body[0] },
@@ -948,10 +963,7 @@ export class AppGateway
       client.emit('friend_request', friendship);
       if (!body[2])
       {
-        console.log("PENDING")
       }
-      else if (body[2] === 'ACCEPTED') 
-        client.emit('create_chat', chat);
       else
         client.emit('update_chat', chat);
 
@@ -959,10 +971,7 @@ export class AppGateway
         friend_socket.emit('friend_request', friendship);
         if (!body[2])
         {
-          console.log("PENDING")
         }
-        else if (body[2] === 'ACCEPTED')
-          friend_socket.emit('create_chat', chat);
         else
           friend_socket.emit('update_chat', chat);
       }

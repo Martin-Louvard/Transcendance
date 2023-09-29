@@ -3,10 +3,10 @@ import { fetchAllRelatedInfoApi } from '../api.ts';
 
 export const fetchRelatedUserData = createAsyncThunk(
   'session/fetchRelatedUserData',
-  async (userId: number) => {
+  async ({userId, access_token}: {userId:number, access_token:string}) => {
     try {
       // Fetch friends data using userId
-      const data = await fetchAllRelatedInfoApi(userId);
+      const data = await fetchAllRelatedInfoApi(userId, access_token);
         return data
     } catch (error) {
       // Handle error

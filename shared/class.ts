@@ -154,6 +154,7 @@ export type ClientPayloads = {
 		leaveLobby: boolean | null,
 		automatch: boolean | null,
 		mode: LobbyMode | null,
+		start: boolean,
 	},
 	[ClientEvents.AuthState]: {
 		id: number,

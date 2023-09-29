@@ -5,10 +5,12 @@ import { PrismaService } from './../prisma/prisma.service';
 import { AuthEntity } from './entities/auth.entity';
 import * as bcrypt from 'bcrypt';
 import { env } from 'process';
+import { PlayerService } from '../game/player/player.service';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService, private jwtService: JwtService, private usersService: UsersService) {}
+    constructor(private prisma: PrismaService, private jwtService: JwtService, private usersService: UsersService, private readonly playerService: PlayerService) {}
     
     //Need to find the right type for the Promise return
     async login(username: string, pass: string): Promise<any> {
@@ -24,7 +26,7 @@ export class AuthService {
         //strip the password from the user object
         try {
             const user = await this.usersService.findOne(username);
-            const payload = { sub: user.id, username: user.username };
+            const payload = { id: user.id, username: user.username };
             const token = await this.jwtService.signAsync(payload);
             const userUpdate = {...user, access_token: token}
             return (userUpdate)
@@ -68,7 +70,7 @@ export class AuthService {
             const token_42 = data.access_token ;
             const userInfo =  await this.get42UserInfo(token_42)
             let dbUser = await this.usersService.createOrLogin42(userInfo);
-            const payload = { sub: dbUser.id, username: dbUser.username };
+            const payload = { id: dbUser.id, username: dbUser.username };
             return {...dbUser, access_token: await this.jwtService.signAsync(payload)};
           }catch(err) {
             return(err);
@@ -90,5 +92,22 @@ export class AuthService {
             return(err);
         }
     }
+
+    async authSocket(client: Socket): Promise<void> {
+        try {
+          if (!client.handshake.auth.token) {
+            throw "no jwt token"
+          }
+          const payload = this.jwtService.verify(
+            client.handshake.auth.token,
+          );
+            const user = await this.usersService.findById(client.handshake.auth.user_id);
+            if (!user) 
+              throw "user not registered";
+            this.playerService.connectPlayer({id: user.id, username: user.username, avatar: user.avatar, socket: client});
+        } catch (error) {
+          client.disconnect();
+        }
+      }
 
 }

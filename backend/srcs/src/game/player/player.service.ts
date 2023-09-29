@@ -167,4 +167,8 @@ export class PlayerService {
 		this.dispatchPlayerRequest(sender);
 		return true;
 	}
+
+	public isInGame(player: Player): boolean {
+		return (player.lobby && player.lobby.instance && player.lobby.instance.hasStarted);
+	}
 }

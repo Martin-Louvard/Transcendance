@@ -19,6 +19,7 @@ const ProfileCard: React.FC = () => {
       formData.append("file", selectorFiles[0])
       const requestOptions = {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${access_token}`},
         body: formData
       };
 
@@ -31,7 +32,6 @@ const ProfileCard: React.FC = () => {
           toast.success("Avatar updated");
         }
       }  catch(err) {
-        console.log(err);
       }
     }
     
@@ -49,7 +49,6 @@ const ProfileCard: React.FC = () => {
           toast.success("2fa disabled")
         }
       }catch(err) {
-        console.log(err);
       }
     }
 

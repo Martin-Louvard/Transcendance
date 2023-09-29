@@ -27,8 +27,22 @@ export class LobbyService {
 		this.server = server;
 	}
 
-	findLobbyById(id: string): Lobby {
-		return (this.lobbies.get(id));
+
+	createLobby(mode: LobbyMode, server: Server, creator: Player) {
+		try {
+			const lobby = new Lobby(mode, server, creator);
+			if (!lobby)
+				return ;
+			this.logger.log(`Lobby ${lobby.id} created`);
+			lobby.connectPlayer(creator);
+			this.logger.log(`creator ${creator.id} joined ${lobby.id}`);
+			this.lobbies.set(lobby.id, lobby);
+			lobby.dispatchLobbyState();
+			this.dispatchEvent();
+			return lobby;
+		} catch (error) {
+			return null;
+		}
 	}
 
 	sendToInstance<T extends InputPacket>(id:string, data: T, senderId: string) {
@@ -39,6 +53,11 @@ export class LobbyService {
 		}
 		lobby.instance.processGameData<T>(data);
 	}
+
+	findLobbyById(id: string): Lobby {
+		return (this.lobbies.get(id));
+	}
+
 
 	addLobby(lobby: Lobby) {
 		if (lobby) {
@@ -96,23 +115,6 @@ export class LobbyService {
 		if (!player)
 			return ;
 		this.listeners.delete(id);
-	}
-
-	createLobby(mode: LobbyMode, server: Server, creator: Player) {
-		try {
-			const lobby = new Lobby(mode, server, creator);
-			if (!lobby)
-				return ;
-			this.logger.log(`Lobby ${lobby.id} created`);
-			lobby.connectPlayer(creator);
-			this.logger.log(`creator ${creator.id} joined ${lobby.id}`);
-			this.lobbies.set(lobby.id, lobby);
-			lobby.dispatchLobbyState();
-			this.dispatchEvent();
-			return lobby;
-		} catch (error) {
-			return null;
-		}
 	}
 
 	getLobby(id: string) {

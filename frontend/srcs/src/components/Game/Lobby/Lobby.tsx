@@ -55,6 +55,7 @@ export const Lobby: React.FC = (props) => {
       leaveLobby: true,
       mode: null,
       automatch: null,
+      start: false,
     }
 		dispatch({
 			type: 'WEBSOCKET_SEND_LOBBYSTATE',
@@ -72,10 +73,6 @@ export const Lobby: React.FC = (props) => {
     }
     dispatch(setLobbyType(LobbyType.none))
   }
-
-  useEffect(() => {
-    console.log("type: ", lobbyType);
-  }, [])
 
   return (
     <div style={{position: "relative", width: "100%", height:"100%"}}>
@@ -96,7 +93,7 @@ export const Lobby: React.FC = (props) => {
         <div style={{display: 'flex'}}>
         {
           lobbyType == LobbyType.score ?
-          <LobbyDisplayScore/>
+          <LobbyDisplayScore />
           :
           !game.lobbyId && lobbyType == LobbyType.auto ?
           <AutoMatch user={user} game={game}/>

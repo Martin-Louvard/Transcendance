@@ -215,3 +215,10 @@ div .position-small{
 .twofa{
   width: 300px;
 }
+
+.history-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
