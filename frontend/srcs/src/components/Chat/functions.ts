@@ -1,6 +1,6 @@
-import { ChatChannels, Message } from "../../Types.ts";
+import { ChatChannels, Message, User } from "../../Types.ts";
 
-export function getName(chat: ChatChannels, userName: string | undefined) {
+export function getName(chat: ChatChannels, user: User) {
   let chatName = chat.name;
   let other = "";
   if (!chatName)
@@ -9,12 +9,12 @@ export function getName(chat: ChatChannels, userName: string | undefined) {
     return chatName;
   if (!chatName && chat.participants?.length > 1) {
     chatName = chat.participants.filter((p) => {
-      if (p.username !== userName) return p;
+      if (p.id !== user.id) return p;
     })[0].username;
     if (chat.participants?.length > 2) other = "and others...";
     return `${chatName} ${other}`;
   }
-  if (chat.participants?.length <= 1) return `${userName} (You)`;
+  if (chat.participants?.length <= 1) return `${user.username} (You)`;
   return chatName;
 }
 
