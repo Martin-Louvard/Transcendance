@@ -23,7 +23,6 @@ const ChatCreator: React.FC = () => {
       toast.error("Chat name should be between 3 and 20 characteres long");
     }
     else {
-      console.log("WHY");
       dispatch({
         type: "CREATE_CHAT",
         payload: {

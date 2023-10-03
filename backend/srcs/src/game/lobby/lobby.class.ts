@@ -92,9 +92,7 @@ export class Lobby {
 	}
 
 	checkIfLobbyFull() {
-		console.log(this.players.size)
 		if (this.players.size == this.mode && this.instance instanceof Instance) {
-			console.log("trigger start, automatch: ", this.instance.automatch);
 			this.full = true;
 			if (this.instance.automatch)
 				this.instance.triggerStart();
