@@ -107,7 +107,7 @@ const SideChatMenu = () => {
               {chat.notifications ? `${chat.notifications}` : ""}
             </div>
             <div className="chat-name-in-menu">
-              <div>{getName(chat, userName)}</div>
+              <div>{getName(chat, currentUser)}</div>
               </div>
               <div className="chat-participants">
                 <div>{`${chat?.participants?.length}`}</div>

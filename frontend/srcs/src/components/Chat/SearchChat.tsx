@@ -37,7 +37,7 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
   const handleSearch = () => {
     if (fetchedChannels && currentUser){
       const foundChannels: ChatChannels[] | undefined = fetchedChannels.filter((chan) => {
-        if (getName(chan, currentUser.username).toLowerCase().includes(searchTerm.toLowerCase()) 
+        if (getName(chan, currentUser).toLowerCase().includes(searchTerm.toLowerCase()) 
           && (chan.channelType !== "Private" && !chan.participants.includes(currentUser)
             && !chan.bannedUsers.filter((user) => user.id === currentUser?.id).length)){
           return chan;
@@ -135,7 +135,7 @@ const SearchBarChat: React.FC<searchBarChatProps> = ({ fetchedChannels }) => {
             onClick={() => handleSelectedChat(chat)}
           >
             <div className="chat-name-in-menu">
-              <div>{getName(chat, currentUser?.username)}</div>
+              <div>{getName(chat, currentUser)}</div>
               <div className="chat-participants">
                 <div>{`${chat.participants.length}`}</div>
                 <div>
