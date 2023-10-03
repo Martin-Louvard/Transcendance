@@ -12,26 +12,21 @@ const LeaveChatButton = ({chat, setIsOpen}: {chat: ChatChannels; setIsOpen:React
       if (chat.owner.id === currentUser.id) {
         if (chat.admins.filter((admin) => admin.id !== currentUser.id).length > 0){
           const newOwner = chat.admins.filter((admin) => admin.id !== currentUser.id)[0];
-          console.log("change with admin");
           dispatch({type:'CHANGE_OWNER', payload:[chat.id, newOwner.id, currentUser.id]})
         }
         else {
           if (chat.participants.filter((user) => user.id !== currentUser.id).length > 0){
             const newOwner = chat.participants.filter((user) => user.id !== currentUser.id)[0];
-            console.log("change");
             dispatch({type:'CHANGE_OWNER', payload:[chat.id, newOwner.id, currentUser.id]})
           }
           else if (chat.participants.length === 1){
-            console.log("delete");
             dispatch({type:'DEL_CHAT', payload:[chat.id]});
           }
         }
       }
       else {
-        console.log("leave");
         if (chat.participants.length === 1){
           dispatch({type:'DEL_CHAT', payload:[chat.id]});
-          console.log("delete");
         }
         else
           dispatch({type:'LEAVE_CHAT', payload:[chat.id, currentUser.id]});

@@ -11,8 +11,8 @@ export class ChatChannelsController {
   constructor(private readonly chatChannelsService: ChatChannelsService) {}
 
   @Post(':id')
-  checkPassword(@Param('id') id: string, @Body() password: string){
-    return this.chatChannelsService.checkPassword(+id, password);
+  checkPassword(@Param('id') id: string, @Body() body){
+    return this.chatChannelsService.checkPassword(+id, body.password.toString());
   }
 
 

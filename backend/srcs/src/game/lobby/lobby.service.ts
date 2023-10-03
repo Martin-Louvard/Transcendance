@@ -83,7 +83,6 @@ export class LobbyService {
 			return false;
 		const lobby = player.lobby;
 		if (lobby && lobby.instance && lobby.instance.hasStarted && !lobby.instance.hasFinished) {
-			console.log("leave lobby trigger surrender : ", lobby.instance.hasFinished);
 			lobby.instance.triggerFinishSurrender(player);
 			return ;
 		}
@@ -300,10 +299,8 @@ export class LobbyService {
 	  }
 
 	async postGame(id: string) {
-		console.log("posting game");
 		const lobby = this.lobbies.get(id);
 		if (!lobby) {
-			console.log("no lobby");
 			return ;
 		}
 		const players = [...lobby.players.values()];
@@ -318,7 +315,6 @@ export class LobbyService {
 		const visitorInfos = players.filter((pl) => pl.team == 'visitor');
 		const homeInfos = players.filter((pl) => pl.team == 'home');
 		if (homeInfos.length < 1 || visitorInfos.length < 1) {
-			console.log("home or visitor info too short : ", homeInfos, ", ", visitorInfos);
 			return ;
 		}
 		const visitor = await this.prismaService.user.findMany({
@@ -381,9 +377,7 @@ export class LobbyService {
 			});
 
 		  } catch (error) {
-			console.error("Error creating a game:", error);
 		  }
-		  console.log("game posted");
 		}
 		
 
