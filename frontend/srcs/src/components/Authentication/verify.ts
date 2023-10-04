@@ -9,7 +9,7 @@ const requestOptions = {
   };
 
   try{
-	const response = await fetch('http://localhost:3001/auth/verify', requestOptions);
+	const response = await fetch('http://${process.env.IP}/auth/verify', requestOptions);
 	if (response.ok)
 	{
 	  const data = await response.json();

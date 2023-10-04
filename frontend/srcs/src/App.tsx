@@ -25,6 +25,7 @@ export function App() {
   const isConnected = useAppSelector((state) => state.websocket.isConnected);
   const dispatch = useAppDispatch();
   const friendProfile = useAppSelector((state) => state.session.friendProfile);
+  
 
   useEffect(() => {
     dispatch(websocketDisconnected());

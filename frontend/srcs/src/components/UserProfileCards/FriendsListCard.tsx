@@ -43,7 +43,7 @@ const FriendsListCard: React.FC = (props) =>{
         headers: { 'Content-Type': 'application/json',
         'Authorization': `Bearer ${access_token}` },
       };
-        const response = await fetch(`http://localhost:3001/users/${newFriendUsername}`, requestOptions);
+        const response = await fetch(`http://${process.env.IP}/users/${newFriendUsername}`, requestOptions);
         if (response.ok)
         {
           dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [user?.id, newFriendUsername]})
