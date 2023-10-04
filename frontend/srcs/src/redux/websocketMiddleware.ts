@@ -7,6 +7,7 @@ import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayl
 import { useAppSelector } from './hooks';
 
 
+
 function handleLobbyState(data:ServerPayloads[ServerEvents.LobbyState], socket: Socket | null, store:MiddlewareAPI<Dispatch<AnyAction>, CombinedState<{
   session: sessionState;
   websocket: WebSocketState;
@@ -49,7 +50,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       case 'WEBSOCKET_CONNECT':
         if (!action.payload || action.payload.length == 0)
           return ;
-        socket = io("http://localhost:3001/", {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
+        socket = io(`http://${import.meta.env.VITE_IP}/`, {auth: {user_id: action.payload[0], token: action.payload[1]}, transports: ['websocket', 'polling']}); 
 
         socket.on('connect', () => {
           store.dispatch(setWaitingToConnect(false));

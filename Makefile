@@ -39,7 +39,5 @@ ffclean:
 	docker network rm            $$(docker network ls -q)
 	docker builder prune --force
 
-toggle_hostname:
-	-sh tools/toggle_hostname.sh
 
 .PHONY: all, build, restart, up, stop, purge, re, rmvol, fclean
