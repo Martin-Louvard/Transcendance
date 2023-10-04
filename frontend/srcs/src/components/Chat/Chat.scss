@@ -1,0 +1,252 @@
+.chat-input  textarea{
+	display: flex;
+    width: 90%;
+    height: 70%;
+    font-size: 8px;
+    resize: none;
+    margin: 5px;
+}
+
+.chat-input {
+	display:flex;
+	background-color: #242526;
+	justify-content: space-between;
+	align-items: center;
+	height: 35px;
+    padding: 5px;
+
+}
+
+.message-wrapper{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.chat-messages{
+    text-align: left;
+    font-size: small;
+    width: auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+	flex: 1;
+    background-color: #242526;
+    padding: 5px 5px 0px 5px;
+}
+
+.chat-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.chat-message{
+    word-wrap: break-word;
+    margin: 3px;
+    font-size: 10px;
+    min-width: 10%;
+    padding: 10px;
+}
+
+
+.left{
+    left: 0;
+    align-self:flex-end;
+
+}
+
+.right{
+    right: 0;
+    align-self:flex-start;
+
+}
+
+.user1{
+    background-color: #646cffaa;;
+    border-radius: 10px 10px 3px 10px;
+    max-width: 80%;
+    width: fit-content;
+    align-self: flex-end;
+
+}
+
+.user2{
+    background-color: #3E4042;
+    border-radius: 10px 10px 10px 10px;
+    max-width: 80%;
+    width: fit-content;
+    align-self: flex-start;
+
+}
+
+.send-button {
+	display: flex;
+	height:90%;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    transition: border-color 0.25s;
+	justify-content: center;
+	align-items: center;
+}
+
+.message-infos{
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-start;
+    margin-bottom: 10px;
+}
+
+.sender-profile-pic{
+    border-radius: 50%;
+    overflow: hidden;
+    height: 15px;
+    width:15px;
+}
+
+.message-username{
+    font-size: smaller;
+    margin-left: 5px;
+}
+
+.message-date{
+    font-size: smaller;
+    margin-left: 5px;
+    align-self: center;
+}
+
+.close-popup-container{
+    position:relative;
+
+}
+
+.chat-popup{
+    background: #242526;
+    border: 1px solid black;
+    border-radius: 15px;
+    padding: 20px;
+    max-height: 60vh;
+    position: relative;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+
+  .popup-oboarding{
+    display: flex;
+    flex-direction:row; 
+    align-items: center;
+  }
+  
+
+  .close-popup{
+    position:absolute;
+    right: -10px;
+    top: -10px;
+    z-index: 999;
+  }
+
+  .popup-mdp{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+
+  }
+
+  .popup-top{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+   }
+   .popup-chat-menu{
+    margin-bottom:10px;
+   }
+  
+  .add-participants-search-bar-wrapper{
+    display: flex;
+    flex-direction: row;
+
+  }
+  .popup-button-add-people{
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    margin-left: 15px;
+    justify-content: center;
+  }
+
+  .management-leave-button{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+    justify-content: center;
+
+    p{
+        margin-right: 10px;
+    }
+  }
+  
+.popup-user-list-item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width:100%;
+    margin:5px;
+    overflow: hidden;
+    padding-right: 5px;
+}
+
+
+.link-to-user{
+    cursor: pointer;
+    border-radius: 15px 0 0 15px;
+    padding-right: 10px;
+
+    .div{
+        margin: 5px;
+    }
+
+    &:hover{
+        background-color: grey;
+    }
+}
+.popup-profile-pic{
+    border-radius: 50%;
+    overflow: hidden;
+    height: 45px;
+    width: 45px;
+    margin:10px;
+}
+
+
+.management-button{
+    cursor: pointer;
+    border-radius: 15%;
+    padding: 10px;
+    &:hover{
+        background-color: grey;
+    }
+}
+
+.management-currentOpenedChat-popup{
+    overflow: scroll;
+}
+
+.popup-ban
+{
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    align-self: flex-end;
+}
+
+.chrono-for-action{
+    font-size: small;
+}

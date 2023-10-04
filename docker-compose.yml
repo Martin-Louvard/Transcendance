@@ -1,0 +1,67 @@
+version: '3.8'
+services:
+    react:
+        networks:
+            - transcendence
+        build:
+            context: frontend
+            dockerfile: Dockerfile
+        ports:
+            - '3000:3000'
+        volumes:
+            - react:/app
+            - ./shared:/app/shared
+        env_file:
+            - .env
+    postgres:
+        image: postgres:13.5
+        restart: always
+        env_file:
+            - .env
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        volumes:
+            - postgres:/var/lib/postgresql/data
+        ports:
+            - '5432:5432'
+        networks:
+            - transcendence
+        depends_on:
+            - nestjs
+    nestjs:
+        networks:
+            - transcendence
+        env_file:
+            - .env
+        build:
+            context: backend
+            dockerfile: Dockerfile
+        ports:
+            - '3001:3000'
+            - '5555:5555'
+        volumes:
+            - nestjs:/usr/src/app
+            - ./shared:/usr/src/app/shared
+
+volumes:
+    react:
+        driver: local
+        driver_opts:
+            type: 'none'
+            o: 'bind'
+            device: "$PWD/frontend/srcs/"
+
+    postgres:
+    nestjs:
+        driver: local
+        driver_opts:
+            type: 'none'
+            o: 'bind'
+            device: "$PWD/backend/srcs/"
+    shared:
+        driver: local
+
+networks:
+    transcendence:
+        driver: bridge

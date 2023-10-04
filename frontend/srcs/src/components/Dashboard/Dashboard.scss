@@ -1,0 +1,38 @@
+.dashboard-wrapper{
+  margin: 80px 0 0 0;
+  height: 100%;
+  //border: 2px solid white;
+  //border-radius: 25%;
+  background-color: #1F1F1F;
+  max-width: 1500px;
+  width: auto;
+  align-items: center;
+  overflow-x:hidden ;
+}
+
+
+.canvas-wrapper{
+  height: auto;
+  //border-radius: 25%;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  min-width: 680px;
+  overflow-x:hidden ;
+
+}
+
+.menu-bottom{
+  position: fixed;
+  display: flex;
+  flex-direction: row;
+  bottom: 5px;
+  left: 0;
+  padding-left: 5px;
+  height: 2.5rem;
+  width: auto;
+
+}
+
+
+

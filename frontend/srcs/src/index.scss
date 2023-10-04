@@ -1,0 +1,201 @@
+// Variables
+$primary-color: #646cff;
+$secondary-color: #535bf2;
+$background-color: #18191A;
+$light-color: #f9f9f9;
+$dark-color: #131313;
+$secondary-bg-color: #4d4848;
+$highlight-color: #FF6262;
+
+@font-face {
+  font-family: "f25";
+  src: local("f25"),
+   url("./fonts/f25/F25_Bank_Printer_Bold.otf") format('OpenType');
+  font-weight: bold;
+ }
+
+// Mixins
+@mixin button-style {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 1.4vh 1.2vw;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: $dark-color;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  margin: 2px;
+}
+
+// Base Styles
+html {
+  font-family: 'f25', "Avenir", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: $background-color;
+  //font-synthesis: none;
+  //text-rendering: optimizeLegibility;
+  //-moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-size: 20px;
+  margin: 0;
+  display: flex;
+  color: rgba(255, 255, 255, 0.87);
+  height: 100%;
+  overflow: hidden;
+}
+
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  bottom: 0;
+  flex: 1;
+  padding: 0;
+  background-color: $background-color;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+// Links
+a {
+  font-weight: 500;
+  color: white;
+  text-decoration: inherit;
+
+  &:hover {
+    color: $secondary-color;
+  }
+}
+
+// Headings
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+// Buttons
+button {
+  @include button-style;
+
+  &:hover {
+    border-color: $primary-color;
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+}
+
+ul{
+  list-style-type: none;
+  padding: 0;
+}
+
+.authors {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .row{
+    display: flex;
+    flex-direction: row;
+  }
+
+.item {
+  background-color: $secondary-bg-color;
+  display: flex;
+  flex-direction: column;
+  justify-content:space-between;
+  align-items: left;
+  cursor: pointer;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 10px;
+  width: 20rem;
+  
+  h3,
+  p {
+    margin: 5px 0;
+    overflow: hidden;
+  }
+
+
+  .accept-deny{
+    button{
+      padding: 5px;
+      background: none;
+    }
+  }
+
+  }
+}
+
+// Media Queries
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #cdcdcd;
+    right: 0;
+  }
+
+  a:hover {
+    color: #747bff;
+  }
+
+  button {
+    @include button-style;
+    background-color: $light-color;
+  }
+}
+.about-wrapper{
+  margin: 80px 60px 0px 60px;
+  height: 100%;
+  //border: 2px solid white;
+  //border-radius: 25%;
+  max-width: 1500px;
+  width: 40vw;
+  align-items: center;
+}
+
+.light-purple{
+  button{
+    color:white;
+    background-color: #131313;
+  }
+}
+
+
+/* Target the entire scrollbar */
+::-webkit-scrollbar {
+  width: 10px; /* Width of the scrollbar */
+}
+
+/* Style the track of the scrollbar */
+::-webkit-scrollbar-track {
+  background-color: transparent; /* Track background color */
+}
+
+/* Style the thumb of the scrollbar */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Thumb color */
+  border-radius: 6px; /* Rounded corners for the thumb */
+}
+
+/* Style the thumb when hovered */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}

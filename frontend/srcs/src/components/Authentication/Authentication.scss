@@ -1,0 +1,31 @@
+// Auth
+.auth-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 40px;
+    height: 100%;
+    width: 90%;
+    max-width: 2500px;
+}
+
+.auth-card-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 40px;
+    width: 50%;
+    justify-content: center;
+}
+
+.auth-card {
+    margin-right: 20px;
+    a{
+    display: flex;
+    flex-direction: column;
+    }
+}
+
+  .logo-42{
+    height: 80px;
+  }
