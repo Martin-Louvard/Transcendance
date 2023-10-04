@@ -1,9 +1,12 @@
 import { Friendships, User, ChatChannels } from "./Types";
 import { sessionState } from "./redux/sessionSlice";
+import  dotenv  from "dotenv";
 /*
 export async function fetchChatChannels(userId: number): Promise<ChatChannels[]> {
 
 }; */
+
+dotenv.config();
 
 export async function fetchAllRelatedInfoApi(userId: number, access_token: string): Promise<sessionState> {
   const requestOptions = {
@@ -12,7 +15,7 @@ export async function fetchAllRelatedInfoApi(userId: number, access_token: strin
     'Authorization': `Bearer ${access_token}` },
   };
   try {
-    const response = await fetch(`http://localhost:3001/users/id/{id}?id=${userId}`, requestOptions);
+    const response = await fetch(`http://${process.env.IP}/users/id/{id}?id=${userId}`, requestOptions);
     const data: sessionState = await response.json();
     return data;
   } catch (error) {
