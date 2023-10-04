@@ -255,6 +255,7 @@ export class Lobby {
 				team: e.team,
 				winner: null,
 				score: null,
+				players: null,
 			}
 			this.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 

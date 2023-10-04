@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {ClientEvents, ClientPayloads, LobbyMode, LobbySlotCli, LobbySlotType, LobbyType, PlayerInfo, ServerEvents, ServerPayloads} from '@shared/class'
-import {Button, ButtonGroup, Slider, Stack, Card, CardContent, Avatar, Dialog, DialogTitle, List, ListItem, ListItemButton, ListItemText, ListItemAvatar, Grid, Typography, IconButton, styled} from '@mui/material';
+import {ClientEvents, ClientPayloads, LobbyMode, LobbySlotCli, LobbySlotType, LobbyType, PaddleCli, PlayerInfo, ServerEvents, ServerPayloads} from '@shared/class'
+import {Button, ButtonGroup, Slider, Stack, Card, CardContent, Avatar, Dialog, DialogTitle, List, ListItem, ListItemButton, ListItemText, ListItemAvatar, Grid, Typography, IconButton, styled, TableContainer, Table, TableHead, TableRow, TableCell, TableBody} from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { useDispatch } from 'react-redux';
 import { Friend, Friendships, User } from 'src/Types';
@@ -20,17 +20,51 @@ import "../Lobby.scss";
 
 export const LobbyDisplayScore: React.FC = (props) => {
   const game = useAppSelector((state) => state.websocket);
+  const [sortedPlayers, setSortedPlayers] = useState<PaddleCli[]>([]);
 
+  useEffect(() => {
+    // game.lastGame &&
+    console.log(":>", game.lastGame);
+    if (game.lastGame && game.lastGame.players) {
+      setSortedPlayers([...game.lastGame.players].sort((a, b) => a.points - b.points))
+    }
+  }, [game.lastGame])
   return (
     game.lastGame && game.lastGame.score &&
       <div>
+        <p style={{width: "150px", margin: "auto"}}> {`${game.lastGame.score.visitor} - ${game.lastGame.score.home} `}</p>
         {
-          game.lastGame.winner != 'draw' ?
-         <p>{game.lastGame.winner} win the game</p>
-         :
-         <p>{game.lastGame.winner} Draw</p>
+          <TableContainer >
+            <Table sx={{ minWidth: 650 }} aria-label="visitor scores">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{color:'white'}} align="right">Player</TableCell>
+                  <TableCell sx={{color:'white'}} align="right">Points</TableCell>
+                  <TableCell sx={{color:'white'}} align="right">Goals</TableCell>
+                  <TableCell sx={{color:'white'}} align="right">Touch</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sortedPlayers.map((player, key) => (
+                  <TableRow
+                    key={key}
+                    sx={{ backgroundColor: player.team == 'visitor' ? '#2387FF' : '#FF5733','&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+
+                    <TableCell sx={{color:'white'}} align="right">{player.username}</TableCell>
+                    <TableCell sx={{color:'white'}} align="right">{player.points}</TableCell>
+                    <TableCell sx={{color:'white'}} align="right">{player.goals}</TableCell>
+                    <TableCell sx={{color:'white'}} align="right">{player.touched}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          // sortedVisitor.map((e) => 
+          //   <>
+          //   </>
+          // )
         }
-        <p style={{width: "150px"}}> {`${game.lastGame.score.visitor} - ${game.lastGame.score.home} `}</p>
       </div>
   )
 }

@@ -91,7 +91,7 @@ export const Game: React.FC = () => {
 					{formatElapsedTime(game.elapsedTime)}
 				</div>
 			</div>
-			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#cfcfcf" }} >
+			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#2E2E2E" }} >
 				<Render game={game}/>
 			</Canvas>
 			<div>

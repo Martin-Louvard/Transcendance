@@ -1,3 +1,4 @@
+import { PaddleCli } from './../../../shared/class'
 import { Timeout } from "@nestjs/schedule";
 import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo, Sphere, Paddle, GameParameters, World} from "@shared/class";
 import { Lobby } from "../lobby/lobby.class";
@@ -6,10 +7,11 @@ import { Player } from "../player/player.class";
 import { EventEmitter } from "stream";
 
 export function recalculateBallAngle(angle: number): number {
-	if (angle < 0.8)
-		return 0.8;
-	else if (angle > 2.5)
-		return 2.5;
+	if (angle > 2.85) {
+		return 2.85
+	} else if (angle < 0.30 && angle > -0.30) {
+		return Math.abs(0.30 - angle) > Math.abs(-0.30 - angle) ? -0.30 : 0.30;
+	}
 	return angle;
 }
 
@@ -17,6 +19,17 @@ export function findNearest(X: number, nb1: number, nb2: number): number {
 	return Math.abs(X - nb1) < Math.abs(X - nb2) ? nb1 : nb2;
 }
 
+export function paddleToPaddleCli(paddle: Paddle) {
+	return {
+		goals: paddle.goals,
+		touched: paddle.touched,
+		saves: paddle.saves,
+		points: paddle.points,
+		team : paddle.player.team,
+		username: paddle.player.infos.username,
+		avatar: paddle.player.infos.avatar,
+	} as PaddleCli
+}
 
 export class ClassicInstance {
 	constructor(lobby: Lobby) {
@@ -44,6 +57,7 @@ export class ClassicInstance {
 	private isRestarting = false;
 	automatch: boolean = true;
 	private playerSpawnPos = [[0, 2, 50], [0, 2, -50], [50, 2, 0], [50, 2, 0]]
+	private	lastTouch: {player: Paddle, timestamp: number} | null = null;
 	private params: GameParameters = {
 		classic: true,
 		duel: false,
@@ -78,7 +92,7 @@ export class ClassicInstance {
 		score: {home: 0, visitor: 0},
 		elapsedTime: 0,
 	};
-	private world: World = {
+	public world: World = {
 		mapHeight:  200,
 		mapWidth: 100,
 		world: null,
@@ -147,6 +161,7 @@ export class ClassicInstance {
 				winner: null,
 				team: e.team,
 				score: this.data.score,
+				players: null,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
@@ -157,6 +172,10 @@ export class ClassicInstance {
 		this.hasFinished = true;
 		this.interval.forEach((e) => {
 			clearInterval(e);
+		})
+		let players: PaddleCli[] = [];
+		this.world.players.forEach((e) =>{
+			players.push(paddleToPaddleCli(e));
 		})
 		this.lobby.players.forEach((e) => {
 			const payload: ServerPayloads[ServerEvents.LobbyState] = {
@@ -170,6 +189,7 @@ export class ClassicInstance {
 				team: e.team,
 				winner: this.data.score.home == this.data.score.visitor ? "draw" : this.data.score.home > this.data.score.visitor ? 'home' : 'visitor', 
 				score: this.data.score,
+				players: players,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
@@ -181,6 +201,10 @@ export class ClassicInstance {
 		this.hasFinished = true;
 		this.interval.forEach((e) => {
 			clearInterval(e);
+		})
+		let players: PaddleCli[] = []
+		this.world.players.forEach((e) =>{
+			players.push(paddleToPaddleCli(e));
 		})
 		this.lobby.players.forEach((e) => {
 			const payload: ServerPayloads[ServerEvents.LobbyState] = {
@@ -194,6 +218,7 @@ export class ClassicInstance {
 				team: e.team,
 				winner: player.team == 'visitor' ? 'home' : 'visitor', 
 				score: this.data.score,
+				players: players,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
@@ -231,26 +256,22 @@ export class ClassicInstance {
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
-			const accelerationVector = e.body.velocity.clone().unit().scale(this.params.ball.ballAcceleration);
-			e.body.velocity.vadd(accelerationVector);
+			e.body.velocity.x = Math.min(e.body.velocity.x, 150);
+			e.body.velocity.z = Math.min(e.body.velocity.z, 150);
 			if ((e.body.position.x < -(this.params.map.size[0] / 2) || e.body.position.x > (this.params.map.size[0] / 2))
 				||
 				(e.body.position.z < -(this.params.map.size[1] / 2) || e.body.position.z > (this.params.map.size[1] / 2))
 		 		) {
 					this.restartRound();
 			}
-			const velocityMagnitude = e.body.velocity.length();
-			if (!this.isRestarting && velocityMagnitude < minSpeed) {
-				const velocityDirection = e.body.velocity.unit();
-				e.body.velocity.copy(velocityDirection.scale(minSpeed));
+			if (!this.isRestarting) {
+				const velocityMagnitude = e.body.velocity.length();
+				const angle = Math.atan2(e.body.velocity.z, e.body.velocity.x);
+				const newAngle = recalculateBallAngle(angle);
+				if (newAngle != angle) {
+					e.body.velocity.set(Math.cos(newAngle) * velocityMagnitude, 0, Math.sin(newAngle) * velocityMagnitude);
+				}
 			}
-			//e.body.velocity.x *= (this.params.ball.globalSpeed / 10);
-			//e.body.velocity.z *= (this.params.ball.globalSpeed / 10);
-			//const coef = new CANNON.Vec3(0.005, 0.005, 0.005);
-			//const velo = e.body.velocity.vmul(coef);
-			//e.body.velocity.vadd(velo);
-			//e.body.angularVelocity.scale(0.5)
-			//e.body.velocity.vadd(e.contactVelocity, e.body.velocity);
 		})
 	}
 
@@ -261,38 +282,25 @@ export class ClassicInstance {
 			if (bl.body.id == contact.bi.id) {
 				this.world.players.forEach((pl) => {
 					if (pl.body.id == contact.bj.id) {
-
-						const collisionNormal = contact.ni;
-
-						const ballVelocityAlongNormal = collisionNormal.dot(bl.body.velocity);
-			  
-						const newVelocity = bl.body.velocity.vsub(
-						  collisionNormal.scale(2 * ballVelocityAlongNormal)
-						);
-			  
-						bl.body.velocity.copy(newVelocity);
-			  
-			  
-						bl.body.angularVelocity.scale(-0.1);
-			  
-						const impulseStrength = this.params.ball.reboundForce;
-						const impulseDirection = new CANNON.Vec3(
-						  Math.floor(Math.random() * 2) - 1,
-						  0,
-						  Math.random()
-						);
-						impulseDirection.normalize();
-						// let angle = Math.atan2(impulseDirection.z, impulseDirection.x);
-						// angle = recalculateBallAngle(angle);
-						const impulseForce = impulseDirection.scale(impulseStrength);
-						bl.body.applyImpulse(impulseForce, bl.body.position);
-			  
-
+						this.lastTouch = {player: pl, timestamp: Date.now()};
+						pl.touched++;
+						pl.points += 2;
+					}
+					const ballX = bl.body.position.x;
+					const ballZ = bl.body.position.z;
+					console.log(ballZ);
+					if ((ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2)) {
+						if (pl.player.team == 'visitor' && ballZ < (this.params.map.size[1] / 2 - 15))
+							pl.saves++;
+						else if (pl.player.team == 'home' && ballZ > ((-this.params.map.size[1] / 2 ) + 15))
+							pl.saves++;
 					}
 				})
 			}
 		})
 	}
+
+
 
 	wallCollisions(event) {
 		const numContacts = this.world.world.contacts.length;
@@ -305,32 +313,37 @@ export class ClassicInstance {
 				(this.world.balls.find(ball => ball.body === bj) && this.world.walls.includes(bi))) {
 					const ball = this.world.balls.find(ball => ball.body === bi || ball.body === bj);
 					const wall = this.world.walls.find(wall => wall == bj || wall == bi);
+					const ballX = ball.body.position.x;
+					if (ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2) {
 				if (wall.id == 99) {
 					this.data.score.home += 1;
 					this.restartRound();
+					if (this.lastTouch && (Date.now() / 1000) - (this.lastTouch.timestamp / 1000) < 3) {
+						if (this.lastTouch.player.player.team == 'visitor') {
+							this.lastTouch.player.goals--;
+							this.lastTouch.player.points -= 50;
+						}
+						else {
+							this.lastTouch.player.goals++;
+							this.lastTouch.player.points += 50;
+						}
+					}
 				} else if (wall.id == 100) {
 					this.data.score.visitor += 1;
 					this.restartRound();
+					if (this.lastTouch && (Date.now() / 1000) - (this.lastTouch.timestamp / 1000) < 3) {
+						if (this.lastTouch.player.player.team == 'home') {
+							this.lastTouch.player.goals--;
+							this.lastTouch.player.points -= 50;
+						}
+						else {
+							this.lastTouch.player.goals++;
+							this.lastTouch.player.points += 50;	
+						}
+					}
 				}
+			}
 				if (ball && wall) {
-					const impactDirection: CANNON.Vec3 = contact.ri.clone();
-
-					let angle = Math.atan2(impactDirection.z, impactDirection.x);
-					const minHorizontalAngle = Math.PI / 4;  // Average on π
-					const maxHorizontalAngle = Math.PI - minHorizontalAngle; // Average on 0
-				  
-					if (angle < minHorizontalAngle) {
-						const adjustmentAngle = minHorizontalAngle - angle;
-						const forceMagnitude = 100;
-						const force = new CANNON.Vec3(forceMagnitude, 0, 0);
-						ball.body.applyForce(force, ball.body.position);
-					  } else if (angle > maxHorizontalAngle) {
-						const adjustmentAngle = angle - maxHorizontalAngle;
-						const forceMagnitude = 100;
-						const force = new CANNON.Vec3(forceMagnitude, 0, 0);
-						ball.body.applyForce(force, ball.body.position);
-					  }
-
 				}
 			}
 		}
@@ -344,9 +357,8 @@ export class ClassicInstance {
 	}
 
 	ballStart(ball: Sphere) {
-		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
-		let angle = recalculateBallAngle(Math.atan2(direction.z, direction.x));
-		// si angle entre -> (PI/6 - 11PI/6) - (5PI/6 - 7PI/6) => set langle de la ball a l'angle le plus proche.
+		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.floor(Math.random() * 2) - 1);
+		let angle = recalculateBallAngle( Math.atan2(direction.z, direction.x));
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
 		const impulseStrength = 500; 
 		ball.body.applyImpulse(direction.scale(impulseStrength), ball.body.position);
@@ -369,8 +381,8 @@ export class ClassicInstance {
 	}
 
 	createWalls(ballMaterial: CANNON.Material) {
-		const wallSize = 2; // Adjust this value as needed
-		const wallHeight = 10; // Adjust this value as needed
+		const wallSize = 2;
+		const wallHeight = 10;
 		this.world.walls = new Array<CANNON.Body>(4);
 	
 		const wallShapeX = new CANNON.Box(new CANNON.Vec3(this.world.mapWidth / 2, wallHeight / 2, wallSize / 2));
@@ -414,7 +426,7 @@ export class ClassicInstance {
 		wallBottom.position.set(0, wallHeight / 2, this.world.mapHeight / 2 + wallSize / 2);
 		this.world.walls.push(wallBottom);
 		this.world.world.addBody(wallBottom);
-		const ballContactMaterial: CANNON.ContactMaterial = new CANNON.ContactMaterial(ballMaterial, wallMaterial, {restitution: 1 });
+		const ballContactMaterial: CANNON.ContactMaterial = new CANNON.ContactMaterial(ballMaterial, wallMaterial, {restitution: 0.95 });
 		this.world.world.addContactMaterial(ballContactMaterial);
 	
 		this.world.world.addEventListener('preStep', this.wallCollisions.bind(this));
@@ -444,13 +456,13 @@ export class ClassicInstance {
 		this.world.players = new Map<number, Paddle>();
 		this.data.players = new Array<PlayerBody>();
 		let i: number = 0;
-		const paddleSize:[number, number, number] = [12, 3, 2];
+		const paddleSize = this.params.players.paddleSize;
 		const playerMaterial: CANNON.Material = new CANNON.Material('slippery');
 		this.lobby.players.forEach((elem) => {
 			const paddle: Paddle = {
 				size: paddleSize,
 				body: new CANNON.Body({
-						mass: 5,
+						mass: 10000,
 						shape: new CANNON.Box(new CANNON.Vec3(paddleSize[0] / 2, paddleSize[1] / 2, paddleSize[2] / 2)),
 						material: playerMaterial,
 						linearDamping: 0,
@@ -461,6 +473,10 @@ export class ClassicInstance {
 				previousVelocity: new CANNON.Vec3(),
 				lastMovement: null,
 				activeDirections: {left:false, right: false, up:false, down: false, boost: false, rotLeft: false, rotRight: false},
+				goals: 0,
+				touched: 0,
+				saves: 0,
+				points: 0,
 			}
 			paddle.body.quaternion.setFromEuler(0, i % 2  ? Math.PI : 0, 0);
 			paddle.body.position.set(this.playerSpawnPos[i][0], this.playerSpawnPos[i][1], this.playerSpawnPos[i][2]);
@@ -469,9 +485,10 @@ export class ClassicInstance {
 			});
 			const ballPlayerContactMaterial = new CANNON.ContactMaterial(ballMaterial, playerMaterial, {
 				friction: 0,
-				restitution: 1,
+				restitution: 1.8,
 			});
 			this.world.world.addBody(paddle.body);
+			this.world.world.addContactMaterial(ballPlayerContactMaterial);
 			this.world.world.addContactMaterial(groundPlayerContactMaterial);
 			this.world.players.set(elem.id, paddle);
 			paddle.body.addEventListener('collide', this.collision.bind(this));
@@ -479,7 +496,6 @@ export class ClassicInstance {
 			elem.team = i % 2 ? 'home' : 'visitor';
 			this.startTime = Date.now() / 1000;
 			i++;
-
 		});
 	}
 

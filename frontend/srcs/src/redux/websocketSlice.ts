@@ -1,5 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit';
-import {PlayerBody, Ball, LobbyMode, LobbyType, PlayerInfo, GameParameters, LobbySlotCli, ServerPayloads, ServerEvents, LobbyCli, GameRequest } from '@shared/class'
+import {PlayerBody, Ball, LobbyMode, LobbyType, PlayerInfo, GameParameters, LobbySlotCli, ServerPayloads, ServerEvents, LobbyCli, GameRequest, Paddle, PaddleCli } from '@shared/class'
 
 export interface WebSocketState {
   isConnected: boolean;
@@ -21,7 +21,7 @@ export interface WebSocketState {
   sentInvites: GameRequest[];
   full: boolean;
   lobbies: LobbyCli[];
-  lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor' | 'draw', team: 'home' | 'visitor', timestamp: number} | null
+  lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor' | 'draw', team: 'home' | 'visitor', timestamp: number, players: PaddleCli[] | null} | null
   isWaitingToConnect: boolean;
   paramsReceived: boolean;
 }
@@ -285,7 +285,7 @@ const websocketSlice = createSlice({
       if (action.payload.hasFinished) {
         state.isPlaying = false;
         state.LobbyType = LobbyType.score;
-        state.lastGame = {score: action.payload.score, winner: action.payload.winner, team: action.payload.team, timestamp: Date.now()};
+        state.lastGame = {score: action.payload.score, winner: action.payload.winner, team: action.payload.team, timestamp: Date.now(), players: action.payload.players};
       }
       if (action.payload.playersInfo) {
         state.playersInfo = action.payload.playersInfo;

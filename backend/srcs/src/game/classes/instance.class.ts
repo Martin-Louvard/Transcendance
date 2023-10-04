@@ -1,10 +1,10 @@
 import { Timeout } from "@nestjs/schedule";
-import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo, GameParameters, World, Sphere, Paddle} from "@shared/class";
+import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo, GameParameters, World, Sphere, Paddle, PaddleCli} from "@shared/class";
 import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
 import { Injectable } from "@nestjs/common";
-import { findNearest, recalculateBallAngle } from "./classicInstance";
+import { findNearest, paddleToPaddleCli, recalculateBallAngle } from "./classicInstance";
 import { EventEmitter } from "stream";
 
 export class Instance {
@@ -17,18 +17,15 @@ export class Instance {
 	private static nbInstances: number = 0;
 	public readonly id: number = 0;
 	private interval = new Array();
-	private maxPlayer: number;
 	hasStarted: boolean = false; // A recuperer dans l'instance
 	hasFinished: boolean = false; // A recuperer dans l'instance
 	isSuspended: boolean = false; // A recuperer dans l'instance
 	scores: {home: number, visitor: number}= {home: 0, visitor: 0}; // A recuperer dans l'instance
-	private startTriggered: boolean = false; // Permet de savoir si le Start a deja été trigger pour annuler un start si
 	private moveDistance: number = 60; // this could be sended by the host of the game in the game parameter
-	private ballContactVelocity: CANNON.Vec3;
 	public startTime: number;
-	private accelerationRate = 50;
-	private maxAcceleration = 5000;
 	private rotationSpeed;
+	private	lastTouch: {player: Paddle, timestamp: number} | null = null;
+
 	automatch: boolean = true;
 	private params: GameParameters = {
 		classic: false,
@@ -65,7 +62,7 @@ export class Instance {
 		score: {home: 0, visitor: 0},
 		elapsedTime: 0,
 	};
-	private world: World = {
+	public world: World = {
 		mapHeight:  200,
 		mapWidth: 100,
 		world: null,
@@ -149,8 +146,6 @@ export class Instance {
 	}
 	triggerStart() {
 		this.hasStarted = true;
-		this.maxPlayer = this.lobby.mode;
-		this.startTriggered = true;
 		this.generate();
 		let infos: PlayerInfo[] = [];
 		this.lobby.players.forEach((e) => {
@@ -169,6 +164,7 @@ export class Instance {
 				winner: null,
 				team: e.team,
 				score: this.data.score,
+				players: null,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
@@ -180,6 +176,11 @@ export class Instance {
 		this.interval.forEach((e) => {
 			clearInterval(e);
 		})
+		let players: PaddleCli[] = [];
+		this.world.players.forEach((e) =>{
+			players.push(paddleToPaddleCli(e));
+		})
+		console.log(players);
 		this.lobby.players.forEach((e) => {
 			const payload: ServerPayloads[ServerEvents.LobbyState] = {
 				lobbyId: this.lobby.id,
@@ -192,6 +193,7 @@ export class Instance {
 				team: e.team,
 				winner: this.data.score.home == this.data.score.visitor ? "draw" : this.data.score.home > this.data.score.visitor ? 'home' : 'visitor', 
 				score: this.data.score,
+				players: players,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
@@ -208,6 +210,10 @@ export class Instance {
 		this.interval.forEach((e) => {
 			clearInterval(e);
 		})
+		let players: PaddleCli[] = [];
+		this.world.players.forEach((e) =>{
+			players.push(paddleToPaddleCli(e));
+		})
 		this.lobby.players.forEach((e) => {
 			const payload: ServerPayloads[ServerEvents.LobbyState] = {
 				lobbyId: this.lobby.id,
@@ -220,6 +226,7 @@ export class Instance {
 				team: e.team,
 				winner: player.team == 'visitor' ? 'home' : 'visitor', 
 				score: this.data.score,
+				players: players,
 			};
 			this.lobby.emit<ServerPayloads[ServerEvents.LobbyState]>(ServerEvents.LobbyState, payload);
 		})
@@ -272,21 +279,26 @@ export class Instance {
 		this.world.balls.forEach((e) => {
 			e.body.velocity.y = 0;
 			e.body.position.y = e.radius;
-
+			e.body.velocity.x = Math.min(e.body.velocity.x, 100);
+			e.body.velocity.z = Math.min(e.body.velocity.z, 100);
 			if ((e.body.position.x < -(this.params.map.size[0] / 2) || e.body.position.x > (this.params.map.size[0] / 2))
-				||
-				(e.body.position.z < -(this.params.map.size[1] / 2) || e.body.position.z > (this.params.map.size[1] / 2))
-		 		) {
-					this.restartRound();
-				}
-			if (!this.isRestarting) {
-
-				
-				const velocityMagnitude = e.body.velocity.length();
-				if (velocityMagnitude < minSpeed) {
-					const velocityDirection = e.body.velocity.unit();
-					e.body.velocity.copy(velocityDirection.scale(minSpeed));
-				}
+			||
+		(e.body.position.z < -(this.params.map.size[1] / 2) || e.body.position.z > (this.params.map.size[1] / 2))
+		) {
+			this.restartRound();
+		}
+		if (!this.isRestarting) {
+				 
+			const velocityMagnitude = e.body.velocity.length();
+			const angle = Math.atan2(e.body.velocity.z, e.body.velocity.x);
+			const newAngle = recalculateBallAngle(angle);
+			if (newAngle != angle) {
+				e.body.velocity.set(Math.cos(newAngle) * velocityMagnitude, 0, Math.sin(newAngle) * velocityMagnitude);
+			}
+			if (velocityMagnitude < minSpeed) {
+				const velocityDirection = e.body.velocity.unit();
+				e.body.velocity.copy(velocityDirection.scale(minSpeed));
+			}
 		}
 	
 		})
@@ -299,24 +311,18 @@ export class Instance {
 			if (bl.body.id == contact.bi.id) {
 				this.world.players.forEach((pl) => {
 					if (pl.body.id == contact.bj.id) {
-						const collisionNormal = contact.ni;
-						const ballVelocityAlongNormal = collisionNormal.dot(bl.body.velocity);
-						const newVelocity = bl.body.velocity.vsub(
-						  collisionNormal.scale(2 * ballVelocityAlongNormal)
-						);
-						bl.body.velocity.copy(newVelocity);
-						bl.body.angularVelocity.scale(-0.1);
-						const impulseStrength = this.params.ball.reboundForce * 2;
-						const impulseDirection = new CANNON.Vec3(
-						  Math.floor(Math.random() * 2) - 1,
-						  0,
-						  Math.random()
-						);
-						let angle = recalculateBallAngle(Math.atan2(impulseDirection.z, impulseDirection.x));
-						impulseDirection.normalize();
-						const impulseForce = impulseDirection.scale(impulseStrength);
-						bl.body.applyImpulse(impulseForce, bl.body.position);
-			  
+						this.lastTouch = {player: pl, timestamp: Date.now()};
+						pl.touched++;
+						pl.points += 2;
+					}
+					const ballX = bl.body.position.x;
+					const ballZ = bl.body.position.z;
+					console.log(ballZ);
+					if ((ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2)) {
+						if (pl.player.team == 'visitor' && ballZ < (this.params.map.size[1] / 2 - 15))
+							pl.saves++;
+						else if (pl.player.team == 'home' && ballZ > ((-this.params.map.size[1] / 2 ) + 15))
+							pl.saves++;
 					}
 				})
 			}
@@ -339,21 +345,32 @@ export class Instance {
 				if (wall.id == 99) {
 					this.data.score.home += 1;
 					this.restartRound();
+					if (this.lastTouch && (Date.now() / 1000) - (this.lastTouch.timestamp / 1000) < 3) {
+						if (this.lastTouch.player.player.team == 'visitor') {
+							this.lastTouch.player.goals--;
+							this.lastTouch.player.points -= 50;
+						}
+						else {
+							this.lastTouch.player.goals++;
+							this.lastTouch.player.points += 50;
+						}
+					}
 				} else if (wall.id == 100) {
 					this.data.score.visitor += 1;
 					this.restartRound();
+					if (this.lastTouch && (Date.now() / 1000) - (this.lastTouch.timestamp / 1000) < 3) {
+						if (this.lastTouch.player.player.team == 'home') {
+							this.lastTouch.player.goals--;
+							this.lastTouch.player.points -= 50;
+						}
+						else {
+							this.lastTouch.player.goals++;
+							this.lastTouch.player.points += 50;	
+						}
+					}
 				}
 			}
 				if (ball && wall) {
-					const impactDirection: CANNON.Vec3 = contact.ri.clone();
-					let angle = recalculateBallAngle(Math.atan2(impactDirection.z, impactDirection.x));
-					const ballSpeed = ball.body.velocity.length();
-
-					const impulseForce = (angle * ballSpeed * this.params.ball.reboundForce) / 100;
-
-					const impulseVector = new CANNON.Vec3(0, 0, impulseForce);
-					ball.body.applyImpulse(impulseVector, ball.body.position);
-
 				}
 			}
 		}
@@ -367,7 +384,7 @@ export class Instance {
 	}
 
 	ballStart(ball: Sphere) {
-		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.random());
+		const direction = new CANNON.Vec3(Math.floor(Math.random() * 2) - 1, 0, Math.floor(Math.random() * 2) - 1);
 		let angle = recalculateBallAngle( Math.atan2(direction.z, direction.x));
 		direction.set(Math.cos(angle), 0, Math.sin(angle))
 		const impulseStrength = 500; 
@@ -391,8 +408,8 @@ export class Instance {
 	}
 
 	createWalls(ballMaterial: CANNON.Material) {
-		const wallSize = 2; // Adjust this value as needed
-		const wallHeight = 10; // Adjust this value as needed
+		const wallSize = 2;
+		const wallHeight = 10;
 		this.world.walls = new Array<CANNON.Body>(4);
 	
 		const wallShapeX = new CANNON.Box(new CANNON.Vec3(this.world.mapWidth / 2, wallHeight / 2, wallSize / 2));
@@ -436,7 +453,7 @@ export class Instance {
 		wallBottom.position.set(0, wallHeight / 2, this.world.mapHeight / 2 + wallSize / 2);
 		this.world.walls.push(wallBottom);
 		this.world.world.addBody(wallBottom);
-		const ballContactMaterial: CANNON.ContactMaterial = new CANNON.ContactMaterial(ballMaterial, wallMaterial, {restitution: 1 });
+		const ballContactMaterial: CANNON.ContactMaterial = new CANNON.ContactMaterial(ballMaterial, wallMaterial, {restitution: 0.95 });
 		this.world.world.addContactMaterial(ballContactMaterial);
 	
 		this.world.world.addEventListener('preStep', this.wallCollisions.bind(this));
@@ -472,7 +489,7 @@ export class Instance {
 			const paddle: Paddle = {
 				size: paddleSize,
 				body: new CANNON.Body({
-						mass: 5,
+						mass: 10000,
 						shape: new CANNON.Box(new CANNON.Vec3(paddleSize[0] / 2, paddleSize[1] / 2, paddleSize[2] / 2)),
 						material: playerMaterial,
 						linearDamping: 0,
@@ -483,6 +500,10 @@ export class Instance {
 				previousVelocity: new CANNON.Vec3(),
 				lastMovement: null,
 				activeDirections: {left:false, right: false, up:false, down: false, boost: false, rotLeft: false, rotRight: false},
+				goals: 0,
+				touched: 0,
+				saves: 0,
+				points: 0,
 			}
 			paddle.body.quaternion.setFromEuler(0, i % 2  ? Math.PI : 0, 0);
 			paddle.body.position.set(this.playerSpawnPos[i][0], this.playerSpawnPos[i][1], this.playerSpawnPos[i][2]);
@@ -491,9 +512,10 @@ export class Instance {
 			});
 			const ballPlayerContactMaterial = new CANNON.ContactMaterial(ballMaterial, playerMaterial, {
 				friction: 0,
-				restitution: 1,
+				restitution: 1.8,
 			});
 			this.world.world.addBody(paddle.body);
+			this.world.world.addContactMaterial(ballPlayerContactMaterial);
 			this.world.world.addContactMaterial(groundPlayerContactMaterial);
 			this.world.players.set(elem.id, paddle);
 			paddle.body.addEventListener('collide', this.collision.bind(this));

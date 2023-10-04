@@ -133,6 +133,7 @@ export type ServerPayloads = {
 		winner: 'home' | 'visitor' | "draw",
 		team: 'home' | 'visitor',
 		score: {'home': number, 'visitor': number},
+		players: PaddleCli[] | null,
 	},
 	[ServerEvents.GameState]: {
 		gameData: GameData;
@@ -293,8 +294,28 @@ export interface Paddle {
 		boost: boolean,
 		rotRight: boolean,
 		rotLeft: boolean,
-	};	
+	};
+	goals: number,
+	touched: number,
+	saves: number,
+	points: number,
 }
+
+export interface PaddleCli {
+	goals: number,
+	touched: number,
+	saves: number,
+	points: number,
+	team : 'visitor' | 'home',
+	username: string,
+	avatar: string,
+}
+
+
+// goals : 50pts;
+// touch : 2pts,
+// saves : 25pts,
+
 
 export interface World {
 	mapHeight:  number;

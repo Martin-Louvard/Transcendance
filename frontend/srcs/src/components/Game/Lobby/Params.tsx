@@ -77,7 +77,7 @@ export const MapParams: React.FC = (props) => {
 			</Stack>
 			{/* <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">
 			  <p>Rebound Force</p>
-			  <Slider size="small" value={params.ball.reboundForce} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={100} aria-label="Default" valueLabelDisplay="auto" min={50} max={300} sx={sliderStyle}
+			  <Slider size="small" value={params.ball.reboundForce} disabled={owner == user?.username || !game.lobbyId ? false : true}  defaultValue={200} aria-label="Default" valueLabelDisplay="auto" min={50} max={500} sx={sliderStyle}
 			  onChange={(_, val) => {setBallParam(prev => ({...prev, reboundForce: val as number}))}}/>
 			</Stack> */}
 			{/* <Stack spacing={0} direction="column" sx={{ mt: 0, mb: 1 }} alignItems="center">

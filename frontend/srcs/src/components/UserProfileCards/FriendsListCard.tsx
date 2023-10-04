@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 const FriendsListCard: React.FC = (props) =>{
     const user = useAppSelector((state) => state.session.user);
+    const access_token = useAppSelector((state) => state.session.access_token)
     const friendships = useAppSelector((state) => state.session.friendships);
     const [friendshipsAccepted, setFriendshipsAccepted] = useState<Friendships[] | undefined>()
     const [friendshipsBlocked, setFriendshipsBlocked] = useState<Friendships[] | undefined>()
@@ -37,8 +38,22 @@ const FriendsListCard: React.FC = (props) =>{
 
     const sendFriendRequest = async (event: React.FormEvent<HTMLFormElement>) =>{
       event.preventDefault()
-      dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [user?.id, newFriendUsername]})
-      toast.success("Request Sent")
+      const requestOptions = {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json',
+        'Authorization': `Bearer ${access_token}` },
+      };
+        const response = await fetch(`http://localhost:3001/users/${newFriendUsername}`, requestOptions);
+        if (response.ok)
+        {
+          dispatch({ type: 'WEBSOCKET_SEND_FRIEND_REQUEST', payload: [user?.id, newFriendUsername]})
+          toast.success("Request Sent")
+        }
+        else
+        {
+          const data = await response.json()
+          toast.error(data.message)
+        }
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
