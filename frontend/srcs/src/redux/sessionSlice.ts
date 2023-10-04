@@ -53,9 +53,9 @@ export const sessionSlice = createSlice({
     addOpenedChatChannel: (state, action) => {
       const chatChannel = action.payload;
       if (
-        !state.OpenedChatChannels?.some(
+        !state.OpenedChatChannels?.filter(
           (channel) => channel.id === chatChannel.id,
-        )
+        ).length
       ) {
         if (state.OpenedChatChannels?.length >= 3) {
           state.OpenedChatChannels?.shift();
@@ -66,9 +66,17 @@ export const sessionSlice = createSlice({
     addNewChatChannel: (state, action) => {
       const newChat: ChatChannels = action.payload;
       if (newChat.participants.filter((user) => user.id === state.user?.id).length){
-        if (!state.JoinedChatChannels?.some(
-          (channel) => channel.id === newChat.id)){
+        if (!state.JoinedChatChannels?.filter(
+          (channel) => channel.id === newChat.id).length){
           state.JoinedChatChannels?.push(newChat);
+        }
+        if (state.OpenedChatChannels?.filter((chann) => chann.id === newChat.id).length){
+          state.OpenedChatChannels = state.OpenedChatChannels?.map((chat) => {
+            if (newChat.id === chat.id){
+              return newChat;
+            }
+            return chat;
+          })
         }
         else {
           state.JoinedChatChannels = state.JoinedChatChannels?.map((chat) => {
@@ -141,6 +149,8 @@ export const sessionSlice = createSlice({
       }
     },
     leaveChat: (state, action) => {
+      console.log(action.payload);
+      console.log(action.payload[0]);
       const updatedChann = action.payload[0];
       if (state.user?.id === action.payload[1]){
         state.JoinedChatChannels = state.JoinedChatChannels?.filter((chann) => chann.id != updatedChann.id);
@@ -252,6 +262,12 @@ export const sessionSlice = createSlice({
             updatedChatChannel.notifications;
         }
       });
+    },
+    deleteChat: (state, action) => {
+      const chatId = action.payload;
+
+      state.JoinedChatChannels = state.JoinedChatChannels?.filter((chann) => chann.id !== chatId);
+      state.OpenedChatChannels = state.OpenedChatChannels?.filter((chann) => chann.id !== chatId);
     },
     setSessionUser: (state, action) => {
       state.user = action.payload;
@@ -510,6 +526,7 @@ export const {
   addReaderId,
   leaveChat,
   beenKicked,
+  deleteChat,
 } = sessionSlice.actions;
 export { fetchRelatedUserData };
 export default sessionSlice.reducer;

@@ -2,7 +2,7 @@ import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction, MiddlewareAPI, CombinedState } from '@reduxjs/toolkit';
 import { WebSocketState, addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, resetLobbyData, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setParams, setParamsReceived, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
-import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat, addNewChatChannel, updateOneChat, updateBlockStatus, addReaderId, leaveChat, beenKicked, sessionState } from './sessionSlice';
+import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat, addNewChatChannel, updateOneChat, updateBlockStatus, addReaderId, leaveChat, beenKicked, sessionState, deleteChat } from './sessionSlice';
 import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType, ClientPayloads} from '@shared/class';
 import { useAppSelector } from './hooks';
 
@@ -67,7 +67,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('leave_chat', (data: any) => {store.dispatch(leaveChat(data))});
         socket.on('new_signup', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('change_owner', (data: any) => {store.dispatch(updateOneChat(data))});
-        socket.on('delete_chat', (data: any) => {store.dispatch(leaveChat(data))});
+        socket.on('delete_chat', (data: any) => {store.dispatch(deleteChat(data))});
         socket.on('update_chat', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('join_chat', (data: any) => {store.dispatch(addNewChatChannel(data))});
         socket.on('add_admin', (data: any) => {store.dispatch(updateOneChat(data))});
@@ -237,6 +237,8 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       
       case 'LEAVE_CHAT':
         if (socket && socket.connected) {
+          console.log("MiddleWare :");
+          console.log(action.payload);
           socket.emit('leave_chat', action.payload);
         }
         break;
