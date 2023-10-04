@@ -382,7 +382,7 @@ export class AppGateway
         participantsInConnectedClients.set(participant.id, client);
       }
     });
-    participantsInConnectedClients.forEach((p)=>{
+    participantsInConnectedClients.forEach((p) => {
       p.emit('message', message);
     })
   }
@@ -442,7 +442,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('add_admin', updatedChats);
@@ -466,7 +466,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('ban_user', [updatedChats, bannedUser.id]);
@@ -501,7 +501,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('mute_user', updatedChats);
@@ -562,7 +562,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('add_user_chat', updatedChats);
@@ -573,6 +573,7 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: Array<any>,
   ): Promise<void> {
+    console.log(body[0], body[1]);
     const chatRecv = await this.prisma.chatChannel.findUnique({
       where: { id: parseInt(body[0]) },
       include: { participants: true },
@@ -682,7 +683,7 @@ export class AppGateway
         participants: true,
         bannedUsers: true,
         actionOnUser: true,
-        friendship: true, 
+        friendship: true,
       },
     });
     this.server.emit('unban_user', updatedChat);
