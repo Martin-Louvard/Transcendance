@@ -24,7 +24,7 @@ const ProfileCard: React.FC = () => {
       };
 
       try{
-        const response = await fetch(`http://${import.meta.env.VITE_IP}/users/${user?.username}/avatar`, requestOptions)
+        const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/users/${user?.username}/avatar`, requestOptions)
         if (response.ok){
           const result = await response.json()
           dispatch(setSessionUser(result))
