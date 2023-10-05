@@ -727,7 +727,7 @@ export class AppGateway
     const updatedChannel = await this.prisma.chatChannel.update({
       where: { id: chatId },
       data: {
-        ownerId: newOwnerId,
+        owner: { connect: { id: newOwnerId } },
         participants: {
           set: updateParticipants.map((user) => ({ id: user.id })),
         },
