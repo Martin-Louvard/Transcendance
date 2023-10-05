@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
 
 
   const logout = () =>{
-    window.location.href="http://localhost:3000/"
+    window.location.href=`http://${import.meta.env.VITE_IP}:3000/`
     dispatch(cleanSession())
     localStorage.removeItem('persist:root')
       const payload: ClientPayloads[ClientEvents.LobbyState] = {

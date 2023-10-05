@@ -9,7 +9,7 @@ export async function fetchAllRelatedInfoApi(userId: number, access_token: strin
     'Authorization': `Bearer ${access_token}` },
   };
   try {
-    const response = await fetch(`http://${import.meta.env.VITE_IP}/users/id/{id}?id=${userId}`, requestOptions);
+    const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/users/id/{id}?id=${userId}`, requestOptions);
     const data: sessionState = await response.json();
     return data;
   } catch (error) {
@@ -20,7 +20,7 @@ export async function fetchAllRelatedInfoApi(userId: number, access_token: strin
 
 export async function fetchFriendsApi(userId: string): Promise<User[]>  {
     try {
-      const response = await fetch(`http://${import.meta.env.VITE_IP}/users/friends/{id}?id=${userId}`);
+      const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/users/friends/{id}?id=${userId}`);
       const data: User[] = await response.json();
       return data;
     } catch (error) {
@@ -30,7 +30,7 @@ export async function fetchFriendsApi(userId: string): Promise<User[]>  {
   
 export async function fetchFriendshipsApi(userId: string): Promise<Friendships[]> {
   try {
-    const response = await fetch(`http://${import.meta.env.VITE_IP}/friends/user/{id}?id=${userId}`);
+    const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/friends/user/{id}?id=${userId}`);
     const data: Friendships[] = await response.json();
     return data;
   } catch (error) {
@@ -45,7 +45,7 @@ export async function fetchChatChannelsApi(access_token: string | undefined): Pr
     'Authorization': `Bearer ${access_token}` },
   };
   try {
-    const response = await fetch(`http://${import.meta.env.VITE_IP}/chat-channels`, requestOptions);
+    const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/chat-channels`, requestOptions);
     const data: ChatChannels[] | undefined = await response.json();
     return data;
   }
@@ -64,7 +64,7 @@ export async function login (username: string, password: string): Promise<User> 
      })
   };
   try{
-    const response = await fetch(`http://${import.meta.env.VITE_IP}/auth/login`, requestOptions);
+    const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/auth/login`, requestOptions);
     const data: User = await response.json();
     return data;
   }catch(error) {
@@ -82,7 +82,7 @@ export async function login2fa (code: string | null, user: User, access_token: s
      })
   };
   try{
-    const response = await fetch(`http://${import.meta.env.VITE_IP}/2fa/${user.username}/login`, requestOptions);
+    const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/2fa/${user.username}/login`, requestOptions);
     const data: User = await response.json();
     data.access_token = access_token
     return data
@@ -102,7 +102,7 @@ export async function login42 (code42: string | null): Promise<User> {
   };
 
   try{
-    const response = await fetch(`http://${import.meta.env.VITE_IP}/auth/42login`, requestOptions);
+    const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/auth/42login`, requestOptions);
     const data: User = await response.json();
     return data
   }catch(error) {

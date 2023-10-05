@@ -48,7 +48,7 @@ const UserListItem = ({ user, chat, setIsOpen }: { user: User; chat: ChatChannel
         <div className="picture-indicator">
           <img
             className="popup-profile-pic"
-            src={`http://${import.meta.env.VITE_IP}/users/avatar/` + user.username + "/" + user.avatar.split("/").reverse()[0]}
+            src={`http://${import.meta.env.VITE_IP}:3001/users/avatar/` + user.username + "/" + user.avatar.split("/").reverse()[0]}
           />
           <StatusDot status={user.status} style={"position-popup"} />
         </div>

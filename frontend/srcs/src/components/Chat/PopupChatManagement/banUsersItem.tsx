@@ -14,7 +14,7 @@ const BanUserItem = ({ user, chat }: { user: User; chat: ChatChannels }) => {
           <img
             className="popup-profile-pic"
             src={
-              `http://${import.meta.env.VITE_IP}/users/avatar/` +
+              `http://${import.meta.env.VITE_IP}:3001/users/avatar/` +
               user.username +
               "/" +
               user.avatar.split("/").reverse()[0]

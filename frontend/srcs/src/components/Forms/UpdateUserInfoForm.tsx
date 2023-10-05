@@ -33,7 +33,7 @@ const ChangeInfo = () => {
          })
       };
       try{
-        const response =  await fetch(`http://${import.meta.env.VITE_IP}/users/${user?.id}`, requestOptions)
+        const response =  await fetch(`http://${import.meta.env.VITE_IP}:3001/users/${user?.id}`, requestOptions)
         const parsedResponse = await response.json();
         if (response.ok)
         {

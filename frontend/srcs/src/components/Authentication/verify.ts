@@ -9,7 +9,7 @@ const requestOptions = {
   };
 
   try{
-	const response = await fetch(`http://${import.meta.env.VITE_IP}/auth/verify`, requestOptions);
+	const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/auth/verify`, requestOptions);
 	if (response.ok)
 	{
 	  const data = await response.json();
