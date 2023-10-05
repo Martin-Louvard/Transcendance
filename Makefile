@@ -32,12 +32,12 @@ fclean:
 	make rmvol
 
 ffclean:
-	docker         stop          $$(docker ps -qa)
-	docker         rm    --force $$(docker ps -qa)
-	docker         rmi   --force $$(docker images -qa)
-	docker volume  rm            $$(docker volume ls -q)
-	docker network rm            $$(docker network ls -q)
-	docker builder prune --force
+	-docker         stop          $$(docker ps -qa)
+	-docker         rm    --force $$(docker ps -qa)
+	-docker         rmi   --force $$(docker images -qa)
+	-docker volume  rm            $$(docker volume ls -q)
+	-docker network rm            $$(docker network ls -q)
+	-docker builder prune --force
 
 
 .PHONY: all, build, restart, up, stop, purge, re, rmvol, fclean
