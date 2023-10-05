@@ -55,7 +55,7 @@ const ChatBoxes = () => {
       >
         <div className="chat-name-wrapper">
           <div className="chat-name">
-            {getName(chat, currentUser?.username)}
+            {getName(chat, currentUser!)}
           </div>
           <div className="chat-name-wrapper-right">
             <button
