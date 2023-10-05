@@ -40,7 +40,7 @@ const AddParticipantsSearchBar = ({chat} : {chat: ChatChannels}) => {
       toast.success(`${WhatsMyName(currentUser!, friend)} has been added to the chat`);
     }
     else {
-      toast.error("User not found");
+      toast.error("User not found among your friends");
     }
   };
 
