@@ -575,10 +575,15 @@ export class AppGateway
   ): Promise<void> {
     const chatRecv = await this.prisma.chatChannel.findUnique({
       where: { id: parseInt(body[0]) },
-      include: { participants: true },
+      include: { participants: true,
+      admins: true },
     });
 
     const updatedParticipants = chatRecv.participants.filter(
+      (user) => user.id !== parseInt(body[1]),
+    );
+
+    const updatedAdmins = chatRecv.admins.filter(
       (user) => user.id !== parseInt(body[1]),
     );
 
@@ -587,6 +592,9 @@ export class AppGateway
       data: {
         participants: {
           set: updatedParticipants.map((user) => ({ id: user.id })),
+        },
+        admins: {
+          set: updatedAdmins.map((user) => ({ id: user.id })),
         },
       },
       include: {
