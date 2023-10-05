@@ -1,6 +1,6 @@
 import io, {Socket} from 'socket.io-client';
 import { Middleware, Dispatch, AnyAction, MiddlewareAPI, CombinedState } from '@reduxjs/toolkit';
-import { WebSocketState, addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, resetLobbyData, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setParams, setParamsReceived, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
+import { WebSocketState, addInvitedGame, addSentInvte, deleteInvitedGame, deleteInvitedGameById, deleteSentInvite, deleteSentInviteById, pushGameAction, resetGameAction, resetLobbyData, setAuthState, setGameRequests, setGameState, setLobbies, setLobbyFull, setLobbySlots, setLobbyState, setLobbyType, setParams, setParamsReceived, setWaitingToConnect, websocketConnected, websocketDisconnected } from './websocketSlice'; // Adjust the paths
 import { RootState } from './store'; // Adjust the path
 import { receiveMessage, updateFriendRequest, updateFriendStatus, createChat, updateChat, addNewChatChannel, updateOneChat, updateBlockStatus, addReaderId, leaveChat, beenKicked, sessionState, deleteChat } from './sessionSlice';
 import { ClientEvents, ServerEvents, Input, InputPacket, GameRequest, ServerPayloads, LobbyType, ClientPayloads} from '@shared/class';
@@ -12,8 +12,10 @@ function handleLobbyState(data:ServerPayloads[ServerEvents.LobbyState], socket: 
   session: sessionState;
   websocket: WebSocketState;
 }>>) {
-  if (data.hasFinished)
+  if (data.hasFinished) {
     store.dispatch(setLobbyType(LobbyType.score)); 
+    store.dispatch(resetGameAction());
+  }
   store.dispatch(setLobbyState(data))
   let payload: ClientPayloads[ClientEvents.LobbyState];
   if (data.hasStarted&& data.lobbyId){
@@ -35,7 +37,7 @@ function handleLobbyState(data:ServerPayloads[ServerEvents.LobbyState], socket: 
     socket?.emit(ClientEvents.LobbyState, payload);
   } 
   if (data.hasStarted && data.lobbyId && store.getState().websocket.LobbyType == LobbyType.auto) {
-    const params = store.getState().websocket.params;
+    let params = JSON.parse(JSON.stringify(store.getState().websocket.params));
     params.map.size[1] = 200;
     params.map.size[0] = 200;
     store.dispatch(setParams(params));
@@ -80,6 +82,7 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
         socket.on('remove_admin', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('erase_action', (data: any) => {store.dispatch(updateOneChat(data))});
         socket.on('read', (data: any) => {store.dispatch(addReaderId(data))});
+        socket.on(ServerEvents.GameAction, (data: ServerPayloads[ServerEvents.GameAction]) => {store.dispatch(pushGameAction(data))});
         socket.on(ServerEvents.AuthState, (data: ServerPayloads[ServerEvents.AuthState]) => {
           const state = store.getState().websocket;
 

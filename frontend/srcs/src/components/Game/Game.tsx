@@ -2,7 +2,7 @@ import { Box, OrbitControls, PerspectiveCamera, Sphere, TrackballControls, useTe
 import { Canvas, extend, useFrame, useThree} from "@react-three/fiber";
 import React, { useEffect, useRef, forwardRef, useState, useMemo, useLayoutEffect} from "react";
 import { socket } from "../../socket";
-import { ServerEvents, ServerPayloads, ClientEvents, ClientPayloads, Input, InputPacket, Player, LobbyType, GameParameters} from '@shared/class';
+import { ServerEvents, ServerPayloads, ClientEvents, ClientPayloads, Input, InputPacket, Player, LobbyType, GameParameters, GameAction, EGameAction} from '@shared/class';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import { DoubleSide, Mesh, PlaneGeometry, SphereGeometry, Vector3 } from "three";
 import { InstancedBufferGeometry, Float32BufferAttribute, BufferAttribute } from 'three';
@@ -51,6 +51,9 @@ export const Game: React.FC = () => {
 	const navigate = useNavigate();
 	const size = useWindowSize();
 	const dispatch = useAppDispatch();
+	const gameActions: GameAction[] = useAppSelector(state => state.websocket.gamesActions);
+	const [displayableGameAction, setDisplayableGameAction] = useState<GameAction[]>([]);
+
 
     function formatElapsedTime(elapsedTime: number) {
         const minutes = Math.floor(Math.round(elapsedTime) / 60);
@@ -75,7 +78,13 @@ export const Game: React.FC = () => {
 	useEffect(() => {
 		if (!game.isConnected || !game.isPlaying)
 			navigate('/');
-
+		const disp: GameAction[] = [];
+			gameActions.forEach((e) => {
+				if ((Date.now() / 1000) - (e.timestamp / 1000) < 3 && disp.length < 3) {
+					disp.push(e);
+				}
+			})
+			setDisplayableGameAction(disp);
 	}, [game])
 
 	return (
@@ -90,6 +99,14 @@ export const Game: React.FC = () => {
 				<div id='time'>
 					{formatElapsedTime(game.elapsedTime)}
 				</div>
+			</div>
+			<div id="game-actions" style={{position: "absolute", top:"50px", left: "50px", opacity: "50%",backgroundColor: "red",  zIndex:10000}}>
+				{
+					displayableGameAction.map((e, key) => (
+					<div key={key} style={{opacity: "100%"}}>
+						<p>{e.player}: {e.id == EGameAction.save ? "SAVE!" : e.id == EGameAction.goal ? "GOAL!" : "CSC :/"}</p>
+					</div>))
+				}
 			</div>
 			<Canvas camera={{fov:75, position:[10, 10, 10]}} style={{ background: "#2E2E2E" }} >
 				<Render game={game}/>
@@ -111,7 +128,6 @@ export const Render: React.FC = (props) => {
 	const user = useAppSelector((state) => state.session.user);
 	const game: WebSocketState = useAppSelector(state => state.websocket);
 	const dispatch = useAppDispatch();
-
 
 	useEffect(() => {
 		setBalls(game.balls.map((ball, index) =>

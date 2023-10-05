@@ -46,6 +46,8 @@ export enum ServerEvents
   ParametersState = 'server.parameters.state',
 
   ListLobbies = 'server.list.lobbies',
+
+  GameAction = 'server.game.action',
 }
 
 export enum ClientEvents
@@ -148,6 +150,7 @@ export type ServerPayloads = {
 	[ServerEvents.DeleteSentGameRequest]: GameRequest,
 	[ServerEvents.DeleteGameRequest]: GameRequest,
 	[ServerEvents.ParametersState]: GameParameters,
+	[ServerEvents.GameAction]: GameAction,
 };
 
 export type ClientPayloads = {
@@ -311,6 +314,17 @@ export interface PaddleCli {
 	avatar: string,
 }
 
+export interface GameAction {
+	id: EGameAction,
+	player: string,
+	timestamp: number,
+}
+
+export enum EGameAction {
+	save = 0,
+	goal = 1,
+	csc = 2,
+}
 
 // goals : 50pts;
 // touch : 2pts,

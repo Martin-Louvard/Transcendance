@@ -285,15 +285,16 @@ export class ClassicInstance {
 						this.lastTouch = {player: pl, timestamp: Date.now()};
 						pl.touched++;
 						pl.points += 2;
-					}
-					const ballX = bl.body.position.x;
-					const ballZ = bl.body.position.z;
-					if ((ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2)) {
-						if (pl.player.team == 'visitor' && ballZ < (this.params.map.size[1] / 2 - 15))
+						const ballZ = bl.body.position.z;
+						if (pl.player.team == 'visitor' && ballZ > (this.params.map.size[1] / 2 - 20)) {
 							pl.saves++;
-						else if (pl.player.team == 'home' && ballZ > ((-this.params.map.size[1] / 2 ) + 15))
+							pl.points += 25;
+						} 
+						else if (pl.player.team == 'home' && ballZ < (-(this.params.map.size[1] / 2 ) + 20)) {
 							pl.saves++;
-					}
+							pl.points += 25;
+						}
+				}
 				})
 			}
 		})

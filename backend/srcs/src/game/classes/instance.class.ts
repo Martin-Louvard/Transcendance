@@ -1,5 +1,5 @@
 import { Timeout } from "@nestjs/schedule";
-import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo, GameParameters, World, Sphere, Paddle, PaddleCli} from "@shared/class";
+import { Ball, GameData, LobbyMode, PlayerBody, ServerEvents, ServerPayloads, InputPacket, PlayerInfo, GameParameters, World, Sphere, Paddle, PaddleCli, EGameAction} from "@shared/class";
 import { Lobby } from "../lobby/lobby.class";
 import * as CANNON from 'cannon-es'
 import { Player } from "../player/player.class";
@@ -313,14 +313,30 @@ export class Instance {
 						this.lastTouch = {player: pl, timestamp: Date.now()};
 						pl.touched++;
 						pl.points += 2;
-					}
-					const ballX = bl.body.position.x;
-					const ballZ = bl.body.position.z;
-					if ((ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2)) {
-						if (pl.player.team == 'visitor' && ballZ < (this.params.map.size[1] / 2 - 15))
-							pl.saves++;
-						else if (pl.player.team == 'home' && ballZ > ((-this.params.map.size[1] / 2 ) + 15))
-							pl.saves++;
+						const ballX = bl.body.position.x;
+						const ballZ = bl.body.position.z;
+						if ((ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2)) {
+							if (pl.player.team == 'visitor' && ballZ > (this.params.map.size[1] / 2 - 20)) {
+								pl.saves++;
+								pl.points += 25;
+								const payload: ServerPayloads[ServerEvents.GameAction] = {
+									id: EGameAction.save,
+									player: pl.player.infos.username,
+									timestamp: Date.now(),
+								}
+								this.lobby.emit<ServerPayloads[ServerEvents.GameAction]>(ServerEvents.GameAction, payload);
+							} 
+							else if (pl.player.team == 'home' && ballZ < (-(this.params.map.size[1] / 2 ) + 20)) {
+								pl.saves++;
+								pl.points += 25;
+								const payload: ServerPayloads[ServerEvents.GameAction] = {
+									id: EGameAction.save,
+									player: pl.player.infos.username,
+									timestamp: Date.now(),
+								}
+								this.lobby.emit<ServerPayloads[ServerEvents.GameAction]>(ServerEvents.GameAction, payload);
+							}
+						}
 					}
 				})
 			}
@@ -347,10 +363,22 @@ export class Instance {
 						if (this.lastTouch.player.player.team == 'visitor') {
 							this.lastTouch.player.goals--;
 							this.lastTouch.player.points -= 50;
+							const payload: ServerPayloads[ServerEvents.GameAction] = {
+								id: EGameAction.csc,
+								player: this.lastTouch.player.player.infos.username,
+								timestamp: Date.now(),
+							}
+							this.lobby.emit<ServerPayloads[ServerEvents.GameAction]>(ServerEvents.GameAction, payload);
 						}
 						else {
 							this.lastTouch.player.goals++;
 							this.lastTouch.player.points += 50;
+							const payload: ServerPayloads[ServerEvents.GameAction] = {
+								id: EGameAction.goal,
+								player: this.lastTouch.player.player.infos.username,
+								timestamp: Date.now(),
+							}
+							this.lobby.emit<ServerPayloads[ServerEvents.GameAction]>(ServerEvents.GameAction, payload);
 						}
 					}
 				} else if (wall.id == 100) {
@@ -360,10 +388,22 @@ export class Instance {
 						if (this.lastTouch.player.player.team == 'home') {
 							this.lastTouch.player.goals--;
 							this.lastTouch.player.points -= 50;
+							const payload: ServerPayloads[ServerEvents.GameAction] = {
+								id: EGameAction.csc,
+								player: this.lastTouch.player.player.infos.username,
+								timestamp: Date.now(),
+							}
+							this.lobby.emit<ServerPayloads[ServerEvents.GameAction]>(ServerEvents.GameAction, payload);
 						}
 						else {
 							this.lastTouch.player.goals++;
 							this.lastTouch.player.points += 50;	
+							const payload: ServerPayloads[ServerEvents.GameAction] = {
+								id: EGameAction.goal,
+								player: this.lastTouch.player.player.infos.username,
+								timestamp: Date.now(),
+							}
+							this.lobby.emit<ServerPayloads[ServerEvents.GameAction]>(ServerEvents.GameAction, payload);
 						}
 					}
 				}

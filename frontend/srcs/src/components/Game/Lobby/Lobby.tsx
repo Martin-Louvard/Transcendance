@@ -41,6 +41,7 @@ export const LobbyDisplayScore: React.FC = (props) => {
                   <TableCell sx={{color:'white'}} align="right">Points</TableCell>
                   <TableCell sx={{color:'white'}} align="right">Goals</TableCell>
                   <TableCell sx={{color:'white'}} align="right">Touch</TableCell>
+                  <TableCell sx={{color:'white'}} align="right">Saves</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -54,6 +55,7 @@ export const LobbyDisplayScore: React.FC = (props) => {
                     <TableCell sx={{color:'white'}} align="right">{player.points}</TableCell>
                     <TableCell sx={{color:'white'}} align="right">{player.goals}</TableCell>
                     <TableCell sx={{color:'white'}} align="right">{player.touched}</TableCell>
+                    <TableCell sx={{color:'white'}} align="right">{player.saves}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

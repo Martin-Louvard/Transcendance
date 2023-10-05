@@ -1,5 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit';
-import {PlayerBody, Ball, LobbyMode, LobbyType, PlayerInfo, GameParameters, LobbySlotCli, ServerPayloads, ServerEvents, LobbyCli, GameRequest, Paddle, PaddleCli } from '@shared/class'
+import {PlayerBody, Ball, LobbyMode, LobbyType, PlayerInfo, GameParameters, LobbySlotCli, ServerPayloads, ServerEvents, LobbyCli, GameRequest, Paddle, PaddleCli, EGameAction, GameAction } from '@shared/class'
 
 export interface WebSocketState {
   isConnected: boolean;
@@ -24,6 +24,7 @@ export interface WebSocketState {
   lastGame: {score: {home: 0, visitor: 0}, winner: 'home' | 'visitor' | 'draw', team: 'home' | 'visitor', timestamp: number, players: PaddleCli[] | null} | null
   isWaitingToConnect: boolean;
   paramsReceived: boolean;
+  gamesActions: GameAction[],
 }
 
 const initialState: WebSocketState = {
@@ -72,6 +73,7 @@ const initialState: WebSocketState = {
   lastGame: null,
   isWaitingToConnect: false,
   paramsReceived: false,
+  gamesActions: [],
 };
 
 const websocketSlice = createSlice({
@@ -95,6 +97,12 @@ const websocketSlice = createSlice({
         state.params.classic = true;
       else if (action.payload == LobbyType.auto)
         state.params.classic = false;
+    },
+    pushGameAction: (state, action) => {
+      state.gamesActions.push(action.payload);
+    },
+    resetGameAction: (state) => {
+      state.gamesActions = [];
     },
     setParams: (state, action) => {
       state.params = JSON.parse(JSON.stringify(action.payload)); 
@@ -171,30 +179,6 @@ const websocketSlice = createSlice({
           state.playersInfo = [];
           state.mapWidth = 0;
           websocketSlice.caseReducers.resetParams(state);
-      //     state.params = {
-      // classic: false,
-      // duel: false,
-        
-      // map: {
-      //   size: [100, 200],
-      //   goalSize: 40,
-      //   medianOffset: 10,
-      // },
-      // ball: {
-      //   globalSpeed: 50, // speed
-      //   reboundForce: 100, // force du rebond
-      //   ballAcceleration: 10, // m / sec
-      //   rotationForce: 1, // force de rotation
-      // },
-      // players: {
-      //   speed: 120, // vitesse X et Z
-      //   rotationSpeed: 50, // vitesse de rotation
-      //   boostForce: 10, // force du boost
-      // },
-      // general: {
-      //   time: 120,
-      // }
-      // }
        state.score = {'home': 0, 'visitor': 0};
     },
     resetParams: (state) => {
@@ -245,30 +229,6 @@ const websocketSlice = createSlice({
         state.owner = null;
         state.playersInfo = [];
         websocketSlice.caseReducers.resetParams(state);
-        // state.params = {
-        //   classic: false,
-        //   duel: false,
-           
-        //   map: {
-        //    size: [100, 200],
-        //    goalSize: 40,
-        //    medianOffset: 10,
-        //   },
-        //   ball: {
-        //    globalSpeed: 50, // speed
-        //    reboundForce: 100, // force du rebond
-        //    ballAcceleration: 10, // m / sec
-        //    rotationForce: 1, // force de rotation
-        //   },
-        //   players: {
-        //    speed: 120, // vitesse X et Z
-        //    rotationSpeed: 50, // vitesse de rotation
-        //    boostForce: 10, // force du boost
-        //   },
-        //   general: {
-        //    time: 120,
-        //   }
-        //  }
       }
       state.lobbyId = action.payload.lobbyId;
       state.isPlaying = action.payload.hasStarted
@@ -303,6 +263,6 @@ const websocketSlice = createSlice({
   },
 });
 
-export const {setInLobby, websocketConnected, websocketDisconnected, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect, resetLobbyData, setParamsReceived} = websocketSlice.actions;
+export const {setInLobby, websocketConnected, websocketDisconnected, pushGameAction, resetGameAction, setGameState, setAuthState, setLobbyState, setLobbyType, setParams, resetParams, setDuel, setLobbySlots, addInvitedGame, setGameRequests, deleteInvitedGame, addSentInvte, deleteSentInvite, deleteSentInviteById, deleteInvitedGameById, setLobbyFull, setLobbies, setWaitingToConnect, resetLobbyData, setParamsReceived} = websocketSlice.actions;
 
 export default websocketSlice.reducer;
