@@ -717,6 +717,10 @@ export class AppGateway
         friendship: true,
       },
     });
+    const updatedAdmins = chat.admins.filter(
+      (user) => user.id !== parseInt(body[1]),
+    );
+
     const updateParticipants = chat.participants.filter(
       (user) => user.id !== oldOwner,
     );
@@ -726,6 +730,9 @@ export class AppGateway
         ownerId: newOwnerId,
         participants: {
           set: updateParticipants.map((user) => ({ id: user.id })),
+        },
+        admins: {
+          set: updatedAdmins.map((user) => ({ id: user.id })),
         },
       },
       include: {
