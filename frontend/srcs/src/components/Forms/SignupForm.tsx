@@ -27,7 +27,7 @@ const SignupForm: React.FC = () => {
     };
 
     try{
-      const response = await fetch(`http://${import.meta.env.VITE_IP}/users`, requestOptions)
+      const response = await fetch(`http://${import.meta.env.VITE_IP}:3001/users`, requestOptions)
       if (response.status !== 201){
         const parsedResponse = await response.json()
         toast.error(parsedResponse.message)
@@ -70,7 +70,6 @@ const SignupForm: React.FC = () => {
     if ( password !== confirmPassword)
         return toast.error("Passwords do not match")
     signup()
-    
   };
 
   return (
