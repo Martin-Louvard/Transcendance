@@ -13,6 +13,8 @@ export const Camera: React.FC = (props) => {
 
 	useEffect(() => {
 		window.addEventListener('keyup', (e) => {
+			if (!player|| !player.position)
+				return ;
 			if (e.key == 'V' || e.key == 'v') {
 				setView((prev) => !prev);
 				camera.lookAt(player.position[0], player.position[1] + offset[1], player.position[2]);

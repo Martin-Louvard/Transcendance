@@ -23,9 +23,8 @@ export const LobbyDisplayScore: React.FC = (props) => {
   const [sortedPlayers, setSortedPlayers] = useState<PaddleCli[]>([]);
 
   useEffect(() => {
-    // game.lastGame &&
     if (game.lastGame && game.lastGame.players) {
-      setSortedPlayers([...game.lastGame.players].sort((a, b) => a.points - b.points))
+      setSortedPlayers([...game.lastGame.players].sort((a, b) => a.points - b.points).reverse())
     }
   }, [game.lastGame])
   return (
