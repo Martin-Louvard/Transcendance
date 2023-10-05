@@ -718,7 +718,7 @@ export class AppGateway
       },
     });
     const updatedAdmins = chat.admins.filter(
-      (user) => user.id !== parseInt(body[1]),
+      (user) => user.id !== oldOwner,
     );
 
     const updateParticipants = chat.participants.filter(
