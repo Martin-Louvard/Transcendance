@@ -573,7 +573,6 @@ export class AppGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() body: Array<any>,
   ): Promise<void> {
-    console.log(body[0], body[1]);
     const chatRecv = await this.prisma.chatChannel.findUnique({
       where: { id: parseInt(body[0]) },
       include: { participants: true },

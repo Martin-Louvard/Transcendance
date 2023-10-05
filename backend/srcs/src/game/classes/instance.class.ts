@@ -180,7 +180,6 @@ export class Instance {
 		this.world.players.forEach((e) =>{
 			players.push(paddleToPaddleCli(e));
 		})
-		console.log(players);
 		this.lobby.players.forEach((e) => {
 			const payload: ServerPayloads[ServerEvents.LobbyState] = {
 				lobbyId: this.lobby.id,
@@ -317,7 +316,6 @@ export class Instance {
 					}
 					const ballX = bl.body.position.x;
 					const ballZ = bl.body.position.z;
-					console.log(ballZ);
 					if ((ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2)) {
 						if (pl.player.team == 'visitor' && ballZ < (this.params.map.size[1] / 2 - 15))
 							pl.saves++;

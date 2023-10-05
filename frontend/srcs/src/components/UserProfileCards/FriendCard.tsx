@@ -57,7 +57,7 @@ const FriendCard: React.FC<FriendCardProps> = ({ userToDisplay }) => {
     return (
       <>
         <div className="profile-picture" style={{marginTop:"10vh"}}>
-          <img src={'http://${process.env.IP}/users/avatar/' +
+          <img src={`http://${import.meta.env.VITE_IP}/users/avatar/` +
       userToDisplay.username +
       '/' + userToDisplay.avatar.split('/').reverse()[0]} alt={`${userToDisplay.username}'s Avatar`} />
         </div>

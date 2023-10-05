@@ -25,7 +25,7 @@ const TwoFACard: React.FC = () => {
         };
   
         try{
-          const response = await fetch(`http://${process.env.IP}/2fa/${user?.username}/generate`, requestOptions)
+          const response = await fetch(`http://${import.meta.env.VITE_IP}/2fa/${user?.username}/generate`, requestOptions)
           if (response.ok) {
             const blobData = await response.blob();
             const blobText = await blobData.text()
@@ -49,7 +49,7 @@ const TwoFACard: React.FC = () => {
         };
   
         try{
-          const response = await fetch(`http://${process.env.IP}/2fa/${user?.username}/turn-on`, requestOptions)
+          const response = await fetch(`http://${import.meta.env.VITE_IP}/2fa/${user?.username}/turn-on`, requestOptions)
           if (response.ok)
           {
             const result = await response.json()

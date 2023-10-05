@@ -64,7 +64,7 @@ const Messages: React.FC<MessagesProps> = ({ messages }) => {
         <div key={"message-infos" + index} className={`message-infos  ${
           message.senderId === user?.id ? "left" : "right"
         }`}>
-          <img key={"sender-picture" + index} className="sender-profile-pic" src={ 'http://${process.env.IP}/users/avatar/' +
+          <img key={"sender-picture" + index} className="sender-profile-pic" src={ `http://${import.meta.env.VITE_IP}/users/avatar/` +
               message.sender.username +
               '/' + message.sender.avatar.split('/').reverse()[0]}/>
           <span key={"message-username" + index} className="message-username">{message.sender.username}</span>

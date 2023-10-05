@@ -238,8 +238,6 @@ const createWebSocketMiddleware = (): Middleware<{}, RootState> => (store) => {
       
       case 'LEAVE_CHAT':
         if (socket && socket.connected) {
-          console.log("MiddleWare :");
-          console.log(action.payload);
           socket.emit('leave_chat', action.payload);
         }
         break;

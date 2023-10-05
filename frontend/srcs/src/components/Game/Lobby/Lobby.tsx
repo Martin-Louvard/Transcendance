@@ -24,7 +24,6 @@ export const LobbyDisplayScore: React.FC = (props) => {
 
   useEffect(() => {
     // game.lastGame &&
-    console.log(":>", game.lastGame);
     if (game.lastGame && game.lastGame.players) {
       setSortedPlayers([...game.lastGame.players].sort((a, b) => a.points - b.points))
     }

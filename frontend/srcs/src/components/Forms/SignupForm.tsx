@@ -27,7 +27,7 @@ const SignupForm: React.FC = () => {
     };
 
     try{
-      const response = await fetch('http://${process.env.IP}/users', requestOptions)
+      const response = await fetch(`http://${import.meta.env.VITE_IP}/users`, requestOptions)
       if (response.status !== 201){
         const parsedResponse = await response.json()
         toast.error(parsedResponse.message)

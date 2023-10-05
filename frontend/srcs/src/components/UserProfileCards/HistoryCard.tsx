@@ -22,7 +22,7 @@ const HistoryCard: React.FC<HistoryProps> = ({user}) => {
       };
     
       try{
-          const response = await fetch(`http://${process.env.IP}/users/{id}/games?id=${user.id}`, requestOptions)
+          const response = await fetch(`http://${import.meta.env.VITE_IP}/users/{id}/games?id=${user.id}`, requestOptions)
           const data = await response.json();
           setGames(data);
     

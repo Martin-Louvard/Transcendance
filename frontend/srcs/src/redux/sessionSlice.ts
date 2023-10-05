@@ -149,8 +149,6 @@ export const sessionSlice = createSlice({
       }
     },
     leaveChat: (state, action) => {
-      console.log(action.payload);
-      console.log(action.payload[0]);
       const updatedChann = action.payload[0];
       if (state.user?.id === action.payload[1]){
         state.JoinedChatChannels = state.JoinedChatChannels?.filter((chann) => chann.id != updatedChann.id);

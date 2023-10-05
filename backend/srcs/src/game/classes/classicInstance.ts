@@ -288,7 +288,6 @@ export class ClassicInstance {
 					}
 					const ballX = bl.body.position.x;
 					const ballZ = bl.body.position.z;
-					console.log(ballZ);
 					if ((ballX >= -(this.params.map.goalSize / 2) && ballX <= this.params.map.goalSize / 2)) {
 						if (pl.player.team == 'visitor' && ballZ < (this.params.map.size[1] / 2 - 15))
 							pl.saves++;
